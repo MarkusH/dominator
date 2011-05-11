@@ -1,0 +1,6 @@
+Debug/*
+Release/*
+.*
+!.cproject
+!.project
+!.gitignore
