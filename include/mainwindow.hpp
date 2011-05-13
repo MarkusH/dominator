@@ -12,7 +12,7 @@
 #include <QtGui/QPushButton>
 
 class MainWindow: public QWidget {
-
+Q_OBJECT
 public:
 	MainWindow(QApplication *app, QWidget *parent = 0);
 
