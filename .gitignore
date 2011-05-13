@@ -1,6 +1,4 @@
 Debug/*
 Release/*
 .*
-!.cproject
-!.project
-!.gitignore
+moc_*
