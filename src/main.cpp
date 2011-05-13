@@ -9,7 +9,8 @@
 #include <QtGui/QApplication>
 
 int main(int argc, char **argv) {
-	std::cout << "Totally Unrelated Studios proudly presents\n\tDOMINATOR\n\n";
+	std::cout << "Totally Unrelated Studios proudly presents:" << std::endl
+			  << "\tDOMINATOR" << std::endl << std::endl;
 
 	QApplication app(argc, argv);
 

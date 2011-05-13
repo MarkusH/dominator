@@ -37,6 +37,6 @@ void MainWindow::OnClosePressed() {
 	msgBox.setDefaultButton(QMessageBox::No);
 	int ret = msgBox.exec();
 	if (ret == QMessageBox::Yes) {
-		exit(0);
+		this->close();
 	}
 }
