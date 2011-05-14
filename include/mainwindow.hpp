@@ -18,9 +18,11 @@ public:
 
 private slots:
 	void OnClosePressed();
+	void OnRenderWindowPressed();
 
 private:
 	QPushButton *bt_close;
+	QPushButton *bt_render_window;
 
 };
 
