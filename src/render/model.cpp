@@ -13,18 +13,17 @@
 #include <lib3ds/mesh.h>
 #include <lib3ds/vector.h>
 
-Model3DS::Model3DS(std::string filename) {
+Model3DS::Model3DS(const char *filename) {
 	m_TotalFaces = 0;
 
-	m_model = lib3ds_file_load(filename.c_str());
+	m_model = lib3ds_file_load(filename);
 	// If loading the model failed, we throw an exception
 	if (!m_model) {
-		std::cout << "Unable to load " << filename.c_str();
+		std::cout << "Unable to load " << filename;
 	}
 }
 
 void Model3DS::GetFaces() {
-	std::cout << "GetFaces" << std::endl;
 	assert(m_model != NULL);
 
 	m_TotalFaces = 0;
@@ -37,12 +36,10 @@ void Model3DS::GetFaces() {
 }
 
 void Model3DS::CreateVBO() {
-	std::cout << "CreateVBO" << std::endl;
 	assert(m_model != NULL);
 
 	// Calculate the number of faces we have in total
 	GetFaces();
-	std::cout << "foo" << std::endl;
 
 
 	// Allocate memory for our vertices and normals
@@ -70,14 +67,12 @@ void Model3DS::CreateVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, m_VertexVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Lib3dsVector) * 3 * m_TotalFaces,
 			vertices, GL_STATIC_DRAW);
-	std::cout << "bar" << std::endl;
 
 	// Generate another Vertex Buffer Object and store the normals in it
 	glGenBuffers(1, &m_NormalVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_NormalVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Lib3dsVector) * 3 * m_TotalFaces,
 			normals, GL_STATIC_DRAW);
-	std::cout << "baz" << std::endl;
 
 	// Clean up our allocated memory
 	delete vertices;
@@ -86,11 +81,9 @@ void Model3DS::CreateVBO() {
 	// We no longer need lib3ds
 	lib3ds_file_free(m_model);
 	m_model = NULL;
-	std::cout << "end" << std::endl;
 }
 
 void Model3DS::Draw() const {
-	std::cout << "Draw" << std::endl;
 	assert(m_TotalFaces != 0);
 
 	// Enable vertex and normal arrays

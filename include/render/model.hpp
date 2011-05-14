@@ -15,7 +15,7 @@
 
 class Model3DS {
 public:
-	Model3DS(std::string filename);
+	Model3DS(const char *filename);
 	virtual void Draw() const;
 	virtual void CreateVBO();
 protected:

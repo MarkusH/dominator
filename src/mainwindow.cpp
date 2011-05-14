@@ -11,6 +11,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
+#include <QtCore/QString>
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 	QWidget(parent) {
@@ -49,6 +50,8 @@ void MainWindow::OnClosePressed() {
 }
 
 void MainWindow::OnRenderWindowPressed() {
-	Render * render = new Render();
+	Render * render = new Render(new QString("data/models/cube.3ds"));
 	render->show();
+	Render * render2 = new Render(new QString("data/models/monkey.3ds"));
+	render2->show();
 }
