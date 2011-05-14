@@ -22,14 +22,19 @@ Render::Render(QWidget *parent) :
 
 void Render::initializeGL() {
 	std::cout << "initializeGL" << std::endl;
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
+	GLenum err = glewInit();
+	if (err != GLEW_OK) {
+		std::cout << "could not initialize GLEW" << std::endl;
+	}
 
-	// Enable lighting and set the position of the light
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHTING);
-	GLfloat pos[] = { 0.0, 4.0, 4.0 };
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+
+    glShadeModel(GL_SMOOTH);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Generate Vertex Buffer Objects
 	monkey->CreateVBO();
@@ -44,15 +49,20 @@ void Render::resizeGL(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// 10 x 10 x 10 viewing volume
-	glOrtho(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
+	//glOrtho(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
+	gluPerspective(60.0f, (float)width / (float)height, 0.1f, 1024.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
 
 void Render::paintGL() {
 	std::cout << "paintGL" << std::endl;
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
+
+	glTranslatef(0.0f, 0.0f, -5.0f);
 	// Draw our model
 	monkey->Draw();
 

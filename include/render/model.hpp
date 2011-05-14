@@ -9,12 +9,9 @@
 
 #include <iostream>
 
-#ifndef LIB3DS_FILE
 #include <lib3ds/file.h>
-#endif
-#ifndef GL_GLEW
 #include <GL/glew.h>
-#endif
+
 
 class Model3DS {
 public:
