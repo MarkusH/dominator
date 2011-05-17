@@ -12,6 +12,7 @@
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
 #include <QtCore/QString>
+#include <QtGui/QSlider>
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 	QWidget(parent) {
@@ -22,15 +23,30 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 	app->processEvents();
 
 	bt_close = new QPushButton("Close", this);
-	bt_close->move(10, 10);
+	bt_close->setGeometry(10, 10, 120, 30);
 	connect(bt_close, SIGNAL(clicked()), this, SLOT(OnClosePressed()));
 
 	bt_render_window = new QPushButton("Render Window", this);
-	bt_render_window->move(10, 50);
+	bt_render_window->setGeometry(140, 10, 120, 30);
 	connect(bt_render_window, SIGNAL(clicked()), this,
 			SLOT(OnRenderWindowPressed()));
 
-	this->resize(250, 150);
+	sl_rotate_x = new QSlider(Qt::Horizontal, this);
+	sl_rotate_x->setGeometry(10, 50, 250, 30);
+	sl_rotate_x->setEnabled(false);
+	sl_rotate_x->setRange(-360, 360);
+
+	sl_rotate_y = new QSlider(Qt::Horizontal, this);
+	sl_rotate_y->setGeometry(10, 90, 250, 30);
+	sl_rotate_y->setEnabled(false);
+	sl_rotate_y->setRange(-360, 360);
+
+	sl_rotate_z = new QSlider(Qt::Horizontal, this);
+	sl_rotate_z->setGeometry(10, 130, 250, 30);
+	sl_rotate_z->setEnabled(false);
+	sl_rotate_z->setRange(-360, 360);
+
+	this->resize(270, 430);
 	this->setWindowTitle("TUStudios - DOMINATOR");
 	this->show();
 
@@ -50,8 +66,16 @@ void MainWindow::OnClosePressed() {
 }
 
 void MainWindow::OnRenderWindowPressed() {
-	Render * render = new Render(new QString("data/models/cube.3ds"));
-	render->show();
-	Render * render2 = new Render(new QString("data/models/monkey.3ds"));
-	render2->show();
+	render_window = new Render(new QString("data/models/monkey.3ds"), this);
+	render_window->setGeometry(10, 170, 250, 250);
+	render_window->show();
+	connect(sl_rotate_x, SIGNAL(valueChanged(int)), render_window,
+			SLOT(setRotationX(int)));
+	connect(sl_rotate_y, SIGNAL(valueChanged(int)), render_window,
+			SLOT(setRotationY(int)));
+	connect(sl_rotate_z, SIGNAL(valueChanged(int)), render_window,
+			SLOT(setRotationZ(int)));
+	sl_rotate_x->setEnabled(true);
+	sl_rotate_y->setEnabled(true);
+	sl_rotate_z->setEnabled(true);
 }

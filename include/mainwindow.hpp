@@ -7,9 +7,11 @@
 #ifndef MAINWINDOW_HPP_
 #define MAINWINDOW_HPP_
 
+#include "render/render.hpp"
 #include <QtGui/QApplication>
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
+#include <QtGui/QSlider>
 
 class MainWindow: public QWidget {
 Q_OBJECT
@@ -24,6 +26,11 @@ private:
 	QPushButton *bt_close;
 	QPushButton *bt_render_window;
 
+	QSlider *sl_rotate_x;
+	QSlider *sl_rotate_y;
+	QSlider *sl_rotate_z;
+
+	Render *render_window;
 };
 
 #endif /* MAINWINDOW_HPP_ */
