@@ -7,11 +7,12 @@
 #ifndef MAINWINDOW_HPP_
 #define MAINWINDOW_HPP_
 
-#include "render/render.hpp"
 #include <QtGui/QApplication>
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QSlider>
+
+class Render;
 
 class MainWindow: public QWidget {
 Q_OBJECT

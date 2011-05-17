@@ -4,7 +4,7 @@
  *      Author: Markus Holtermann
  */
 
-#include "render/render.hpp"
+#include <render/render.hpp>
 
 #include <iostream>
 #include <QtGui/QWidget>
@@ -70,8 +70,8 @@ void Render::paintGL() {
 	glLoadIdentity();
 
 	glTranslatef(0.0f, 0.0f, -5.0f);
-	glRotatef(rotate_x, 1.0f, 0.0f, 0.0f);
 	glRotatef(rotate_y, 0.0f, 1.0f, 0.0f);
+	glRotatef(rotate_x, 1.0f, 0.0f, 0.0f);
 	glRotatef(rotate_z, 0.0f, 0.0f, 1.0f);
 
 	// Draw our model

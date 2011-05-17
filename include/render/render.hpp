@@ -7,7 +7,7 @@
 #ifndef RENDER_RENDER_HPP_
 #define RENDER_RENDER_HPP_
 
-#include "model.hpp"
+#include <render/model.hpp>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 

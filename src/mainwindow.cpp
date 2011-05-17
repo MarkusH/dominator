@@ -6,8 +6,8 @@
 
 #include <iostream>
 
-#include "mainwindow.hpp"
-#include "render/render.hpp"
+#include <mainwindow.hpp>
+#include <render/render.hpp>
 #include <QtGui/QPixmap>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
