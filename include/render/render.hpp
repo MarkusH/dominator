@@ -10,6 +10,7 @@
 #include <render/model.hpp>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
+#include <opengl/Shader.hpp>
 
 class Render: public QGLWidget {
 Q_OBJECT
@@ -26,6 +27,7 @@ protected:
 	virtual void resizeGL(int width, int height);
 	virtual void paintGL();
 private:
+	ogl::ShaderPtr m_shader;
 	Model3DS * model;
 	float rotate_x, rotate_y, rotate_z;
 };

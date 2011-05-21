@@ -34,11 +34,32 @@ void Render::initializeGL() {
 		std::cout << "could not initialize GLEW" << std::endl;
 	}
 
-	// Enable lighting and set the position of the light
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHTING);
-	GLfloat pos[] = { 0.0, 4.0, 4.0 };
+	// load per-pixel lighting shader
+	m_shader = ogl::Shader::load("data/shaders/ppl.vs", "data/shaders/ppl.fs");
+	m_shader->compile();
+
+	// set the position of the light
+	GLfloat pos[] = { 0.0, 10.0, 15.0, 0.0};
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+	// set some material properties
+	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	const float mat_specular[] = { 0.5, 0.5, 0.5, 1.0 };
+	const float mat_shininess = 20.0f;
+
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat_diffuse[0]);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, &mat_specular[0]);
+	glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
+	glEnable(GL_COLOR_MATERIAL);
+
+	// set some light properties
+	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
+	GLfloat diffuse[4] = { 0.3, 0.3, 0.3, 1.0 };
+	GLfloat specular[4] = { 0.5, 0.5, 0.5, 1.0 };
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -68,6 +89,8 @@ void Render::paintGL() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	m_shader->bind();
 
 	glTranslatef(0.0f, 0.0f, -5.0f);
 	glRotatef(rotate_y, 0.0f, 1.0f, 0.0f);
