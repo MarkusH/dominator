@@ -28,6 +28,7 @@ moc_*
 *.log
 *.lib
 *.sbr
+*.qrc
 ## VS diretories
 [Bb]in
 [Dd]ebug*/

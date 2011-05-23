@@ -7,7 +7,11 @@
 
 #include <opengl/Texture.hpp>
 #include "stb_image.hpp"
+#ifdef _WIN32
+	// TODO: useful include
+#else
 #include <dirent.h>
+#endif
 #include <stdexcept>
 
 namespace ogl {

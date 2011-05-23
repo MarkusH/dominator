@@ -13,7 +13,11 @@
 #include <algorithm>
 #include <math.h>
 #include <cstring>
+#ifdef _WIN32
+	// TODO: useful include
+#else
 #include <dirent.h>
+#endif
 #include <stdexcept>
 
 namespace ogl {
