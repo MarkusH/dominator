@@ -27,7 +27,6 @@ protected:
 	virtual void resizeGL(int width, int height);
 	virtual void paintGL();
 private:
-	ogl::ShaderPtr m_shader;
 	Model3DS * model;
 	float rotate_x, rotate_y, rotate_z;
 };

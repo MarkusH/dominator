@@ -35,8 +35,7 @@ void Render::initializeGL() {
 	}
 
 	// load per-pixel lighting shader
-	m_shader = ogl::Shader::load("data/shaders/ppl.vs", "data/shaders/ppl.fs");
-	m_shader->compile();
+	ogl::ShaderMgr::instance().load("data/shaders/");
 
 	// set the position of the light
 	GLfloat pos[] = { 0.0, 10.0, 15.0, 0.0};
@@ -54,7 +53,7 @@ void Render::initializeGL() {
 
 	// set some light properties
 	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
-	GLfloat diffuse[4] = { 0.3, 0.3, 0.3, 1.0 };
+	GLfloat diffuse[4] = { 0.5, 0.5, 0.5, 1.0 };
 	GLfloat specular[4] = { 0.5, 0.5, 0.5, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
@@ -90,7 +89,7 @@ void Render::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	m_shader->bind();
+	ogl::ShaderMgr::instance().get("ppl")->bind();
 
 	glTranslatef(0.0f, 0.0f, -5.0f);
 	glRotatef(rotate_y, 0.0f, 1.0f, 0.0f);

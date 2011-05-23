@@ -13,8 +13,12 @@
 #include <algorithm>
 #include <math.h>
 #include <cstring>
+#include <dirent.h>
+#include <stdexcept>
 
 namespace ogl {
+
+ShaderMgr* ShaderMgr::s_instance = NULL;
 
 Shader::Shader(GLchar* vertexSource, GLchar* fragmentSource) :
 	m_vertexSource(vertexSource), m_fragmentSource(fragmentSource) {
@@ -87,7 +91,7 @@ bool Shader::compile()
 }
 
 
-unsigned long getFileLength(std::ifstream& file)
+static unsigned long getFileLength(std::ifstream& file)
 {
     if (!file.good()) return 0;
 
@@ -99,7 +103,7 @@ unsigned long getFileLength(std::ifstream& file)
     return len;
 }
 
-GLchar* getFileContent(std::string& fileName)
+static GLchar* getFileContent(std::string& fileName)
 {
 	std::ifstream file;
 	file.open(fileName.c_str(), std::ios::in);
@@ -142,6 +146,78 @@ ShaderPtr Shader::load(std::string vertexFile, std::string fragmentFile)
 	if (!fsrc) return ShaderPtr();
 
 	return ShaderPtr(new Shader(vsrc, fsrc));
+}
+
+
+ShaderMgr::ShaderMgr()
+	: std::map<std::string, ShaderPtr>()
+{
+}
+
+ShaderMgr::ShaderMgr(const ShaderMgr& other)
+{
+}
+
+ShaderMgr::~ShaderMgr()
+{
+}
+
+ShaderMgr& ShaderMgr::instance()
+{
+	if (!s_instance)
+		s_instance = new ShaderMgr();
+	return *s_instance;
+}
+
+void ShaderMgr::destroy()
+{
+	if (s_instance)
+		delete s_instance;
+}
+
+ShaderPtr ShaderMgr::add(std::string name, ShaderPtr shader)
+{
+	(*this)[name] = shader;
+	return shader;
+}
+
+unsigned ShaderMgr::load(std::string folder)
+{
+	int count = 0;
+	if (folder.at(folder.size() - 1) != '/')
+		folder.append("/");
+
+	DIR* dir = opendir(folder.c_str());
+	dirent* ent;
+
+	if (dir != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			std::string vs(ent->d_name);
+			if (vs.find(".vs") != std::string::npos) {
+				std::string fs(vs);
+				fs.replace(fs.size() - 2, 1, "f");
+				ShaderPtr shader = Shader::load(folder + vs, folder + fs);
+				shader->compile();
+				std::string name(vs);
+				name.erase(name.size() - 3, 3);
+				add(name, shader);
+			}
+		}
+		closedir(dir);
+	}
+	return count;
+}
+
+ShaderPtr ShaderMgr::get(std::string name)
+{
+	try {
+		ShaderPtr result = this->at(name);
+		return result;
+	} catch (std::out_of_range& err) {
+		ShaderPtr result;
+		return result;
+	}
+
 }
 
 
