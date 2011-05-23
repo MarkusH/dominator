@@ -13,6 +13,7 @@
 #include <QtGui/QMessageBox>
 #include <QtCore/QString>
 #include <QtGui/QSlider>
+#include <QtCore/QTimer>
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 	QWidget(parent) {
@@ -46,6 +47,16 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 	sl_rotate_z->setEnabled(false);
 	sl_rotate_z->setRange(-360, 360);
 
+	render_window = new Render(new QString("data/models/monkey.3ds"), this);
+	render_window->setGeometry(10, 170, 250, 250);
+	connect(sl_rotate_x, SIGNAL(valueChanged(int)), render_window, SLOT(setRotationX(int)));
+	connect(sl_rotate_y, SIGNAL(valueChanged(int)), render_window, SLOT(setRotationY(int)));
+	connect(sl_rotate_z, SIGNAL(valueChanged(int)), render_window, SLOT(setRotationZ(int)));
+
+	timer_render = new QTimer(this);
+	timer_render->setInterval(40);
+	connect(timer_render, SIGNAL(timeout()), render_window, SLOT(updateGL()));
+
 	this->resize(270, 430);
 	this->setWindowTitle("TUStudios - DOMINATOR");
 	this->show();
@@ -66,16 +77,18 @@ void MainWindow::OnClosePressed() {
 }
 
 void MainWindow::OnRenderWindowPressed() {
-	render_window = new Render(new QString("data/models/monkey.3ds"), this);
-	render_window->setGeometry(10, 170, 250, 250);
-	render_window->show();
-	connect(sl_rotate_x, SIGNAL(valueChanged(int)), render_window,
-			SLOT(setRotationX(int)));
-	connect(sl_rotate_y, SIGNAL(valueChanged(int)), render_window,
-			SLOT(setRotationY(int)));
-	connect(sl_rotate_z, SIGNAL(valueChanged(int)), render_window,
-			SLOT(setRotationZ(int)));
-	sl_rotate_x->setEnabled(true);
-	sl_rotate_y->setEnabled(true);
-	sl_rotate_z->setEnabled(true);
+	if (render_window->isVisible()) {
+		sl_rotate_x->setEnabled(false);
+		sl_rotate_y->setEnabled(false);
+		sl_rotate_z->setEnabled(false);
+		render_window->hide();
+		timer_render->stop();
+		this->update();
+	} else {
+		timer_render->start();
+		render_window->show();
+		sl_rotate_x->setEnabled(true);
+		sl_rotate_y->setEnabled(true);
+		sl_rotate_z->setEnabled(true);
+	}
 }

@@ -132,15 +132,12 @@ void Render::paintGL() {
 
 void Render::setRotationX(int value) {
 	rotate_x = (float)value * PI / 180.0f;
-	updateGL();
 }
 
 void Render::setRotationY(int value) {
 	rotate_y = (float)value * PI / 180.0f;
-	updateGL();
 }
 
 void Render::setRotationZ(int value) {
 	rotate_z = (float)value * PI / 180.0f;
-	updateGL();
 }
