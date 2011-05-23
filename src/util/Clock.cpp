@@ -6,7 +6,11 @@
  */
 
 #include <util/Clock.hpp>
+#ifdef _WIN32
+	// TODO useful include
+#else
 #include <sys/time.h>
+#endif
 
 namespace util
 {

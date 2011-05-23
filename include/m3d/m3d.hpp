@@ -10,7 +10,11 @@
 #ifndef M3D_HPP_
 #define M3D_HPP_
 
+#ifdef _WIN32
+#include <pstdint.h>
+#else
 #include <stdint.h>
+#endif
 #include <string>
 #include <sstream>
 #include <math.h>
