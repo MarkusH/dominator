@@ -43,10 +43,12 @@ void Render::initializeGL() {
 
 	// set some material properties
 	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	const float mat_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float mat_specular[] = { 0.5, 0.5, 0.5, 1.0 };
 	const float mat_shininess = 20.0f;
 
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat_diffuse[0]);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, &mat_ambient[0]);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, &mat_specular[0]);
 	glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
 	glEnable(GL_COLOR_MATERIAL);
