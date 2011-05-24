@@ -11,11 +11,11 @@
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 
+using namespace m3d;
+
 Render::Render(QString *filename, QWidget *parent) :
 	QGLWidget(parent) {
-	rotate_x = 0.0f;
-	rotate_y = 0.0f;
-	rotate_z = 0.0f;
+	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	load(filename);
 }
 
@@ -89,55 +89,49 @@ void Render::paintGL() {
 
 	ogl::ShaderMgr::instance().get("ppl")->bind();
 
-	/*
-	glTranslatef(0.0f, 0.0f, -5.0f);
-	glRotatef(rotate_y, 0.0f, 1.0f, 0.0f);
-	glRotatef(rotate_x, 1.0f, 0.0f, 0.0f);
-	glRotatef(rotate_z, 0.0f, 0.0f, 1.0f);
-	*/
-
 	// set the position of the light
 	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
 
-	// First translation then rotation --> rotation around the axis of the object
-	// v' = rotZ * (rotX * (rotY * (translation * v)))
-	m3d::Mat4f matrix =
-			m3d::Mat4f::rotZ(rotate_z) *
-			m3d::Mat4f::rotX(rotate_x) *
-			m3d::Mat4f::rotY(rotate_y) *
-			m3d::Mat4f::translate(m3d::Vec3f(0.0f, 0.0f, -5.0f));
-
-	// Or with quaternions for fewer calculations
-	// (matrix multiplication needs many adds/muls)
-	{
-		// easier access to namespace members
-		using namespace m3d;
-
-		Quatf rot =
-				Quatf(Vec3f::yAxis(), rotate_y) *
-				Quatf(Vec3f::xAxis(), rotate_x) *
-				Quatf(Vec3f::zAxis(), rotate_z);
-
-		matrix = rot.mat4() * Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
-	}
-
 	// multiply object matrix with current modelview matrix (i.e. the camera)
-	glMultMatrixf(matrix[0]);
-
+	glMultMatrixf(m_matrix[0]);
 
 	// Draw our model
 	model->Draw();
 }
 
-void Render::setRotationX(int value) {
-	rotate_x = (float)value * PI / 180.0f;
+void Render::setRotationXInc() {
+	Vec3f pos = m_matrix.getW();
+	m_matrix = Mat4f::rotX(PI / 180.0f) * m_matrix;
+	m_matrix.setW(pos);
 }
 
-void Render::setRotationY(int value) {
-	rotate_y = (float)value * PI / 180.0f;
+void Render::setRotationXDec() {
+	Vec3f pos = m_matrix.getW();
+	m_matrix = Mat4f::rotX(-PI / 180.0f) * m_matrix;
+	m_matrix.setW(pos);
 }
 
-void Render::setRotationZ(int value) {
-	rotate_z = (float)value * PI / 180.0f;
+void Render::setRotationYInc() {
+	Vec3f pos = m_matrix.getW();
+	m_matrix = Mat4f::rotY(PI / 180.0f) * m_matrix;
+	m_matrix.setW(pos);
+}
+
+void Render::setRotationYDec() {
+	Vec3f pos = m_matrix.getW();
+	m_matrix = Mat4f::rotY(-PI / 180.0f) * m_matrix;
+	m_matrix.setW(pos);
+}
+
+void Render::setRotationZInc() {
+	Vec3f pos = m_matrix.getW();
+	m_matrix = Mat4f::rotZ(PI / 180.0f) * m_matrix;
+	m_matrix.setW(pos);
+}
+
+void Render::setRotationZDec() {
+	Vec3f pos = m_matrix.getW();
+	m_matrix = Mat4f::rotZ(-PI / 180.0f) * m_matrix;
+	m_matrix.setW(pos);
 }

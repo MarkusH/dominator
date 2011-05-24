@@ -28,9 +28,9 @@ private:
 	QPushButton *bt_close;
 	QPushButton *bt_render_window;
 
-	QSlider *sl_rotate_x;
-	QSlider *sl_rotate_y;
-	QSlider *sl_rotate_z;
+	QPushButton *bt_rotate_x_plus, *bt_rotate_x_minus;
+	QPushButton *bt_rotate_y_plus, *bt_rotate_y_minus;
+	QPushButton *bt_rotate_z_plus, *bt_rotate_z_minus;
 
 	QTimer *timer_render;
 

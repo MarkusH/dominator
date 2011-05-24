@@ -11,6 +11,7 @@
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 #include <opengl/Shader.hpp>
+#include <m3d/m3d.hpp>
 
 class Render: public QGLWidget {
 Q_OBJECT
@@ -20,9 +21,12 @@ public:
 	void rotate();
 
 public slots:
-	void setRotationX(int value);
-	void setRotationY(int value);
-	void setRotationZ(int value);
+	void setRotationXInc();
+	void setRotationXDec();
+	void setRotationYInc();
+	void setRotationYDec();
+	void setRotationZInc();
+	void setRotationZDec();
 
 protected:
 	virtual void initializeGL();
@@ -31,7 +35,7 @@ protected:
 
 private:
 	Model3DS * model;
-	float rotate_x, rotate_y, rotate_z;
+	m3d::Mat4f m_matrix;
 };
 
 #endif /* RENDER_RENDER_HPP_ */
