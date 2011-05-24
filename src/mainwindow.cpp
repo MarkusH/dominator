@@ -32,29 +32,42 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 	connect(bt_render_window, SIGNAL(clicked()), this,
 			SLOT(OnRenderWindowPressed()));
 
-	sl_rotate_x = new QSlider(Qt::Horizontal, this);
-	sl_rotate_x->setGeometry(10, 50, 250, 30);
-	sl_rotate_x->setEnabled(false);
-	sl_rotate_x->setRange(-360, 360);
+	bt_rotate_x_plus = new QPushButton("+", this);
+	bt_rotate_x_plus->setGeometry(10, 50, 30, 30);
 
-	sl_rotate_y = new QSlider(Qt::Horizontal, this);
-	sl_rotate_y->setGeometry(10, 90, 250, 30);
-	sl_rotate_y->setEnabled(false);
-	sl_rotate_y->setRange(-360, 360);
+	bt_rotate_x_minus = new QPushButton("-", this);
+	bt_rotate_x_minus->setGeometry(10, 90, 30, 30);
 
-	sl_rotate_z = new QSlider(Qt::Horizontal, this);
-	sl_rotate_z->setGeometry(10, 130, 250, 30);
-	sl_rotate_z->setEnabled(false);
-	sl_rotate_z->setRange(-360, 360);
+	bt_rotate_y_plus = new QPushButton("+", this);
+	bt_rotate_y_plus->setGeometry(60, 50, 30, 30);
+
+	bt_rotate_y_minus = new QPushButton("-", this);
+	bt_rotate_y_minus->setGeometry(60, 90, 30, 30);
+
+	bt_rotate_z_plus = new QPushButton("+", this);
+	bt_rotate_z_plus->setGeometry(110, 50, 30, 30);
+
+	bt_rotate_z_minus = new QPushButton("-", this);
+	bt_rotate_z_minus->setGeometry(110, 90, 30, 30);
 
 	render_window = new Render(new QString("data/models/monkey.3ds"), this);
 	render_window->setGeometry(10, 170, 250, 250);
-	connect(sl_rotate_x, SIGNAL(valueChanged(int)), render_window, SLOT(setRotationX(int)));
-	connect(sl_rotate_y, SIGNAL(valueChanged(int)), render_window, SLOT(setRotationY(int)));
-	connect(sl_rotate_z, SIGNAL(valueChanged(int)), render_window, SLOT(setRotationZ(int)));
+	render_window->show();
+	connect(bt_rotate_x_plus, SIGNAL(clicked()), render_window,
+			SLOT(setRotationXInc()));
+	connect(bt_rotate_x_minus, SIGNAL(clicked()), render_window,
+			SLOT(setRotationXDec()));
+	connect(bt_rotate_y_plus, SIGNAL(clicked()), render_window,
+			SLOT(setRotationYInc()));
+	connect(bt_rotate_y_minus, SIGNAL(clicked()), render_window,
+			SLOT(setRotationYDec()));
+	connect(bt_rotate_z_plus, SIGNAL(clicked()), render_window,
+			SLOT(setRotationZInc()));
+	connect(bt_rotate_z_minus, SIGNAL(clicked()), render_window,
+			SLOT(setRotationZDec()));
 
 	timer_render = new QTimer(this);
-	timer_render->setInterval(40);
+	timer_render->start();
 	connect(timer_render, SIGNAL(timeout()), render_window, SLOT(updateGL()));
 
 	this->resize(270, 430);
@@ -78,17 +91,23 @@ void MainWindow::OnClosePressed() {
 
 void MainWindow::OnRenderWindowPressed() {
 	if (render_window->isVisible()) {
-		sl_rotate_x->setEnabled(false);
-		sl_rotate_y->setEnabled(false);
-		sl_rotate_z->setEnabled(false);
+		bt_rotate_x_plus->setEnabled(false);
+		bt_rotate_x_minus->setEnabled(false);
+		bt_rotate_y_plus->setEnabled(false);
+		bt_rotate_y_minus->setEnabled(false);
+		bt_rotate_z_plus->setEnabled(false);
+		bt_rotate_z_minus->setEnabled(false);
 		render_window->hide();
 		timer_render->stop();
 		this->update();
 	} else {
 		timer_render->start();
 		render_window->show();
-		sl_rotate_x->setEnabled(true);
-		sl_rotate_y->setEnabled(true);
-		sl_rotate_z->setEnabled(true);
+		bt_rotate_x_plus->setEnabled(true);
+		bt_rotate_x_minus->setEnabled(true);
+		bt_rotate_y_plus->setEnabled(true);
+		bt_rotate_y_minus->setEnabled(true);
+		bt_rotate_z_plus->setEnabled(true);
+		bt_rotate_z_minus->setEnabled(true);
 	}
 }
