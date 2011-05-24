@@ -214,14 +214,12 @@ unsigned ShaderMgr::load(std::string folder)
 
 ShaderPtr ShaderMgr::get(std::string name)
 {
-	try {
-		ShaderPtr result = this->at(name);
-		return result;
-	} catch (std::out_of_range& err) {
+	ShaderMgr::iterator it = this->find(name);
+	if (it == this->end()) {
 		ShaderPtr result;
 		return result;
 	}
-
+	return it->second;
 }
 
 
