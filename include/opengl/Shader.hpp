@@ -16,11 +16,30 @@
 #endif
 
 #include <iostream>
+#include <map>
+
 namespace ogl {
 
+// forward declaration
 class Shader;
+
+// smart pointer for the shader class
 typedef std::tr1::shared_ptr<Shader> ShaderPtr;
 
+/**
+ * A class that wraps an OpenGL shader program, i.e. a combination
+ * of vertex and fragment shader. It is recommended to always use
+ * the smart pointer ShaderPtr instead of a pointer to a shader object.
+ *
+ * A shader can be constructed using the source code of vertex and
+ * fragment shader, or by using the static load() method. After the
+ * creation, the shader has to be compiled and linked with the
+ * compile() method.
+ *
+ * To use the shader, call bind() and then (optionally) set the uniforms
+ * using setUniform(). The current shader can be unbound by calling the
+ * static unbind() method.
+ */
 class Shader {
 protected:
 	// source code of the vertex and fragment shader
@@ -37,23 +56,78 @@ public:
 	virtual ~Shader();
 
 	bool compile();
-	inline void bind() { glUseProgram(m_programObject); };
-	inline static void unbind() { glUseProgram(0); };
 
-	inline void setUniform4fv(const char* uniform, GLfloat* data) {
-		glUniform4fv(glGetUniformLocation(m_programObject, uniform), 1, data);
-	};
+	void bind();
+	static void unbind();
 
-	inline void setUniform1f(const char* uniform, GLfloat data) {
-		glUniform1f(glGetUniformLocation(m_programObject, uniform), data);
-	};
-
-	inline void setUniform1i(const char* uniform, GLint data) {
-		glUniform1i(glGetUniformLocation(m_programObject, uniform), data);
-	};
+	void setUniform4fv(const char* uniform, GLfloat* data);
+	void setUniform1f(const char* uniform, GLfloat data);
+	void setUniform1i(const char* uniform, GLint data);
 
 	static ShaderPtr load(std::string vertexFile, std::string fragmentFile);
 };
+
+/**
+ * A manager that contains ShaderPtr smart pointers associated with
+ * a unique name.
+ *
+ * All shaders in a folder can be loaded and compiled using the load
+ * method.
+ */
+class ShaderMgr : public std::map<std::string, ShaderPtr> {
+private:
+	static ShaderMgr* s_instance;
+	ShaderMgr();
+	ShaderMgr(const ShaderMgr& other);
+	virtual ~ShaderMgr();
+protected:
+public:
+	static ShaderMgr& instance();
+	static void destroy();
+
+	/** Adds the pair of name and shader to the manager. */
+	ShaderPtr add(std::string name, ShaderPtr shader);
+
+	/** Loads all shaders in the specified folder. Vertex (*.vs) and
+	 * fragment shader (*.fs) files with the same name are linked together
+	 * and stored with the file name as a key.
+	 */
+	unsigned load(std::string folder);
+
+	/** Returns the associated shader or an empty smart pointer */
+	ShaderPtr get(std::string name);
+};
+
+
+inline
+void Shader::bind()
+{
+	glUseProgram(m_programObject);
+}
+
+inline
+void Shader::unbind()
+{
+	glUseProgram(0);
+}
+
+inline
+void Shader::setUniform4fv(const char* uniform, GLfloat* data)
+{
+	glUniform4fv(glGetUniformLocation(m_programObject, uniform), 1, data);
+}
+
+inline
+void Shader::setUniform1f(const char* uniform, GLfloat data)
+{
+	glUniform1f(glGetUniformLocation(m_programObject, uniform), data);
+}
+
+inline
+void Shader::setUniform1i(const char* uniform, GLint data)
+{
+	glUniform1i(glGetUniformLocation(m_programObject, uniform), data);
+}
 
 
 }

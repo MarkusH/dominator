@@ -11,6 +11,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QSlider>
+#include <QtCore/QTimer>
 
 class Render;
 
@@ -30,6 +31,8 @@ private:
 	QSlider *sl_rotate_x;
 	QSlider *sl_rotate_y;
 	QSlider *sl_rotate_z;
+
+	QTimer *timer_render;
 
 	Render *render_window;
 };

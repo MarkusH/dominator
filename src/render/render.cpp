@@ -5,7 +5,7 @@
  */
 
 #include <render/render.hpp>
-
+#include <m3d/m3d.hpp>
 #include <iostream>
 #include <QtGui/QWidget>
 #include <QtOpenGL/QGLWidget>
@@ -35,12 +35,7 @@ void Render::initializeGL() {
 	}
 
 	// load per-pixel lighting shader
-	m_shader = ogl::Shader::load("data/shaders/ppl.vs", "data/shaders/ppl.fs");
-	m_shader->compile();
-
-	// set the position of the light
-	GLfloat pos[] = { 0.0, 10.0, 15.0, 0.0};
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+	ogl::ShaderMgr::instance().load("data/shaders/");
 
 	// set some material properties
 	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -55,8 +50,8 @@ void Render::initializeGL() {
 	glEnable(GL_COLOR_MATERIAL);
 
 	// set some light properties
-	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
-	GLfloat diffuse[4] = { 0.3, 0.3, 0.3, 1.0 };
+	GLfloat ambient[4] = { 0.2, 0.2, 0.2, 1.0 };
+	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
 	GLfloat specular[4] = { 0.5, 0.5, 0.5, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
@@ -92,28 +87,57 @@ void Render::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	m_shader->bind();
+	ogl::ShaderMgr::instance().get("ppl")->bind();
 
+	/*
 	glTranslatef(0.0f, 0.0f, -5.0f);
 	glRotatef(rotate_y, 0.0f, 1.0f, 0.0f);
 	glRotatef(rotate_x, 1.0f, 0.0f, 0.0f);
 	glRotatef(rotate_z, 0.0f, 0.0f, 1.0f);
+	*/
+
+	// set the position of the light
+	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
+	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
+
+	// First translation then rotation --> rotation around the axis of the object
+	// v' = rotZ * (rotX * (rotY * (translation * v)))
+	m3d::Mat4f matrix =
+			m3d::Mat4f::rotZ(rotate_z) *
+			m3d::Mat4f::rotX(rotate_x) *
+			m3d::Mat4f::rotY(rotate_y) *
+			m3d::Mat4f::translate(m3d::Vec3f(0.0f, 0.0f, -5.0f));
+
+	// Or with quaternions for fewer calculations
+	// (matrix multiplication needs many adds/muls)
+	{
+		// easier access to namespace members
+		using namespace m3d;
+
+		Quatf rot =
+				Quatf(Vec3f::yAxis(), rotate_y) *
+				Quatf(Vec3f::xAxis(), rotate_x) *
+				Quatf(Vec3f::zAxis(), rotate_z);
+
+		matrix = rot.mat4() * Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
+	}
+
+	// multiply object matrix with current modelview matrix (i.e. the camera)
+	glMultMatrixf(matrix[0]);
+
 
 	// Draw our model
 	model->Draw();
 }
 
 void Render::setRotationX(int value) {
-	rotate_x = (float) value;
-	updateGL();
+	rotate_x = (float)value * PI / 180.0f;
 }
 
 void Render::setRotationY(int value) {
-	rotate_y = (float) value;
-	updateGL();
+	rotate_y = (float)value * PI / 180.0f;
 }
 
 void Render::setRotationZ(int value) {
-	rotate_z = (float) value;
-	updateGL();
+	rotate_z = (float)value * PI / 180.0f;
 }
