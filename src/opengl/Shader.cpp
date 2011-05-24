@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <math.h>
 #include <cstring>
+#include <string>
 #ifdef _WIN32
 	// TODO: useful include
 #else
@@ -188,6 +189,8 @@ ShaderPtr ShaderMgr::add(std::string name, ShaderPtr shader)
 unsigned ShaderMgr::load(std::string folder)
 {
 	int count = 0;
+#ifdef _WIN32
+#else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");
 
@@ -209,6 +212,7 @@ unsigned ShaderMgr::load(std::string folder)
 		}
 		closedir(dir);
 	}
+#endif
 	return count;
 }
 

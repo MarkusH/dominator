@@ -7,9 +7,9 @@
 
 #include <util/Clock.hpp>
 #ifdef _WIN32
-	// TODO useful include
+	#include <windows.h>
 #else
-#include <sys/time.h>
+	#include <sys/time.h>
 #endif
 
 namespace util
@@ -27,7 +27,18 @@ Clock::~Clock()
 double Clock::sysTime() const
 {
 #ifdef _WIN32
-	// TODO: use query performance counter
+	LARGE_INTEGER freq, start;
+	double time;
+
+	// returns counts per second
+	QueryPerformanceFrequency(&freq);
+
+	// returns counts since boot
+	QueryPerformanceCounter(&start);
+
+	time = (double)start.QuadPart/(double)freq.QuadPart;
+	
+	return time;
 #else
 	timeval time = { 0, 0 };
 	gettimeofday(&time, 0);

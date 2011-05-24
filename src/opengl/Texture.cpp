@@ -13,6 +13,7 @@
 #include <dirent.h>
 #endif
 #include <stdexcept>
+#include <iostream>
 
 namespace ogl {
 
@@ -100,6 +101,8 @@ TexturePtr TextureMgr::add(std::string name, TexturePtr texture)
 unsigned TextureMgr::load(std::string folder)
 {
 	int count = 0;
+#ifdef _WIN32
+#else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");
 
@@ -120,6 +123,7 @@ unsigned TextureMgr::load(std::string folder)
 		}
 		closedir(dir);
 	}
+#endif
 	return count;
 }
 
