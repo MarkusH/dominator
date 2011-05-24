@@ -101,37 +101,25 @@ void Render::paintGL() {
 }
 
 void Render::setRotationXInc() {
-	Vec3f pos = m_matrix.getW();
-	m_matrix = Mat4f::rotX(PI / 180.0f) * m_matrix;
-	m_matrix.setW(pos);
+	m_matrix %= Mat4f::rotX(4.0f * PI / 180.0f);
 }
 
 void Render::setRotationXDec() {
-	Vec3f pos = m_matrix.getW();
-	m_matrix = Mat4f::rotX(-PI / 180.0f) * m_matrix;
-	m_matrix.setW(pos);
+	m_matrix %= Mat4f::rotX(-4.0f * PI / 180.0f);
 }
 
 void Render::setRotationYInc() {
-	Vec3f pos = m_matrix.getW();
-	m_matrix = Mat4f::rotY(PI / 180.0f) * m_matrix;
-	m_matrix.setW(pos);
+	m_matrix %= Mat4f::rotY(4.0f * PI / 180.0f);
 }
 
 void Render::setRotationYDec() {
-	Vec3f pos = m_matrix.getW();
-	m_matrix = Mat4f::rotY(-PI / 180.0f) * m_matrix;
-	m_matrix.setW(pos);
+	m_matrix %= Mat4f::rotY(-4.0f * PI / 180.0f);
 }
 
 void Render::setRotationZInc() {
-	Vec3f pos = m_matrix.getW();
-	m_matrix = Mat4f::rotZ(PI / 180.0f) * m_matrix;
-	m_matrix.setW(pos);
+	m_matrix %= Mat4f::rotZ(4.0f * PI / 180.0f);
 }
 
 void Render::setRotationZDec() {
-	Vec3f pos = m_matrix.getW();
-	m_matrix = Mat4f::rotZ(-PI / 180.0f) * m_matrix;
-	m_matrix.setW(pos);
+	m_matrix %= Mat4f::rotZ(-4.0f * PI / 180.0f);
 }

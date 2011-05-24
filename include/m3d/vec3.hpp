@@ -17,8 +17,25 @@ public:
 	Vec3<T>(const T& x, const T& y, const T& z);
 	Vec3<T>(const T* const v);
 
+	/**
+	 * Returns the x axis.
+	 *
+	 * @return The vector (1, 0, 0)
+	 */
 	static Vec3<T> xAxis();
+
+	/**
+	 * Returns the y axis.
+	 *
+	 * @return The vector (0, 1, 0)
+	 */
 	static Vec3<T> yAxis();
+
+	/**
+	 * Returns the z axis.
+	 *
+	 * @return The vector (0, 0, 1)
+	 */
 	static Vec3<T> zAxis();
 
 	Vec3<T> normalized() const; ///< Returns the vector in a normalized form
