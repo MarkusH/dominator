@@ -11,20 +11,81 @@
 template<typename T>
 class Mat4 {
 public:
+	/**
+	 * Constructs an empty matrix, i.e all elements are 0.
+	 */
 	Mat4<T>();
+
+	/**
+	 * Copies the matrix m.
+	 *
+	 * @param m The matrix to copy from.
+	 */
 	Mat4<T>(const Mat4<float>& m);
+
+	/**
+	 * Copies the matrix m.
+	 *
+	 * @param m The matrix to copy from.
+	 */
 	Mat4<T>(const Mat4<double>& m);
+
+	/**
+	 * Assigns the values of the two-dimensional array m to the
+	 * components of the matrix, where _xy = m[x][y].
+	 *
+	 * @param m A two-dimensional array that are the components.
+	 */
 	Mat4<T>(const T m[4][4]);
+
+	/**
+	 * Assigns the values of the array m to the components of the
+	 * matrix, where _xy = m[x + 4*y]
+	 *
+	 * @param m
+	 */
 	Mat4<T>(const T* const m);
+
+	/**
+	 * Assigns the parameter values to the corresponding components
+	 * of the matrix.
+	 */
 	Mat4<T>(const T& _11, const T& _12, const T& _13, const T& _14,
 			const T& _21, const T& _22, const T& _23, const T& _24,
 			const T& _31, const T& _32, const T& _33, const T& _34,
 			const T& _41, const T& _42, const T& _43, const T& _44);
+
+	/**
+	 * Constructs a matrix using the specified row vectors, where x = right,
+	 * y = up, z = front and w = pos.
+	 *
+	 * @param right The first row vector of the matrix, i.e the x axis
+	 * @param up 	The second row vector of the matrix, i.e the y axis
+	 * @param front The third row vector of the matrix, i.e the z axis
+	 * @param pos 	The fourth row vector of the matrix, i.e the position
+	 */
 	Mat4<T>(const Vec4<T>& right, const Vec4<T>& up, const Vec4<T>& front, const Vec4<T>& pos);
+
+	/**
+	 * Constructs an orthonormal matrix using the up vector, the tangent
+	 * front and the position. All vectors will be normalized and will be
+	 * pairwise perpendicular.
+	 *
+	 * @param up 	The up vector of the matrix, i.e. the y axis
+	 * @param front The front vector of the matrix, i.e. the z axis
+	 * @param pos	The position vector of the matrix
+	 */
 	Mat4<T>(Vec3<T> up, Vec3<T> front, Vec3<T> pos);
 
 #ifdef M3D_USE_OPENGL
+	/**
+	 * Returns the current modelview matrix of OpenGL.
+	 */
 	static Mat4<T> modelview();
+
+	/**
+	 * Returns the current projection matrix of OpenGL.
+	 */
 	static Mat4<T> projection();
 #endif
 
@@ -35,6 +96,33 @@ public:
 	Mat4<T> operator*(const T& t) const;
 
 	Mat4<T> operator-() const;
+
+	/**
+	 * Multiplies the matrix m with this matrix without regarding
+	 * the position vector. m %= r is the same as m' = r * m, where
+	 * the m'.w = m.w.
+	 *
+	 * It is a convenience operator that avoids having to restore
+	 * the position vector of a matrix after a multiplication
+	 * where only the rotation part is important, i.e. if one wants to
+	 * rotate an object's matrix around its axes.
+	 *
+	 * @param m A matrix that hold the rotation around the local axes
+	 * 			of this matrix
+	 * @return  A reference to this matrix
+	 */
+	Mat4<T>& operator%=(const Mat4<T>& m);
+
+	/**
+	 * Multiplies this matrix with m, only regarding the rotation part,
+	 * i.e. x, y, and z. The position w of this matrix will be replaced
+	 * by the position vector of m.
+	 *
+	 * @param m Multiplies the first three rows of the matrix with m and
+	 * 			replaces the position.
+	 * @return A reference to this matrix
+	 */
+	Mat4<T>& rotMultiply(const Mat4<T>& m);
 
 	Mat4<T> transposed() const;
 	Mat4<T> inverse() const;
@@ -292,6 +380,78 @@ Mat4<T> Mat4<T>::operator-() const
 				   -_21, -_22, -_23, -_24,
 				   -_31, -_32, -_33, -_34,
 				   -_41, -_42, -_43, -_44);
+}
+
+template<typename T>
+inline
+Mat4<T>& Mat4<T>::operator%=(const Mat4<T>& m)
+{
+	T t1, t2, t3, t4;
+	t1 = m._11*_11 + m._12*_21 + m._13*_31 + m._14*_41;
+	t2 = m._11*_12 + m._12*_22 + m._13*_32 + m._14*_42;
+	t3 = m._11*_13 + m._12*_23 + m._13*_33 + m._14*_43;
+	t4 = m._11*_14 + m._12*_24 + m._13*_34 + m._14*_44;
+	_11 = t1;
+	_12 = t2;
+	_13 = t3;
+	_14 = t4;
+
+	t1 = m._21*_11 + m._22*_21 + m._23*_31 + m._24*_41;
+	t2 = m._21*_12 + m._22*_22 + m._23*_32 + m._24*_42;
+	t3 = m._21*_13 + m._22*_23 + m._23*_33 + m._24*_43;
+	t4 = m._21*_14 + m._22*_24 + m._23*_34 + m._24*_44;
+	_21 = t1;
+	_22 = t2;
+	_23 = t3;
+	_24 = t4;
+
+	t1 = m._31*_11 + m._32*_21 + m._33*_31 + m._34*_41;
+	t2 = m._31*_12 + m._32*_22 + m._33*_32 + m._34*_42;
+	t3 = m._31*_13 + m._32*_23 + m._33*_33 + m._34*_43;
+	t4 = m._31*_14 + m._32*_24 + m._33*_34 + m._34*_44;
+	_31 = t1;
+	_32 = t2;
+	_33 = t3;
+	_34 = t4;
+
+	return *this;
+}
+
+template<typename T>
+inline
+Mat4<T>& Mat4<T>::rotMultiply(const Mat4<T>& m)
+{
+	T t1, t2, t3, t4;
+	t1 = _11*m._11 + _12*m._21 + _13*m._31 + _14*m._41;
+	t2 = _11*m._12 + _12*m._22 + _13*m._32 + _14*m._42;
+	t3 = _11*m._13 + _12*m._23 + _13*m._33 + _14*m._43;
+	t4 = _11*m._14 + _12*m._24 + _13*m._34 + _14*m._44;
+	_11 = t1;
+	_12 = t2;
+	_13 = t3;
+	_14 = t4;
+
+	t1 = _21*m._11 + _22*m._21 + _23*m._31 + _24*m._41;
+	t2 = _21*m._12 + _22*m._22 + _23*m._32 + _24*m._42;
+	t3 = _21*m._13 + _22*m._23 + _23*m._33 + _24*m._43;
+	t4 = _21*m._14 + _22*m._24 + _23*m._34 + _24*m._44;
+	_21 = t1;
+	_22 = t2;
+	_23 = t3;
+	_24 = t4;
+
+	t1 = _31*m._11 + _32*m._21 + _33*m._31 + _34*m._41;
+	t2 = _31*m._12 + _32*m._22 + _33*m._32 + _34*m._42;
+	t3 = _31*m._13 + _32*m._23 + _33*m._33 + _34*m._43;
+	t4 = _31*m._14 + _32*m._24 + _33*m._34 + _34*m._44;
+	_31 = t1;
+	_32 = t2;
+	_33 = t3;
+	_34 = t4;
+
+	setW(m.getW());
+
+	return *this;
 }
 
 template<typename T>

@@ -125,13 +125,12 @@ unsigned TextureMgr::load(std::string folder)
 
 TexturePtr TextureMgr::get(std::string name)
 {
-	try {
-		TexturePtr result = this->at(name);
-		return result;
-	} catch (std::out_of_range& err) {
+	TextureMgr::iterator it = this->find(name);
+	if (it == this->end()) {
 		TexturePtr result;
 		return result;
 	}
+	return it->second;
 
 }
 
