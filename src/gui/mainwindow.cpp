@@ -30,10 +30,11 @@ MainWindow::MainWindow(QApplication *app) {
 	createMenu();
 	app->processEvents();
 
-	createModifyBox();
+	m_modifyBox = new ModifyBox();
 	app->processEvents();
 
-	createToolBox();
+	m_toolBox = new ToolBox();
+	m_toolBox->addWidget(m_modifyBox);
 	app->processEvents();
 
 	m_renderWindow = new Render(new QString("data/models/monkey.3ds"), this);
@@ -107,75 +108,4 @@ void MainWindow::createMenu() {
 
 	m_info = new QAction("&Info", this);
 	m_menuHelp->addAction(m_info);
-}
-
-void MainWindow::createToolBox() {
-	m_toolBox = new QWidget();
-	QVBoxLayout *layout = new QVBoxLayout();
-
-	layout->addWidget(new QLabel("3D objects:"));
-
-	m_tb3DOjects = new QComboBox();
-	layout->addWidget(m_tb3DOjects);
-
-	layout->addWidget(new QLabel("Stones:"));
-
-	m_tbStones = new QComboBox();
-	layout->addWidget(m_tbStones);
-
-	layout->addWidget(new QLabel("Templates:"));
-
-	m_tbTemplate = new QComboBox();
-	layout->addWidget(m_tbTemplate);
-
-	layout->addWidget(new QLabel("Textures:"));
-
-	m_tbTexture = new QComboBox();
-	layout->addWidget(m_tbTexture);
-
-//	layout->addWidget(m_modifyBox);
-
-	m_toolBox->setLayout(layout);
-	m_toolBox->setMaximumWidth(250);
-}
-
-void MainWindow::createModifyBox() {
-	m_modifyBox = new QWidget();
-	QGridLayout *layout = new QGridLayout();
-
-	layout->addWidget(new QLabel("Size:"), 0, 0, 1, 3);
-
-	m_mbSizeX = new QSpinBox();
-	layout->addWidget(m_mbSizeX, 1, 0);
-
-	m_mbSizeY = new QSpinBox();
-	layout->addWidget(m_mbSizeY, 1, 1);
-
-	m_mbSizeZ = new QSpinBox();
-	layout->addWidget(m_mbSizeZ, 1, 2);
-
-	layout->addWidget(new QLabel("Location:"), 2, 0, 1, 3);
-
-	m_mbLocX = new QSpinBox();
-	layout->addWidget(m_mbLocX, 3, 0);
-
-	m_mbLocY = new QSpinBox();
-	layout->addWidget(m_mbLocY, 3, 1);
-
-	m_mbLocZ = new QSpinBox();
-	layout->addWidget(m_mbLocZ, 3, 2);
-
-	layout->addWidget(new QLabel("Rotation:"), 4, 0, 1, 3);
-
-	m_mbRotX = new QSpinBox();
-	layout->addWidget(m_mbRotX, 5, 0);
-
-	m_mbRotY = new QSpinBox();
-	layout->addWidget(m_mbRotY, 5, 1);
-
-	m_mbRotZ = new QSpinBox();
-	layout->addWidget(m_mbRotZ, 5, 2);
-
-	m_modifyBox->setLayout(layout);
-	m_modifyBox->setMaximumSize(250, 250);
 }

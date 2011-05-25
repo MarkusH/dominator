@@ -7,6 +7,8 @@
 #ifndef MAINWINDOW_HPP_
 #define MAINWINDOW_HPP_
 
+#include <gui/toolbox.hpp>
+#include <gui/modifybox.hpp>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
@@ -31,8 +33,6 @@ private slots:
 
 private:
 	void createMenu();
-	void createToolBox();
-	void createModifyBox();
 
 	QTimer *m_renderTimer;
 	Render *m_renderWindow;
@@ -48,22 +48,9 @@ private:
 	QAction *m_help;
 	QAction *m_info;
 
-	QWidget *m_toolBox;
-	QComboBox *m_tb3DOjects;
-	QComboBox *m_tbStones;
-	QComboBox *m_tbTemplate;
-	QComboBox *m_tbTexture;
+	ToolBox *m_toolBox;
 
-	QWidget *m_modifyBox;
-	QSpinBox *m_mbSizeX;
-	QSpinBox *m_mbSizeY;
-	QSpinBox *m_mbSizeZ;
-	QSpinBox *m_mbLocX;
-	QSpinBox *m_mbLocY;
-	QSpinBox *m_mbLocZ;
-	QSpinBox *m_mbRotX;
-	QSpinBox *m_mbRotY;
-	QSpinBox *m_mbRotZ;
+	ModifyBox *m_modifyBox;
 
 	QSplitter *m_splitter;
 };
