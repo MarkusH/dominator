@@ -3,7 +3,7 @@
  *
  *      Author: Markus Holtermann
  */
-#include "mainwindow.hpp"
+#include "gui/mainwindow.hpp"
 
 #include <iostream>
 #include <QtGui/QApplication>

@@ -4,7 +4,7 @@
  *      Author: Markus Holtermann
  */
 
-#include <render/render.hpp>
+#include <gui/render.hpp>
 #include <m3d/m3d.hpp>
 #include <iostream>
 #include <QtGui/QWidget>
