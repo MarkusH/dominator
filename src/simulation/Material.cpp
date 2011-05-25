@@ -2,7 +2,7 @@
  * Material.cpp
  *
  *  Created on: May 24, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #include <simulation/Material.hpp>

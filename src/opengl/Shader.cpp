@@ -2,7 +2,7 @@
  * Shader.cpp
  *
  *  Created on: May 21, 2011
- *      Author: markus
+ *      Author: Markus Doellinger, Robert Waury
  */
 
 #include <opengl/Shader.hpp>

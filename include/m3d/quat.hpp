@@ -2,7 +2,7 @@
  * quat.hpp
  *
  *  Created on: May 14, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef QUAT_HPP_

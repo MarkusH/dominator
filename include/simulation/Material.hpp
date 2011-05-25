@@ -2,7 +2,7 @@
  * Material.hpp
  *
  *  Created on: May 24, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef MATERIAL_HPP_
