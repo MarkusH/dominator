@@ -101,7 +101,7 @@ int MaterialMgr::getID(const std::string& name) const
 
 
 
-Material* MaterialMgr::fromID(int id)
+Material* MaterialMgr::fromID(unsigned int id)
 {
 	if (id == 0)
 		return NULL;

@@ -140,7 +140,7 @@ public:
 	 * @param id The id of the material
 	 * @return   A pointer to the material or NULL
 	 */
-	Material* fromID(int id);
+	Material* fromID(unsigned int id);
 
 	/**
 	 * Adds a new material pair to the internal map and returns
