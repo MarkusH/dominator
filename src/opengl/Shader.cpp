@@ -15,7 +15,9 @@
 #include <cstring>
 #include <string>
 #ifdef _WIN32
-//#include <boost/filesystem.hpp>
+#include <boost/filesystem.hpp>
+// ensures your legacy libraries still work
+#define BOOST_FILESYSTEM_VERSION 2
 #else
 #include <dirent.h>
 #endif
@@ -190,11 +192,26 @@ unsigned ShaderMgr::load(std::string folder)
 {
 	int count = 0;
 #ifdef _WIN32
-	// open folder
-	// iterate over the folder
-	// find *.vs and *.fs files
-	// load with Shader Manager
-	// close folder
+	using namespace boost::filesystem;
+
+	path p (folder);
+	
+	if(is_directory(p)) {
+		if(!is_empty(p)) {
+			path::iterator it = p.begin();
+			while (it != p.end()) {
+				if(!extension(*it).compare(".vs"))	 {
+					std::string s = it->string();
+					ShaderPtr shader = Shader::load(s, s.replace(s.size() - 2, 1, "f"));
+					shader->compile();
+					s.erase(s.size() - 3, 3);
+					add(basename(*it), shader);
+				}
+				++it;
+			}
+		}
+
+	}
 #else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");
