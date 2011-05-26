@@ -34,7 +34,7 @@ MainWindow::MainWindow(QApplication *app) {
 	app->processEvents();
 
 	m_toolBox = new ToolBox();
-	m_toolBox->addWidget(m_modifyBox);
+	//m_toolBox->addWidget(m_modifyBox);
 	app->processEvents();
 
 	m_renderWindow = new Render(new QString("data/models/monkey.3ds"), this);
@@ -57,6 +57,7 @@ MainWindow::MainWindow(QApplication *app) {
 	m_splitter->setChildrenCollapsible(false);
 
 	setCentralWidget(m_splitter);
+	m_modifyBox->setParent(this);
 
 	showMaximized();
 	splash.finish(this);

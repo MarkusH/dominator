@@ -45,6 +45,7 @@ ModifyBox::ModifyBox(QWidget *parent) {
 	layout->addStretch(-1);
 
 	setLayout(layout);
+	setMaximumWidth(150);
 }
 
 void ModifyBox::mouseMoveEvent(QMouseEvent * event) {
