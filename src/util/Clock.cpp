@@ -2,7 +2,7 @@
  * Clock.cpp
  *
  *  Created on: May 23, 2011
- *      Author: markus
+ *      Author: Markus Doellinger, Robert Waury
  */
 
 #include <util/Clock.hpp>

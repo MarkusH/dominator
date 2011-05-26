@@ -2,7 +2,7 @@
  * vec3.hpp
  *
  *  Created on: May 14, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef VEC3_HPP_

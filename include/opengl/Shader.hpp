@@ -2,7 +2,7 @@
  * Shader.hpp
  *
  *  Created on: May 21, 2011
- *      Author: markus
+ *      Author: Markus Doellinger, Robert Waury
  */
 
 #ifndef SHADER_HPP_

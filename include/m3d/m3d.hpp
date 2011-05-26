@@ -4,7 +4,7 @@
  * A 3D math package.
  *
  *  Created on: May 14, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef M3D_HPP_

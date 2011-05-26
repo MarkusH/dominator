@@ -2,7 +2,7 @@
  * Clock.hpp
  *
  *  Created on: May 23, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef CLOCK_HPP_

@@ -2,7 +2,7 @@
  * stb_image.hpp
  *
  *  Created on: Apr 9, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef STB_IMAGE_HPP_
