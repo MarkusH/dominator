@@ -15,7 +15,7 @@
 #include <cstring>
 #include <string>
 #ifdef _WIN32
-	// TODO: useful include
+//#include <boost/filesystem.hpp>
 #else
 #include <dirent.h>
 #endif
@@ -190,6 +190,11 @@ unsigned ShaderMgr::load(std::string folder)
 {
 	int count = 0;
 #ifdef _WIN32
+	// open folder
+	// iterate over the folder
+	// find *.vs and *.fs files
+	// load with Shader Manager
+	// close folder
 #else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");

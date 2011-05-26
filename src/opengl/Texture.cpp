@@ -102,6 +102,11 @@ unsigned TextureMgr::load(std::string folder)
 {
 	int count = 0;
 #ifdef _WIN32
+	// open folder
+	// iterate over the folder
+	// find *.[a-zA-Z] files
+	// load with Texture Manager
+	// close folder
 #else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");
