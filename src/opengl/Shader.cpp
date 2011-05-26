@@ -15,9 +15,10 @@
 #include <cstring>
 #include <string>
 #ifdef _WIN32
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 // ensures your legacy libraries still work
-#define BOOST_FILESYSTEM_VERSION 2
+
 #else
 #include <dirent.h>
 #endif
@@ -201,7 +202,8 @@ unsigned ShaderMgr::load(std::string folder)
 			path::iterator it = p.begin();
 			while (it != p.end()) {
 				if(!extension(*it).compare(".vs"))	 {
-					std::string s = it->string();
+					std::string s = *it;
+					std::cout << "path: " << s << std::endl;
 					ShaderPtr shader = Shader::load(s, s.replace(s.size() - 2, 1, "f"));
 					shader->compile();
 					s.erase(s.size() - 3, 3);
