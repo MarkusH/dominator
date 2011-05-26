@@ -141,6 +141,11 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 
 MaterialPair& MaterialMgr::getPair(int id0, int id1)
 {
+	if (id0 > id1) {
+		int tmp = id0;
+		id0 = id1;
+		id1 = tmp;
+	}
 	// search for interaction
 	std::map<std::pair<int, int>, MaterialPair>::iterator it;
 	it = m_pairs.find(std::make_pair(id0, id1));
