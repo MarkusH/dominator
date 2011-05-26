@@ -9,6 +9,8 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 
+//#include <boost/foreach.hpp>
+
 namespace util {
 
 KeyAdapter::KeyAdapter()
@@ -100,6 +102,10 @@ SimpleMouseAdapter::~SimpleMouseAdapter()
 
 void SimpleMouseAdapter::mouseMove(int x, int y)
 {
+	//BOOST_FOREACH(MouseListener* lis, m_listeners) {
+	//	lis->mouseMove(x, y);
+	//}
+
 	for (std::list<MouseListener*>::iterator itr = m_listeners.begin();
 			itr != m_listeners.end(); ++itr)
 		(*itr)->mouseMove(x, y);
@@ -112,7 +118,7 @@ void SimpleMouseAdapter::mouseButton(Button button, bool down, int x, int y)
 	m_down[button] = down;
 	for (std::list<MouseListener*>::iterator itr = m_listeners.begin();
 			itr != m_listeners.end(); ++itr)
-		(*itr)->mouseButton(button, down, y, x);
+		(*itr)->mouseButton(button, down, x, y);
 	m_x = x;
 	m_y = y;
 }
@@ -127,10 +133,49 @@ QtMouseAdapter::~QtMouseAdapter()
 
 void QtMouseAdapter::mouseEvent(QMouseEvent* event)
 {
-	//TODO: extract event data and call listeners
-	// note that m_x and m_y must be set after the listeners
-	// have been called. This is because the listeners must be able
-	// to determine the delta in position
+	Button button = LEFT;
+	switch (event->button()) {
+	case Qt::LeftButton:
+		button = LEFT;
+		break;
+
+	case Qt::RightButton:
+		button = RIGHT;
+		break;
+
+	case Qt::MiddleButton:
+		button = MIDDLE;
+		break;
+
+	default:
+		break;
+	}
+
+	switch (event->type()) {
+
+	case QEvent::MouseButtonPress:
+	case QEvent::MouseButtonRelease:
+		m_down[button] = event->type() == QEvent::MouseButtonPress;
+		for (std::list<MouseListener*>::iterator itr = m_listeners.begin();
+				itr != m_listeners.end(); ++itr)
+			(*itr)->mouseButton(button, m_down[button], event->x(), event->y());
+		break;
+
+	case QEvent::MouseButtonDblClick:
+		break;
+
+	case QEvent::MouseMove:
+		for (std::list<MouseListener*>::iterator itr = m_listeners.begin();
+				itr != m_listeners.end(); ++itr)
+			(*itr)->mouseMove(event->x(), event->y());
+		break;
+
+	default:
+		break;
+	}
+
+	m_x = event->x();
+	m_y = event->y();
 }
 
 }
