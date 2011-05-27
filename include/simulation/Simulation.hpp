@@ -11,10 +11,15 @@
 #include <util/InputAdapters.hpp>
 #include <util/Clock.hpp>
 #include <opengl/Camera.hpp>
+#include <simulation/Object.hpp>
+#include <map>
+
 
 namespace sim {
 
 using namespace m3d;
+
+typedef std::map<int, Object> ObjectMap;
 
 class Simulation : public util::MouseListener {
 private:
@@ -29,6 +34,8 @@ protected:
 	util::Clock m_clock;
 
 	ogl::Camera m_camera;
+
+	ObjectMap m_objects;
 
 public:
 	/**
