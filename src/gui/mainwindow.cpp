@@ -43,9 +43,6 @@ MainWindow::MainWindow(QApplication *app) {
 
 	m_renderWindow = new Render(new QString("data/models/monkey.3ds"), this);
 	m_renderWindow->setMinimumWidth(400);
-	m_renderTimer = new QTimer(this);
-	m_renderTimer->start();
-	connect(m_renderTimer, SIGNAL(timeout()), m_renderWindow, SLOT(updateGL()));
 	m_renderWindow->show();
 
 	m_splitter = new QSplitter(Qt::Horizontal);
