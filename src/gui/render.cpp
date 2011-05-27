@@ -95,11 +95,6 @@ void Render::paintGL() {
 	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
 
-	// temporary fix
-	m_matrix.setX(m_matrix.getX().normalized());
-	m_matrix.setY(m_matrix.getY().normalized());
-	m_matrix.setZ(m_matrix.getZ().normalized());
-
 	// multiply object matrix with current modelview matrix (i.e. the camera)
 	glMultMatrixf(m_matrix[0]);
 
@@ -118,6 +113,9 @@ void Render::setRotationX(float x) {
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotX(x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);
+
+
+	//Mat4f m = Mat4f::rotX(x * PI / 180.0f).rotMultiply(m_matrix);
 	m_matrix %= Mat4f::rotX(x * PI / 180.0f);
 }
 
