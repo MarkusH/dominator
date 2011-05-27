@@ -12,8 +12,7 @@
 	#include <sys/time.h>
 #endif
 
-namespace util
-{
+namespace util {
 
 Clock::Clock()
 {
@@ -27,7 +26,7 @@ Clock::~Clock()
 double Clock::sysTime() const
 {
 #ifdef _WIN32
-	LARGE_INTEGER freq, start;
+	static LARGE_INTEGER freq, start;
 	double time;
 
 	// returns counts per second

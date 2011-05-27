@@ -8,7 +8,8 @@
 #include <opengl/Texture.hpp>
 #include "stb_image.hpp"
 #ifdef _WIN32
-	// TODO: useful include
+#define BOOST_FILESYSTEM_VERSION 2
+#include <boost/filesystem.hpp>
 #else
 #include <dirent.h>
 #endif
@@ -102,6 +103,27 @@ unsigned TextureMgr::load(std::string folder)
 {
 	int count = 0;
 #ifdef _WIN32
+	using namespace boost::filesystem;
+
+	path p (folder);
+	
+	if(is_directory(p)) {
+		if(!is_empty(p)) {
+			directory_iterator end_itr;
+			for(directory_iterator itr(p); itr != end_itr; ++itr) {
+				if(itr->leaf().size() > 3) {
+					TexturePtr texture = Texture::load(itr->string(), GL_TEXTURE_2D);
+					add(basename(*itr), texture);
+				}
+			}
+		}
+
+	}
+	// open folder
+	// iterate over the folder
+	// find *.[a-zA-Z] files
+	// load with Texture Manager
+	// close folder
 #else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");

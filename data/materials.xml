@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<materials>
+	<!--
+	A material has only graphical properties, the physical interactions are
+	defined by so-called material-pairs (see below). A material can have the
+	following properties:
+
+	- name			: The name of the material is used as a key
+	- texture		: The texture of the material, or "" if there is none
+	(-texture1		: A second, special texture, for example a normal map)
+	- ambient		: The ambient material color, it is independent of the light
+						source (RGBA)
+	- diffuse		: The diffuse material color, its effect depends on the
+						light source (RGBA)
+	- specular		: The specular material color, its effect depends on the
+						angle of the face-normal to the light-direction (RGBA)
+	- shininess		: The shininess of the material, it influences the specular
+						color of the material
+				
+
+			
+	-->
+    <material name="wood_shiny" texture="wood_shiny" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.6, 0.6, 0.6, 1" shininess="50" />
+	<material name="wood_matt" texture="wood_matt" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
+	<!-- 
+	For each pair of materials, there can be a material-pair that defines their
+	mutual interactions. If there is no pair defines for two materials, the
+	physical properties are taken from the default pair (mat0 = mat1 = ""). A
+	pair can have the following properties:
+
+	- mat0, mat1		: The two material names of the pair
+	- elasticity		: The elasticity of the two materials during a collision
+	- staticFriction	: The static friction of the two materials during a
+							collision
+	- kineticFriction	: The kinetic friction of the two materials during a
+							collision
+	- softness			: The softness of the two materials during a collision
+
+	(- impactSound		: The sound that is played whenever the two materials
+							collide)
+	(- impactStrength	: The strength of the impact that is required to trigger
+							a sound event
+
+	-->
+    <pair mat0="" mat1="" elasticity="0.400000" staticFriction="0.900000" kineticFriction="0.500000" softness="0.100000" />
+    <pair mat0="wood_shiny" mat1="wood_shiny" elasticity="0.100000" staticFriction="0.450000" kineticFriction="0.310000" softness="0.050000" />
+	<pair mat0="wood_matt" mat1="wood_matt" elasticity="0.15000" staticFriction="0.55000" kineticFriction="0.45000" softness="0.080000" />
+</materials>

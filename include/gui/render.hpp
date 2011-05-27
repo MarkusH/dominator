@@ -12,6 +12,7 @@
 #include <QtCore/QString>
 #include <opengl/Shader.hpp>
 #include <m3d/m3d.hpp>
+#include <util/Clock.hpp>
 
 class Render: public QGLWidget {
 Q_OBJECT
@@ -36,6 +37,7 @@ protected:
 private:
 	Model3DS * model;
 	m3d::Mat4f m_matrix;
+	util::Clock m_clock;
 };
 
 #endif /* RENDER_RENDER_HPP_ */

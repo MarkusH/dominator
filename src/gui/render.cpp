@@ -6,6 +6,7 @@
 
 #include <gui/render.hpp>
 #include <m3d/m3d.hpp>
+#include <util/Clock.hpp>
 #include <iostream>
 #include <QtGui/QWidget>
 #include <QtOpenGL/QGLWidget>
@@ -67,6 +68,7 @@ void Render::initializeGL() {
 
 	// Generate Vertex Buffer Objects
 	model->CreateVBO();
+	m_clock.reset();
 }
 
 void Render::resizeGL(int width, int height) {
@@ -87,6 +89,7 @@ void Render::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+
 	ogl::ShaderMgr::instance().get("ppl")->bind();
 
 	// set the position of the light
@@ -98,6 +101,13 @@ void Render::paintGL() {
 
 	// Draw our model
 	model->Draw();
+	static int frames = 0;
+	frames++;
+	if(m_clock.get() >= 1.0f) {
+		std::cout << frames << std::endl;
+		m_clock.reset();
+		frames = 0;
+	}
 }
 
 void Render::setRotationXInc() {

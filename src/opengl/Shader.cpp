@@ -15,7 +15,8 @@
 #include <cstring>
 #include <string>
 #ifdef _WIN32
-	// TODO: useful include
+#define BOOST_FILESYSTEM_VERSION 2
+#include <boost/filesystem.hpp>
 #else
 #include <dirent.h>
 #endif
@@ -190,6 +191,26 @@ unsigned ShaderMgr::load(std::string folder)
 {
 	int count = 0;
 #ifdef _WIN32
+	using namespace boost::filesystem;
+
+	path p (folder);
+	
+	if(is_directory(p)) {
+		if(!is_empty(p)) {
+			directory_iterator end_itr;
+			for(directory_iterator itr(p); itr != end_itr; ++itr) {
+				if(itr->leaf().find(".vs") != std::string::npos) {
+					std::string vs = itr->string();
+					std::string fs = vs;
+					fs.replace(vs.size() - 2, 1, "f");
+					ShaderPtr shader = Shader::load(vs, fs);
+					shader->compile();
+					add(basename(*itr), shader);
+				}
+			}
+		}
+
+	}
 #else
 	if (folder.at(folder.size() - 1) != '/')
 		folder.append("/");
