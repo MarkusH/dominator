@@ -11,6 +11,8 @@
 #include <QtGui/QWidget>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
+#include <simulation/Simulation.hpp>
+#include <iostream>
 
 using namespace m3d;
 
@@ -18,6 +20,7 @@ Render::Render(QString *filename, QWidget *parent) :
 	QGLWidget(parent) {
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	load(filename);
+	setFocusPolicy(Qt::WheelFocus);
 }
 
 void Render::load(QString *filename) {
@@ -66,6 +69,8 @@ void Render::initializeGL() {
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
+	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
+
 	// Generate Vertex Buffer Objects
 	model->CreateVBO();
 	m_clock.reset();
@@ -89,6 +94,9 @@ void Render::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	sim::Simulation::instance().update();
+	sim::Simulation::instance().render();
+
 	ogl::ShaderMgr::instance().get("ppl")->bind();
 
 	// set the position of the light
@@ -107,6 +115,10 @@ void Render::paintGL() {
 		m_clock.reset();
 		frames = 0;
 	}
+}
+
+void Render::keyPressEvent( QKeyEvent *e ) {
+	m_keyAdapter.keyEvent(e);
 }
 
 void Render::setRotationX(float x) {
