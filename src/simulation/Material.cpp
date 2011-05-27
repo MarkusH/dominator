@@ -16,6 +16,13 @@
 
 namespace sim {
 
+MaterialMgr* MaterialMgr::s_instance = NULL;
+
+Material::Material(const std::string& name)
+		: name(name)
+{
+}
+
 Material::Material(const Material& m)
 	: name(m.name),
 	  texture(m.texture),
@@ -26,6 +33,22 @@ Material::Material(const Material& m)
 	  shininess(m.shininess)
 {
 }
+
+/*
+void Material::load(XMLNode)
+{
+	// load properties
+	// vectors can be loaded from a string like that:
+	//	diffuse.assign(str);
+}
+
+void Material::save(XMLNode) const;
+{
+	// save properties
+	// vectors can be saved to a string like that:
+	//	std::string str = diffuse.str()
+}
+*/
 
 MaterialPair::MaterialPair()
 {
@@ -47,6 +70,22 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 }
 
 
+/*
+void MaterialPair::load(XMLNode)
+{
+	// load properties
+}
+
+void MaterialPair::save(XMLNode) const;
+{
+	// save properties
+	// get material by using MaterialMgr::fromID
+	// and then get the name from it
+	// MaterialMgr::instance().fromID(id)->name;
+}
+*/
+
+
 
 MaterialMgr::MaterialMgr()
 {
@@ -56,6 +95,24 @@ MaterialMgr::MaterialMgr()
 MaterialMgr::~MaterialMgr()
 {
 	clear();
+}
+
+MaterialMgr::MaterialMgr(const MaterialMgr& other)
+{
+}
+
+
+MaterialMgr& MaterialMgr::instance()
+{
+	if (!s_instance)
+		s_instance = new MaterialMgr();
+	return *s_instance;
+}
+
+void MaterialMgr::destroy()
+{
+	if (s_instance)
+		delete s_instance;
 }
 
 
@@ -142,6 +199,44 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 
 	return std::make_pair(pair.id0, pair.id1);
 }
+
+
+bool MaterialMgr::load(const char* fileName)
+{
+	clear(true);
+
+	// parse document
+	// return false on error
+
+	// foreach material tag
+		// Material mat("none");
+		// mat.load(elem);
+		// add(mat);
+
+	// foreach pair tag
+		// MaterialPair pair;
+		// pair.load(elem);
+		// m_pairs[std::make_pair(pair.id0, pair.id1)] = pair;
+
+	return true;
+}
+
+bool MaterialMgr::save(const char* fileName)
+{
+	// create document
+	// create root element "materials"
+
+	// foreach material
+		// mat.save(root)
+
+	// foreach pair
+		// pair.save(root)
+
+	// save document
+
+	return true;
+}
+
 
 MaterialPair& MaterialMgr::getPair(int id0, int id1)
 {

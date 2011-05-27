@@ -46,7 +46,7 @@ public:
 
 	Vec2<T> xz() const;
 
-	std::string str();
+	std::string str() const;
 	void assign(std::string str);
 
 	Vec3<T>& operator+=(const Vec3<T>& v);
@@ -180,7 +180,7 @@ Vec2<T> Vec3<T>::xz() const
 
 template<typename T>
 inline
-std::string Vec3<T>::str()
+std::string Vec3<T>::str() const
 {
 	std::stringstream sst;
 	sst << *this;

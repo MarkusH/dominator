@@ -41,6 +41,8 @@ struct Material {
 	/** The shininess of the material */
 	float shininess;
 
+
+	Material(const std::string& name);
 	/**
 	 * The copy constructor
 	 *
@@ -48,8 +50,8 @@ struct Material {
 	 */
 	Material(const Material& m);
 
-	//load(node);
-	//save(node);
+	//void load(XMLNode);
+	//void save(XMLNode) const;
 };
 
 /**
@@ -78,8 +80,8 @@ struct MaterialPair {
 	 */
 	MaterialPair(const MaterialPair& p);
 
-	//load(node);
-	//save(node);
+	//void load(XMLNode);
+	//void save(XMLNode) const;
 };
 
 /**
@@ -89,6 +91,13 @@ struct MaterialPair {
  * interaction.
  */
 class MaterialMgr {
+private:
+	// singleton
+	static MaterialMgr* s_instance;
+	MaterialMgr();
+	MaterialMgr(const MaterialMgr& other);
+	virtual ~MaterialMgr();
+
 protected:
 	/** The names of materials mapped to the material struct */
 	std::map<std::string, Material> m_materials;
@@ -97,8 +106,18 @@ protected:
 	std::map<std::pair<int, int>, MaterialPair> m_pairs;
 
 public:
-	MaterialMgr();
-	virtual ~MaterialMgr();
+	/**
+	 * Returns an instance of the MaterialMgr and creates it,
+	 * if there is none.
+	 *
+	 * @return The MaterialMgr
+	 */
+	static MaterialMgr& instance();
+
+	/**
+	 * Destroys the instance of the MaterialMgr
+	 */
+	static void destroy();
 
 	/**
 	 * Adds a material to the internal material map and returns the
@@ -161,6 +180,23 @@ public:
 								float kineticFriction,
 								float softness);
 
+
+	/**
+	 * Saves all material and pairs to the given XML material file.
+	 *
+	 * @param  fileName The XML material file.
+	 * @return True, if successfull, false otherwise
+	 */
+	bool save(const char* fileName);
+
+	/**
+	 * Loads all material and pairs from the given XML material file.
+	 *
+	 * @param fileName The XML material file.
+	 * @return True, if successfull, false otherwise
+	 */
+	bool load(const char* fileName);
+
 	/**
 	 * Retrieves the material pair of the given material ids. If
 	 * there is none, returns the default pair.
@@ -181,9 +217,6 @@ public:
 	void processContact(const NewtonJoint* contactJoint,
 						dFloat timestep,
 						int threadIndex);
-
-	//load
-	//save
 };
 
 }
