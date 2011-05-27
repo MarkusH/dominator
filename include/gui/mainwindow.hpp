@@ -32,6 +32,7 @@ public:
 private slots:
 	void OnClosePressed();
 	void updateFramesPerSecond(int frames);
+	void rotate();
 
 private:
 	void createMenu();

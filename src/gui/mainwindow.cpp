@@ -67,6 +67,17 @@ MainWindow::MainWindow(QApplication *app) {
 	showMaximized();
 	splash.finish(this);
 
+	// Just for debugging
+	QTimer *rotx = new QTimer(this);
+	rotx->setInterval(30);
+	rotx->start();
+	connect(rotx, SIGNAL(timeout()), this, SLOT(rotate()));
+}
+
+void MainWindow::rotate() {
+	m_renderWindow->setRotationXInc(1.0f);
+	m_renderWindow->setRotationYInc(2.0f);
+	m_renderWindow->setRotationZInc(4.0f);
 }
 
 void MainWindow::OnClosePressed() {

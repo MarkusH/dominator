@@ -22,12 +22,12 @@ public:
 	void rotate();
 
 public slots:
-	void setRotationXInc();
-	void setRotationXDec();
-	void setRotationYInc();
-	void setRotationYDec();
-	void setRotationZInc();
-	void setRotationZDec();
+	void setRotationXInc(float x = 4.0f);
+	void setRotationXDec(float x = 4.0f);
+	void setRotationYInc(float x = 4.0f);
+	void setRotationYDec(float x = 4.0f);
+	void setRotationZInc(float x = 4.0f);
+	void setRotationZDec(float x = 4.0f);
 
 protected:
 	virtual void initializeGL();
