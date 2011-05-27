@@ -12,6 +12,7 @@
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 #include <simulation/Simulation.hpp>
+#include <opengl/Texture.hpp>
 #include <iostream>
 
 using namespace m3d;
@@ -43,6 +44,7 @@ void Render::initializeGL()
 
 	// load per-pixel lighting shader
 	ogl::ShaderMgr::instance().load("data/shaders/");
+	ogl::TextureMgr::instance().load("data/textures/");
 
 	// set some material properties
 	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -102,7 +104,7 @@ void Render::paintGL()
 	sim::Simulation::instance().update();
 	sim::Simulation::instance().render();
 
-	ogl::ShaderMgr::instance().get("ppl")->bind();
+	ogl::ShaderMgr::instance().get("ppl_textured")->bind();
 
 	// set the position of the light
 	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);

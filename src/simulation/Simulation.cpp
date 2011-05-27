@@ -6,6 +6,7 @@
  */
 
 #include <simulation/Simulation.hpp>
+#include <opengl/Texture.hpp>
 
 namespace sim {
 
@@ -77,11 +78,16 @@ void Simulation::render()
 {
 	m_camera.update();
 	m_camera.apply();
+
+	ogl::TextureMgr::instance().get("yellow")->bind();
+
 	glTranslatef(0.0f, 0.2f, -5.2f);
 	ObjectMap::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
 		glTranslatef(0.0f, 0.2f, -0.2f);
 		GLUquadric* q = gluNewQuadric();
+		gluQuadricTexture(q, GL_TRUE);
+		gluQuadricNormals(q, GL_TRUE);
 		gluSphere(q, 2.0f, 12, 24);
 		gluDeleteQuadric(q);
 	}
