@@ -23,6 +23,9 @@ Render::Render(QString *filename, QWidget *parent) :
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	load(filename);
 	setFocusPolicy(Qt::WheelFocus);
+	m_timer = new QTimer(this);
+	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
+	m_timer->start();
 }
 
 void Render::load(QString *filename)
@@ -73,6 +76,8 @@ void Render::initializeGL()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
 

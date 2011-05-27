@@ -7,6 +7,7 @@
 #ifndef RENDER_RENDER_HPP_
 #define RENDER_RENDER_HPP_
 
+#include <QtCore/QTimer>
 #include <render/model.hpp>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
@@ -38,6 +39,7 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 
 private:
+	QTimer *m_timer;
 	Model3DS * model;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;

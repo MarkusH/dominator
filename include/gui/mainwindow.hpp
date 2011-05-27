@@ -8,8 +8,6 @@
 #define MAINWINDOW_HPP_
 
 #include <QtCore/QTextCodec>
-#include <gui/toolbox.hpp>
-#include <gui/modifybox.hpp>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
@@ -21,7 +19,9 @@
 #include <QtGui/QMenuBar>
 #include <QtGui/QStatusBar>
 #include <QtGui/QAction>
-#include <QtCore/QTimer>
+#include <gui/toolbox.hpp>
+#include <gui/modifybox.hpp>
+
 
 class Render;
 
@@ -40,7 +40,6 @@ private:
 	void createStatusBar();
 	void initialize();
 
-	QTimer *m_renderTimer;
 	Render *m_renderWindow;
 
 	QMenu *m_menuFile;
