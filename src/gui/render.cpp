@@ -17,13 +17,15 @@
 using namespace m3d;
 
 Render::Render(QString *filename, QWidget *parent) :
-	QGLWidget(parent) {
+	QGLWidget(parent)
+{
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	load(filename);
 	setFocusPolicy(Qt::WheelFocus);
 }
 
-void Render::load(QString *filename) {
+void Render::load(QString *filename)
+{
 	try {
 		model = new Model3DS(filename->toUtf8().constData());
 		std::cout << "loaded " << filename->toUtf8().constData() << std::endl;
@@ -32,7 +34,8 @@ void Render::load(QString *filename) {
 	}
 }
 
-void Render::initializeGL() {
+void Render::initializeGL()
+{
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		std::cout << "could not initialize GLEW" << std::endl;
@@ -76,7 +79,8 @@ void Render::initializeGL() {
 	m_clock.reset();
 }
 
-void Render::resizeGL(int width, int height) {
+void Render::resizeGL(int width, int height)
+{
 	// Reset the viewport
 	glViewport(0, 0, width, height);
 	// Reset the projection and modelview matrix
@@ -89,7 +93,8 @@ void Render::resizeGL(int width, int height) {
 	glLoadIdentity();
 }
 
-void Render::paintGL() {
+void Render::paintGL()
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -117,11 +122,33 @@ void Render::paintGL() {
 	}
 }
 
-void Render::keyPressEvent( QKeyEvent *e ) {
-	m_keyAdapter.keyEvent(e);
+void Render::keyPressEvent(QKeyEvent *event)
+{
+	m_keyAdapter.keyEvent(event);
 }
 
-void Render::setRotationX(float x) {
+void Render::keyReleaseEvent(QKeyEvent *event)
+{
+	m_keyAdapter.keyEvent(event);
+}
+
+void Render::mouseMoveEvent(QMouseEvent *event)
+{
+	m_mouseAdapter.mouseEvent(event);
+}
+
+void Render::mousePressEvent(QMouseEvent *event)
+{
+	m_mouseAdapter.mouseEvent(event);
+}
+
+void Render::mouseReleaseEvent(QMouseEvent *event)
+{
+	m_mouseAdapter.mouseEvent(event);
+}
+
+void Render::setRotationX(float x)
+{
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotX(x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);
@@ -131,14 +158,16 @@ void Render::setRotationX(float x) {
 	m_matrix %= Mat4f::rotX(x * PI / 180.0f);
 }
 
-void Render::setRotationY(float x) {
+void Render::setRotationY(float x)
+{
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotY(x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);
 	m_matrix %= Mat4f::rotY(x * PI / 180.0f);
 }
 
-void Render::setRotationZ(float x) {
+void Render::setRotationZ(float x)
+{
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotZ(x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);

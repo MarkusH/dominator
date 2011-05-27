@@ -21,7 +21,6 @@ Q_OBJECT
 public:
 	Render(QString *filename = 0, QWidget *parent = 0);
 	void load(QString *filename);
-	void keyPressEvent(QKeyEvent *e);
 
 public slots:
 	void setRotationX(float x = 4.0f);
@@ -32,6 +31,11 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL(int width, int height);
 	virtual void paintGL();
+	virtual void keyPressEvent(QKeyEvent *event);
+	virtual void keyReleaseEvent(QKeyEvent *event);
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void mouseReleaseEvent(QMouseEvent *event);
 
 private:
 	Model3DS * model;
