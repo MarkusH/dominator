@@ -7,6 +7,7 @@
 #ifndef MAINWINDOW_HPP_
 #define MAINWINDOW_HPP_
 
+#include <QtCore/QTextCodec>
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
 #include <QtGui/QApplication>
@@ -32,11 +33,12 @@ public:
 private slots:
 	void OnClosePressed();
 	void updateFramesPerSecond(int frames);
-	void rotate();
+	void rotate(char axis, int angle);
 
 private:
 	void createMenu();
 	void createStatusBar();
+	void initialize();
 
 	QTimer *m_renderTimer;
 	Render *m_renderWindow;

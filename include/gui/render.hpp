@@ -19,15 +19,11 @@ Q_OBJECT
 public:
 	Render(QString *filename = 0, QWidget *parent = 0);
 	void load(QString *filename);
-	void rotate();
 
 public slots:
-	void setRotationXInc(float x = 4.0f);
-	void setRotationXDec(float x = 4.0f);
-	void setRotationYInc(float x = 4.0f);
-	void setRotationYDec(float x = 4.0f);
-	void setRotationZInc(float x = 4.0f);
-	void setRotationZDec(float x = 4.0f);
+	void setRotationX(float x = 4.0f);
+	void setRotationY(float x = 4.0f);
+	void setRotationZ(float x = 4.0f);
 
 protected:
 	virtual void initializeGL();

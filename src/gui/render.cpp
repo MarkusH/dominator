@@ -103,8 +103,6 @@ void Render::paintGL() {
 	// multiply object matrix with current modelview matrix (i.e. the camera)
 	glMultMatrixf(m_matrix[0]);
 
-	std::cout << m_matrix << std::endl;
-
 	// Draw our model
 	model->Draw();
 	static int frames = 0;
@@ -116,44 +114,23 @@ void Render::paintGL() {
 	}
 }
 
-void Render::setRotationXInc(float x) {
+void Render::setRotationX(float x) {
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotX(x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);
 	m_matrix %= Mat4f::rotX(x * PI / 180.0f);
 }
 
-void Render::setRotationXDec(float x) {
-	//	Vec3f pos = m_matrix.getW();
-	//	m_matrix = Mat4f::rotX(-x * PI / 180.0f) * m_matrix;
-	//	m_matrix.setW(pos);
-	m_matrix %= Mat4f::rotX(x * PI / 180.0f);
-}
-
-void Render::setRotationYInc(float x) {
+void Render::setRotationY(float x) {
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotY(x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);
 	m_matrix %= Mat4f::rotY(x * PI / 180.0f);
 }
 
-void Render::setRotationYDec(float x) {
-	//	Vec3f pos = m_matrix.getW();
-	//	m_matrix = Mat4f::rotY(-x * PI / 180.0f) * m_matrix;
-	//	m_matrix.setW(pos);
-	m_matrix %= Mat4f::rotY(x * PI / 180.0f);
-}
-
-void Render::setRotationZInc(float x) {
+void Render::setRotationZ(float x) {
 	//	Vec3f pos = m_matrix.getW();
 	//	m_matrix = Mat4f::rotZ(x * PI / 180.0f) * m_matrix;
-	//	m_matrix.setW(pos);
-	m_matrix %= Mat4f::rotZ(x * PI / 180.0f);
-}
-
-void Render::setRotationZDec(float x) {
-	//	Vec3f pos = m_matrix.getW();
-	//	m_matrix = Mat4f::rotZ(-x * PI / 180.0f) * m_matrix;
 	//	m_matrix.setW(pos);
 	m_matrix %= Mat4f::rotZ(x * PI / 180.0f);
 }
