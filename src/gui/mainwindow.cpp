@@ -30,7 +30,11 @@ MainWindow::MainWindow(QApplication *app) {
 	createMenu();
 	app->processEvents();
 
+	createStatusBar();
+	app->processEvents();
+
 	m_modifyBox = new ModifyBox();
+	m_modifyBox->move(10, 250);
 	app->processEvents();
 
 	m_toolBox = new ToolBox();
@@ -39,7 +43,7 @@ MainWindow::MainWindow(QApplication *app) {
 
 	m_renderWindow = new Render(new QString("data/models/monkey.3ds"), this);
 	m_renderWindow->setMinimumWidth(400);
-	m_renderTimer= new QTimer(this);
+	m_renderTimer = new QTimer(this);
 	m_renderTimer->start();
 	connect(m_renderTimer, SIGNAL(timeout()), m_renderWindow, SLOT(updateGL()));
 	m_renderWindow->show();
@@ -109,4 +113,32 @@ void MainWindow::createMenu() {
 
 	m_info = new QAction("&Info", this);
 	m_menuHelp->addAction(m_info);
+}
+
+void MainWindow::createStatusBar() {
+	m_framesPerSec = new QLabel("nA");
+	m_framesPerSec->setMinimumSize(m_framesPerSec->sizeHint());
+	m_framesPerSec->setAlignment(Qt::AlignRight);
+	m_framesPerSec->setToolTip("Current frames per second not yet initialized.");
+	statusBar()->addWidget(m_framesPerSec);
+	statusBar()->addWidget(new QLabel("frames/s"));
+
+	m_objectsCount = new QLabel("1");
+	m_objectsCount->setMinimumSize(m_objectsCount->sizeHint());
+	m_objectsCount->setAlignment(Qt::AlignRight);
+	m_objectsCount->setToolTip("There is 1 object in the world");
+	statusBar()->addWidget(m_objectsCount);
+	statusBar()->addWidget(new QLabel("objects"));
+
+	m_currentFilename = new QLabel("");
+	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
+	m_currentFilename->setAlignment(Qt::AlignCenter);
+	m_currentFilename->setToolTip("The world is not saved");
+	statusBar()->addWidget(m_currentFilename);
+
+	statusBar()->showMessage("Ready", 2000);
+}
+
+void MainWindow::updateFramesPerSecond(int frames) {
+	m_framesPerSec->setText(QString::number(frames));
 }
