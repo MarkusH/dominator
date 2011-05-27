@@ -68,8 +68,9 @@ MainWindow::MainWindow(QApplication *app) {
 	splash.finish(this);
 
 	// Just for debugging
+	m_renderWindow->setRotationXInc(90.0f);
 	QTimer *rotx = new QTimer(this);
-	rotx->setInterval(30);
+	//rotx->setInterval(15);
 	rotx->start();
 	connect(rotx, SIGNAL(timeout()), this, SLOT(rotate()));
 }

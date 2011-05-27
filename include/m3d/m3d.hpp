@@ -19,6 +19,8 @@
 #include <sstream>
 #include <math.h>
 
+//#include <iostream>
+
 #define M3D_USE_OPENGL 1
 
 #ifdef M3D_USE_OPENGL
