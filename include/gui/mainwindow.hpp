@@ -18,6 +18,7 @@
 #include <QtGui/QComboBox>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
+#include <QtGui/QStatusBar>
 #include <QtGui/QAction>
 #include <QtCore/QTimer>
 
@@ -28,11 +29,15 @@ Q_OBJECT
 public:
 	MainWindow(QApplication *app);
 
+protected slots:
+	void updateFramesPerSecond(int frames);
+
 private slots:
 	void OnClosePressed();
 
 private:
 	void createMenu();
+	void createStatusBar();
 
 	QTimer *m_renderTimer;
 	Render *m_renderWindow;
@@ -53,6 +58,10 @@ private:
 	ModifyBox *m_modifyBox;
 
 	QSplitter *m_splitter;
+
+	QLabel *m_framesPerSec;
+	QLabel *m_objectsCount;
+	QLabel *m_currentFilename;
 };
 
 #endif /* MAINWINDOW_HPP_ */

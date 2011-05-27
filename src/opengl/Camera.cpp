@@ -96,7 +96,7 @@ Vec3f Camera::viewVector() const
 
 Vec3f Camera::pointer() const
 {
-	Vec4i viewport = Vec4i::viewport();
+	Vec4<GLint> viewport = Vec4<GLint>::viewport();
 	return pointer((viewport.z - viewport.x) / 2,
 				   (viewport.w - viewport.y) / 2);
 }
@@ -105,7 +105,7 @@ Vec3f Camera::pointer(int x, int y) const
 {
 	Mat4d modelview = Mat4d::modelview();
 	Mat4d projection = Mat4d::projection();
-	Vec4i viewport = Vec4i::viewport();
+	Vec4<GLint> viewport = Vec4<GLint>::viewport();
 	GLfloat z;
 
 	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);

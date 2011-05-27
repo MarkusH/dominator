@@ -89,10 +89,8 @@ void Render::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-#ifdef _WIN32
-#else
+
 	ogl::ShaderMgr::instance().get("ppl")->bind();
-#endif
 
 	// set the position of the light
 	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);

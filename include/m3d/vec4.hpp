@@ -20,7 +20,7 @@ public:
 	Vec4<T>(const Vec3<T>& v, const T& w = (T)0);
 
 #ifdef M3D_USE_OPENGL
-	static Vec4i viewport();
+	static Vec4<GLint> viewport();
 #endif
 
 	Vec4<T> normalized() const;
@@ -102,9 +102,9 @@ Vec4<T>::Vec4(const Vec3<T>& v, const T& w)
 #ifdef M3D_USE_OPENGL
 template<typename T>
 inline
-Vec4i Vec4<T>::viewport()
+Vec4<GLint> Vec4<T>::viewport()
 {
-	Vec4i res;
+	Vec4<GLint> res;
 	glGetIntegerv(GL_VIEWPORT, &res[0]);
 	return res;
 }

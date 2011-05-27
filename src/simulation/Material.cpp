@@ -7,7 +7,11 @@
 
 #include <simulation/Material.hpp>
 #include <limits.h>
+#ifdef _WIN32
+#include <boost/functional/hash.hpp>
+#else
 #include <tr1/functional_hash.h>
+#endif
 #include <Newton.h>
 
 namespace sim {
