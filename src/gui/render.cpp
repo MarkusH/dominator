@@ -104,7 +104,7 @@ void Render::paintGL() {
 	static int frames = 0;
 	frames++;
 	if(m_clock.get() >= 1.0f) {
-		std::cout << frames << std::endl;
+		emit framesPerSecondChanged(frames);
 		m_clock.reset();
 		frames = 0;
 	}

@@ -29,11 +29,9 @@ Q_OBJECT
 public:
 	MainWindow(QApplication *app);
 
-protected slots:
-	void updateFramesPerSecond(int frames);
-
 private slots:
 	void OnClosePressed();
+	void updateFramesPerSecond(int frames);
 
 private:
 	void createMenu();

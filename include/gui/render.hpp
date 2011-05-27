@@ -38,6 +38,9 @@ private:
 	Model3DS * model;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
+
+signals:
+	void framesPerSecondChanged(int);
 };
 
 #endif /* RENDER_RENDER_HPP_ */
