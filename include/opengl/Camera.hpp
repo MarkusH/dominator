@@ -23,9 +23,16 @@ public:
 	Camera();
 	virtual ~Camera();
 
+	/** The position of the camera */
 	Vec4f m_position;
+
+	/** The focus point of the camera, this is not the view vector! */
 	Vec4f m_eye;
+
+	/** The up vector of the camera, usually (0, 1, 0) */
 	Vec4f m_up;
+
+	/** A vector perpendicular to the viewVector() and the up vector */
 	Vec4f m_strafe;
 
 	Mat4f m_matrix;

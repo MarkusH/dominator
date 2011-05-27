@@ -68,12 +68,23 @@ void Simulation::update()
 	if (m_keyAdapter.isDown('a')) m_camera.strafe(-step);
 	if (m_keyAdapter.isDown('s')) m_camera.move(-step);
 	if (m_keyAdapter.isDown('d')) m_camera.strafe(step);
+
+	Object obj = Object(new __Object());
+	m_objects.insert(std::make_pair(0, obj));
 }
 
 void Simulation::render()
 {
 	m_camera.update();
 	m_camera.apply();
+	glTranslatef(0.0f, 0.2f, -5.2f);
+	ObjectMap::iterator itr = m_objects.begin();
+	for ( ; itr != m_objects.end(); ++itr) {
+		glTranslatef(0.0f, 0.2f, -0.2f);
+		GLUquadric* q = gluNewQuadric();
+		gluSphere(q, 2.0f, 12, 24);
+		gluDeleteQuadric(q);
+	}
 }
 
 }
