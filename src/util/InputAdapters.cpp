@@ -20,18 +20,6 @@ KeyAdapter::KeyAdapter()
 {
 }
 
-KeyAdapter::~KeyAdapter()
-{
-}
-
-AsciiKeyAdapter::AsciiKeyAdapter()
-{
-}
-
-AsciiKeyAdapter::~AsciiKeyAdapter()
-{
-}
-
 void AsciiKeyAdapter::keyEvent(bool down, unsigned char key)
 {
 	if (down)
@@ -62,12 +50,6 @@ void QtKeyAdapter::keyEvent(QKeyEvent* event)
 	}
 }
 
-
-
-MouseAdapter::MouseAdapter()
-{
-}
-
 MouseAdapter::~MouseAdapter()
 {
 	m_listeners.clear();
@@ -88,16 +70,6 @@ void MouseAdapter::removeListener(MouseListener* listener)
 bool MouseAdapter::isDown(Button button)
 {
 	return m_down[button];
-}
-
-
-
-SimpleMouseAdapter::SimpleMouseAdapter()
-{
-}
-
-SimpleMouseAdapter::~SimpleMouseAdapter()
-{
 }
 
 void SimpleMouseAdapter::mouseMove(int x, int y)
@@ -121,14 +93,6 @@ void SimpleMouseAdapter::mouseButton(Button button, bool down, int x, int y)
 		(*itr)->mouseButton(button, down, x, y);
 	m_x = x;
 	m_y = y;
-}
-
-QtMouseAdapter::QtMouseAdapter()
-{
-}
-
-QtMouseAdapter::~QtMouseAdapter()
-{
 }
 
 void QtMouseAdapter::mouseEvent(QMouseEvent* event)

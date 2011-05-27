@@ -11,6 +11,7 @@
 #include <QtGui/QWidget>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
+#include <simulation/Simulation.hpp>
 
 using namespace m3d;
 
@@ -66,6 +67,8 @@ void Render::initializeGL() {
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
+	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
+
 	// Generate Vertex Buffer Objects
 	model->CreateVBO();
 	m_clock.reset();
@@ -89,6 +92,8 @@ void Render::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	sim::Simulation::instance().update();
+	sim::Simulation::instance().render();
 
 	ogl::ShaderMgr::instance().get("ppl")->bind();
 

@@ -13,6 +13,7 @@
 #include <opengl/Shader.hpp>
 #include <m3d/m3d.hpp>
 #include <util/Clock.hpp>
+#include <util/InputAdapters.hpp>
 
 class Render: public QGLWidget {
 Q_OBJECT
@@ -38,6 +39,9 @@ private:
 	Model3DS * model;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
+
+	util::QtMouseAdapter m_mouseAdapter;
+	util::QtKeyAdapter m_keyAdapter;
 };
 
 #endif /* RENDER_RENDER_HPP_ */

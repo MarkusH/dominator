@@ -36,7 +36,6 @@ protected:
 
 public:
 	KeyAdapter();
-	virtual ~KeyAdapter();
 
 	/**
 	 * Returns the state of the given key in ASCII format.
@@ -68,9 +67,6 @@ public:
  */
 class AsciiKeyAdapter : public KeyAdapter {
 public:
-	AsciiKeyAdapter();
-	virtual ~AsciiKeyAdapter();
-
 	void keyEvent(bool down, unsigned char key);
 	void changeAlt(bool alt) { m_alt = alt; };
 	void changeCtrl(bool ctrl) { m_ctrl = ctrl; };
@@ -82,9 +78,6 @@ public:
  */
 class QtKeyAdapter : public KeyAdapter {
 public:
-	QtKeyAdapter();
-	virtual ~QtKeyAdapter();
-
 	/**
 	 * Must be called if a new Qt key event is received. The method
 	 * will set the appropriate modifier and key states.
@@ -148,7 +141,6 @@ protected:
 	/** The x and y position of the mouse */
 	int m_x, m_y;
 public:
-	MouseAdapter();
 	virtual ~MouseAdapter();
 
 	/**
@@ -191,9 +183,6 @@ public:
  */
 class SimpleMouseAdapter : public MouseAdapter {
 public:
-	SimpleMouseAdapter();
-	virtual ~SimpleMouseAdapter();
-
 	/**
 	 * Must be called whenever the mouse is moved.
 	 *
@@ -218,9 +207,6 @@ public:
  */
 class QtMouseAdapter : public MouseAdapter {
 public:
-	QtMouseAdapter();
-	virtual ~QtMouseAdapter();
-
 	/**
 	 * Must be called if a new Qt mouse event is received. The
 	 * method will set the appropriate button and position states.
