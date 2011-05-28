@@ -35,9 +35,12 @@ public:
 	__Object(Type type);
 	virtual ~__Object();
 
+	virtual bool contains(const NewtonBody* const body) = 0;
+
 	virtual void render() = 0;
 
 	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
+	static RigidBody createBox(Mat4f matrix, float w, float h, float d, float mass, const std::string& material = "");
 
 	friend class __RigidBody;
 };
@@ -49,6 +52,8 @@ public:
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "");
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "");
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "");
+
+	virtual bool contains(const NewtonBody* const body);
 
 	virtual void render();
 

@@ -36,6 +36,7 @@ protected:
 
 	ogl::Camera m_camera;
 
+	int m_nextID;
 	ObjectMap m_objects;
 
 	NewtonWorld* m_world;
@@ -63,11 +64,43 @@ public:
 	 */
 	static Simulation& instance();
 
+
+
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;
 
 	/** @return Returns the current gravity */
 	float getGravity() const;
+
+	/** @return The camera */
+	ogl::Camera& getCamera();
+
+
+	/**
+	 * Selects the object at the viewport position (x, y). If
+	 * there is no object, returns an empty smart pointer.
+	 *
+	 * @param x The x coordinate of the viewport
+	 * @param y The y coordinate of the viewport
+	 * @return  The selected body, or an empty smart pointer
+	 */
+	Object selectObject(int x, int y);
+
+	/**
+	 * Adds the specified object to the simulation.
+	 *
+	 * @param object The object to add
+	 * @return		 The id of the object
+	 */
+	int add(Object object);
+
+	/**
+	 * Removes the object from the simulation.
+	 *
+	 * @param object The object to remove
+	 */
+	void remove(Object object);
+
 
 	virtual void mouseMove(int x, int y);
 	virtual void mouseButton(util::Button button, bool down, int x, int y);
@@ -78,6 +111,8 @@ public:
 };
 
 
+// inline methods
+
 inline NewtonWorld* Simulation::getWorld() const
 {
 	return m_world;
@@ -86,6 +121,11 @@ inline NewtonWorld* Simulation::getWorld() const
 inline float Simulation::getGravity() const
 {
 	return m_gravity;
+}
+
+inline ogl::Camera& Simulation::getCamera()
+{
+	return m_camera;
 }
 
 }
