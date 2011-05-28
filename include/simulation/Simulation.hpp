@@ -13,6 +13,7 @@
 #include <opengl/Camera.hpp>
 #include <simulation/Object.hpp>
 #include <map>
+#include <Newton.h>
 
 
 namespace sim {
@@ -37,6 +38,9 @@ protected:
 
 	ObjectMap m_objects;
 
+	NewtonWorld* m_world;
+	float m_gravity;
+
 public:
 	/**
 	 * Creates a new instance of the Simulation.
@@ -59,6 +63,12 @@ public:
 	 */
 	static Simulation& instance();
 
+	/** @return The handle to the NewtonWorld */
+	NewtonWorld* getWorld() const;
+
+	/** @return Returns the current gravity */
+	float getGravity() const;
+
 	virtual void mouseMove(int x, int y);
 	virtual void mouseButton(util::Button button, bool down, int x, int y);
 
@@ -66,6 +76,17 @@ public:
 	void update();
 	void render();
 };
+
+
+inline NewtonWorld* Simulation::getWorld() const
+{
+	return m_world;
+}
+
+inline float Simulation::getGravity() const
+{
+	return m_gravity;
+}
 
 }
 
