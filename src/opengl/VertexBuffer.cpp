@@ -10,7 +10,8 @@
 namespace ogl {
 
 VertexBuffer::VertexBuffer()
-	: m_ibo(0), m_vbo(0),
+	: m_format(GL_T2F_N3F_V3F),
+	  m_ibo(0), m_vbo(0),
 	  m_vboSize(0), m_vboUsedSize(0),
 	  m_iboSize(0), m_iboUsedSize(0)
 {

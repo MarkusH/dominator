@@ -15,6 +15,7 @@
 #endif
 #include <string>
 #include <simulation/Body.hpp>
+#include <opengl/VertexBuffer.hpp>
 
 namespace sim {
 
@@ -35,8 +36,26 @@ public:
 	__Object(Type type);
 	virtual ~__Object();
 
+	/**
+	 * Checks whether this object contains the given NewtonBody.
+	 *
+	 * @param body The NewtonBody to find
+	 * @return True, if the object contains the NewtonBody, false otherwise
+	 */
 	virtual bool contains(const NewtonBody* const body) = 0;
 
+	/**
+	 * Generates the vertices, uv-coordinates, normals and indices (buffers)
+	 * of this object. The data will be added to the given vertex buffer object.
+	 *
+	 * @param vbo The VBO the add the data to
+	 * @return    The number of sub-buffers added
+	 */
+	virtual void genBuffers(ogl::VertexBuffer& vbo) = 0;
+
+	/**
+	 * Renders the object in debugging mode.
+	 */
 	virtual void render() = 0;
 
 	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
@@ -54,6 +73,8 @@ public:
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "");
 
 	virtual bool contains(const NewtonBody* const body);
+
+	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
 	virtual void render();
 

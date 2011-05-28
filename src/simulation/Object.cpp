@@ -72,6 +72,81 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const
 {
 }
 
+void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
+{
+	// get the offset in floats and vertices
+	const unsigned vertexSize = vbo.floatSize();
+	const unsigned byteSize = vbo.byteSize();
+	const unsigned floatOffset = vbo.m_data.size();
+	const unsigned vertexOffset = floatOffset / vertexSize;
+
+	NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+
+	// create a mesh from the collision
+	NewtonMesh* collisionMesh = NewtonMeshCreateFromCollision(collision);
+
+	switch (m_type) {
+	case SPHERE:
+		NewtonMeshApplySphericalMapping(collisionMesh, 0);
+		break;
+//	case CYLINDER:
+//		NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
+//		break;
+	case BOX:
+	default:
+		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);
+		break;
+	}
+
+	//NewtonMeshCalculateVertexNormals(collisionMesh, 60.0f * 3.1416f/180.0f);
+
+
+	// allocate the vertex data
+	int vertexCount = NewtonMeshGetPointCount(collisionMesh);
+
+	vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
+	vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
+
+	NewtonMeshGetVertexStreams(collisionMesh,
+			byteSize, &vbo.m_data[floatOffset + 2 + 3],
+			byteSize, &vbo.m_data[floatOffset + 2],
+			byteSize, &vbo.m_data[floatOffset],
+			byteSize, &vbo.m_data[floatOffset]);
+
+	// iterate over the submeshes and store the indices
+	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
+	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
+			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
+
+		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
+
+		// create a new submesh
+		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
+		subBuffer->material = m_material;
+		subBuffer->object = this;
+
+		subBuffer->dataCount = vertexCount;
+		subBuffer->dataOffset = vertexOffset;
+
+		// get the indices
+		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
+		uint32_t* indices = new unsigned[subBuffer->indexCount];
+		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
+
+		subBuffer->indexOffset = vbo.m_indices.size();
+
+		// copy the indices to the global list and add the offset
+		vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
+		for (unsigned i = 0; i < subBuffer->indexCount; ++i)
+			vbo.m_indices.push_back(vertexOffset + indices[i]);
+
+		delete indices;
+		vbo.m_buffers.push_back(subBuffer);
+	}
+	NewtonMeshEndHandle(collisionMesh, meshCookie);
+	NewtonMeshDestroy(collisionMesh);
+}
+
 bool __RigidBody::contains(const NewtonBody* const body)
 {
 	return m_body == body;

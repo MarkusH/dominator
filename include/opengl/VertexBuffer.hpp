@@ -58,6 +58,9 @@ typedef std::list<SubBuffer*> SubBuffers;
  */
 class VertexBuffer {
 public:
+	// the format of the buffer, using the GL_ constants
+	GLuint m_format;
+
 	// index and vertex buffers
 	GLuint m_ibo, m_vbo;
 	// actual size and used size of the buffers
@@ -75,6 +78,12 @@ public:
 	VertexBuffer();
 	~VertexBuffer();
 
+	/** @return The size of a single vertex in floats */
+	unsigned floatSize();
+
+	/** @return The size of a single vertex in bytes */
+	unsigned byteSize();
+
 	/**
 	 * Uploads and creates the buffers.
 	 */
@@ -85,6 +94,18 @@ public:
 	 */
 	void flush();
 };
+
+inline unsigned VertexBuffer::floatSize()
+{
+	switch (m_format) {
+	case GL_T2F_N3F_V3F:
+		return (2 + 3 + 3);
+	}
+}
+inline unsigned VertexBuffer::byteSize()
+{
+	return floatSize() * 4;
+}
 
 }
 
