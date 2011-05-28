@@ -11,6 +11,7 @@
 #include <util/InputAdapters.hpp>
 #include <util/Clock.hpp>
 #include <opengl/Camera.hpp>
+#include <opengl/VertexBuffer.hpp>
 #include <simulation/Object.hpp>
 #include <map>
 #include <Newton.h>
@@ -30,17 +31,21 @@ private:
 	virtual ~Simulation();
 
 protected:
+	// input adapters
 	util::KeyAdapter& m_keyAdapter;
 	util::MouseAdapter& m_mouseAdapter;
+
 	util::Clock m_clock;
 
 	ogl::Camera m_camera;
 
+	NewtonWorld* m_world;
+	float m_gravity;
+
 	int m_nextID;
 	ObjectMap m_objects;
 
-	NewtonWorld* m_world;
-	float m_gravity;
+	ogl::VertexBuffer m_vertexBuffer;
 
 public:
 	/**
