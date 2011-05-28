@@ -49,11 +49,18 @@ Simulation::~Simulation()
 }
 
 
-
+void Simulation::upload(ObjectMap::iterator begin, ObjectMap::iterator end)
+{
+	for (ObjectMap::iterator itr = begin; itr != end; ++itr) {
+		itr->second->genBuffers(m_vertexBuffer);
+	}
+	m_vertexBuffer.upload();
+}
 
 int Simulation::add(Object object)
 {
-	m_objects.insert(std::make_pair(++m_nextID, object));
+	ObjectMap::iterator begin = m_objects.insert(std::make_pair(++m_nextID, object)).first;
+	upload(begin, m_objects.end());
 	return m_nextID;
 }
 
@@ -109,11 +116,13 @@ void Simulation::mouseMove(int x, int y)
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	if (!m_objects.size()) {
-		Object obj = __Object::createSphere(Mat4f::identity(), 2.0f, 1.0f, "yellow");
-		m_objects.insert(std::make_pair(0, obj));
+		Mat4f matrix = Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
+		Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
+		add(obj);
 	} else if (m_objects.size() == 1) {
-		Object obj = __Object::createBox(Mat4f::identity(), 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
-		m_objects.insert(std::make_pair(1, obj));
+		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 0.0f, -5.0f));
+		Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
+		add(obj);
 	} else {
 		Object selection = selectObject(x, y);
 		std::cout << selection.get() << std::endl;
@@ -146,18 +155,24 @@ void Simulation::render()
 
 	ogl::TextureMgr::instance().get("yellow")->bind();
 
-	//glTranslatef(0.0f, 0.2f, -5.2f);
+	/*
 	ObjectMap::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
 		itr->second->render();
-		/*
-		glTranslatef(0.0f, 0.2f, -0.2f);
-		GLUquadric* q = gluNewQuadric();
-		gluQuadricTexture(q, GL_TRUE);
-		gluQuadricNormals(q, GL_TRUE);
-		gluSphere(q, 2.0f, 12, 24);
-		gluDeleteQuadric(q);
-		*/
+	}*/
+
+	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
+		m_vertexBuffer.bind();
+
+		ogl::SubBuffers::iterator itr = m_vertexBuffer.m_buffers.begin();
+		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {
+			ogl::SubBuffer* buf = (*itr);
+			__Object* obj = (__Object*)buf->object;
+			glPushMatrix();
+			glMultMatrixf(obj->getMatrix()[0]);
+			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
+			glPopMatrix();
+		}
 	}
 }
 

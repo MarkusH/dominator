@@ -53,7 +53,7 @@ public:
 	NewtonCollision* getCollision() const;
 
 	/** @return The Matrix of this body */
-	const Mat4f& getMatrix();
+	virtual const Mat4f& getMatrix();
 
 	/**
 	 * Sets the matrix of this body.

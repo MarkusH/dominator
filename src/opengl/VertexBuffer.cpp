@@ -22,6 +22,32 @@ VertexBuffer::~VertexBuffer()
 	flush();
 }
 
+void VertexBuffer::bind(bool setup)
+{
+	if (m_vbo) {
+		if (setup) {
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+		if (setup) {
+			glVertexPointer(3, GL_FLOAT, byteSize(), (void*)((2+3)*4));
+			glTexCoordPointer(3, GL_FLOAT, byteSize(), (void*)0);
+			glNormalPointer(GL_FLOAT, byteSize(), (void*)((2)*4));
+		}
+	}
+
+	if (m_ibo) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+		if (setup) {
+			glIndexPointer(GL_UNSIGNED_INT, 0, 0);
+		}
+	}
+
+}
+
 void VertexBuffer::upload()
 {
 	// calculate the actual size of the required buffer

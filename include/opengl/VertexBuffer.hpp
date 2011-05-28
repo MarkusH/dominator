@@ -85,6 +85,14 @@ public:
 	unsigned byteSize();
 
 	/**
+	 * Binds the vertex buffer object. If setup is specified, also enables
+	 * the client states and sets the element pointers.
+	 *
+	 * @param setup If true, a setup is done
+	 */
+	void bind(bool setup = true);
+
+	/**
 	 * Uploads and creates the buffers.
 	 */
 	void upload();
@@ -101,7 +109,9 @@ inline unsigned VertexBuffer::floatSize()
 	case GL_T2F_N3F_V3F:
 		return (2 + 3 + 3);
 	}
+	return 0;
 }
+
 inline unsigned VertexBuffer::byteSize()
 {
 	return floatSize() * 4;

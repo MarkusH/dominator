@@ -47,6 +47,14 @@ protected:
 
 	ogl::VertexBuffer m_vertexBuffer;
 
+	/**
+	 * Uploads the vertex data of all objects between begin
+	 * and end, not including end.
+	 *
+	 * @param begin The first object to upload
+	 * @param end   The end iterator
+	 */
+	void upload(ObjectMap::iterator begin, ObjectMap::iterator end);
 public:
 	/**
 	 * Creates a new instance of the Simulation.
