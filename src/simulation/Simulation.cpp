@@ -122,7 +122,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 
 
 void Simulation::mouseWheel(int delta) {
-	float step = delta / 0.08;
+	float step = delta / 800.0;
 	m_camera.move(step);
 }
 

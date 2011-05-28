@@ -154,7 +154,7 @@ void Render::mouseReleaseEvent(QMouseEvent *event)
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mouseWheelEvent(QWheelEvent *event) {
+void Render::wheelEvent(QWheelEvent *event) {
 	m_mouseAdapter.mouseWheelEvent(event);
 }
 
