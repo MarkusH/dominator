@@ -121,6 +121,11 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 }
 
 
+void Simulation::mouseWheel(int delta) {
+	float step = delta / 0.08;
+	m_camera.move(step);
+}
+
 void Simulation::update()
 {
 	float delta = m_clock.get();

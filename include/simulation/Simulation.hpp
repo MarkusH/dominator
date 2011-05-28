@@ -109,6 +109,7 @@ public:
 
 	virtual void mouseMove(int x, int y);
 	virtual void mouseButton(util::Button button, bool down, int x, int y);
+	virtual void mouseWheel(int delta);
 
 
 	void update();

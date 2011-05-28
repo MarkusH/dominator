@@ -154,6 +154,10 @@ void Render::mouseReleaseEvent(QMouseEvent *event)
 	m_mouseAdapter.mouseEvent(event);
 }
 
+void Render::mouseWheelEvent(QWheelEvent *event) {
+	m_mouseAdapter.mouseWheelEvent(event);
+}
+
 void Render::setRotationX(float x)
 {
 	//	Vec3f pos = m_matrix.getW();

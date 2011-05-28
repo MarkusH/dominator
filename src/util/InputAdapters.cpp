@@ -8,6 +8,7 @@
 #include <util/InputAdapters.hpp>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QWheelEvent>
 
 //#include <boost/foreach.hpp>
 
@@ -140,6 +141,12 @@ void QtMouseAdapter::mouseEvent(QMouseEvent* event)
 
 	m_x = event->x();
 	m_y = event->y();
+}
+
+void QtMouseAdapter::mouseWheelEvent(QWheelEvent* event) {
+	for (std::list<MouseListener*>::iterator itr = m_listeners.begin();
+			itr != m_listeners.end(); ++itr)
+		(*itr)->mouseWheel(event->delta());
 }
 
 }

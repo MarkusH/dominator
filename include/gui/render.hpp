@@ -15,7 +15,6 @@
 #include <m3d/m3d.hpp>
 #include <util/Clock.hpp>
 #include <util/InputAdapters.hpp>
-#include <QtGui/QKeyEvent>
 
 class Render: public QGLWidget {
 Q_OBJECT
@@ -37,6 +36,7 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent *event);
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
+	virtual void mouseWheelEvent(QWheelEvent *event);
 
 private:
 	QTimer *m_timer;
