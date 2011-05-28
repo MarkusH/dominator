@@ -7,6 +7,7 @@
 
 #include <simulation/Simulation.hpp>
 #include <opengl/Texture.hpp>
+#include <iostream>
 
 namespace sim {
 
@@ -36,6 +37,8 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_mouseAdapter(mouseAdapter)
 {
 	m_mouseAdapter.addListener(this);
+
+	m_world = NewtonCreate();
 }
 
 Simulation::~Simulation()
@@ -55,6 +58,10 @@ void Simulation::mouseMove(int x, int y)
 
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
+	if (!m_objects.size()) {
+		Object obj = __Object::createSphere(Mat4f::identity(), 2.0f, 1.0f, "yellow");
+		m_objects.insert(std::make_pair(0, obj));
+	}
 }
 
 
@@ -69,9 +76,6 @@ void Simulation::update()
 	if (m_keyAdapter.isDown('a')) m_camera.strafe(-step);
 	if (m_keyAdapter.isDown('s')) m_camera.move(-step);
 	if (m_keyAdapter.isDown('d')) m_camera.strafe(step);
-
-	Object obj = Object(new __Object());
-	m_objects.insert(std::make_pair(0, obj));
 }
 
 void Simulation::render()
@@ -84,12 +88,15 @@ void Simulation::render()
 	glTranslatef(0.0f, 0.2f, -5.2f);
 	ObjectMap::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
+		itr->second->render();
+		/*
 		glTranslatef(0.0f, 0.2f, -0.2f);
 		GLUquadric* q = gluNewQuadric();
 		gluQuadricTexture(q, GL_TRUE);
 		gluQuadricNormals(q, GL_TRUE);
 		gluSphere(q, 2.0f, 12, 24);
 		gluDeleteQuadric(q);
+		*/
 	}
 }
 
