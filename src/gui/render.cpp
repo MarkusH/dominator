@@ -14,6 +14,7 @@
 #include <simulation/Simulation.hpp>
 #include <opengl/Texture.hpp>
 #include <iostream>
+#include <simulation/Material.hpp>
 
 using namespace m3d;
 
@@ -48,6 +49,7 @@ void Render::initializeGL()
 	// load per-pixel lighting shader
 	ogl::ShaderMgr::instance().load("data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
+	sim::MaterialMgr::instance().load("data/materials.xml");
 
 	// set some material properties
 	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
