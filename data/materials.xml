@@ -20,7 +20,7 @@
 
 			
 	-->
-    <material name="wood_shiny" texture="wood_shiny" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.6, 0.6, 0.6, 1" shininess="50" />
+  <material name="wood_shiny" texture="wood_shiny" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.6, 0.6, 0.6, 1" shininess="50" />
 	<material name="wood_matt" texture="wood_matt" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<!-- 
 	For each pair of materials, there can be a material-pair that defines their

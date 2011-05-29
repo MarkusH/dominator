@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <xml/rapidxml.hpp>
 
 namespace sim {
 
@@ -50,7 +51,7 @@ struct Material {
 	 */
 	Material(const Material& m);
 
-	//void load(XMLNode);
+	void load(rapidxml::xml_node<>* n);
 	//void save(XMLNode) const;
 };
 
@@ -80,7 +81,7 @@ struct MaterialPair {
 	 */
 	MaterialPair(const MaterialPair& p);
 
-	//void load(XMLNode);
+	void load(rapidxml::xml_node<>* n);
 	//void save(XMLNode) const;
 };
 
