@@ -130,7 +130,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 		// get the indices
 		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-		uint32_t* indices = new unsigned[subBuffer->indexCount];
+		uint32_t* indices = new uint32_t[subBuffer->indexCount];
 		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
 
 		subBuffer->indexOffset = vbo.m_indices.size();
