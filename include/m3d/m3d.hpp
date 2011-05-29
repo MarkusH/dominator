@@ -18,6 +18,9 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include <algorithm>
+
+//#include <iostream>
 
 #define M3D_USE_OPENGL 1
 

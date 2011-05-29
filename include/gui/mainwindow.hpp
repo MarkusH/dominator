@@ -7,8 +7,7 @@
 #ifndef MAINWINDOW_HPP_
 #define MAINWINDOW_HPP_
 
-#include <gui/toolbox.hpp>
-#include <gui/modifybox.hpp>
+#include <QtCore/QTextCodec>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
@@ -20,7 +19,9 @@
 #include <QtGui/QMenuBar>
 #include <QtGui/QStatusBar>
 #include <QtGui/QAction>
-#include <QtCore/QTimer>
+#include <gui/toolbox.hpp>
+#include <gui/modifybox.hpp>
+
 
 class Render;
 
@@ -29,17 +30,15 @@ Q_OBJECT
 public:
 	MainWindow(QApplication *app);
 
-protected slots:
-	void updateFramesPerSecond(int frames);
-
 private slots:
 	void OnClosePressed();
+	void updateFramesPerSecond(int frames);
 
 private:
 	void createMenu();
 	void createStatusBar();
+	void initialize();
 
-	QTimer *m_renderTimer;
 	Render *m_renderWindow;
 
 	QMenu *m_menuFile;

@@ -128,6 +128,8 @@ public:
 	Mat4<T> inverse() const;
 	Mat4<T> orthonormalInverse() const;
 
+	Vec3<T> eulerAngles() const;
+
 	static Mat4<T> identity();
 	static Mat4<T> translate(const Vec3<T>& translation);
 	static Mat4<T> rotX(const T& angle);
@@ -386,6 +388,16 @@ template<typename T>
 inline
 Mat4<T>& Mat4<T>::operator%=(const Mat4<T>& m)
 {
+
+	Mat4<T> _m = m * *this;
+	_m.setW(this->getW());
+	_m.setX(_m.getX().normalized());
+	_m.setY(_m.getY().normalized());
+	_m.setZ(_m.getZ().normalized());
+	*this = _m;
+	return *this;
+
+/*
 	T t1, t2, t3, t4;
 	t1 = m._11*_11 + m._12*_21 + m._13*_31 + m._14*_41;
 	t2 = m._11*_12 + m._12*_22 + m._13*_32 + m._14*_42;
@@ -396,6 +408,8 @@ Mat4<T>& Mat4<T>::operator%=(const Mat4<T>& m)
 	_13 = t3;
 	_14 = t4;
 
+	std::cout << t1 << ", " << t2 << ", " << t3 << ", " << t4 << ", " << std::endl;
+
 	t1 = m._21*_11 + m._22*_21 + m._23*_31 + m._24*_41;
 	t2 = m._21*_12 + m._22*_22 + m._23*_32 + m._24*_42;
 	t3 = m._21*_13 + m._22*_23 + m._23*_33 + m._24*_43;
@@ -404,6 +418,9 @@ Mat4<T>& Mat4<T>::operator%=(const Mat4<T>& m)
 	_22 = t2;
 	_23 = t3;
 	_24 = t4;
+
+	std::cout << t1 << ", " << t2 << ", " << t3 << ", " << t4 << ", " << std::endl;
+
 
 	t1 = m._31*_11 + m._32*_21 + m._33*_31 + m._34*_41;
 	t2 = m._31*_12 + m._32*_22 + m._33*_32 + m._34*_42;
@@ -414,6 +431,11 @@ Mat4<T>& Mat4<T>::operator%=(const Mat4<T>& m)
 	_33 = t3;
 	_34 = t4;
 
+	// _32 and _33 need to be exchanged, no idea why though
+
+	std::cout << t1 << ", " << t2 << ", " << t3 << ", " << t4 << ", " << std::endl;
+
+*/
 	return *this;
 }
 
@@ -431,6 +453,8 @@ Mat4<T>& Mat4<T>::rotMultiply(const Mat4<T>& m)
 	_13 = t3;
 	_14 = t4;
 
+	//std::cout << t1 << ", " << t2 << ", " << t3 << ", " << t4 << ", " << std::endl;
+
 	t1 = _21*m._11 + _22*m._21 + _23*m._31 + _24*m._41;
 	t2 = _21*m._12 + _22*m._22 + _23*m._32 + _24*m._42;
 	t3 = _21*m._13 + _22*m._23 + _23*m._33 + _24*m._43;
@@ -440,6 +464,9 @@ Mat4<T>& Mat4<T>::rotMultiply(const Mat4<T>& m)
 	_23 = t3;
 	_24 = t4;
 
+
+	//std::cout << t1 << ", " << t2 << ", " << t3 << ", " << t4 << ", " << std::endl;
+
 	t1 = _31*m._11 + _32*m._21 + _33*m._31 + _34*m._41;
 	t2 = _31*m._12 + _32*m._22 + _33*m._32 + _34*m._42;
 	t3 = _31*m._13 + _32*m._23 + _33*m._33 + _34*m._43;
@@ -448,6 +475,9 @@ Mat4<T>& Mat4<T>::rotMultiply(const Mat4<T>& m)
 	_32 = t2;
 	_33 = t3;
 	_34 = t4;
+
+
+	//std::cout << t1 << ", " << t2 << ", " << t3 << ", " << t4 << ", " << std::endl;
 
 	setW(m.getW());
 
@@ -541,6 +571,30 @@ Mat4<T> Mat4<T>::orthonormalInverse() const
 				   _12, _22, _32, 0,
 				   _13, _23, _33, 0,
 				    -x,  -y,  -z, 1 );
+}
+
+template<typename T>
+inline
+Vec3<T> Mat4<T>::eulerAngles() const
+{
+	float yaw = 0.0f, roll = 0.0f, pitch = 0.0f;
+
+	if (_32 > 0.99995) {
+		roll = 0.0f;
+		pitch = -PI / 2.0f;
+		yaw = -roll - atan2(_21, _11);
+	} else if (_32 < -0.99995) {
+		roll = 0.0f;
+		pitch = PI / 2.0f;
+		yaw = roll + atan2(_21, _11);
+	} else {
+		pitch = asin(-_32);
+		T t = cos(pitch);
+		yaw = atan2(_31 / t, _33 / t);
+		roll = atan2(_12 / t, _22 / t);
+	}
+
+	return Vec3<T>(pitch, yaw, roll);
 }
 
 template<typename T>

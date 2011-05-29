@@ -3,10 +3,9 @@
  *
  *      Author: Markus Holtermann
  */
-#include "gui/mainwindow.hpp"
-
 #include <iostream>
 #include <QtGui/QApplication>
+#include <gui/mainwindow.hpp>
 
 int main(int argc, char **argv) {
 	std::cout << "Totally Unrelated Studios proudly presents:" << std::endl

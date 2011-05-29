@@ -15,6 +15,7 @@
 // we will do in in the .cpp file for faster compilation
 class QKeyEvent;
 class QMouseEvent;
+class QWheelEvent;
 
 namespace util {
 
@@ -119,6 +120,22 @@ public:
 	 * @param y      The y position of the mouse
 	 */
 	virtual void mouseButton(Button button, bool down, int x, int y) = 0;
+
+	/**
+	 * This methid is called whenever a double click was made by the user.
+	 *
+	 * @param button The button that was pressed
+	 * @param x      The x position of the mouse
+	 * @param y      The y position of the mouse
+	 */
+	virtual void mouseDoubleClick(Button button, int x, int y) = 0;
+
+	/**
+	 * This method is called whenever the mouse wheel is rotated
+	 *
+	 * @param delta	 The delta of rotation in eighths of a degree
+	 */
+	virtual void mouseWheel(int delta) = 0;
 };
 
 /**
@@ -211,9 +228,15 @@ public:
 	 * Must be called if a new Qt mouse event is received. The
 	 * method will set the appropriate button and position states.
 	 *
-	 * @param event The received Qt key event
+	 * @param event The received Qt mouse event
 	 */
 	void mouseEvent(QMouseEvent* event);
+
+	/**
+	 *
+	 * @param event The received Qt wheel event
+	 */
+	void mouseWheelEvent(QWheelEvent* event);
 };
 
 }

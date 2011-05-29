@@ -25,7 +25,7 @@ MainWindow::MainWindow(QApplication *app) {
 	splash.show();
 	app->processEvents();
 
-	this->setWindowTitle("TUStudios - DOMINATOR");
+	initialize();
 
 	createMenu();
 	app->processEvents();
@@ -38,14 +38,11 @@ MainWindow::MainWindow(QApplication *app) {
 	app->processEvents();
 
 	m_toolBox = new ToolBox();
-	//m_toolBox->addWidget(m_modifyBox);
+	m_toolBox->addWidget(m_modifyBox);
 	app->processEvents();
 
 	m_renderWindow = new Render(new QString("data/models/monkey.3ds"), this);
 	m_renderWindow->setMinimumWidth(400);
-	m_renderTimer = new QTimer(this);
-	m_renderTimer->start();
-	connect(m_renderTimer, SIGNAL(timeout()), m_renderWindow, SLOT(updateGL()));
 	m_renderWindow->show();
 
 	m_splitter = new QSplitter(Qt::Horizontal);
@@ -61,11 +58,16 @@ MainWindow::MainWindow(QApplication *app) {
 	m_splitter->setChildrenCollapsible(false);
 
 	setCentralWidget(m_splitter);
-	m_modifyBox->setParent(this);
+
+	connect(m_renderWindow, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
+	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
+	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
+	connect(m_modifyBox, SIGNAL(changeSize(char, int)), m_renderWindow, SLOT(renderSize(char, int)));
+	connect(m_modifyBox, SIGNAL(changeLocation(char, int)), m_renderWindow, SLOT(renderLocation(char, int)));
+	connect(m_modifyBox, SIGNAL(changeRotation(char, int)), m_renderWindow, SLOT(renderRotation(char, int)));
 
 	showMaximized();
 	splash.finish(this);
-
 }
 
 void MainWindow::OnClosePressed() {
@@ -118,27 +120,29 @@ void MainWindow::createMenu() {
 void MainWindow::createStatusBar() {
 	m_framesPerSec = new QLabel("nA");
 	m_framesPerSec->setMinimumSize(m_framesPerSec->sizeHint());
-	m_framesPerSec->setAlignment(Qt::AlignRight);
+	m_framesPerSec->setAlignment(Qt::AlignLeft);
 	m_framesPerSec->setToolTip("Current frames per second not yet initialized.");
-	statusBar()->addWidget(m_framesPerSec);
-	statusBar()->addWidget(new QLabel("frames/s"));
+	statusBar()->addWidget(m_framesPerSec, 2);
 
-	m_objectsCount = new QLabel("1");
+	m_objectsCount = new QLabel("1 objects");
 	m_objectsCount->setMinimumSize(m_objectsCount->sizeHint());
-	m_objectsCount->setAlignment(Qt::AlignRight);
+	m_objectsCount->setAlignment(Qt::AlignLeft);
 	m_objectsCount->setToolTip("There is 1 object in the world");
-	statusBar()->addWidget(m_objectsCount);
-	statusBar()->addWidget(new QLabel("objects"));
+	statusBar()->addWidget(m_objectsCount, 2);
 
-	m_currentFilename = new QLabel("");
+	m_currentFilename = new QLabel("unsaved document");
 	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
-	m_currentFilename->setAlignment(Qt::AlignCenter);
+	m_currentFilename->setAlignment(Qt::AlignRight);
 	m_currentFilename->setToolTip("The world is not saved");
-	statusBar()->addWidget(m_currentFilename);
-
-	statusBar()->showMessage("Ready", 2000);
+	statusBar()->addWidget(m_currentFilename, 2);
 }
 
 void MainWindow::updateFramesPerSecond(int frames) {
-	m_framesPerSec->setText(QString::number(frames));
+	m_framesPerSec->setText(QString("%1 fps").arg(frames));
+}
+
+void MainWindow::initialize() {
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+
+	this->setWindowTitle("TUStudios - DOMINATOR");
 }
