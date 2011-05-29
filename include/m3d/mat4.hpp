@@ -128,6 +128,8 @@ public:
 	Mat4<T> inverse() const;
 	Mat4<T> orthonormalInverse() const;
 
+	Vec3<T> eulerAngles() const;
+
 	static Mat4<T> identity();
 	static Mat4<T> translate(const Vec3<T>& translation);
 	static Mat4<T> rotX(const T& angle);
@@ -569,6 +571,30 @@ Mat4<T> Mat4<T>::orthonormalInverse() const
 				   _12, _22, _32, 0,
 				   _13, _23, _33, 0,
 				    -x,  -y,  -z, 1 );
+}
+
+template<typename T>
+inline
+Vec3<T> Mat4<T>::eulerAngles() const
+{
+	float yaw = 0.0f, roll = 0.0f, pitch = 0.0f;
+
+	if (_32 > 0.99995) {
+		roll = 0.0f;
+		pitch = -PI / 2.0f;
+		yaw = -roll - atan2(_21, _11);
+	} else if (_32 < -0.99995) {
+		roll = 0.0f;
+		pitch = PI / 2.0f;
+		yaw = roll + atan2(_21, _11);
+	} else {
+		pitch = asin(-_32);
+		T t = cos(pitch);
+		yaw = atan2(_31 / t, _33 / t);
+		roll = atan2(_12 / t, _22 / t);
+	}
+
+	return Vec3<T>(pitch, yaw, roll);
 }
 
 template<typename T>

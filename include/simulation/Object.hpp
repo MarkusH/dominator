@@ -25,6 +25,18 @@ typedef std::tr1::shared_ptr<__Object> Object;
 class __RigidBody;
 typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
 
+/**
+ * An __Object is an abstract class that represents all objects
+ * in the simulation. It defines the type of the object and provides
+ * several abstract methods for manipulating and rendering the objects.
+ * The actual objects inherit from this class, and possibly "Body", to
+ * form a final, usable object.
+ *
+ * The class also behaves as a factory to construct these specific objects.
+ *
+ * __Object should not be used directly, but as the smart pointer version
+ * "Object".
+ */
 class __Object {
 public:
 	typedef enum { BOX, SPHERE } Type;
@@ -67,6 +79,9 @@ public:
 	friend class __RigidBody;
 };
 
+/**
+ * A __Rigidbody is an object that is a single body.
+ */
 class __RigidBody : public __Object, public Body {
 protected:
 	std::string m_material;

@@ -122,15 +122,34 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	m_pointer = m_camera.pointer(x, y);
 	if (!m_objects.size()) {
-		Mat4f matrix = Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
+		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 0.0f, -5.0f));
 		Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
 		add(obj);
 	} else if (m_objects.size() == 1) {
-		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 0.0f, -5.0f));
+		// set matrix
+		Mat4f matrix =
+				Mat4f::rotZ(15.0f * PI / 180.0f) *
+				Mat4f::rotX(-90.0f * PI / 180.0f) *
+				Mat4f::rotY(25.0f * PI / 180.0f) *
+				Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
+
 		Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 		add(obj);
 	} else {
 		m_selectedObject = selectObject(x, y);
+		if (m_selectedObject) {
+			// get euler angles
+			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
+			angles *= 180.0f / PI;
+			std::cout << angles << std::endl;
+			// try to rotate anew, using the generated values
+			Mat4f matrix =
+					Mat4f::rotZ(angles.z * PI / 180.0f) *
+					Mat4f::rotX(angles.x * PI / 180.0f) *
+					Mat4f::rotY(angles.y * PI / 180.0f) *
+					Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
+			m_selectedObject->setMatrix(matrix);
+		}
 	}
 }
 
