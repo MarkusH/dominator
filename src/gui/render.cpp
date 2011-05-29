@@ -149,33 +149,79 @@ void Render::mouseReleaseEvent(QMouseEvent *event)
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::wheelEvent(QWheelEvent *event) {
+void Render::wheelEvent(QWheelEvent *event)
+{
 	m_mouseAdapter.mouseWheelEvent(event);
 }
 
-void Render::setRotationX(float x)
+void Render::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	//	Vec3f pos = m_matrix.getW();
-	//	m_matrix = Mat4f::rotX(x * PI / 180.0f) * m_matrix;
-	//	m_matrix.setW(pos);
-
-
-	//Mat4f m = Mat4f::rotX(x * PI / 180.0f).rotMultiply(m_matrix);
-	m_matrix %= Mat4f::rotX(x * PI / 180.0f);
+	if (sim::Simulation::instance().getSelectedObject()) {
+		std::cout
+				<< sim::Simulation::instance().getSelectedObject()->getMatrix()
+				<< std::endl;
+		emit objectSelected(true);
+		emit objectSelected(
+				&sim::Simulation::instance().getSelectedObject()->getMatrix());
+	} else {
+		emit objectSelected(false);
+	}
 }
 
-void Render::setRotationY(float x)
+void Render::renderSize(char axis, int size)
 {
-	//	Vec3f pos = m_matrix.getW();
-	//	m_matrix = Mat4f::rotY(x * PI / 180.0f) * m_matrix;
-	//	m_matrix.setW(pos);
-	m_matrix %= Mat4f::rotY(x * PI / 180.0f);
+	std::cout << axis << " size " << size << std::endl;
+	switch (axis) {
+	case 'x':
+		m_matrix._11 = (float) size / 10.0;
+		break;
+	case 'y':
+		m_matrix._22 = (float) size / 10.0;
+		break;
+	case 'z':
+		m_matrix._33 = (float) size / 10.0;
+		break;
+	}
 }
 
-void Render::setRotationZ(float x)
+void Render::renderLocation(char axis, int position)
 {
-	//	Vec3f pos = m_matrix.getW();
-	//	m_matrix = Mat4f::rotZ(x * PI / 180.0f) * m_matrix;
-	//	m_matrix.setW(pos);
-	m_matrix %= Mat4f::rotZ(x * PI / 180.0f);
+	std::cout << axis << " position " << position << std::endl;
+	if (sim::Simulation::instance().getSelectedObject()) {
+		m3d::Mat4f matrix =
+				sim::Simulation::instance().getSelectedObject()->getMatrix();
+		switch (axis) {
+		case 'x':
+			matrix._41 = (float) position / 10.0;
+			break;
+		case 'y':
+			matrix._42 = (float) position / 10.0;
+			break;
+		case 'z':
+			matrix._43 = (float) position / 10.0;
+			break;
+		}
+		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
+	}
+}
+
+void Render::renderRotation(char axis, int angle)
+{
+	std::cout << axis << " angle " << angle << std::endl;
+	if (sim::Simulation::instance().getSelectedObject()) {
+		m3d::Mat4f matrix =
+				sim::Simulation::instance().getSelectedObject()->getMatrix();
+		switch (axis) {
+		case 'x':
+			matrix %= Mat4f::rotX(angle * PI / 180.0f);
+			break;
+		case 'y':
+			matrix %= Mat4f::rotY(angle * PI / 180.0f);
+			break;
+		case 'z':
+			matrix %= Mat4f::rotZ(angle * PI / 180.0f);
+			break;
+		}
+		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
+	}
 }
