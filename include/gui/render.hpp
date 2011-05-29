@@ -24,20 +24,21 @@ public:
 	void load(QString *filename);
 
 public slots:
-	void setRotationX(float x = 4.0f);
-	void setRotationY(float x = 4.0f);
-	void setRotationZ(float x = 4.0f);
+	void renderSize(char axis, int size);
+	void renderLocation(char axis, int position);
+	void renderRotation(char axis, int angle);
 
 protected:
 	virtual void initializeGL();
 	virtual void resizeGL(int width, int height);
 	virtual void paintGL();
-	virtual void keyPressEvent(QKeyEvent *event);
-	virtual void keyReleaseEvent(QKeyEvent *event);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void wheelEvent(QWheelEvent *event);
+	virtual void keyPressEvent(QKeyEvent* event);
+	virtual void keyReleaseEvent(QKeyEvent* event);
+	virtual void mouseMoveEvent(QMouseEvent* event);
+	virtual void mousePressEvent(QMouseEvent* event);
+	virtual void mouseReleaseEvent(QMouseEvent* event);
+	virtual void wheelEvent(QWheelEvent* event);
+	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
 private:
 	QTimer *m_timer;
@@ -49,6 +50,8 @@ private:
 
 signals:
 	void framesPerSecondChanged(int);
+	void objectSelected(const m3d::Mat4f*);
+	void objectSelected(bool);
 };
 
 #endif /* RENDER_RENDER_HPP_ */

@@ -60,24 +60,14 @@ MainWindow::MainWindow(QApplication *app) {
 	setCentralWidget(m_splitter);
 
 	connect(m_renderWindow, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
-	connect(m_modifyBox, SIGNAL(changeRotation(char, int)), this, SLOT(rotate(char, int)));
+	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
+	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
+	connect(m_modifyBox, SIGNAL(changeSize(char, int)), m_renderWindow, SLOT(renderSize(char, int)));
+	connect(m_modifyBox, SIGNAL(changeLocation(char, int)), m_renderWindow, SLOT(renderLocation(char, int)));
+	connect(m_modifyBox, SIGNAL(changeRotation(char, int)), m_renderWindow, SLOT(renderRotation(char, int)));
 
 	showMaximized();
 	splash.finish(this);
-}
-
-void MainWindow::rotate(char axis, int angle) {
-	switch (axis) {
-	case 'x':
-		m_renderWindow->setRotationX((float) angle);
-		break;
-	case 'y':
-		m_renderWindow->setRotationY((float) angle);
-		break;
-	case 'z':
-		m_renderWindow->setRotationZ((float) angle);
-		break;
-	}
 }
 
 void MainWindow::OnClosePressed() {
