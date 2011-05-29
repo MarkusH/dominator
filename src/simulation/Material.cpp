@@ -13,6 +13,8 @@
 #include <tr1/functional_hash.h>
 #endif
 #include <Newton.h>
+#include <xml/rapidxml.hpp>
+#include <xml/rapidxml_utils.hpp>
 
 namespace sim {
 
@@ -34,14 +36,26 @@ Material::Material(const Material& m)
 {
 }
 
-/*
-void Material::load(XMLNode)
+
+void Material::load(rapidxml::xml_node<>* const node)
 {
+	using namespace rapidxml;
+	for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
+		std::string name = attr->name();
+		if( name == "name" )		name = attr->value();
+		if( name == "texture" )		texture = attr->value();
+		if( name == "shader" )		shader = attr->value();
+		if( name == "ambient" )		ambient.assign(attr->value());
+		if( name == "diffuse")		diffuse.assign(attr->value());
+		if( name == "specular")		specular.assign(attr->value());
+		if( name == "shininess")	shininess = atof(attr->value());
+		}
 	// load properties
 	// vectors can be loaded from a string like that:
 	//	diffuse.assign(str);
 }
 
+/*
 void Material::save(XMLNode) const;
 {
 	// save properties
@@ -70,12 +84,23 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 }
 
 
-/*
-void MaterialPair::load(XMLNode)
+
+void MaterialPair::load(rapidxml::xml_node<>* node)
 {
-	// load properties
+	using namespace rapidxml;
+	MaterialMgr& m = MaterialMgr::instance();
+	for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
+		std::string name = attr->name();
+		if( name == "mat0" )			id0 = m.getID(attr->value());
+		if( name == "mat1" )			id1 = m.getID(attr->value());
+		if( name == "elasticity" )		elasticity = atof(attr->value());
+		if( name == "staticFriction" )	staticFriction = atof(attr->value());
+		if( name == "kineticFriction")	kineticFriction = atof(attr->value());
+		if( name == "softness")			softness = atof(attr->value());
+	}
 }
 
+/*
 void MaterialPair::save(XMLNode) const;
 {
 	// save properties
@@ -203,8 +228,38 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 
 bool MaterialMgr::load(const char* fileName)
 {
-	clear(true);
+	using namespace rapidxml;
 
+	//file<char> f(fileName);
+
+	xml_document<> materials;
+	// string containing valid xml for test purposes
+	char m[] = "<?xml version=\"1.0\" ?><materials><material name=\"wood_shiny\" texture=\"wood_shiny\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.6, 0.6, 0.6, 1\" shininess=\"50\" /><material name=\"wood_matt\" texture=\"wood_matt\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.1, 0.1, 0.1, 1\" shininess=\"20\" /><pair mat0=\"wood_shiny\" mat1=\"wood_shiny\" elasticity=\"0.100000\" staticFriction=\"0.450000\" kineticFriction=\"0.310000\" softness=\"0.050000\" /><pair mat0=\"wood_matt\" mat1=\"wood_matt\" elasticity=\"0.15000\" staticFriction=\"0.55000\" kineticFriction=\"0.45000\" softness=\"0.080000\" /></materials>";
+	materials.parse<0>(m);
+	std::cout<<m<<std::endl;
+	xml_node<>* nodes = materials.first_node();
+
+	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
+		std::string name = node->name();
+		if(name == "material") {
+			Material mat("none");
+			mat.load(node);
+			add(mat);
+		}d
+		if(name == "pair") {
+			MaterialPair pair;
+			pair.load(node);
+			m_pairs[std::make_pair(pair.id0, pair.id1)] = pair;
+		}
+	}
+	/*
+	xml_node<> *node = doc.first_node("foobar");
+	cout << "Node foobar has value " << node->value() << "\n";
+	for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
+		cout << "Node foobar has attribute " << attr->name() << " ";
+	    cout << "with value " << attr->value() << "\n";
+	}
+	*/
 	// parse document
 	// return false on error
 
