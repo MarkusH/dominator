@@ -37,6 +37,7 @@ public:
 	virtual ~__Object();
 
 	virtual const Mat4f& getMatrix() = 0;
+	virtual void setMatrix(const Mat4f& matrix) = 0;
 
 	/**
 	 * Checks whether this object contains the given NewtonBody.
@@ -75,6 +76,7 @@ public:
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "");
 
 	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
+	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual bool contains(const NewtonBody* const body);
 
