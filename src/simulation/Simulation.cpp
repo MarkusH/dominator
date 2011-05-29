@@ -109,11 +109,25 @@ Object Simulation::selectObject(int x, int y)
 
 void Simulation::mouseMove(int x, int y)
 {
-	float angleX = (m_mouseAdapter.getX() - x) * 0.075f;
-	float angleY = (m_mouseAdapter.getY() - y) * 0.1f;
+	if (m_mouseAdapter.isDown(util::LEFT)) {
+		float angleX = (m_mouseAdapter.getX() - x) * 0.075f;
+		float angleY = (m_mouseAdapter.getY() - y) * 0.1f;
 
-	m_camera.rotate(angleX, Vec3f::yAxis());
-	m_camera.rotate(angleY, m_camera.m_strafe.xyz());
+		m_camera.rotate(angleX, Vec3f::yAxis());
+		m_camera.rotate(angleY, m_camera.m_strafe.xyz());
+	} else if (m_mouseAdapter.isDown(util::RIGHT)) {
+		if (m_selectedObject) {
+			// TODO move object according to the correct world coordinates of the mouse
+			float dx = (x - m_mouseAdapter.getX()) * 0.05f;
+			float dy = (m_mouseAdapter.getY() - y) * 0.05f;
+			std::cout << "delta " << dx << std::endl;
+			Mat4f matrix = m_selectedObject->getMatrix();
+			matrix.setW(matrix.getW() +
+					m_camera.m_strafe.xyz().normalized() * dx +
+					Vec3f::yAxis() * dy);
+			m_selectedObject->setMatrix(matrix);
+		}
+	}
 
 	m_pointer = m_camera.pointer(x, y);
 }
@@ -136,27 +150,45 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 		add(obj);
 	} else {
-		m_selectedObject = selectObject(x, y);
-		/*if (m_selectedObject) {
+
+		/*
+		if (m_selectedObject) {
 			// get euler angles
 			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
 			angles *= 180.0f / PI;
 			std::cout << angles << std::endl;
 			// try to rotate anew, using the generated values
+
 			Mat4f matrix =
 					Mat4f::rotZ(angles.z * PI / 180.0f) *
 					Mat4f::rotX(angles.x * PI / 180.0f) *
 					Mat4f::rotY(angles.y * PI / 180.0f) *
-					Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
+					Mat4f::translate(Vec3f(5.0f, 0.0f, -5.0f));
+			//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
 			m_selectedObject->setMatrix(matrix);
-		}*/
+
+		}
+		*/
 	}
 }
 
+void Simulation::mouseDoubleClick(util::Button button, int x, int y)
+{
+	m_pointer = m_camera.pointer(x, y);
+	if (button == util::LEFT)
+		m_selectedObject = selectObject(x, y);
+}
 
 void Simulation::mouseWheel(int delta) {
-	float step = delta / 800.0;
-	m_camera.move(step);
+	float step = delta / 800.0f;
+
+	if (m_selectedObject) {
+		Mat4f matrix = m_selectedObject->getMatrix();
+		matrix.setW(matrix.getW() + m_camera.viewVector() * step);
+		m_selectedObject->setMatrix(matrix);
+	} else {
+		m_camera.move(step);
+	}
 }
 
 void Simulation::update()

@@ -127,6 +127,9 @@ void QtMouseAdapter::mouseEvent(QMouseEvent* event)
 		break;
 
 	case QEvent::MouseButtonDblClick:
+		for (std::list<MouseListener*>::iterator itr = m_listeners.begin();
+				itr != m_listeners.end(); ++itr)
+			(*itr)->mouseDoubleClick(button, event->x(), event->y());
 		break;
 
 	case QEvent::MouseMove:

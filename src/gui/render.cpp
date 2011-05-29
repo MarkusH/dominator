@@ -156,6 +156,8 @@ void Render::wheelEvent(QWheelEvent *event)
 
 void Render::mouseDoubleClickEvent(QMouseEvent* event)
 {
+	m_mouseAdapter.mouseEvent(event);
+
 	if (sim::Simulation::instance().getSelectedObject()) {
 		std::cout
 				<< sim::Simulation::instance().getSelectedObject()->getMatrix()

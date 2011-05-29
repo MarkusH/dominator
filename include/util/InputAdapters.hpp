@@ -122,6 +122,15 @@ public:
 	virtual void mouseButton(Button button, bool down, int x, int y) = 0;
 
 	/**
+	 * This methid is called whenever a double click was made by the user.
+	 *
+	 * @param button The button that was pressed
+	 * @param x      The x position of the mouse
+	 * @param y      The y position of the mouse
+	 */
+	virtual void mouseDoubleClick(Button button, int x, int y) = 0;
+
+	/**
 	 * This method is called whenever the mouse wheel is rotated
 	 *
 	 * @param delta	 The delta of rotation in eighths of a degree
