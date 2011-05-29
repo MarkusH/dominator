@@ -137,7 +137,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		add(obj);
 	} else {
 		m_selectedObject = selectObject(x, y);
-		if (m_selectedObject) {
+		/*if (m_selectedObject) {
 			// get euler angles
 			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
 			angles *= 180.0f / PI;
@@ -149,7 +149,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 					Mat4f::rotY(angles.y * PI / 180.0f) *
 					Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
 			m_selectedObject->setMatrix(matrix);
-		}
+		}*/
 	}
 }
 
