@@ -21,7 +21,7 @@ namespace sim {
 
 using namespace m3d;
 
-typedef std::map<int, Object> ObjectMap;
+typedef std::map<Object, int> ObjectMap;
 
 class Simulation : public util::MouseListener {
 private:
@@ -39,11 +39,17 @@ protected:
 
 	ogl::Camera m_camera;
 
+	/** The world position of the mouse pointer */
+	Vec3f m_pointer;
+
 	NewtonWorld* m_world;
 	float m_gravity;
 
 	int m_nextID;
 	ObjectMap m_objects;
+
+	/** The currently selected object, or an empty smart pointer */
+	Object m_selectedObject;
 
 	ogl::VertexBuffer m_vertexBuffer;
 
@@ -100,6 +106,13 @@ public:
 	Object selectObject(int x, int y);
 
 	/**
+	 * Returns the selected object.
+	 *
+	 * @return The selected object or an empty smart pointer.
+	 */
+	Object getSelectedObject();
+
+	/**
 	 * Adds the specified object to the simulation.
 	 *
 	 * @param object The object to add
@@ -140,6 +153,11 @@ inline float Simulation::getGravity() const
 inline ogl::Camera& Simulation::getCamera()
 {
 	return m_camera;
+}
+
+inline Object Simulation::getSelectedObject()
+{
+	return m_selectedObject;
 }
 
 }

@@ -52,27 +52,31 @@ Simulation::~Simulation()
 void Simulation::upload(ObjectMap::iterator begin, ObjectMap::iterator end)
 {
 	for (ObjectMap::iterator itr = begin; itr != end; ++itr) {
-		itr->second->genBuffers(m_vertexBuffer);
+		itr->first->genBuffers(m_vertexBuffer);
 	}
 	m_vertexBuffer.upload();
+	//TODO: sort materials
 }
 
 int Simulation::add(Object object)
 {
-	ObjectMap::iterator begin = m_objects.insert(std::make_pair(++m_nextID, object)).first;
+	ObjectMap::iterator begin = m_objects.insert(std::make_pair(object, ++m_nextID)).first;
 	upload(begin, m_objects.end());
 	return m_nextID;
 }
 
 void Simulation::remove(Object object)
 {
+	m_objects.erase(object);
+	/*
 	ObjectMap::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
-		if (itr->second == object) {
+		if (itr->first == object) {
 			m_objects.erase(itr);
 			break;
 		}
 	}
+	*/
 }
 
 
@@ -93,8 +97,8 @@ Object Simulation::selectObject(int x, int y)
 	// find the matching body
 	ObjectMap::iterator itr = m_objects.begin();
 	for ( ; body && itr != m_objects.end(); ++itr) {
-		if (itr->second->contains(body))
-			return itr->second;
+		if (itr->first->contains(body))
+			return itr->first;
 	}
 
 	// nothing was selected, return an empty smart pointer
@@ -110,11 +114,13 @@ void Simulation::mouseMove(int x, int y)
 
 	m_camera.rotate(angleX, Vec3f::yAxis());
 	m_camera.rotate(angleY, m_camera.m_strafe.xyz());
-}
 
+	m_pointer = m_camera.pointer(x, y);
+}
 
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
+	m_pointer = m_camera.pointer(x, y);
 	if (!m_objects.size()) {
 		Mat4f matrix = Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
 		Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
@@ -124,8 +130,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 		add(obj);
 	} else {
-		Object selection = selectObject(x, y);
-		std::cout << selection.get() << std::endl;
+		m_selectedObject = selectObject(x, y);
 	}
 }
 
@@ -155,11 +160,7 @@ void Simulation::render()
 
 	ogl::TextureMgr::instance().get("yellow")->bind();
 
-	/*
-	ObjectMap::iterator itr = m_objects.begin();
-	for ( ; itr != m_objects.end(); ++itr) {
-		itr->second->render();
-	}*/
+
 
 	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
 		m_vertexBuffer.bind();
@@ -174,6 +175,31 @@ void Simulation::render()
 			glPopMatrix();
 		}
 	}
-}
+
+	glUseProgram(0);
+	glDisable(GL_TEXTURE_2D);
+	glColor3f(1.0f, 0.0, 0.0f);
+
+	ObjectMap::iterator itr = m_objects.find(m_selectedObject);
+	if (itr != m_objects.end()) {
+		itr->first->render();
+	}
+
+	/*
+	if (m_selectedObject) {
+		ObjectMap::iterator itr = m_objects.begin();
+		for ( ; itr != m_objects.end(); ++itr) {
+			if (itr->first.get() == select)
+			itr->first->render();
+		}
+	}
+	*/
+
+	glPointSize(5.0f);
+	glBegin(GL_POINTS);
+	glVertex3fv(&m_pointer[0]);
+	glEnd();
+	glColor3f(1.0f, 1.0f, 1.0f);
+ }
 
 }

@@ -115,11 +115,6 @@ void Render::paintGL()
 	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
 
-	// multiply object matrix with current modelview matrix (i.e. the camera)
-	glMultMatrixf(m_matrix[0]);
-
-	// Draw our model
-	model->Draw();
 	static int frames = 0;
 	frames++;
 	if (m_clock.get() >= 1.0f) {
