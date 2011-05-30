@@ -18,25 +18,14 @@
 
 using namespace m3d;
 
-Render::Render(QString *filename, QWidget *parent) :
+Render::Render(QWidget *parent) :
 	QGLWidget(parent)
 {
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
-	load(filename);
 	setFocusPolicy(Qt::WheelFocus);
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
 	m_timer->start();
-}
-
-void Render::load(QString *filename)
-{
-	try {
-		model = new Model3DS(filename->toUtf8().constData());
-		std::cout << "loaded " << filename->toUtf8().constData() << std::endl;
-	} catch (std::string& error_str) {
-		std::cerr << "Error: " << error_str << std::endl;
-	}
 }
 
 void Render::initializeGL()
@@ -83,8 +72,6 @@ void Render::initializeGL()
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
 
-	// Generate Vertex Buffer Objects
-	model->CreateVBO();
 	m_clock.reset();
 }
 

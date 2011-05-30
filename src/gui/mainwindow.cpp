@@ -41,7 +41,7 @@ MainWindow::MainWindow(QApplication *app) {
 	m_toolBox->addWidget(m_modifyBox);
 	app->processEvents();
 
-	m_renderWindow = new Render(new QString("data/models/monkey.3ds"), this);
+	m_renderWindow = new Render(this);
 	m_renderWindow->setMinimumWidth(400);
 	m_renderWindow->show();
 
@@ -60,6 +60,7 @@ MainWindow::MainWindow(QApplication *app) {
 	setCentralWidget(m_splitter);
 
 	connect(m_renderWindow, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
+	connect(m_renderWindow, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
 	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
 	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
 	connect(m_modifyBox, SIGNAL(changeSize(char, int)), m_renderWindow, SLOT(renderSize(char, int)));
@@ -139,6 +140,10 @@ void MainWindow::createStatusBar() {
 
 void MainWindow::updateFramesPerSecond(int frames) {
 	m_framesPerSec->setText(QString("%1 fps").arg(frames));
+}
+
+void MainWindow::updateObjectsCount(int count) {
+	m_objectsCount->setText(QString("%1").arg(count));
 }
 
 void MainWindow::initialize() {

@@ -33,6 +33,7 @@ public:
 private slots:
 	void OnClosePressed();
 	void updateFramesPerSecond(int frames);
+	void updateObjectsCount(int count);
 
 private:
 	void createMenu();

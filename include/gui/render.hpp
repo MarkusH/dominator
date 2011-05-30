@@ -20,8 +20,7 @@
 class Render: public QGLWidget {
 Q_OBJECT
 public:
-	Render(QString *filename = 0, QWidget *parent = 0);
-	void load(QString *filename);
+	Render(QWidget *parent = 0);
 
 public slots:
 	void renderSize(char axis, int size);
@@ -42,7 +41,6 @@ protected:
 
 private:
 	QTimer *m_timer;
-	Model3DS * model;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;
@@ -50,6 +48,7 @@ private:
 
 signals:
 	void framesPerSecondChanged(int);
+	void objectsCountChanged(int);
 	void objectSelected(const m3d::Mat4f*);
 	void objectSelected(bool);
 };
