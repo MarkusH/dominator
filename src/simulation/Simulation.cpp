@@ -196,9 +196,9 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	} else {
 
 
-/*		if (m_selectedObject) {
+		if (m_selectedObject) {
 			// get euler angles
-
+/*
 			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
 			angles *= 180.0f / PI;
 			std::cout << "angles == " << angles << std::endl;

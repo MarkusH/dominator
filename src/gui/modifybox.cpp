@@ -141,14 +141,20 @@ void ModifyBox::signalLocation(double value)
 
 void ModifyBox::signalRotation(double value)
 {
-	float deltaX, deltaY, deltaZ;
-	deltaX = (float)m_mbRotX->value() - m_rx;
-	deltaY = (float)m_mbRotY->value() - m_ry;
-	deltaZ = (float)m_mbRotZ->value() - m_rz;
-	m_rx = (float)m_mbRotX->value();
-	m_ry = (float)m_mbRotY->value();
-	m_rz = (float)m_mbRotZ->value();
-	emit changeRotation(deltaX, deltaY, deltaZ);
+	float delta;
+	if (QObject::sender() == m_mbRotX) {
+		delta = value - m_rx;
+		m_rx = value;
+		emit changeRotation('x', (float) delta);
+	} else if (QObject::sender() == m_mbRotY) {
+		delta = value - m_ry;
+		m_ry = value;
+		emit changeRotation('y', (float) delta);
+	} else if (QObject::sender() == m_mbRotZ) {
+		delta = value - m_rz;
+		m_rz = value;
+		emit changeRotation('z', (float) delta);
+	}
 }
 
 void ModifyBox::updateData(const m3d::Mat4f* matrix)
