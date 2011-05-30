@@ -162,16 +162,22 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 void Render::renderSize(char axis, float size)
 {
 	std::cout << axis << " size " << size << std::endl;
-	switch (axis) {
-	case 'x':
-		m_matrix._11 = size;
-		break;
-	case 'y':
-		m_matrix._22 = size;
-		break;
-	case 'z':
-		m_matrix._33 = size;
-		break;
+	if (sim::Simulation::instance().getSelectedObject()) {
+		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
+		m3d::Mat4f helper = m3d::Mat4f::identity();
+		switch (axis) {
+		case 'x':
+			helper._11 = size;
+			break;
+		case 'y':
+			helper._22 = size;
+			break;
+		case 'z':
+			helper._33 = size;
+			break;
+		}
+		matrix = helper * matrix;
+		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
 

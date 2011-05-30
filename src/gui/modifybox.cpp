@@ -165,14 +165,19 @@ void ModifyBox::updateData(const m3d::Mat4f* matrix)
 	if (matrix) {
 		std::cout << matrix->_11 << " " << matrix->_22 << " "
 				<< matrix->_33 << std::endl;
-		m_mbSizeX->setValue(matrix->_11);
-		m_mbSizeY->setValue(matrix->_22);
-		m_mbSizeZ->setValue(matrix->_33);
+		m_mbSizeX->setValue(matrix->getX().len());
+		m_mbSizeY->setValue(matrix->getX().len());
+		m_mbSizeZ->setValue(matrix->getX().len());
 		std::cout << matrix->_41 << " " << matrix->_42 << " "
 				<< matrix->_43 << std::endl;
 		m_mbLocX->setValue(matrix->_41);
 		m_mbLocY->setValue(matrix->_42);
 		m_mbLocZ->setValue(matrix->_43);
+		std::cout << matrix->_41 << " " << matrix->_42 << " "
+				<< matrix->_43 << std::endl;
+		m_mbRotX->setValue(matrix->eulerAngles().x);
+		m_mbRotY->setValue(matrix->eulerAngles().y);
+		m_mbRotZ->setValue(matrix->eulerAngles().z);
 	}
 }
 
