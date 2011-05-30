@@ -21,7 +21,7 @@ namespace sim {
 
 using namespace m3d;
 
-typedef std::map<Object, int> ObjectMap;
+typedef std::map<int, Object> ObjectMap;
 
 class Simulation : public util::MouseListener {
 private:
@@ -61,7 +61,7 @@ protected:
 	 * @param begin The first object to upload
 	 * @param end   The end iterator
 	 */
-	void upload(ObjectMap::iterator begin, ObjectMap::iterator end);
+	void upload(const ObjectMap::iterator& begin, const ObjectMap::iterator& end);
 
 	/**
 	 * Applies the given material. If it is not available, disable all

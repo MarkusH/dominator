@@ -9,6 +9,7 @@
 #include <simulation/Material.hpp>
 #include <simulation/Simulation.hpp>
 #include <newton/util.hpp>
+#include <iostream>
 
 namespace sim {
 
@@ -21,7 +22,9 @@ __Object::__Object(Type type)
 
 __Object::~__Object()
 {
-	// TODO Auto-generated destructor stub
+#ifdef _DEBUG
+	std::cout << "delete object" << std::endl;
+#endif
 }
 
 RigidBody __Object::createSphere(Mat4f matrix, float radius, float mass, const std::string& material)
@@ -113,12 +116,18 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 			byteSize, &vbo.m_data[floatOffset],
 			byteSize, &vbo.m_data[floatOffset]);
 
+
+
+	//std::cout << "____ " << std::endl;
+
+
 	// iterate over the submeshes and store the indices
 	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
 	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
 			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
 
-		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
+		int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
+		//std::cout << "mesh " << material << std::endl;
 
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
@@ -132,7 +141,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
 		uint32_t* indices = new uint32_t[subBuffer->indexCount];
 		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
-
+//std::cout << "indices " << subBuffer->indexCount << std::endl;
 		subBuffer->indexOffset = vbo.m_indices.size();
 
 		// copy the indices to the global list and add the offset
@@ -144,12 +153,20 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		vbo.m_buffers.push_back(subBuffer);
 	}
 	NewtonMeshEndHandle(collisionMesh, meshCookie);
+
 	NewtonMeshDestroy(collisionMesh);
 }
 
 bool __RigidBody::contains(const NewtonBody* const body)
 {
 	return m_body == body;
+}
+
+bool __RigidBody::contains(const Object& object)
+{
+	if (object.get() == this)
+		return true;
+	return false;
 }
 
 

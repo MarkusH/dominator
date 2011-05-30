@@ -60,6 +60,14 @@ public:
 	virtual bool contains(const NewtonBody* const body) = 0;
 
 	/**
+	 * Checks whether this object contains (or is) the given object.
+	 *
+	 * @param object
+	 * @return
+	 */
+	virtual bool contains(const Object& object) = 0;
+
+	/**
 	 * Generates the vertices, uv-coordinates, normals and indices (buffers)
 	 * of this object. The data will be added to the given vertex buffer object.
 	 *
@@ -94,6 +102,7 @@ public:
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual bool contains(const NewtonBody* const body);
+	virtual bool contains(const Object& object);
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 

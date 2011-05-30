@@ -76,6 +76,27 @@ void Simulation::init()
 
 	//int id = NewtonMaterialGetDefaultGroupID(m_world);
 	//NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, GenericContactProcess);
+
+
+	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
+	Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
+	add(obj);
+	//std::cout << "sp: " << m_vertexBuffer.m_buffers.size() << std::endl;
+
+	matrix =
+			Mat4f::rotZ(15.0f * PI / 180.0f) *
+			Mat4f::rotX(-90.0f * PI / 180.0f) *
+			Mat4f::rotY(25.0f * PI / 180.0f) *
+			Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
+
+	obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
+	add(obj);
+	//std::cout << "bx: " << m_vertexBuffer.m_buffers.size() << std::endl;
+
+	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
+	add(m_environment);
+	//std::cout << "env: " << m_vertexBuffer.m_buffers.size() << std::endl;
+
 }
 
 void Simulation::clear()
@@ -90,37 +111,104 @@ void Simulation::clear()
 	}
 }
 
-void Simulation::upload(ObjectMap::iterator begin, ObjectMap::iterator end)
-{
-	for (ObjectMap::iterator itr = begin; itr != end; ++itr) {
-		itr->first->genBuffers(m_vertexBuffer);
-	}
-	m_vertexBuffer.upload();
-	//TODO: sort materials
-}
-
 int Simulation::add(Object object)
 {
-	ObjectMap::iterator begin = m_objects.insert(std::make_pair(object, ++m_nextID)).first;
+	// iterator gives lowest address of smart pointer, it is NOT sorted by time of insertion......
+	ObjectMap::iterator begin = m_objects.insert(std::make_pair(++m_nextID, object)).first;
 	upload(begin, m_objects.end());
 	return m_nextID;
 }
 
 void Simulation::remove(Object object)
 {
-	m_objects.erase(object);
-	/*
-	ObjectMap::iterator itr = m_objects.begin();
-	for ( ; itr != m_objects.end(); ++itr) {
-		if (itr->first == object) {
-			m_objects.erase(itr);
+	// check if it is a compound, if so we have to check whether
+	// one of its children is in a sub-mesh
+
+	// the offset that has to be subtracted from the index offset
+	// of all sub-meshes after the sub-mesh that has been deleted.
+	// this is necessary, because index data will be removed from
+	// the global index list
+	unsigned indexOffset = 0;
+
+	// the offset that has to be subtracted from the individual index
+	// values of the indices after the deleted sub-mesh. this has to be
+	// done because data will be removed from the global vertex list
+	unsigned dataOffset = 0;
+
+	// delete vertices only once per object, because there may be
+	// multiple sub-meshes with the same data and different materials
+	std::set<__Object*> deleted;
+
+	// iterate over all sub-buffers and check if it has to be deleted
+	for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin();
+			it != m_vertexBuffer.m_buffers.end(); ) {
+
+		__Object* curObj = (__Object*)(*it)->object;
+
+		// adjust the offsets according to the previously deleted buffers
+		(*it)->indexOffset -= indexOffset;
+		(*it)->dataOffset -= dataOffset;
+
+		// delete the data associated with the object
+		if (curObj->contains(object)) {
+			const unsigned co = (*it)->indexOffset;
+			const unsigned cc = (*it)->indexCount;
+			indexOffset += cc;
+
+			// delete vertices
+			if (deleted.find(curObj) == deleted.end()) {
+				const unsigned vo = (*it)->dataOffset * m_vertexBuffer.floatSize();
+				const unsigned vc = (*it)->dataCount * m_vertexBuffer.floatSize();
+				dataOffset += (*it)->dataCount;
+				m_vertexBuffer.m_data.erase(m_vertexBuffer.m_data.begin() + vo,
+						m_vertexBuffer.m_data.begin() + vo + vc);
+				deleted.insert(curObj);
+			}
+
+			// delete indices
+			m_vertexBuffer.m_indices.erase(m_vertexBuffer.m_indices.begin() + co,
+					m_vertexBuffer.m_indices.begin() + co + cc);
+
+			// delete sub-mesh
+			delete (*it);
+			it = m_vertexBuffer.m_buffers.erase(it);
+		} else {
+			// adjust the indices of the object, because vertices were deleted
+			if (dataOffset > 0) {
+				for (unsigned i = 0; i < (*it)->indexCount; ++i)
+					m_vertexBuffer.m_indices[i + (*it)->indexOffset] -= dataOffset;
+			}
+			++it;
+		}
+	}
+
+	for (ObjectMap::iterator it = m_objects.begin(); it != m_objects.end(); ++it) {
+		if (it->second == object) {
+			m_objects.erase(it);
 			break;
 		}
 	}
-	*/
+
+	if (m_environment == object)
+		m_environment = Object();
+	if (m_selectedObject == object)
+		m_selectedObject = Object();
+
+	// upload, because the index offset of the sub-meshes in not correct with
+	// regard to the current indices in the element buffer (we deleted some indices)
+	upload(m_objects.end(), m_objects.end());
 }
 
-
+void Simulation::upload(const ObjectMap::iterator& begin, const ObjectMap::iterator& end)
+{
+	//std::cout << begin->first << " " << end->first << std::endl;
+	for (ObjectMap::iterator itr = begin; itr != end; ++itr) {
+	//	std::cout << "id " << itr->first << std::endl;
+		itr->second->genBuffers(m_vertexBuffer);
+	}
+	m_vertexBuffer.upload();
+	//TODO: sort materials
+}
 
 Object Simulation::selectObject(int x, int y)
 {
@@ -138,8 +226,8 @@ Object Simulation::selectObject(int x, int y)
 	// find the matching body
 	ObjectMap::iterator itr = m_objects.begin();
 	for ( ; body && itr != m_objects.end(); ++itr) {
-		if (itr->first->contains(body))
-			return itr->first;
+		if (itr->second->contains(body))
+			return itr->second;
 	}
 
 	// nothing was selected, return an empty smart pointer
@@ -176,10 +264,12 @@ void Simulation::mouseMove(int x, int y)
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	m_pointer = m_camera.pointer(x, y);
+	/*
 	if (!m_objects.size()) {
 		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
 		Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
 		add(obj);
+		std::cout << "sp: " << m_vertexBuffer.m_buffers.size() << std::endl;
 	} else if (m_objects.size() == 1) {
 		// set matrix
 		Mat4f matrix =
@@ -190,15 +280,17 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 
 		Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 		add(obj);
+		std::cout << "bx: " << m_vertexBuffer.m_buffers.size() << std::endl;
 	} else if (m_objects.size() == 2) {
 		m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 		add(m_environment);
+		std::cout << "env: " << m_vertexBuffer.m_buffers.size() << std::endl;
 	} else {
 
 
 		if (m_selectedObject) {
 			// get euler angles
-/*
+
 			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
 			angles *= 180.0f / PI;
 			std::cout << "angles == " << angles << std::endl;
@@ -211,10 +303,11 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 					Mat4f::translate(m_selectedObject->getMatrix().getW());
 			//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
 			m_selectedObject->setMatrix(matrix);
-*/
+
 		}
 
 	}
+	*/
 }
 
 void Simulation::mouseDoubleClick(util::Button button, int x, int y)
@@ -222,6 +315,14 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 	m_pointer = m_camera.pointer(x, y);
 	if (button == util::LEFT) {
 		m_selectedObject = selectObject(x, y);
+		if (m_selectedObject) {
+			//std::cout << "objs: " << m_objects.size() << std::endl;
+			//std::cout << "bufs: " << m_vertexBuffer.m_buffers.size() << std::endl;
+			//remove(m_selectedObject);
+			//m_selectedObject = Object();
+			//std::cout << "objs: " << m_objects.size() << std::endl;
+			//std::cout << "bufs: " << m_vertexBuffer.m_buffers.size() << std::endl;
+		}
 		if (m_selectedObject && m_selectedObject == m_environment)
 			m_selectedObject = Object();
 	}
@@ -308,20 +409,21 @@ void Simulation::render()
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
+	/*
 	ObjectMap::iterator itr = m_objects.find(m_selectedObject);
 	if (itr != m_objects.end()) {
-		itr->first->render();
+		itr->second->render();
 	}
+*/
 
-	/*
 	if (m_selectedObject) {
 		ObjectMap::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			if (itr->first.get() == select)
-			itr->first->render();
+			if (itr->second == m_selectedObject)
+			itr->second->render();
 		}
 	}
-	*/
+
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);
