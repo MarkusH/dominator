@@ -15,23 +15,8 @@
 #include <Newton.h>
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
-#include <sstream> // for ftoa
 #include <fstream> // for file I/O
-
-
-/**
-* float to C string conversion needed to put everything back to XML
-*
-* @param f	float to convert to a C string
-* @return char*
-*/
-const char* ftoa(double value) {
-  std::ostringstream o;
-  if (!(o << value)) return "";
-  else {
-  return o.str().c_str();
-  }
-}
+#include <boost/lexical_cast.hpp>
 
 
 namespace sim {
@@ -110,7 +95,7 @@ void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* d
 	node->append_attribute(attrSp);
 
 	// allocate string for shininess and create attribute
-	char* pShininess = doc->allocate_string(ftoa(shininess));
+	char* pShininess = doc->allocate_string(boost::lexical_cast<std::string>(shininess).c_str());
 	xml_attribute<>* attrSh = doc->allocate_attribute("shininess", pShininess);
 	node->append_attribute(attrSh);
 
@@ -179,22 +164,22 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	node->append_attribute(attrId1);
 
 	// allocate string for ambient and create attribute
-	char* pElasticity = doc->allocate_string(ftoa(elasticity));
+	char* pElasticity = doc->allocate_string(boost::lexical_cast<std::string>(elasticity).c_str());
 	xml_attribute<>* attrE = doc->allocate_attribute("elasticity", pElasticity);
 	node->append_attribute(attrE);
 
 	// allocate string for diffuse and create attribute
-	char* pStaticFriction = doc->allocate_string(ftoa(staticFriction));
+	char* pStaticFriction = doc->allocate_string(boost::lexical_cast<std::string>(staticFriction).c_str());
 	xml_attribute<>* attrSF = doc->allocate_attribute("staticFriction", pStaticFriction);
 	node->append_attribute(attrSF);
 
 	// allocate string for specular and create attribute
-	char* pKineticFriction = doc->allocate_string(ftoa(kineticFriction));
+	char* pKineticFriction = doc->allocate_string(boost::lexical_cast<std::string>(kineticFriction).c_str());
 	xml_attribute<>* attrKF = doc->allocate_attribute("kineticFriction", pKineticFriction);
 	node->append_attribute(attrKF);
 
 	// allocate string for shininess and create attribute
-	char* pSoftness = doc->allocate_string(ftoa(softness));
+	char* pSoftness = doc->allocate_string(boost::lexical_cast<std::string>(softness).c_str());
 	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
 	node->append_attribute(attrS);
 
