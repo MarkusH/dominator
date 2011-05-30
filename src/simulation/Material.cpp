@@ -14,6 +14,25 @@
 #endif
 #include <Newton.h>
 #include <xml/rapidxml_utils.hpp>
+#include <xml/rapidxml_print.hpp>
+#include <sstream> // for ftoa
+#include <fstream> // for file I/O
+
+
+/**
+* float to C string conversion needed to put everything back to XML
+*
+* @param f	float to convert to a C string
+* @return char*
+*/
+const char* ftoa(double value) {
+  std::ostringstream o;
+  if (!(o << value)) return "";
+  else {
+  return o.str().c_str();
+  }
+}
+
 
 namespace sim {
 
@@ -54,6 +73,48 @@ void Material::load(rapidxml::xml_node<>* const node)
 
 void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const
 {
+	using namespace rapidxml;
+
+	// create material node
+	xml_node<>* node = doc->allocate_node(node_element, "material");
+	materials->append_node(node);
+
+	// allocate string for name and create attribute
+	char* pName = doc->allocate_string(name.c_str());
+	xml_attribute<>* attrN = doc->allocate_attribute("name", pName);
+	node->append_attribute(attrN);
+
+	// allocate string for texture and create attribute
+	char* pTexture = doc->allocate_string(texture.c_str());
+	xml_attribute<>* attrT = doc->allocate_attribute("texture", pTexture);
+	node->append_attribute(attrT);
+
+	// allocate string for shader and create attribute
+	char* pShader = doc->allocate_string(shader.c_str());
+	xml_attribute<>* attrS = doc->allocate_attribute("shader", pShader);
+	node->append_attribute(attrS);
+
+	// allocate string for ambient and create attribute
+	char* pAmbient = doc->allocate_string(ambient.str().c_str());
+	xml_attribute<>* attrA = doc->allocate_attribute("ambient", pAmbient);
+	node->append_attribute(attrA);
+
+	// allocate string for diffuse and create attribute
+	char* pDiffuse = doc->allocate_string(diffuse.str().c_str());
+	xml_attribute<>* attrD = doc->allocate_attribute("diffuse", pDiffuse);
+	node->append_attribute(attrD);
+
+	// allocate string for specular and create attribute
+	char* pSpecular = doc->allocate_string(specular.str().c_str());
+	xml_attribute<>* attrSp = doc->allocate_attribute("specular", pSpecular);
+	node->append_attribute(attrSp);
+
+	// allocate string for shininess and create attribute
+	char* pShininess = doc->allocate_string(ftoa(shininess));
+	xml_attribute<>* attrSh = doc->allocate_attribute("shininess", pShininess);
+	node->append_attribute(attrSh);
+
+	
 	// save properties
 	// vectors can be saved to a string like that:
 	//	std::string str = diffuse.str()
@@ -99,10 +160,44 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 
 void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const
 {
-	// save properties
-	// get material by using MaterialMgr::fromID
-	// and then get the name from it
-	// MaterialMgr::instance().fromID(id)->name;
+	using namespace rapidxml;
+
+	MaterialMgr& m = MaterialMgr::instance();
+
+	// create material node
+	xml_node<>* node = doc->allocate_node(node_element, "pair");
+	materials->append_node(node);
+
+	// allocate string for texture and create attribute
+	char* pId0 = doc->allocate_string("test");
+	xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+	node->append_attribute(attrId0);
+
+	// allocate string for shader and create attribute
+	char* pId1 = doc->allocate_string("test");
+	xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+	node->append_attribute(attrId1);
+
+	// allocate string for ambient and create attribute
+	char* pElasticity = doc->allocate_string(ftoa(elasticity));
+	xml_attribute<>* attrE = doc->allocate_attribute("elasticity", pElasticity);
+	node->append_attribute(attrE);
+
+	// allocate string for diffuse and create attribute
+	char* pStaticFriction = doc->allocate_string(ftoa(staticFriction));
+	xml_attribute<>* attrSF = doc->allocate_attribute("staticFriction", pStaticFriction);
+	node->append_attribute(attrSF);
+
+	// allocate string for specular and create attribute
+	char* pKineticFriction = doc->allocate_string(ftoa(kineticFriction));
+	xml_attribute<>* attrKF = doc->allocate_attribute("kineticFriction", pKineticFriction);
+	node->append_attribute(attrKF);
+
+	// allocate string for shininess and create attribute
+	char* pSoftness = doc->allocate_string(ftoa(softness));
+	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
+	node->append_attribute(attrS);
+
 }
 
 
@@ -282,29 +377,39 @@ bool MaterialMgr::save(const char* fileName)
 {
 	using namespace rapidxml;
 	// create document
-	xml_document<> root;
+	xml_document<> doc;
 
 	// create XML declaration
-	xml_node<>* declaration = root.allocate_node(node_declaration);
-	root.append_node(declaration);
+	xml_node<>* declaration = doc.allocate_node(node_declaration);
+	doc.append_node(declaration);
+	declaration->append_attribute(doc.allocate_attribute("version", "1.0"));
+    declaration->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+
 
 	// create root element "materials"
-	xml_node<>* materials = root.allocate_node(node_element, "materials");
-	root.append_node(materials);
+	xml_node<>* materials = doc.allocate_node(node_element, "materials");
+	doc.append_node(materials);
 	
 	// foreach material
 	std::map<std::string, Material>::iterator it;
 	for (it = m_materials.begin(); it != m_materials.end(); ++it) {
-		it->second.save(materials, &root);
+		it->second.save(materials, &doc);
 	}
 	
 	// foreach pair
 	std::map<std::pair<int, int>, MaterialPair>::iterator itp;
 	for (itp = m_pairs.begin(); itp != m_pairs.end(); ++itp) {
-		itp->second.save(materials, &root);
+		itp->second.save(materials, &doc);
 	}
 
+	std::string s;
+	print(std::back_inserter(s), doc, 0);
+
 	// save document
+	std::ofstream myfile;
+	myfile.open (fileName);
+	myfile << s;
+	myfile.close();
 
 	return true;
 }
@@ -371,8 +476,5 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 
 
 }
-
-
-
 
 }

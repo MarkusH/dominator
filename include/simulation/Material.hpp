@@ -226,6 +226,7 @@ public:
 	void processContact(const NewtonJoint* contactJoint,
 						dFloat timestep,
 						int threadIndex);
+
 };
 
 }
