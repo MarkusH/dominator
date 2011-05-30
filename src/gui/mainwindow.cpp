@@ -65,7 +65,7 @@ MainWindow::MainWindow(QApplication *app) {
 	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
 	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWindow, SLOT(renderSize(char, float)));
 	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWindow, SLOT(renderLocation(char, float)));
-	connect(m_modifyBox, SIGNAL(changeRotation(char, float)), m_renderWindow, SLOT(renderRotation(char, float)));
+	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWindow, SLOT(renderRotation(float, float, float)));
 
 	showMaximized();
 	splash.finish(this);

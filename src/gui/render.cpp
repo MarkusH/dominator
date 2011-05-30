@@ -151,6 +151,7 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 				<< sim::Simulation::instance().getSelectedObject()->getMatrix()
 				<< std::endl;
 		emit objectSelected(true);
+		std::cout << "get " << sim::Simulation::instance().getSelectedObject()->getMatrix().eulerAngles() << std::endl;
 		emit objectSelected(
 				&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
@@ -201,23 +202,18 @@ void Render::renderLocation(char axis, float position)
 	}
 }
 
-void Render::renderRotation(char axis, float angle)
+void Render::renderRotation(float x, float y, float z)
 {
-	std::cout << axis << " angle " << angle << std::endl;
+	std::cout << " angle " << x << " " << y << " " << z << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix =
-				sim::Simulation::instance().getSelectedObject()->getMatrix();
-		switch (axis) {
-		case 'x':
-			matrix %= Mat4f::rotX(angle * PI / 180.0f);
-			break;
-		case 'y':
-			matrix %= Mat4f::rotY(angle * PI / 180.0f);
-			break;
-		case 'z':
-			matrix %= Mat4f::rotZ(angle * PI / 180.0f);
-			break;
-		}
-		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+
+		Mat4f matrix =
+				Mat4f::rotZ(z * PI / 180.0f) *
+				Mat4f::rotX(x * PI / 180.0f) *
+				Mat4f::rotY(y * PI / 180.0f) *
+				Mat4f::translate(obj->getMatrix().getW());
+
+		obj->setMatrix(matrix);
 	}
 }

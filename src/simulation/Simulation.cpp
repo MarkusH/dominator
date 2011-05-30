@@ -211,9 +211,9 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 					Mat4f::translate(m_selectedObject->getMatrix().getW());
 			//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
 			m_selectedObject->setMatrix(matrix);
-
-		}
 */
+		}
+
 	}
 }
 

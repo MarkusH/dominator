@@ -55,7 +55,7 @@ private slots:
 signals:
 	void changeSize(char, float);
 	void changeLocation(char, float);
-	void changeRotation(char, float);
+	void changeRotation(float, float, float);
 };
 
 #endif /* MODIFYBOX_HPP_ */
