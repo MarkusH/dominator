@@ -23,9 +23,9 @@ public:
 	Render(QWidget *parent = 0);
 
 public slots:
-	void renderSize(char axis, int size);
-	void renderLocation(char axis, int position);
-	void renderRotation(char axis, int angle);
+	void renderSize(char axis, float size);
+	void renderLocation(char axis, float position);
+	void renderRotation(char axis, float angle);
 
 protected:
 	virtual void initializeGL();

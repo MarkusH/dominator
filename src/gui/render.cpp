@@ -159,23 +159,23 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 	}
 }
 
-void Render::renderSize(char axis, int size)
+void Render::renderSize(char axis, float size)
 {
 	std::cout << axis << " size " << size << std::endl;
 	switch (axis) {
 	case 'x':
-		m_matrix._11 = (float) size / 10.0;
+		m_matrix._11 = size;
 		break;
 	case 'y':
-		m_matrix._22 = (float) size / 10.0;
+		m_matrix._22 = size;
 		break;
 	case 'z':
-		m_matrix._33 = (float) size / 10.0;
+		m_matrix._33 = size;
 		break;
 	}
 }
 
-void Render::renderLocation(char axis, int position)
+void Render::renderLocation(char axis, float position)
 {
 	std::cout << axis << " position " << position << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
@@ -183,20 +183,20 @@ void Render::renderLocation(char axis, int position)
 				sim::Simulation::instance().getSelectedObject()->getMatrix();
 		switch (axis) {
 		case 'x':
-			matrix._41 = (float) position / 10.0;
+			matrix._41 = position;
 			break;
 		case 'y':
-			matrix._42 = (float) position / 10.0;
+			matrix._42 = position;
 			break;
 		case 'z':
-			matrix._43 = (float) position / 10.0;
+			matrix._43 = position;
 			break;
 		}
 		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
 
-void Render::renderRotation(char axis, int angle)
+void Render::renderRotation(char axis, float angle)
 {
 	std::cout << axis << " angle " << angle << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {

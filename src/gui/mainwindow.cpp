@@ -63,9 +63,9 @@ MainWindow::MainWindow(QApplication *app) {
 	connect(m_renderWindow, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
 	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
 	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
-	connect(m_modifyBox, SIGNAL(changeSize(char, int)), m_renderWindow, SLOT(renderSize(char, int)));
-	connect(m_modifyBox, SIGNAL(changeLocation(char, int)), m_renderWindow, SLOT(renderLocation(char, int)));
-	connect(m_modifyBox, SIGNAL(changeRotation(char, int)), m_renderWindow, SLOT(renderRotation(char, int)));
+	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWindow, SLOT(renderSize(char, float)));
+	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWindow, SLOT(renderLocation(char, float)));
+	connect(m_modifyBox, SIGNAL(changeRotation(char, float)), m_renderWindow, SLOT(renderRotation(char, float)));
 
 	showMaximized();
 	splash.finish(this);
