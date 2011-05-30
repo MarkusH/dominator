@@ -199,7 +199,7 @@ unsigned ShaderMgr::load(std::string folder)
 		if(!is_empty(p)) {
 			directory_iterator end_itr;
 			for(directory_iterator itr(p); itr != end_itr; ++itr) {
-				if(itr->leaf().find(".vs") != std::string::npos) {
+				if(itr->path().filename().find(".vs") != std::string::npos) {
 					std::string vs = itr->string();
 					std::string fs = vs;
 					fs.replace(vs.size() - 2, 1, "f");
