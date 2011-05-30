@@ -156,6 +156,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 
 		if (m_selectedObject) {
 			// get euler angles
+			/*
 			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
 			angles *= 180.0f / PI;
 			std::cout << "angles == " << angles << std::endl;
@@ -168,7 +169,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 					Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
 			//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
 			m_selectedObject->setMatrix(matrix);
-
+*/
 		}
 
 	}
