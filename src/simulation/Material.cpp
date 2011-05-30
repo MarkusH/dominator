@@ -182,7 +182,13 @@ int MaterialMgr::getID(const std::string& name) const
 	return string_hash(name) % INT_MAX;
 }
 
-
+Material* MaterialMgr::get(const std::string& name)
+{
+	std::map<std::string, Material>::iterator itr = m_materials.find(name);
+	if (itr == m_materials.end())
+		return NULL;
+	return &(itr->second);
+}
 
 Material* MaterialMgr::fromID(unsigned int id)
 {

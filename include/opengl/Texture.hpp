@@ -19,13 +19,13 @@
 
 namespace ogl {
 
-class Texture;
-typedef std::tr1::shared_ptr<Texture> TexturePtr;
+class __Texture;
+typedef std::tr1::shared_ptr<__Texture> Texture;
 
-class Texture {
+class __Texture {
 public:
-	Texture(GLuint textureID, GLuint stage);
-	virtual ~Texture();
+	__Texture(GLuint textureID, GLuint stage);
+	virtual ~__Texture();
 
 	void setTexParameterf(GLenum pname, GLfloat param);
 	void setTexParameteri(GLenum pname, GLint param);
@@ -40,15 +40,15 @@ public:
 
 	static void stage(GLuint stage);
 
-	static TexturePtr load(std::string file, GLuint target = GL_TEXTURE_2D);
-	static TexturePtr create(GLuint target = GL_TEXTURE_2D);
+	static Texture load(std::string file, GLuint target = GL_TEXTURE_2D);
+	static Texture create(GLuint target = GL_TEXTURE_2D);
 
 	GLuint m_textureID;
 	GLuint m_target;
 };
 
 
-class TextureMgr : public std::map<std::string, TexturePtr> {
+class TextureMgr : public std::map<std::string, Texture> {
 private:
 	static TextureMgr* s_instance;
 	TextureMgr();
@@ -59,65 +59,65 @@ public:
 	static TextureMgr& instance();
 	static void destroy();
 
-	TexturePtr add(std::string name, TexturePtr texture);
+	Texture add(std::string name, Texture texture);
 	unsigned load(std::string folder);
-	TexturePtr get(std::string name);
+	Texture get(std::string name);
 };
 
 
 inline
-void Texture::setTexParameterf(GLenum pname, GLfloat param)
+void __Texture::setTexParameterf(GLenum pname, GLfloat param)
 {
 	glTexParameterf(m_target, pname, param);
 }
 
 inline
-void Texture::setTexParameteri(GLenum pname, GLint param)
+void __Texture::setTexParameteri(GLenum pname, GLint param)
 {
 	glTexParameteri(m_target, pname, param);
 }
 
 inline
-void Texture::setTexParameterfv(GLenum pname, const GLfloat* param)
+void __Texture::setTexParameterfv(GLenum pname, const GLfloat* param)
 {
 	glTexParameterfv(m_target, pname, param);
 }
 
 inline
-void Texture::setTexParameteriv(GLenum pname, const GLint* param)
+void __Texture::setTexParameteriv(GLenum pname, const GLint* param)
 {
 	glTexParameteriv(m_target, pname, param);
 }
 
 inline
-void Texture::setFilter(GLint min, GLint mag)
+void __Texture::setFilter(GLint min, GLint mag)
 {
 	setTexParameteri(GL_TEXTURE_MIN_FILTER, min);
 	setTexParameterf(GL_TEXTURE_MAG_FILTER, mag);
 }
 
 inline
-void Texture::setWrap(GLint s, GLint t)
+void __Texture::setWrap(GLint s, GLint t)
 {
 	setTexParameteri(GL_TEXTURE_WRAP_S, s);
 	setTexParameteri(GL_TEXTURE_WRAP_T, t);
 }
 
 inline
-void Texture::bind()
+void __Texture::bind()
 {
 	glBindTexture(m_target, m_textureID);
 }
 
 inline
-void Texture::unbind()
+void __Texture::unbind()
 {
 	glBindTexture(m_target, 0);
 }
 ;
 
 inline
-void Texture::stage(GLuint stage)
+void __Texture::stage(GLuint stage)
 {
 	glActiveTexture(stage);
 }
