@@ -38,14 +38,14 @@ public:
 	Mat4f m_matrix;
 
 	/**
-	 * Positions the camera at position, with the focus point
-	 * eye and the up-vector up.
+	 * Positions the camera at position,in direction view
+	 * and the up-vector up.
 	 *
 	 * @param position The position of the camera
-	 * @param eye	   The focus point
+	 * @param view	   The view direction
 	 * @param up	   The up-vector
 	 */
-	void positionCamera(Vec3f position, Vec3f eye, Vec3f up);
+	void positionCamera(Vec3f position, Vec3f view, Vec3f up);
 
 	/**
 	 * Moves the camera in the view direction.

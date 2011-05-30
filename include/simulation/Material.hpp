@@ -163,6 +163,14 @@ public:
 	Material* fromID(unsigned int id);
 
 	/**
+	 * Returns the material with the given name, or NULL.
+	 *
+	 * @param name
+	 * @return
+	 */
+	Material* get(const std::string& name);
+
+	/**
 	 * Adds a new material pair to the internal map and returns
 	 * the corresponding pair of material ids.
 	 *

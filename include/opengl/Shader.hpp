@@ -21,10 +21,10 @@
 namespace ogl {
 
 // forward declaration
-class Shader;
+class __Shader;
 
 // smart pointer for the shader class
-typedef std::tr1::shared_ptr<Shader> ShaderPtr;
+typedef std::tr1::shared_ptr<__Shader> Shader;
 
 /**
  * A class that wraps an OpenGL shader program, i.e. a combination
@@ -40,7 +40,7 @@ typedef std::tr1::shared_ptr<Shader> ShaderPtr;
  * using setUniform(). The current shader can be unbound by calling the
  * static unbind() method.
  */
-class Shader {
+class __Shader {
 protected:
 	// source code of the vertex and fragment shader
 	GLchar *m_vertexSource, *m_fragmentSource;
@@ -52,8 +52,8 @@ protected:
 	// returns the info (error) log
 	void getInfoLog(GLuint object);
 public:
-	Shader(GLchar* vertexSource, GLchar* fragmentSource);
-	virtual ~Shader();
+	__Shader(GLchar* vertexSource, GLchar* fragmentSource);
+	virtual ~__Shader();
 
 	bool compile();
 
@@ -64,7 +64,7 @@ public:
 	void setUniform1f(const char* uniform, GLfloat data);
 	void setUniform1i(const char* uniform, GLint data);
 
-	static ShaderPtr load(std::string vertexFile, std::string fragmentFile);
+	static Shader load(std::string vertexFile, std::string fragmentFile);
 };
 
 /**
@@ -74,7 +74,7 @@ public:
  * All shaders in a folder can be loaded and compiled using the load
  * method.
  */
-class ShaderMgr : public std::map<std::string, ShaderPtr> {
+class ShaderMgr : public std::map<std::string, Shader> {
 private:
 	static ShaderMgr* s_instance;
 	ShaderMgr();
@@ -86,7 +86,7 @@ public:
 	static void destroy();
 
 	/** Adds the pair of name and shader to the manager. */
-	ShaderPtr add(std::string name, ShaderPtr shader);
+	Shader add(std::string name, Shader shader);
 
 	/** Loads all shaders in the specified folder. Vertex (*.vs) and
 	 * fragment shader (*.fs) files with the same name are linked together
@@ -95,36 +95,36 @@ public:
 	unsigned load(std::string folder);
 
 	/** Returns the associated shader or an empty smart pointer */
-	ShaderPtr get(std::string name);
+	Shader get(std::string name);
 };
 
 
 inline
-void Shader::bind()
+void __Shader::bind()
 {
 	glUseProgram(m_programObject);
 }
 
 inline
-void Shader::unbind()
+void __Shader::unbind()
 {
 	glUseProgram(0);
 }
 
 inline
-void Shader::setUniform4fv(const char* uniform, GLfloat* data)
+void __Shader::setUniform4fv(const char* uniform, GLfloat* data)
 {
 	glUniform4fv(glGetUniformLocation(m_programObject, uniform), 1, data);
 }
 
 inline
-void Shader::setUniform1f(const char* uniform, GLfloat data)
+void __Shader::setUniform1f(const char* uniform, GLfloat data)
 {
 	glUniform1f(glGetUniformLocation(m_programObject, uniform), data);
 }
 
 inline
-void Shader::setUniform1i(const char* uniform, GLint data)
+void __Shader::setUniform1i(const char* uniform, GLint data)
 {
 	glUniform1i(glGetUniformLocation(m_programObject, uniform), data);
 }

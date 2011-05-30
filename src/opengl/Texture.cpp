@@ -20,12 +20,12 @@ namespace ogl {
 
 TextureMgr* TextureMgr::s_instance = NULL;
 
-Texture::Texture(GLuint textureID, GLuint target)
+__Texture::__Texture(GLuint textureID, GLuint target)
 	: m_textureID(textureID), m_target(target)
 {
 }
 
-Texture::~Texture()
+__Texture::~__Texture()
 {
 #ifdef _DEBUG
 	std::cout << "delete texture" << std::endl;
@@ -34,13 +34,13 @@ Texture::~Texture()
 		glDeleteTextures(0, &m_textureID);
 }
 
-TexturePtr Texture::load(std::string file, GLuint target)
+Texture __Texture::load(std::string file, GLuint target)
 {
 	int w, h, c;
 	unsigned char* data = stbi_load(file.c_str(), &w, &h, &c, STBI_rgb_alpha);
 
 	if (!data)
-		return TexturePtr();
+		return Texture();
 
     GLuint textureID = 0;
     glGenTextures(1, &textureID);
@@ -53,22 +53,22 @@ TexturePtr Texture::load(std::string file, GLuint target)
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-    TexturePtr result(new Texture(textureID, target));
+    Texture result(new __Texture(textureID, target));
     return result;
 }
 
-TexturePtr Texture::create(GLuint target)
+Texture __Texture::create(GLuint target)
 {
     GLuint textureID = 0;
     glGenTextures(1, &textureID);
     glBindTexture(target, textureID);
 
-    TexturePtr result(new Texture(textureID, target));
+    Texture result(new __Texture(textureID, target));
     return result;
 }
 
 TextureMgr::TextureMgr()
-	: std::map<std::string, TexturePtr>()
+	: std::map<std::string, Texture>()
 {
 }
 
@@ -93,7 +93,7 @@ void TextureMgr::destroy()
 		delete s_instance;
 }
 
-TexturePtr TextureMgr::add(std::string name, TexturePtr texture)
+Texture TextureMgr::add(std::string name, Texture texture)
 {
 	(*this)[name] = texture;
 	return texture;
@@ -112,7 +112,7 @@ unsigned TextureMgr::load(std::string folder)
 			directory_iterator end_itr;
 			for(directory_iterator itr(p); itr != end_itr; ++itr) {
 				if(itr->leaf().size() > 3) {
-					TexturePtr texture = Texture::load(itr->string(), GL_TEXTURE_2D);
+					Texture texture = __Texture::load(itr->string(), GL_TEXTURE_2D);
 					add(basename(*itr), texture);
 				}
 			}
@@ -139,7 +139,7 @@ unsigned TextureMgr::load(std::string folder)
 #ifdef _DEBUG
 				std::cout << "load texture " << name << std::endl;
 #endif
-				TexturePtr texture = Texture::load(folder + file, GL_TEXTURE_2D);
+				Texture texture = __Texture::load(folder + file, GL_TEXTURE_2D);
 				add(name, texture);
 			}
 		}
@@ -149,11 +149,11 @@ unsigned TextureMgr::load(std::string folder)
 	return count;
 }
 
-TexturePtr TextureMgr::get(std::string name)
+Texture TextureMgr::get(std::string name)
 {
 	TextureMgr::iterator it = this->find(name);
 	if (it == this->end()) {
-		TexturePtr result;
+		Texture result;
 		return result;
 	}
 	return it->second;
