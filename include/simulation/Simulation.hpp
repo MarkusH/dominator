@@ -61,6 +61,14 @@ protected:
 	 * @param end   The end iterator
 	 */
 	void upload(ObjectMap::iterator begin, ObjectMap::iterator end);
+
+	/**
+	 * Applies the given material. If it is not available, disable all
+	 * material properties.
+	 *
+	 * @param material
+	 */
+	void applyMaterial(const std::string& material);
 public:
 	/**
 	 * Creates a new instance of the Simulation.

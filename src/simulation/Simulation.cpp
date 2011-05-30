@@ -6,7 +6,9 @@
  */
 
 #include <simulation/Simulation.hpp>
+#include <simulation/Material.hpp>
 #include <opengl/Texture.hpp>
+#include <opengl/Shader.hpp>
 #include <iostream>
 #include <newton/util.hpp>
 
@@ -151,24 +153,24 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		add(obj);
 	} else {
 
-		/*
+
 		if (m_selectedObject) {
 			// get euler angles
 			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
 			angles *= 180.0f / PI;
-			std::cout << angles << std::endl;
+			std::cout << "angles == " << angles << std::endl;
 			// try to rotate anew, using the generated values
 
 			Mat4f matrix =
 					Mat4f::rotZ(angles.z * PI / 180.0f) *
 					Mat4f::rotX(angles.x * PI / 180.0f) *
 					Mat4f::rotY(angles.y * PI / 180.0f) *
-					Mat4f::translate(Vec3f(5.0f, 0.0f, -5.0f));
+					Mat4f::translate(Vec3f(-5.0f, 0.0f, -5.0f));
 			//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
 			m_selectedObject->setMatrix(matrix);
 
 		}
-		*/
+
 	}
 }
 
@@ -204,14 +206,42 @@ void Simulation::update()
 	if (m_keyAdapter.isDown('d')) m_camera.strafe(step);
 }
 
+void Simulation::applyMaterial(const std::string& material) {
+	const Material* const _mat = MaterialMgr::instance().get(material);
+
+	if (_mat != NULL) {
+		const Material& mat = *_mat;
+		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
+
+		if (texture) {
+			glEnable(GL_TEXTURE_2D);
+			texture->bind();
+		} else {
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, &mat.specular[0]);
+		glMaterialf(GL_FRONT, GL_SHININESS, mat.shininess);
+
+		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
+		if (shader) {
+			shader->bind();
+		} else {
+			ogl::__Shader::unbind();
+		}
+
+	} else {
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glUseProgram(0);
+	}
+}
+
 void Simulation::render()
 {
 	m_camera.update();
 	m_camera.apply();
-
-	ogl::TextureMgr::instance().get("yellow")->bind();
-
-
 
 	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
 		m_vertexBuffer.bind();
@@ -220,6 +250,7 @@ void Simulation::render()
 		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {
 			ogl::SubBuffer* buf = (*itr);
 			__Object* obj = (__Object*)buf->object;
+			applyMaterial(buf->material);
 			glPushMatrix();
 			glMultMatrixf(obj->getMatrix()[0]);
 			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));

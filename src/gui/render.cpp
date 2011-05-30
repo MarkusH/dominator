@@ -111,8 +111,6 @@ void Render::paintGL()
 	sim::Simulation::instance().update();
 	sim::Simulation::instance().render();
 
-	ogl::ShaderMgr::instance().get("ppl_textured")->bind();
-
 	// set the position of the light
 	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);

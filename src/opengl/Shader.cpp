@@ -26,14 +26,14 @@ namespace ogl {
 
 ShaderMgr* ShaderMgr::s_instance = NULL;
 
-Shader::Shader(GLchar* vertexSource, GLchar* fragmentSource) :
+__Shader::__Shader(GLchar* vertexSource, GLchar* fragmentSource) :
 	m_vertexSource(vertexSource), m_fragmentSource(fragmentSource) {
 	m_programObject = 0;
 	m_vertexObject = 0;
 	m_fragmentObject = 0;
 }
 
-Shader::~Shader() {
+__Shader::~__Shader() {
 #ifdef _DEBUG
 	std::cout << "delete shader" << std::endl;
 #endif
@@ -42,7 +42,7 @@ Shader::~Shader() {
 	if (m_programObject) glDeleteProgram(m_programObject);
 }
 
-void Shader::getInfoLog(GLuint object)
+void __Shader::getInfoLog(GLuint object)
 {
 	GLint len, slen;
 	glGetObjectParameterivARB(object, GL_OBJECT_INFO_LOG_LENGTH_ARB, &len);
@@ -54,7 +54,7 @@ void Shader::getInfoLog(GLuint object)
 	}
 }
 
-bool Shader::compile()
+bool __Shader::compile()
 {
 	// load vertex source
 	m_vertexObject = glCreateShader(GL_VERTEX_SHADER);
@@ -143,20 +143,20 @@ static GLchar* getFileContent(std::string& fileName)
 }
 
 
-ShaderPtr Shader::load(std::string vertexFile, std::string fragmentFile)
+Shader __Shader::load(std::string vertexFile, std::string fragmentFile)
 {
 	GLchar* vsrc = getFileContent(vertexFile);
-	if (!vsrc) return ShaderPtr();
+	if (!vsrc) return Shader();
 
 	GLchar* fsrc = getFileContent(fragmentFile);
-	if (!fsrc) return ShaderPtr();
+	if (!fsrc) return Shader();
 
-	return ShaderPtr(new Shader(vsrc, fsrc));
+	return Shader(new __Shader(vsrc, fsrc));
 }
 
 
 ShaderMgr::ShaderMgr()
-	: std::map<std::string, ShaderPtr>()
+	: std::map<std::string, Shader>()
 {
 }
 
@@ -181,7 +181,7 @@ void ShaderMgr::destroy()
 		delete s_instance;
 }
 
-ShaderPtr ShaderMgr::add(std::string name, ShaderPtr shader)
+Shader ShaderMgr::add(std::string name, Shader shader)
 {
 	(*this)[name] = shader;
 	return shader;
@@ -203,7 +203,7 @@ unsigned ShaderMgr::load(std::string folder)
 					std::string vs = itr->string();
 					std::string fs = vs;
 					fs.replace(vs.size() - 2, 1, "f");
-					ShaderPtr shader = Shader::load(vs, fs);
+					Shader shader = __Shader::load(vs, fs);
 					shader->compile();
 					add(basename(*itr), shader);
 				}
@@ -224,7 +224,7 @@ unsigned ShaderMgr::load(std::string folder)
 			if (vs.find(".vs") != std::string::npos) {
 				std::string fs(vs);
 				fs.replace(fs.size() - 2, 1, "f");
-				ShaderPtr shader = Shader::load(folder + vs, folder + fs);
+				Shader shader = __Shader::load(folder + vs, folder + fs);
 				shader->compile();
 				std::string name(vs);
 				name.erase(name.size() - 3, 3);
@@ -237,11 +237,11 @@ unsigned ShaderMgr::load(std::string folder)
 	return count;
 }
 
-ShaderPtr ShaderMgr::get(std::string name)
+Shader ShaderMgr::get(std::string name)
 {
 	ShaderMgr::iterator it = this->find(name);
 	if (it == this->end()) {
-		ShaderPtr result;
+		Shader result;
 		return result;
 	}
 	return it->second;
