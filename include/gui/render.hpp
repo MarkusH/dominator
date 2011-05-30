@@ -25,7 +25,7 @@ public:
 public slots:
 	void renderSize(char axis, float size);
 	void renderLocation(char axis, float position);
-	void renderRotation(char axis, float angle);
+	void renderRotation(float x, float y, float z);
 
 protected:
 	virtual void initializeGL();

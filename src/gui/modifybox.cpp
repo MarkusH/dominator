@@ -117,8 +117,11 @@ void ModifyBox::mouseReleaseEvent(QMouseEvent * event)
 	m_moveOffset = QPoint();
 }
 
+bool doUpdate = true;
+
 void ModifyBox::signalSize(double value)
 {
+	if (!doUpdate) return;
 	if (QObject::sender() == m_mbSizeX) {
 		emit changeSize('x', (float) value);
 	} else if (QObject::sender() == m_mbSizeY) {
@@ -130,6 +133,7 @@ void ModifyBox::signalSize(double value)
 
 void ModifyBox::signalLocation(double value)
 {
+	if (!doUpdate) return;
 	if (QObject::sender() == m_mbLocX) {
 		emit changeLocation('x', (float) value);
 	} else if (QObject::sender() == m_mbLocY) {
@@ -141,48 +145,53 @@ void ModifyBox::signalLocation(double value)
 
 void ModifyBox::signalRotation(double value)
 {
+	if (!doUpdate) return;
 	float delta;
 	if (QObject::sender() == m_mbRotX) {
 		delta = value - m_rx;
 		m_rx = value;
-		emit changeRotation('x', (float) delta);
+		emit changeRotation(m_mbRotX->value(), m_mbRotY->value(), m_mbRotZ->value());
 	} else if (QObject::sender() == m_mbRotY) {
 		delta = value - m_ry;
 		m_ry = value;
-		emit changeRotation('y', (float) delta);
+		emit changeRotation(m_mbRotX->value(), m_mbRotY->value(), m_mbRotZ->value());
 	} else if (QObject::sender() == m_mbRotZ) {
 		delta = value - m_rz;
 		m_rz = value;
-		emit changeRotation('z', (float) delta);
+		emit changeRotation(m_mbRotX->value(), m_mbRotY->value(), m_mbRotZ->value());
 	}
 }
 
 void ModifyBox::updateData(const m3d::Mat4f* matrix)
 {
+	doUpdate = false;
 	// TODO: this seems to trigger the signals of the spinners
 	// we may need to set a boolean in this function that temporarily
 	// disables the handling code in the slots above.
 	if (matrix) {
-		std::cout << matrix->_11 << " " << matrix->_22 << " "
-				<< matrix->_33 << std::endl;
+		//std::cout << matrix->_11 << " " << matrix->_22 << " "
+		//		<< matrix->_33 << std::endl;
 		m_mbSizeX->setValue(matrix->getX().len());
 		m_mbSizeY->setValue(matrix->getY().len());
 		m_mbSizeZ->setValue(matrix->getZ().len());
-		std::cout << matrix->_41 << " " << matrix->_42 << " "
-				<< matrix->_43 << std::endl;
+		//std::cout << matrix->_41 << " " << matrix->_42 << " "
+		//		<< matrix->_43 << std::endl;
 		m_mbLocX->setValue(matrix->_41);
 		m_mbLocY->setValue(matrix->_42);
 		m_mbLocZ->setValue(matrix->_43);
-		std::cout << matrix->_41 << " " << matrix->_42 << " "
-				<< matrix->_43 << std::endl;
-		m_mbRotX->setValue(matrix->eulerAngles().x);
-		m_mbRotY->setValue(matrix->eulerAngles().y);
-		m_mbRotZ->setValue(matrix->eulerAngles().z);
+		//std::cout << matrix->_41 << " " << matrix->_42 << " "
+		//		<< matrix->_43 << std::endl;
+		//std::cout << "get " << matrix->eulerAngles() << std::endl;
+		m_mbRotX->setValue(matrix->eulerAngles().x * 180.0f / PI);
+		m_mbRotY->setValue(matrix->eulerAngles().y * 180.0f / PI);
+		m_mbRotZ->setValue(matrix->eulerAngles().z * 180.0f / PI);
 	}
+	doUpdate = true;
 }
 
 void ModifyBox::updateData(bool selected)
 {
+	doUpdate = false;
 	m_mbSizeX->setEnabled(selected);
 	m_mbSizeY->setEnabled(selected);
 	m_mbSizeZ->setEnabled(selected);
@@ -194,4 +203,5 @@ void ModifyBox::updateData(bool selected)
 	m_mbRotX->setEnabled(selected);
 	m_mbRotY->setEnabled(selected);
 	m_mbRotZ->setEnabled(selected);
+	doUpdate = true;
 }
