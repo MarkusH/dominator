@@ -47,6 +47,7 @@ protected:
 
 	int m_nextID;
 	ObjectMap m_objects;
+	Object m_environment;
 
 	/** The currently selected object, or an empty smart pointer */
 	Object m_selectedObject;
@@ -91,7 +92,17 @@ public:
 	 */
 	static Simulation& instance();
 
+	/**
+	 * Initializes the Simulation. This has to be done before adding
+	 * objects. Initializing the Simulation will clear the current
+	 * state.
+	 */
+	void init();
 
+	/**
+	 * Clears the Simulation, including all objects in it.
+	 */
+	void clear();
 
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;

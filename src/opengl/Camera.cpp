@@ -23,10 +23,10 @@ Camera::~Camera()
 {
 }
 
-void Camera::positionCamera(Vec3f position, Vec3f eye, Vec3f up)
+void Camera::positionCamera(Vec3f position, Vec3f view, Vec3f up)
 {
 	m_position = Vec4f(position);
-	m_eye      = Vec4f(eye);
+	m_eye      = Vec4f(position + view);
 	m_up       = Vec4f(up);
 }
 

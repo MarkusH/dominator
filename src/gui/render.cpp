@@ -82,6 +82,7 @@ void Render::initializeGL()
 	glCullFace(GL_BACK);
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
+	sim::Simulation::instance().init();
 
 	// Generate Vertex Buffer Objects
 	model->CreateVBO();
