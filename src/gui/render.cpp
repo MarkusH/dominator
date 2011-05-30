@@ -14,28 +14,18 @@
 #include <simulation/Simulation.hpp>
 #include <opengl/Texture.hpp>
 #include <iostream>
+#include <simulation/Material.hpp>
 
 using namespace m3d;
 
-Render::Render(QString *filename, QWidget *parent) :
+Render::Render(QWidget *parent) :
 	QGLWidget(parent)
 {
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
-	load(filename);
 	setFocusPolicy(Qt::WheelFocus);
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
 	m_timer->start();
-}
-
-void Render::load(QString *filename)
-{
-	try {
-		model = new Model3DS(filename->toUtf8().constData());
-		std::cout << "loaded " << filename->toUtf8().constData() << std::endl;
-	} catch (std::string& error_str) {
-		std::cerr << "Error: " << error_str << std::endl;
-	}
 }
 
 void Render::initializeGL()
@@ -48,6 +38,7 @@ void Render::initializeGL()
 	// load per-pixel lighting shader
 	ogl::ShaderMgr::instance().load("data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
+	sim::MaterialMgr::instance().load("data/materials.xml");
 
 	// set some material properties
 	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -81,8 +72,6 @@ void Render::initializeGL()
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
 
-	// Generate Vertex Buffer Objects
-	model->CreateVBO();
 	m_clock.reset();
 }
 
@@ -170,23 +159,23 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 	}
 }
 
-void Render::renderSize(char axis, int size)
+void Render::renderSize(char axis, float size)
 {
 	std::cout << axis << " size " << size << std::endl;
 	switch (axis) {
 	case 'x':
-		m_matrix._11 = (float) size / 10.0;
+		m_matrix._11 = size;
 		break;
 	case 'y':
-		m_matrix._22 = (float) size / 10.0;
+		m_matrix._22 = size;
 		break;
 	case 'z':
-		m_matrix._33 = (float) size / 10.0;
+		m_matrix._33 = size;
 		break;
 	}
 }
 
-void Render::renderLocation(char axis, int position)
+void Render::renderLocation(char axis, float position)
 {
 	std::cout << axis << " position " << position << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
@@ -194,20 +183,20 @@ void Render::renderLocation(char axis, int position)
 				sim::Simulation::instance().getSelectedObject()->getMatrix();
 		switch (axis) {
 		case 'x':
-			matrix._41 = (float) position / 10.0;
+			matrix._41 = position;
 			break;
 		case 'y':
-			matrix._42 = (float) position / 10.0;
+			matrix._42 = position;
 			break;
 		case 'z':
-			matrix._43 = (float) position / 10.0;
+			matrix._43 = position;
 			break;
 		}
 		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
 
-void Render::renderRotation(char axis, int angle)
+void Render::renderRotation(char axis, float angle)
 {
 	std::cout << axis << " angle " << angle << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
