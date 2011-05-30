@@ -100,7 +100,7 @@ void Render::paintGL()
 	sim::Simulation::instance().render();
 
 	// set the position of the light
-	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
+	static Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
 
 	static int frames = 0;
@@ -151,8 +151,7 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 				<< sim::Simulation::instance().getSelectedObject()->getMatrix()
 				<< std::endl;
 		emit objectSelected(true);
-		emit objectSelected(
-				&sim::Simulation::instance().getSelectedObject()->getMatrix());
+		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
 		emit objectSelected(false);
 	}
@@ -162,8 +161,9 @@ void Render::renderSize(char axis, float size)
 {
 	std::cout << axis << " size " << size << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
-		m3d::Mat4f helper = m3d::Mat4f::identity();
+		Mat4f matrix =
+				sim::Simulation::instance().getSelectedObject()->getMatrix();
+		Mat4f helper = Mat4f::identity();
 		switch (axis) {
 		case 'x':
 			helper._11 = size;
@@ -184,7 +184,7 @@ void Render::renderLocation(char axis, float position)
 {
 	std::cout << axis << " position " << position << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix =
+		Mat4f matrix =
 				sim::Simulation::instance().getSelectedObject()->getMatrix();
 		switch (axis) {
 		case 'x':
@@ -201,23 +201,14 @@ void Render::renderLocation(char axis, float position)
 	}
 }
 
-void Render::renderRotation(char axis, float angle)
+void Render::renderRotation(float angleX, float angleY, float angleZ)
 {
-	std::cout << axis << " angle " << angle << std::endl;
+	std::cout << " x " << angleX << " y " << angleY << " z " << angleZ << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix =
-				sim::Simulation::instance().getSelectedObject()->getMatrix();
-		switch (axis) {
-		case 'x':
-			matrix %= Mat4f::rotX(angle * PI / 180.0f);
-			break;
-		case 'y':
-			matrix %= Mat4f::rotY(angle * PI / 180.0f);
-			break;
-		case 'z':
-			matrix %= Mat4f::rotZ(angle * PI / 180.0f);
-			break;
-		}
+		Mat4f matrix = Mat4f::rotZ(angleY * PI / 180.0f) *
+					   Mat4f::rotX(angleX * PI / 180.0f) *
+					   Mat4f::rotY(angleZ * PI / 180.0f) *
+					   Mat4f::translate(sim::Simulation::instance().getSelectedObject()->getMatrix().getW());
 		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
