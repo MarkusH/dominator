@@ -23,14 +23,13 @@ namespace sim {
 MaterialMgr* MaterialMgr::s_instance = NULL;
 
 template<typename T>
-const char* toString(T value)
+char* toString(T value)
 {
 	std::stringstream sst;
 	sst << value;
 	sst.seekg(0, std::ios::beg);
-	return sst.str().c_str();
+	return strdup(sst.str().c_str());
 }
-
 Material::Material(const std::string& name)
 		: name(name)
 {
@@ -104,9 +103,10 @@ void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* d
 
 	// allocate string for shininess and create attribute
 	//char* pShininess = doc->allocate_string(boost::lexical_cast<std::string>(shininess).c_str());
-	const char* pShininess = doc->allocate_string(toString(shininess));
+	char* pShininess = doc->allocate_string(toString(shininess));
 	xml_attribute<>* attrSh = doc->allocate_attribute("shininess", pShininess);
 	node->append_attribute(attrSh);
+	//free(pShininess);
 
 	
 	// save properties
@@ -162,39 +162,58 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	xml_node<>* node = doc->allocate_node(node_element, "pair");
 	materials->append_node(node);
 
-	// allocate string for texture and create attribute
-	char* pId0 = doc->allocate_string("test");
-	xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
-	node->append_attribute(attrId0);
+	// allocate string for mat0 and create attribute
+	if (m.fromID(id0) != NULL) {
+		const char* pId0 = doc->allocate_string(m.fromID(id0)->name.c_str());
+		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+		node->append_attribute(attrId0);
+	}
+	else {
+		const char* pId0 = doc->allocate_string("");
+		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+		node->append_attribute(attrId0);
+	}
 
-	// allocate string for shader and create attribute
-	char* pId1 = doc->allocate_string("test");
-	xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
-	node->append_attribute(attrId1);
+	// allocate string for mat1 and create attribute
+	if (m.fromID(id1) != NULL) {
+		const char* pId1 = doc->allocate_string(m.fromID(id1)->name.c_str());
+		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+		node->append_attribute(attrId1);
+	}
+	else {
+		const char* pId1 = doc->allocate_string("");
+		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+		node->append_attribute(attrId1);
+	}
 
-	// allocate string for ambient and create attribute
+
+	// allocate string for elasticity and create attribute
 	//char* pElasticity = doc->allocate_string(boost::lexical_cast<std::string>(elasticity).c_str());
-	const char* pElasticity = doc->allocate_string(toString(elasticity));
+	char* pElasticity = doc->allocate_string(toString(elasticity));
 	xml_attribute<>* attrE = doc->allocate_attribute("elasticity", pElasticity);
 	node->append_attribute(attrE);
+	//free(pElasticity);
 
-	// allocate string for diffuse and create attribute
+	// allocate string for static friction and create attribute
 	//char* pStaticFriction = doc->allocate_string(boost::lexical_cast<std::string>(staticFriction).c_str());
-	const char* pStaticFriction = doc->allocate_string(toString(staticFriction));
+	char* pStaticFriction = doc->allocate_string(toString(staticFriction));
 	xml_attribute<>* attrSF = doc->allocate_attribute("staticFriction", pStaticFriction);
 	node->append_attribute(attrSF);
+	//free(pStaticFriction);
 
-	// allocate string for specular and create attribute
+	// allocate string for kinetic friction and create attribute
 	//char* pKineticFriction = doc->allocate_string(boost::lexical_cast<std::string>(kineticFriction).c_str());
-	const char* pKineticFriction = doc->allocate_string(toString(kineticFriction));
+	char* pKineticFriction = doc->allocate_string(toString(kineticFriction));
 	xml_attribute<>* attrKF = doc->allocate_attribute("kineticFriction", pKineticFriction);
 	node->append_attribute(attrKF);
+	//free(pKineticFriction);
 
-	// allocate string for shininess and create attribute
+	// allocate string for softness and create attribute
 	//char* pSoftness = doc->allocate_string(boost::lexical_cast<std::string>(softness).c_str());
-	const char* pSoftness = doc->allocate_string(toString(softness));
+	char* pSoftness = doc->allocate_string(toString(softness));
 	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
 	node->append_attribute(attrS);
+	//free(pSoftness);
 
 }
 
@@ -346,9 +365,9 @@ bool MaterialMgr::load(const char* fileName)
 				add(mat);
 			}
 			if(name == "pair") {
-				MaterialPair pair;
-				pair.load(node);
-				m_pairs[std::make_pair(pair.id0, pair.id1)] = pair;
+				MaterialPair p;
+				p.load(node);
+				m_pairs[std::make_pair(p.id0, p.id1)] = p;
 			}
 		}
 	
@@ -391,13 +410,16 @@ bool MaterialMgr::save(const char* fileName)
 	// foreach material
 	std::map<std::string, Material>::iterator it;
 	for (it = m_materials.begin(); it != m_materials.end(); ++it) {
-		it->second.save(materials, &doc);
+				std::cout << it->second.name << std::endl;
+		it->second.save(materials, &doc);		std::cout << it->second.name << std::endl;
 	}
 	
 	// foreach pair
 	std::map<std::pair<int, int>, MaterialPair>::iterator itp;
 	for (itp = m_pairs.begin(); itp != m_pairs.end(); ++itp) {
+		std::cout << itp->second.id0 << " " << itp->second.id1 << std::endl;
 		itp->second.save(materials, &doc);
+		std::cout << itp->second.id0 << " " << itp->second.id1 << std::endl;
 	}
 
 	std::string s;
@@ -408,6 +430,9 @@ bool MaterialMgr::save(const char* fileName)
 	myfile.open (fileName);
 	myfile << s;
 	myfile.close();
+
+	// //frees all memory allocated to the nodes
+	doc.clear();
 
 	return true;
 }
