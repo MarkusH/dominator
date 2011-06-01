@@ -63,6 +63,39 @@ typedef Quat<double> Quatd;
 #include "quat.hpp"
 #include "operators.hpp"
 
+/**
+ * Returns the intersection point of the ray (origin, dest) and the plane
+ * (p1, p2, p3). p1, p2, p3 are three points on the plane.
+ *
+ * @param origin The origin of the ray
+ * @param dest   The destination of the ray
+ * @param p1     A point on the plane
+ * @param p2     A point on the plane
+ * @param p3     A point on the plane
+ * @return
+ */
+template<typename T>
+Vec3<T> rayPlaneIntersect(Vec3<T> origin, Vec3<T> dest, Vec3<T> p1, Vec3<T> p2, Vec3<T> p3)
+{
+	// compute
+	Vec3<T> v1 = p2 - p1;
+	Vec3<T> v2 = p3 - p1;
+	Vec3<T> v3 = v1 % v2;
+
+	// project ray onto the plane
+	Vec3<T> proj1 = Vec3f(v1 * (origin - p1), v2 * (origin - p1), v3 * (origin - p1));
+	Vec3<T> proj2 = Vec3f(v1 * (dest - p1),   v2 * (dest - p1),   v3 * (dest - p1));
+
+	// check if the plane normal is parallel to the ray direction
+	if (proj1.z == proj2.z) return Vec3<T>();
+
+	// calculate ray coefficient
+	float t = proj1.z / (proj2.z - proj1.z);
+
+	// calculate the world-coordinates of the intersection
+	return origin + (origin - dest) * t;
+}
+
 }
 
 #endif /* M3D_HPP_ */

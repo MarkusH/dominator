@@ -235,6 +235,11 @@ Object Simulation::selectObject(int x, int y)
 	return result;
 }
 
+Mat4f start_mat;
+Vec3f start_drag;
+Vec3f cur_drag;
+float mx, my;
+
 
 void Simulation::mouseMove(int x, int y)
 {
@@ -249,12 +254,64 @@ void Simulation::mouseMove(int x, int y)
 			// TODO move object according to the correct world coordinates of the mouse
 			float dx = (x - m_mouseAdapter.getX()) * 0.05f;
 			float dy = (m_mouseAdapter.getY() - y) * 0.05f;
-			//std::cout << "delta " << dx << std::endl;
+
+			/*
+			 * get first position of the mouse (last pos) on the object using pointer
+			 * get the second pos of the mouse (cur pos) in the world
+			 * shoot a ray from cam pos to second pos and intersect with the plane
+			 * move from pos1 to intersection point
+			 */
+
+			Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
+			Vec3f pos2 = m_camera.pointer(x, y);
+			cur_drag = pos2;
+			Vec3f R1, R2, S1, S2;
+			{
+				Vec4<GLint> viewport = Vec4<GLint>::viewport();
+				GLfloat z;
+				float _y = viewport.w - y;
+				Mat4d mvmatrix = Mat4d::modelview();
+				Mat4d projmatrix = Mat4d::projection();
+
+				// get new ray
+				double dX, dY, dZ;
+				gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+				gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+
+				// get old ray
+				_y = viewport.w - m_mouseAdapter.getY();
+				gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+				gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+			}
+
+			// billboard matrix
+			Vec3f look = m_camera.m_position.xyz() - pos1;
+			Vec3f right = Vec3f::yAxis() % look;
+			Vec3f up = Vec3f::yAxis();
+
+			// billboard plane
+			//Vec3f p1 = pos1;
+			//Vec3f p2 = pos1 + Vec3f::yAxis();
+			//Vec3f p3 = pos1 + m_camera.m_strafe.xyz();
+
+			// bottom plane
+			Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
+			Vec3f p2 = pos1 + Vec3f::xAxis();
+			Vec3f p3 = pos1 + Vec3f::zAxis();
+
+			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
+			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
+
 			Mat4f matrix = m_selectedObject->getMatrix();
 			matrix.setW(matrix.getW() +
-					m_camera.m_strafe.xyz().normalized() * dx +
-					Vec3f::yAxis() * dy);
-			m_selectedObject->setMatrix(matrix);
+					(pos3 - pos1));
+					//m_camera.m_strafe.xyz().normalized() * dx +
+					//Vec3f::yAxis() * dy);
+			//m_selectedObject->setMatrix(matrix);
 		}
 	}
 
@@ -263,7 +320,13 @@ void Simulation::mouseMove(int x, int y)
 
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
+	std::cout << "down" << std::endl;
 	m_pointer = m_camera.pointer(x, y);
+	if (button == util::RIGHT && m_selectedObject) {
+		start_drag = m_pointer;
+		start_mat = m_selectedObject->getMatrix();
+		mx = x; my = y;
+	}
 	/*
 	if (!m_objects.size()) {
 		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
@@ -392,12 +455,17 @@ void Simulation::render()
 
 	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
 		m_vertexBuffer.bind();
-
+		applyMaterial("");
+		glColor3f(0.0f, 0.0f, 1.0f);
 		ogl::SubBuffers::iterator itr = m_vertexBuffer.m_buffers.begin();
 		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {
 			ogl::SubBuffer* buf = (*itr);
 			__Object* obj = (__Object*)buf->object;
 			applyMaterial(buf->material);
+			//if (m_environment.get() == obj)
+			//	glColor3f(0.0f, 0.0f, 1.0f);
+			//else
+			//	glColor3f(0.0f, 1.0f, 0.0f);
 			glPushMatrix();
 			glMultMatrixf(obj->getMatrix()[0]);
 			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
@@ -422,14 +490,75 @@ void Simulation::render()
 			if (itr->second == m_selectedObject)
 			itr->second->render();
 		}
-	}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glColor4f(1.0f, 1.0, 1.0f, 0.5f);
+		glDisable(GL_CULL_FACE);
+		//if (m_mouseAdapter.isDown(util::RIGHT)) {
 
+			Vec3f pos = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
+			Vec3f look = m_camera.m_position.xyz() - pos;
+			Vec3f right = m_camera.m_up.xyz() % look;
+			Vec3f up = look % right;
+
+			Vec3f position = pos * Mat4f::modelview();// * Mat4f(right, up, look, Vec3f());
+			Mat4f matrix = Mat4f(right, up, look, Vec3f());
+
+			float scale = 50.0f;
+			glPushMatrix();
+			glLoadIdentity();
+			//glMultMatrixf(matrix[0]);
+			glBegin(GL_QUADS);
+			//glTexCoord2f(0.0f, 0.0f); glVertex3f(position[0] - scale, position[1] - scale, position[2]);
+			//glTexCoord2f(0.0f, 1.0f); glVertex3f(position[0] - scale, position[1] + scale, position[2]);
+			//glTexCoord2f(1.0f, 1.0f); glVertex3f(position[0] + scale, position[1] + scale, position[2]);
+			//glTexCoord2f(1.0f, 0.0f); glVertex3f(position[0] + scale, position[1] - scale, position[2]);
+			glEnd();
+			glPopMatrix();
+		//}
+
+			glDisable(GL_BLEND);
+	}
+glDepthMask(GL_FALSE);
+	glColor3f(1.0f, 0.0f, 1.0f);
+	if (m_selectedObject) {
+		Vec3f origin = m_selectedObject->getMatrix().getW();
+		Vec3f axis = (start_drag - origin) % (cur_drag - origin);
+
+		float angle = (start_drag - origin).normalized() * (cur_drag - origin).normalized();
+		angle = acos(angle);// * 180.0f / PI;
+		int md = abs(mx -m_mouseAdapter.getX()) + abs(my -m_mouseAdapter.getY());
+		if (md >2&&angle > 0.01f && angle < PI) {
+			//std::cout << "angle = " << (start_drag - cur_drag).len() << std::endl;
+			Mat4f mat = Mat4f::rotAxis(axis, -angle);
+			Vec3f euler = mat.eulerAngles();
+			//if (euler.x < 2.0f)
+			//	mat = Mat4f::rotAxis(Vec3f::xAxis(), -euler.x) * mat;
+			//if (euler.y < 2.0f)
+			//	mat = Mat4f::rotAxis(Vec3f::yAxis(), -euler.y) * mat;
+			//if (euler.z < 2.0f)
+				mat = Mat4f::rotAxis(Vec3f::zAxis(), -euler.z) * mat;
+			mat = start_mat * mat;
+			mat.setW(start_mat.getW());
+			m_selectedObject->setMatrix(mat);
+		}
+		axis = axis.normalized() * 50.0f + origin;
+		glBegin(GL_POINTS);
+		glVertex3fv(&start_drag[0]);
+		glVertex3fv(&cur_drag[0]);
+		glEnd();
+		glBegin(GL_LINES);
+			glVertex3fv(&(m_selectedObject->getMatrix().getW()[0]));
+			glVertex3fv(&axis.x);
+		glEnd();
+	}
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);
 	glVertex3fv(&m_pointer[0]);
 	glEnd();
 	glColor3f(1.0f, 1.0f, 1.0f);
+	glDepthMask(GL_TRUE);
  }
 
 }
