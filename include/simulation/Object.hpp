@@ -39,7 +39,7 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE } Type;
+	typedef enum { BOX, SPHERE, COMPOUND } Type;
 
 protected:
 	Type m_type;
@@ -81,7 +81,25 @@ public:
 	 */
 	virtual void render() = 0;
 
+	/**
+	 * Saves the given object to the specified node by creating a
+	 * new child node and appending it to the given one.
+	 *
+	 * @param id     The id of the object
+	 * @param object The object itself
+	 */
+	static void save(int id, const __Object& object /* node */);
+
+	/**
+	 * Loads an object from the given node.
+	 *
+	 * @param id Returns the id of the object
+	 * @return   The generated object
+	 */
+	static Object load(int* id /* node */);
+
 	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
+	static RigidBody createSphere(Mat4f matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
 	static RigidBody createBox(Mat4f matrix, float w, float h, float d, float mass, const std::string& material = "");
 
 	friend class __RigidBody;
@@ -107,6 +125,9 @@ public:
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
 	virtual void render();
+
+	static void save(const __RigidBody& body /* node */);
+	static RigidBody load(/*node */);
 
 	friend class __Object;
 };

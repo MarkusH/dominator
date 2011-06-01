@@ -6,6 +6,7 @@
  */
 
 #include <simulation/Simulation.hpp>
+#include <simulation/Compound.hpp>
 #include <simulation/Material.hpp>
 #include <opengl/Texture.hpp>
 #include <opengl/Shader.hpp>
@@ -423,7 +424,6 @@ void Simulation::render()
 			itr->second->render();
 		}
 	}
-
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);

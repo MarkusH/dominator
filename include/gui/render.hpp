@@ -7,8 +7,8 @@
 #ifndef RENDER_RENDER_HPP_
 #define RENDER_RENDER_HPP_
 
+#include <GL/glew.h>
 #include <QtCore/QTimer>
-#include <render/model.hpp>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 #include <opengl/Shader.hpp>
