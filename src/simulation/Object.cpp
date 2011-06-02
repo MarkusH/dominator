@@ -237,7 +237,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
 
 		int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
-		std::cout << "material " << material << std::endl;
+		//std::cout << "material " << material << std::endl;
 		//std::cout << "mesh " << material << std::endl;
 
 		// create a new submesh
@@ -250,7 +250,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 		// get the indices
 		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-		std::cout << subBuffer->indexCount << std::endl;
+		//std::cout << subBuffer->indexCount << std::endl;
 		uint32_t* indices = new uint32_t[subBuffer->indexCount];
 		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
 //std::cout << "indices " << subBuffer->indexCount << std::endl;
@@ -304,7 +304,7 @@ __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& m
 		numFaces += mesh->faces;
 
 	m_vertexCount = numFaces*3;
-	std::cout << m_vertexCount << std::endl;
+	//std::cout << m_vertexCount << std::endl;
 	m_vertices = new Lib3dsVector[numFaces * 3];
 	m_normals = new Lib3dsVector[numFaces * 3];
 	m_uvs = new Lib3dsTexel[numFaces * 3];
@@ -325,13 +325,13 @@ __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& m
 			}
 			finishedFaces++;
 		}
-		std::cout << "mesh" << std::endl;
+		//std::cout << "mesh" << std::endl;
 	}
 	lib3ds_file_free(file);
 
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateConvexHull(world, m_vertexCount, m_vertices[0], sizeof(Lib3dsVector), 0.002f, materialID, identity[0]);
-	std::cout << collision << std::endl;
+	//std::cout << collision << std::endl;
 	this->create(collision, mass);
 	NewtonReleaseCollision(world, collision);
 }
@@ -423,7 +423,7 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 			}
 			finishedFaces++;
 		}
-		std::cout << "mesh" << std::endl;
+		//std::cout << "mesh" << std::endl;
 		collisions.push_back(NewtonCreateConvexHull(world, vCount, m_vertices[vOffset], sizeof(Lib3dsVector), 0.002f, materialID++, identity[0]));
 		vOffset += vCount;
 	}

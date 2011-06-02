@@ -16,7 +16,8 @@
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
 #include <fstream> // for file I/O
-
+#include <iostream>
+#include <string.h>
 
 namespace sim {
 
@@ -410,16 +411,13 @@ bool MaterialMgr::save(const char* fileName)
 	// foreach material
 	std::map<std::string, Material>::iterator it;
 	for (it = m_materials.begin(); it != m_materials.end(); ++it) {
-				std::cout << it->second.name << std::endl;
-		it->second.save(materials, &doc);		std::cout << it->second.name << std::endl;
+		it->second.save(materials, &doc);
 	}
 	
 	// foreach pair
 	std::map<std::pair<int, int>, MaterialPair>::iterator itp;
 	for (itp = m_pairs.begin(); itp != m_pairs.end(); ++itp) {
-		std::cout << itp->second.id0 << " " << itp->second.id1 << std::endl;
 		itp->second.save(materials, &doc);
-		std::cout << itp->second.id0 << " " << itp->second.id1 << std::endl;
 	}
 
 	std::string s;
@@ -488,9 +486,9 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		// get the pair for the materials, or the default pair
 		MaterialPair& pair = getPair(id0, id1);
 
-		if (id0 > 0 && id1 > 0 && (id0 < 200 || id1 < 200))
-			if ((fromID(id0) && fromID(id0)->name == "wood_matt") || (fromID(id1) && fromID(id1)->name == "wood_matt"))
-		std::cout << "pair " << id0 << ", " << id1 << std::endl;
+		//if (id0 > 0 && id1 > 0 && (id0 < 200 || id1 < 200))
+		//	if ((fromID(id0) && fromID(id0)->name == "wood_matt") || (fromID(id1) && fromID(id1)->name == "wood_matt"))
+		//std::cout << "pair " << id0 << ", " << id1 << std::endl;
 
 		// set the material properties for this contact
 		NewtonMaterialSetContactElasticity(material, pair.elasticity);
