@@ -10,19 +10,19 @@
 namespace sim {
 
 __Compound::__Compound()
-	: __Object(COMPOUND)
+	: __Object(COMPOUND), m_nextID(0)
 {
 	m_matrix = Mat4f::identity();
 }
 
 __Compound::__Compound(const Mat4f& matrix)
-	: __Object(COMPOUND)
+	: __Object(COMPOUND), m_nextID(0)
 {
 	m_matrix = matrix;
 }
 
 __Compound::__Compound(const Vec3f& position)
-	: __Object(COMPOUND)
+	: __Object(COMPOUND), m_nextID(0)
 {
 	m_matrix = Mat4f::translate(position);
 }
@@ -37,9 +37,8 @@ void __Compound::save(const __Compound& compound /* node */)
 {
 	// set attribute matrix to matrix.str()
 
-	// id = 0
 	// foreach child_node
-	// 		__Object::save(id++, child_node, node)
+	// 		__Object::save(child_node, node)
 
 	// foreach joint
 	// 		__Joint::save(joint, node)
@@ -50,13 +49,12 @@ Compound __Compound::load(/*node */)
 	Compound result = Compound(new __Compound());
 	// load matrix
 
-	// int id
 	// foreach element "object" in node
-	// 		Object obj = __Object::load(id, element)
+	// 		Object obj = __Object::load(element)
 	// 		result->add(obj)
 
 	// foreach element "joint" in node
-	// 		Joint joint = __Joint::load(id, element)
+	// 		Joint joint = __Joint::load(element)
 	// 		result->m_joints.push_back(joint)
 
 	return result;
@@ -66,9 +64,7 @@ Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Obj
 {
 	if (child && child != parent) {
 		Vec3f pin = pinDir % m_matrix;
-		__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
-		__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
-		Hinge hinge = __Hinge::create(pivot, pin, childBody->m_body, parentBody ? parentBody->m_body : NULL);
+		Hinge hinge = __Hinge::create(pivot, pin, child, parent);
 		m_joints.push_back(hinge);
 		return hinge;
 	}
@@ -78,6 +74,7 @@ Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Obj
 
 void __Compound::add(Object object)
 {
+	object->setID(m_nextID++);
 	Mat4f matrix = object->getMatrix() * m_matrix;
 	object->setMatrix(matrix);
 	m_nodes.push_back(object);

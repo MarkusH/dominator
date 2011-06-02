@@ -29,11 +29,11 @@ __Object::~__Object()
 }
 
 
-void __Object::save(int id, const __Object& object /* node */)
+void __Object::save(const __Object& object /* node */)
 {
 	// create new node and append it to the given node
 
-	// set attribute id
+	// set attribute "id" to m_id
 
 	switch (object.m_type) {
 	case BOX:
@@ -54,9 +54,9 @@ void __Object::save(int id, const __Object& object /* node */)
 }
 
 
-Object __Object::load(int* id /* node */)
+Object __Object::load(/* node */)
 {
-	// store the id in the *id parameter
+	// load m_id from "id"
 
 	// if type == compound
 	// 		return __Compound::load(node)

@@ -21,7 +21,7 @@ namespace sim {
 
 using namespace m3d;
 
-typedef std::map<int, Object> ObjectMap;
+typedef std::list<Object> ObjectList;
 
 class Simulation : public util::MouseListener {
 private:
@@ -47,7 +47,7 @@ protected:
 	bool m_enabled;
 
 	int m_nextID;
-	ObjectMap m_objects;
+	ObjectList m_objects;
 	Object m_environment;
 
 	/** The currently selected object, or an empty smart pointer */
@@ -62,7 +62,7 @@ protected:
 	 * @param begin The first object to upload
 	 * @param end   The end iterator
 	 */
-	void upload(const ObjectMap::iterator& begin, const ObjectMap::iterator& end);
+	void upload(const ObjectList::iterator& begin, const ObjectList::iterator& end);
 
 	/**
 	 * Applies the given material. If it is not available, disable all

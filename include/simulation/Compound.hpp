@@ -36,6 +36,7 @@ typedef std::tr1::shared_ptr<__Compound> Compound;
  */
 class __Compound : public __Object {
 protected:
+	int m_nextID;
 	Mat4f m_matrix;
 	std::list<Object> m_nodes;
 	std::list<Joint> m_joints;

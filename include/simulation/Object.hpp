@@ -43,6 +43,7 @@ public:
 
 protected:
 	Type m_type;
+	int m_id;
 
 public:
 	__Object(Type type);
@@ -50,6 +51,9 @@ public:
 
 	virtual const Mat4f& getMatrix() = 0;
 	virtual void setMatrix(const Mat4f& matrix) = 0;
+
+	int getID() const { return m_id; }
+	void setID(int id) { m_id = id; }
 
 	/**
 	 * Checks whether this object contains the given NewtonBody.
@@ -85,18 +89,16 @@ public:
 	 * Saves the given object to the specified node by creating a
 	 * new child node and appending it to the given one.
 	 *
-	 * @param id     The id of the object
 	 * @param object The object itself
 	 */
-	static void save(int id, const __Object& object /* node */);
+	static void save(const __Object& object /* node */);
 
 	/**
 	 * Loads an object from the given node.
 	 *
-	 * @param id Returns the id of the object
 	 * @return   The generated object
 	 */
-	static Object load(int* id /* node */);
+	static Object load(/* node */);
 
 	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
 	static RigidBody createSphere(Mat4f matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");

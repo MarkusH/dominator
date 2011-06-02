@@ -138,9 +138,11 @@ void Simulation::clear()
 int Simulation::add(Object object)
 {
 	// iterator gives lowest address of smart pointer, it is NOT sorted by time of insertion......
-	ObjectMap::iterator begin = m_objects.insert(std::make_pair(++m_nextID, object)).first;
+	object->setID(m_nextID++);
+	ObjectList::iterator begin = m_objects.insert(m_objects.end(), object);
+
 	upload(begin, m_objects.end());
-	return m_nextID;
+	return m_nextID-1;
 }
 
 void Simulation::remove(Object object)
@@ -206,12 +208,7 @@ void Simulation::remove(Object object)
 		}
 	}
 
-	for (ObjectMap::iterator it = m_objects.begin(); it != m_objects.end(); ++it) {
-		if (it->second == object) {
-			m_objects.erase(it);
-			break;
-		}
-	}
+	m_objects.remove(object);
 
 	if (m_environment == object)
 		m_environment = Object();
@@ -223,12 +220,12 @@ void Simulation::remove(Object object)
 	upload(m_objects.end(), m_objects.end());
 }
 
-void Simulation::upload(const ObjectMap::iterator& begin, const ObjectMap::iterator& end)
+void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
 {
 	//std::cout << begin->first << " " << end->first << std::endl;
-	for (ObjectMap::iterator itr = begin; itr != end; ++itr) {
+	for (ObjectList::iterator itr = begin; itr != end; ++itr) {
 	//	std::cout << "id " << itr->first << std::endl;
-		itr->second->genBuffers(m_vertexBuffer);
+		(*itr)->genBuffers(m_vertexBuffer);
 	}
 	m_vertexBuffer.upload();
 	//TODO: sort materials
@@ -248,10 +245,10 @@ Object Simulation::selectObject(int x, int y)
 	NewtonBody* body = newton::getRayCastBody(m_world, origin, world - origin);
 
 	// find the matching body
-	ObjectMap::iterator itr = m_objects.begin();
+	ObjectList::iterator itr = m_objects.begin();
 	for ( ; body && itr != m_objects.end(); ++itr) {
-		if (itr->second->contains(body))
-			return itr->second;
+		if ((*itr)->contains(body))
+			return *itr;
 	}
 
 	// nothing was selected, return an empty smart pointer
@@ -462,10 +459,10 @@ void Simulation::render()
 */
 
 	if (m_selectedObject) {
-		ObjectMap::iterator itr = m_objects.begin();
+		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			if (itr->second == m_selectedObject)
-			itr->second->render();
+			if (*itr == m_selectedObject)
+			(*itr)->render();
 		}
 	}
 
