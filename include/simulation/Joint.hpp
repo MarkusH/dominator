@@ -18,6 +18,7 @@
 #else
 #include <tr1/memory>
 #endif
+#include <list>
 
 namespace sim {
 
@@ -37,13 +38,22 @@ public:
 	Type type;
 
 	__Joint(Type type);
+
+	static void save(const __Joint& joint, std::list<Object> list /*node*/);
+	Joint load(std::list<Object> list /*node*/);
 };
 
 class __Hinge : public __Joint, public CustomHinge {
 protected:
-	__Hinge(const dMatrix& pinAndPivot, const NewtonBody* child, const NewtonBody* parent);
+	__Hinge(Vec3f pivot, Vec3f pinDir, const dMatrix& pinAndPivot, const NewtonBody* child, const NewtonBody* parent);
 public:
+	Vec3f pivot;
+	Vec3f pinDir;
+
 	static Hinge create(Vec3f pivot, Vec3f pinDir, const NewtonBody* child, const NewtonBody* parent);
+
+	static void save(const __Hinge& hinge, std::list<Object> list /* node */);
+	static Hinge load(std::list<Object> list /*node*/);
 };
 
 

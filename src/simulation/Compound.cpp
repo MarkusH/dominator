@@ -57,8 +57,7 @@ Compound __Compound::load(/*node */)
 
 	// foreach element "joint" in node
 	// 		Joint joint = __Joint::load(id, element)
-	// 		joint->create()
-	// 		result->add(obj)
+	// 		result->m_joints.push_back(joint)
 
 	return result;
 }
