@@ -54,6 +54,37 @@ Simulation::~Simulation()
 	m_mouseAdapter.removeListener(this);
 }
 
+void Simulation::save(const std::string& fileName)
+{
+	// create document and root node "level" or "simulation", depends on you
+
+	ObjectList::iterator itr = m_objects.begin();
+	for ( ; itr != m_objects.end(); ++itr) {
+		// add node paramenter to save method
+		__Object::save(*itr->get());
+	}
+
+	// save attribute "gravity" to m_gravity
+	// save attribute "environment" to
+	// 		m_environment ? m_environment->getID() : -1
+}
+
+void Simulation::load(const std::string&fileName)
+{
+	// parse document
+
+	// for each node object
+	// add node paramenter to save method
+	Object object = __Object::load();
+	add(object, object->getID());
+
+	// load gravity
+	// load "environment"
+	// m_environment = (id == -1) ? Object() : retrieve object with id
+
+	m_clock.reset();
+}
+
 void Simulation::init()
 {
 	clear();
@@ -140,9 +171,13 @@ void Simulation::clear()
 	}
 }
 
-int Simulation::add(Object object)
+int Simulation::add(const Object& object)
 {
-	// iterator gives lowest address of smart pointer, it is NOT sorted by time of insertion......
+	return add(object, m_nextID++);
+}
+
+int Simulation::add(const Object& object, int id)
+{
 	object->setID(m_nextID++);
 	ObjectList::iterator begin = m_objects.insert(m_objects.end(), object);
 

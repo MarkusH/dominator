@@ -432,6 +432,8 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], 55);
 	this->create(collision, mass);
 	NewtonReleaseCollision(world, collision);
+	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
+		NewtonReleaseCollision(world, *itr);
 }
 
 

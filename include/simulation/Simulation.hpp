@@ -144,7 +144,16 @@ public:
 	 * @param object The object to add
 	 * @return		 The id of the object
 	 */
-	int add(Object object);
+	int add(const Object& object);
+
+	/**
+	 * Adds the object and assigns the id to it
+	 *
+	 * @param
+	 * @param id
+	 * @return
+	 */
+	int add(const Object& object, int id);
 
 	/**
 	 * Removes the object from the simulation.
@@ -152,6 +161,9 @@ public:
 	 * @param object The object to remove
 	 */
 	void remove(Object object);
+
+	void save(const std::string& fileName);
+	void load(const std::string&fileName);
 
 
 	virtual void mouseMove(int x, int y);
