@@ -226,6 +226,10 @@ public:
 	void processContact(const NewtonJoint* contactJoint,
 						dFloat timestep,
 						int threadIndex);
+
+	static void	GenericContactCallback(const NewtonJoint* contactJoint,
+			dFloat timestep,
+			int threadIndex);
 };
 
 }

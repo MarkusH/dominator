@@ -15,6 +15,7 @@
 #include <Newton.h>
 #include <xml/rapidxml.hpp>
 #include <xml/rapidxml_utils.hpp>
+#include <iostream>
 
 namespace sim {
 
@@ -350,6 +351,10 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		// get the pair for the materials, or the default pair
 		MaterialPair& pair = getPair(id0, id1);
 
+		if (id0 > 0 && id1 > 0 && (id0 < 200 || id1 < 200))
+			if ((fromID(id0) && fromID(id0)->name == "wood_matt") || (fromID(id1) && fromID(id1)->name == "wood_matt"))
+		std::cout << "pair " << id0 << ", " << id1 << std::endl;
+
 		// set the material properties for this contact
 		NewtonMaterialSetContactElasticity(material, pair.elasticity);
 		NewtonMaterialSetContactSoftness(material, pair.softness);
@@ -362,7 +367,12 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 
 }
 
-
+void MaterialMgr::GenericContactCallback(const NewtonJoint* contactJoint,
+		dFloat timestep,
+		int threadIndex)
+{
+	instance().processContact(contactJoint, timestep, threadIndex);
+}
 
 
 }

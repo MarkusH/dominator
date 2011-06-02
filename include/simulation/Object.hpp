@@ -16,6 +16,7 @@
 #include <string>
 #include <simulation/Body.hpp>
 #include <opengl/VertexBuffer.hpp>
+#include <lib3ds/file.h>
 
 namespace sim {
 
@@ -39,7 +40,7 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE, COMPOUND } Type;
+	typedef enum { BOX, SPHERE, CONVEXHULL, CONVEXASSEMBLY, COMPOUND } Type;
 
 protected:
 	Type m_type;
@@ -134,6 +135,38 @@ public:
 	static RigidBody load(/*node */);
 
 	friend class __Object;
+};
+
+/**
+ * A simple convex body with a single material. Generates a
+ * convex hull of a 3ds file.
+ */
+class __ConvexHull : public __RigidBody {
+protected:
+	int m_vertexCount;
+	Lib3dsVector* m_vertices;
+	Lib3dsVector* m_normals;
+	Lib3dsTexel* m_uvs;
+public:
+	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName);
+
+	virtual void genBuffers(ogl::VertexBuffer& vbo);
+};
+
+/**
+ * A NewtonCompound is generated for each submesh of a 3ds file.
+ */
+class __ConvexAssembly : public __RigidBody  {
+protected:
+	int m_vertexCount;
+	Lib3dsVector* m_vertices;
+	Lib3dsVector* m_normals;
+	Lib3dsTexel* m_uvs;
+public:
+	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName);
+};
+
+class __TreeCollision : public __Object {
 };
 
 }

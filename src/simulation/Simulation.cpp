@@ -77,8 +77,8 @@ void Simulation::init()
 	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 1);
 
 
-	//int id = NewtonMaterialGetDefaultGroupID(m_world);
-	//NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, GenericContactProcess);
+	int id = NewtonMaterialGetDefaultGroupID(m_world);
+	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
@@ -118,6 +118,11 @@ void Simulation::init()
 	add(c);
 	c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
 
+	Object convex = Object(new __ConvexHull(Mat4f::identity(), 2.0f, "yellow", "data/models/mesh.3ds"));
+	add(convex);
+
+	convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(10.0f, 0.0f, 0.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+	add(convex);
 
 	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 	add(m_environment);
@@ -289,10 +294,10 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		Vec3f view = m_camera.viewVector();
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position.xyz());
-		RigidBody obj = (rand() % 2) ?
-				__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
-				__Object::createSphere(matrix, 1.0f, 1.0f, "yellow");
-		obj->setVelocity(view * 20.0f);
+		RigidBody obj =// (rand() % 2) ?
+				//__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
+				__Object::createSphere(matrix, 0.1f, 1.0f, "wood_matt");
+		obj->setVelocity(view * 2.0f);
 		add(obj);
 	}
 	/*
