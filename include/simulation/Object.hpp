@@ -100,7 +100,9 @@ public:
 
 	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
 	static RigidBody createSphere(Mat4f matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
+	static RigidBody createSphere(Vec3f position, float radius, float mass, const std::string& material);
 	static RigidBody createBox(Mat4f matrix, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createBox(Vec3f position, float w, float h, float d, float mass, const std::string& material = "");
 
 	friend class __RigidBody;
 };

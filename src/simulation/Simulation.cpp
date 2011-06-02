@@ -42,6 +42,8 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_nextID(0)
 {
 	m_world = NULL;
+	m_enabled = true;
+	m_gravity = -9.81f * 4.0f;
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
 }
@@ -78,11 +80,10 @@ void Simulation::init()
 	//int id = NewtonMaterialGetDefaultGroupID(m_world);
 	//NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, GenericContactProcess);
 
-
+/*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
 	Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
 	add(obj);
-	//std::cout << "sp: " << m_vertexBuffer.m_buffers.size() << std::endl;
 
 	matrix =
 			Mat4f::rotZ(15.0f * PI / 180.0f) *
@@ -92,12 +93,34 @@ void Simulation::init()
 
 	obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 	add(obj);
-	//std::cout << "bx: " << m_vertexBuffer.m_buffers.size() << std::endl;
+*/
+
+	RigidBody boxes[5];
+	RigidBody spheres[5];
+
+	Compound c(new __Compound(Mat4f::translate(Vec3f(0.0f, 15.0f, 10.0f))));
+	RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "black");
+	c->add(top);
+
+	for (int x = -2; x <= 2; ++x) {
+		boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "blue");
+		spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "red");
+
+		c->add(boxes[x + 2]);
+		c->add(spheres[x + 2]);
+
+		Vec3f dir(0.0f, 0.0f, 1.0f);
+
+		c->createHinge(spheres[x + 2]->getMatrix().getW(), dir, boxes[x + 2], spheres[x + 2]);
+		Vec3f pivot = boxes[x + 2]->getMatrix().getW() + Vec3f(0.0f, 2.4f, 0.0f);
+		c->createHinge(pivot, dir, top, boxes[x + 2]);
+	}
+	add(c);
+	c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
+
 
 	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 	add(m_environment);
-	//std::cout << "env: " << m_vertexBuffer.m_buffers.size() << std::endl;
-
 }
 
 void Simulation::clear()
@@ -265,6 +288,16 @@ void Simulation::mouseMove(int x, int y)
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	m_pointer = m_camera.pointer(x, y);
+	if (button == util::MIDDLE) {
+		Vec3f view = m_camera.viewVector();
+
+		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position.xyz());
+		RigidBody obj = (rand() % 2) ?
+				__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
+				__Object::createSphere(matrix, 1.0f, 1.0f, "yellow");
+		obj->setVelocity(view * 20.0f);
+		add(obj);
+	}
 	/*
 	if (!m_objects.size()) {
 		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
@@ -345,6 +378,17 @@ void Simulation::update()
 {
 	float delta = m_clock.get();
 	m_clock.reset();
+
+	static float timeSlice = 0.0f;
+
+	if (m_enabled) {
+		timeSlice += delta * 1000.0f;
+
+		while (timeSlice > 12.0f) {
+			NewtonUpdate(m_world, (12.0f / 1000.0f) * 20.0f);
+			timeSlice = timeSlice - 12.0f;
+		}
+	}
 
 	float step = delta * (m_keyAdapter.shift() ? 10.f : 5.0f);
 

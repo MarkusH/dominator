@@ -16,6 +16,7 @@
 #include <tr1/memory>
 #endif
 #include <list>
+#include <simulation/Joint.hpp>
 
 namespace sim {
 
@@ -37,6 +38,7 @@ class __Compound : public __Object {
 protected:
 	Mat4f m_matrix;
 	std::list<Object> m_nodes;
+	std::list<Joint> m_joints;
 public:
 	__Compound();
 	__Compound(const Mat4f& matrix);
@@ -47,6 +49,8 @@ public:
 
 	virtual const Mat4f& getMatrix();
 	virtual void setMatrix(const Mat4f& matrix);
+
+	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const Object& object);

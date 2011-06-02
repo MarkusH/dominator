@@ -94,6 +94,11 @@ RigidBody __Object::createSphere(Mat4f matrix,
 	return result;
 }
 
+RigidBody __Object::createSphere(Vec3f position, float radius, float mass, const std::string& material)
+{
+	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material);
+}
+
 RigidBody __Object::createBox(Mat4f matrix, float w, float h, float d, float mass, const std::string& material)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material));
@@ -107,6 +112,11 @@ RigidBody __Object::createBox(Mat4f matrix, float w, float h, float d, float mas
 	NewtonReleaseCollision(world, collision);
 
 	return result;
+}
+
+RigidBody __Object::createBox(Vec3f position, float w, float h, float d, float mass, const std::string& material)
+{
+	return createBox(Mat4f::translate(position), w, h, d, mass, material);
 }
 
 

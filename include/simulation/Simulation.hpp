@@ -44,6 +44,7 @@ protected:
 
 	NewtonWorld* m_world;
 	float m_gravity;
+	bool m_enabled;
 
 	int m_nextID;
 	ObjectMap m_objects;
@@ -103,6 +104,12 @@ public:
 	 * Clears the Simulation, including all objects in it.
 	 */
 	void clear();
+
+	/** @param enabled True, if the simulation should be enabled, false otherwise */
+	void setEnabled(bool enabled);
+
+	/** @return True, if the simulation is enabled, false otherwise */
+	bool isEnabled();
 
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;
@@ -168,6 +175,16 @@ inline NewtonWorld* Simulation::getWorld() const
 inline float Simulation::getGravity() const
 {
 	return m_gravity;
+}
+
+inline void Simulation::setEnabled(bool enabled)
+{
+	m_enabled = enabled;
+}
+
+inline bool Simulation::isEnabled()
+{
+	return m_enabled;
 }
 
 inline ogl::Camera& Simulation::getCamera()

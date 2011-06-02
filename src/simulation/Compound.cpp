@@ -30,6 +30,7 @@ __Compound::__Compound(const Vec3f& position)
 __Compound::~__Compound()
 {
 	m_nodes.clear();
+	m_joints.clear();
 }
 
 void __Compound::save(const __Compound& compound /* node */)
@@ -59,6 +60,20 @@ Compound __Compound::load(/*node */)
 	// 		joint->create()
 	// 		result->add(obj)
 
+	return result;
+}
+
+Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent)
+{
+	if (child && child != parent) {
+		Vec3f pin = pinDir % m_matrix;
+		__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
+		__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
+		Hinge hinge = __Hinge::create(pivot, pin, childBody->m_body, parentBody ? parentBody->m_body : NULL);
+		m_joints.push_back(hinge);
+		return hinge;
+	}
+	Hinge result;
 	return result;
 }
 
