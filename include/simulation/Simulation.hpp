@@ -21,7 +21,7 @@ namespace sim {
 
 using namespace m3d;
 
-typedef std::map<Object, int> ObjectMap;
+typedef std::list<Object> ObjectList;
 
 class Simulation : public util::MouseListener {
 private:
@@ -44,9 +44,10 @@ protected:
 
 	NewtonWorld* m_world;
 	float m_gravity;
+	bool m_enabled;
 
 	int m_nextID;
-	ObjectMap m_objects;
+	ObjectList m_objects;
 	Object m_environment;
 
 	/** The currently selected object, or an empty smart pointer */
@@ -61,7 +62,7 @@ protected:
 	 * @param begin The first object to upload
 	 * @param end   The end iterator
 	 */
-	void upload(ObjectMap::iterator begin, ObjectMap::iterator end);
+	void upload(const ObjectList::iterator& begin, const ObjectList::iterator& end);
 
 	/**
 	 * Applies the given material. If it is not available, disable all
@@ -104,6 +105,12 @@ public:
 	 */
 	void clear();
 
+	/** @param enabled True, if the simulation should be enabled, false otherwise */
+	void setEnabled(bool enabled);
+
+	/** @return True, if the simulation is enabled, false otherwise */
+	bool isEnabled();
+
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;
 
@@ -137,7 +144,16 @@ public:
 	 * @param object The object to add
 	 * @return		 The id of the object
 	 */
-	int add(Object object);
+	int add(const Object& object);
+
+	/**
+	 * Adds the object and assigns the id to it
+	 *
+	 * @param
+	 * @param id
+	 * @return
+	 */
+	int add(const Object& object, int id);
 
 	/**
 	 * Removes the object from the simulation.
@@ -145,6 +161,9 @@ public:
 	 * @param object The object to remove
 	 */
 	void remove(Object object);
+
+	void save(const std::string& fileName);
+	void load(const std::string&fileName);
 
 
 	virtual void mouseMove(int x, int y);
@@ -168,6 +187,16 @@ inline NewtonWorld* Simulation::getWorld() const
 inline float Simulation::getGravity() const
 {
 	return m_gravity;
+}
+
+inline void Simulation::setEnabled(bool enabled)
+{
+	m_enabled = enabled;
+}
+
+inline bool Simulation::isEnabled()
+{
+	return m_enabled;
 }
 
 inline ogl::Camera& Simulation::getCamera()

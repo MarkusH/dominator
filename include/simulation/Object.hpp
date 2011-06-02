@@ -16,6 +16,7 @@
 #include <string>
 #include <simulation/Body.hpp>
 #include <opengl/VertexBuffer.hpp>
+#include <lib3ds/file.h>
 
 namespace sim {
 
@@ -39,10 +40,11 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE } Type;
+	typedef enum { BOX, SPHERE, CONVEXHULL, CONVEXASSEMBLY, COMPOUND } Type;
 
 protected:
 	Type m_type;
+	int m_id;
 
 public:
 	__Object(Type type);
@@ -51,6 +53,9 @@ public:
 	virtual const Mat4f& getMatrix() = 0;
 	virtual void setMatrix(const Mat4f& matrix) = 0;
 
+	int getID() const { return m_id; }
+	void setID(int id) { m_id = id; }
+
 	/**
 	 * Checks whether this object contains the given NewtonBody.
 	 *
@@ -58,6 +63,14 @@ public:
 	 * @return True, if the object contains the NewtonBody, false otherwise
 	 */
 	virtual bool contains(const NewtonBody* const body) = 0;
+
+	/**
+	 * Checks whether this object contains (or is) the given object.
+	 *
+	 * @param object
+	 * @return
+	 */
+	virtual bool contains(const Object& object) = 0;
 
 	/**
 	 * Generates the vertices, uv-coordinates, normals and indices (buffers)
@@ -73,8 +86,26 @@ public:
 	 */
 	virtual void render() = 0;
 
+	/**
+	 * Saves the given object to the specified node by creating a
+	 * new child node and appending it to the given one.
+	 *
+	 * @param object The object itself
+	 */
+	static void save(const __Object& object /* node */);
+
+	/**
+	 * Loads an object from the given node.
+	 *
+	 * @return   The generated object
+	 */
+	static Object load(/* node */);
+
 	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
+	static RigidBody createSphere(Mat4f matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
+	static RigidBody createSphere(Vec3f position, float radius, float mass, const std::string& material);
 	static RigidBody createBox(Mat4f matrix, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createBox(Vec3f position, float w, float h, float d, float mass, const std::string& material = "");
 
 	friend class __RigidBody;
 };
@@ -94,12 +125,48 @@ public:
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual bool contains(const NewtonBody* const body);
+	virtual bool contains(const Object& object);
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
 	virtual void render();
 
+	static void save(const __RigidBody& body /* node */);
+	static RigidBody load(/*node */);
+
 	friend class __Object;
+};
+
+/**
+ * A simple convex body with a single material. Generates a
+ * convex hull of a 3ds file.
+ */
+class __ConvexHull : public __RigidBody {
+protected:
+	int m_vertexCount;
+	Lib3dsVector* m_vertices;
+	Lib3dsVector* m_normals;
+	Lib3dsTexel* m_uvs;
+public:
+	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName);
+
+	virtual void genBuffers(ogl::VertexBuffer& vbo);
+};
+
+/**
+ * A NewtonCompound is generated for each submesh of a 3ds file.
+ */
+class __ConvexAssembly : public __RigidBody  {
+protected:
+	int m_vertexCount;
+	Lib3dsVector* m_vertices;
+	Lib3dsVector* m_normals;
+	Lib3dsTexel* m_uvs;
+public:
+	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName);
+};
+
+class __TreeCollision : public __Object {
 };
 
 }

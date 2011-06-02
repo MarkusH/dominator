@@ -11,10 +11,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
-#include <QtGui/QPushButton>
 #include <QtGui/QSplitter>
-#include <QtGui/QSpinBox>
-#include <QtGui/QComboBox>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
 #include <QtGui/QStatusBar>
@@ -33,6 +30,7 @@ public:
 private slots:
 	void OnClosePressed();
 	void updateFramesPerSecond(int frames);
+	void updateObjectsCount(int count);
 
 private:
 	void createMenu();
