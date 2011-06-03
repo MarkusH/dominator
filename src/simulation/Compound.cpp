@@ -35,8 +35,8 @@ __Compound::~__Compound()
 
 void __Compound::save(const __Compound& compound /* node */)
 {
-	// set attribute matrix to matrix.str()
-
+	// set attribute matrix to m_matrix.str()
+	// set attribute freezeState to m_freezeState
 	// foreach child_node
 	// 		__Object::save(child_node, node)
 
@@ -47,7 +47,7 @@ void __Compound::save(const __Compound& compound /* node */)
 Compound __Compound::load(/*node */)
 {
 	Compound result = Compound(new __Compound());
-	// load matrix
+	// load m_matrix
 
 	// foreach element "object" in node
 	// 		Object obj = __Object::load(element)
@@ -56,6 +56,11 @@ Compound __Compound::load(/*node */)
 	// foreach element "joint" in node
 	// 		Joint joint = __Joint::load(element)
 	// 		result->m_joints.push_back(joint)
+
+	// DO NOT LOAD THE freezeState BEFORE, THIS WOULD OVERRIDE
+	// THE STATE OF THE NODES
+	// TODO: think about that: is this even necessary?
+	// load m_freezeState
 
 	return result;
 }
@@ -87,6 +92,7 @@ BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& p
 void __Compound::add(Object object)
 {
 	object->setID(m_nextID++);
+	object->setFreezeState(m_freezeState);
 	Mat4f matrix = object->getMatrix() * m_matrix;
 	object->setMatrix(matrix);
 	m_nodes.push_back(object);
@@ -102,6 +108,15 @@ void __Compound::setMatrix(const Mat4f& matrix)
 		(*itr)->setMatrix(newMatrix);
 	}
 	m_matrix = matrix;
+}
+
+void __Compound::setFreezeState(int state)
+{
+	m_freezeState = state;
+	for (std::list<Object>::iterator itr = m_nodes.begin();
+				itr != m_nodes.end(); ++itr) {
+		(*itr)->setFreezeState(state);
+	}
 }
 
 bool __Compound::contains(const NewtonBody* const body)
