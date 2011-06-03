@@ -40,7 +40,7 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE, CONVEXHULL, CONVEXASSEMBLY, COMPOUND } Type;
+	typedef enum { BOX, SPHERE, CYLINDER, CAPSULE, CONE, CHAMFER_CYLINER, CONVEX_HULL, CONVEX_ASSEMBLY, COMPOUND } Type;
 
 protected:
 	Type m_type;
@@ -101,11 +101,20 @@ public:
 	 */
 	static Object load(/* node */);
 
-	static RigidBody createSphere(Mat4f matrix, float radius, float mass, const std::string& material = "");
-	static RigidBody createSphere(Mat4f matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
-	static RigidBody createSphere(Vec3f position, float radius, float mass, const std::string& material);
-	static RigidBody createBox(Mat4f matrix, float w, float h, float d, float mass, const std::string& material = "");
-	static RigidBody createBox(Vec3f position, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Vec3f& position, float radius, float mass, const std::string& material);
+	static RigidBody createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
 
 	friend class __RigidBody;
 };

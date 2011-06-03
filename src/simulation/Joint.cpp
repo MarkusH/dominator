@@ -102,4 +102,37 @@ Hinge __Hinge::load(const std::list<Object>& list/* node */)
 	return hinge;
 }
 
+
+__BallAndSocket::__BallAndSocket(Vec3f pivot, Vec3f pinDir,
+		const Object& child, const Object& parent,
+		const dMatrix& pinAndPivot,
+		const NewtonBody* childBody, const NewtonBody* parentBody)
+	: __Joint(BALL_AND_SOCKET),
+	  pivot(pivot), pinDir(pinDir),
+	  child(child), parent(parent)
+{
+	m_joint = new CustomBallAndSocket(pinAndPivot, childBody, parentBody);
+}
+
+__BallAndSocket::~__BallAndSocket()
+{
+	if (m_joint)
+		delete m_joint;
+}
+
+BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
+{
+	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
+	__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
+
+	dMatrix pinAndPivot(GetIdentityMatrix());
+	pinAndPivot.m_front = dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f);
+	pinAndPivot.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
+	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
+
+	BallAndSocket result = BallAndSocket(new __BallAndSocket(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL));
+	return result;
+}
+
 }

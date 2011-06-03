@@ -117,6 +117,9 @@ public:
 	/** @return Returns the current gravity */
 	float getGravity() const;
 
+	/** @param gravity The new gravity*/
+	void setGravity(float gravity);
+
 	/** @return The camera */
 	ogl::Camera& getCamera();
 
@@ -187,6 +190,11 @@ inline NewtonWorld* Simulation::getWorld() const
 inline float Simulation::getGravity() const
 {
 	return m_gravity;
+}
+
+inline void Simulation::setGravity(float gravity)
+{
+	m_gravity = gravity;
 }
 
 inline void Simulation::setEnabled(bool enabled)

@@ -149,10 +149,10 @@ void Simulation::init()
 	add(c);
 	c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
 
-	Object convex = Object(new __ConvexHull(Mat4f::identity(), 2.0f, "yellow", "data/models/mesh.3ds"));
+	Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 	add(convex);
 
-	convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(10.0f, 0.0f, 0.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+	convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 	add(convex);
 
 	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
@@ -498,13 +498,13 @@ void Simulation::render()
 	}
 */
 
-	if (m_selectedObject) {
+	//if (m_selectedObject) {
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			if (*itr == m_selectedObject)
+			//if (*itr == m_selectedObject)
 			(*itr)->render();
 		}
-	}
+	//}
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);

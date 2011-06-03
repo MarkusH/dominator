@@ -13,6 +13,7 @@
 #include <dVector.h>
 #include <NewtonCustomJoint.h>
 #include <CustomHinge.h>
+#include <CustomBallAndSocket.h>
 #ifdef _WIN32
 #include <boost/tr1/memory.hpp>
 #else
@@ -30,10 +31,12 @@ class __Joint;
 typedef std::tr1::shared_ptr<__Joint> Joint;
 class __Hinge;
 typedef std::tr1::shared_ptr<__Hinge> Hinge;
+class __BallAndSocket;
+typedef std::tr1::shared_ptr<__BallAndSocket> BallAndSocket;
 
 class __Joint {
 public:
-	typedef enum { HINGE } Type;
+	typedef enum { HINGE, BALL_AND_SOCKET, BALL_AND_SOCKET_LIMITED } Type;
 
 	Type type;
 
@@ -61,7 +64,25 @@ public:
 	static Hinge load(const std::list<Object>& list/*node*/);
 };
 
+//TODO unfinished!
+class __BallAndSocket : public __Joint {
+protected:
+	CustomBallAndSocket* m_joint;
 
+	__BallAndSocket(Vec3f pivot, Vec3f pinDir,
+			const Object& child, const Object& parent,
+			const dMatrix& pinAndPivot,
+			const NewtonBody* childBody, const NewtonBody* parentBody);
+public:
+	Vec3f pivot;
+	Vec3f pinDir;
+	Object child;
+	Object parent;
+
+	~__BallAndSocket();
+
+	static BallAndSocket create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
+};
 }
 
 #endif /* JOINT_HPP_ */
