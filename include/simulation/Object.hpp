@@ -149,6 +149,7 @@ protected:
 	Lib3dsTexel* m_uvs;
 public:
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName);
+	~__ConvexHull();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 };
@@ -164,6 +165,9 @@ protected:
 	Lib3dsTexel* m_uvs;
 public:
 	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName);
+	~__ConvexAssembly();
+
+	virtual void genBuffers(ogl::VertexBuffer& vbo);
 };
 
 class __TreeCollision : public __Object {
