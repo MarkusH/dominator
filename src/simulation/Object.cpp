@@ -39,6 +39,7 @@ void __Object::save(const __Object& object /* node */)
 
 	// set attribute "id" to m_id
 
+	//TODO save convex hull, convex assembly
 	switch (object.m_type) {
 	case BOX:
 		// set attribute "type" to  "box"
@@ -70,16 +71,16 @@ Object __Object::load(/* node */)
 
 
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
+RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::SPHERE, matrix, material));
+	RigidBody result = RigidBody(new __RigidBody(__Object::SPHERE, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateSphere(world, radius_x, radius_y, radius_z, materialID, identity[0]);
 
-	result->create(collision, mass);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
 	return result;
@@ -87,29 +88,29 @@ RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radi
 
 RigidBody __Object::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
 {
-	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material);
+	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f());
 }
 
 RigidBody __Object::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
 {
-	return __Object::createSphere(matrix, radius, radius, radius, mass, material);
+	return __Object::createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f());
 }
 
 RigidBody __Object::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
 {
-	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material);
+	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material, 0, Vec4f());
 }
 
-RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material)
+RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material));
+	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateBox(world, w, h, d, materialID, identity[0]);
 
-	result->create(collision, mass);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
 	return result;
@@ -117,103 +118,103 @@ RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, fl
 
 RigidBody __Object::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
 {
-	return createBox(Mat4f::translate(position), w, h, d, mass, material);
+	return createBox(Mat4f::translate(position), w, h, d, mass, material, 0, Vec4f());
 }
 
-static RigidBody createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::CYLINDER, matrix, material));
+	RigidBody result = RigidBody(new __RigidBody(__Object::CYLINDER, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateCylinder(world, radius, height, materialID, identity[0]);
 
-	result->create(collision, mass);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
 	return result;
 }
 
-static RigidBody createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createCylinder(Mat4f::translate(position), radius, height, mass, material);
+	return createCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
 }
 
-static RigidBody createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINER, matrix, material));
+	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINER, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateChamferCylinder(world, radius, height, materialID, identity[0]);
 
-	result->create(collision, mass);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
 	return result;
 }
 
-static RigidBody createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material);
+	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
 }
 
-static RigidBody createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::CAPSULE, matrix, material));
+	RigidBody result = RigidBody(new __RigidBody(__Object::CAPSULE, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateCapsule(world, radius, height, materialID, identity[0]);
 
-	result->create(collision, mass);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
 	return result;
 }
 
-static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createCapsule(Mat4f::translate(position), radius, height, mass, material);
+	return createCapsule(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
 }
 
-static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::CONE, matrix, material));
+	RigidBody result = RigidBody(new __RigidBody(__Object::CONE, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateCone(world, radius, height, materialID, identity[0]);
 
-	result->create(collision, mass);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
 	return result;
 }
 
-static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "")
+RigidBody __Object::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createCone(Mat4f::translate(position), radius, height, mass, material);
+	return createCone(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
 }
 
 
-__RigidBody::__RigidBody(Type type, NewtonBody* body, const std::string& material)
-	: __Object(type), Body(body), m_material(material)
+__RigidBody::__RigidBody(Type type, NewtonBody* body, const std::string& material, int freezeState, const Vec4f& damping)
+	: __Object(type), Body(body), m_material(material), m_initialFreezeState(freezeState), m_damping(damping)
 
 {
 }
 
-__RigidBody::__RigidBody(Type type, const Mat4f& matrix, const std::string& material)
-	: __Object(type), Body(matrix), m_material(material)
+__RigidBody::__RigidBody(Type type, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
+	: __Object(type), Body(matrix), m_material(material), m_initialFreezeState(freezeState), m_damping(damping)
 {
 }
 
-__RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material)
-	: __Object(type), Body(body, matrix), m_material(material)
+__RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
+	: __Object(type), Body(body, matrix), m_material(material), m_initialFreezeState(freezeState), m_damping(damping)
 
 {
 }
@@ -225,6 +226,7 @@ void __RigidBody::save(const __RigidBody& body /* node */)
 	NewtonCollisionInfoRecord info;
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
+	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute "width" to info.m_box.m_x
@@ -239,6 +241,8 @@ void __RigidBody::save(const __RigidBody& body /* node */)
 	}
 	// set attribute "material" to body.m_material
 	// set attribute "mass" to body.getMass()
+	// set attribute "freezeState" to m_initialFreezeState
+	// set attribute "damping" to m_damping.str()
 }
 
 RigidBody __RigidBody::load(/*node */)
@@ -246,18 +250,20 @@ RigidBody __RigidBody::load(/*node */)
 	// mass = get mass attribute
 	// material = get material attribute
 	// matrix.assign(matrix string)
+	// get initialfreezestate
+	// get damping
 
 	// if node.type = "box"
 	// 		w = node.width
 	// 		h = node.height
 	// 		d = node.depth
-	// 		return __Object::createBox(matrix, w, h, d, mass, material)
+	// 		return __Object::createBox(matrix, w, h, d, mass, material, m_initialFreezeState, m_damping)
 
 	// if node.type = "sphere"
 	// 		x = node.radius_x
 	// 		y = node.radius_y
 	// 		z = node.radius_z
-	// 		return __Object::creaSphere(matrix, x, y, z, mass, material)
+	// 		return __Object::createSphere(matrix, x, y, z, mass, material, m_initialFreezeState, m_damping)
 
 	return RigidBody();
 }
@@ -279,13 +285,13 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 	case SPHERE:
 		NewtonMeshApplySphericalMapping(collisionMesh, 0);
 		break;
-//	case CYLINDER:
-//		NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
-//		break;
+	case CYLINDER:
+	case CHAMFER_CYLINER:
+		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
+		//break;
 	case BOX:
-		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);
-		break;
 	default:
+		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);
 		break;
 	}
 
@@ -368,8 +374,8 @@ void __RigidBody::render()
 	newton::showCollisionShape(getCollision(), m_matrix);
 }
 
-__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName)
-	: __RigidBody(CONVEX_HULL, matrix, material)
+__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
+	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping)
 {
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
@@ -413,7 +419,7 @@ __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& m
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateConvexHull(world, m_vertexCount, m_vertices[0], sizeof(Lib3dsVector), 0.002f, materialID, identity[0]);
 	//std::cout << collision << std::endl;
-	this->create(collision, mass);
+	this->create(collision, mass, m_initialFreezeState, m_damping);
 	NewtonReleaseCollision(world, collision);
 }
 
@@ -468,8 +474,8 @@ void __ConvexHull::genBuffers(ogl::VertexBuffer& vbo)
 }
 
 
-__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName)
-	: __RigidBody(CONVEX_ASSEMBLY, matrix, material)
+__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
+	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping)
 {
 	//TODO implement index array for 3ds data
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
@@ -521,7 +527,7 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 	//NewtonMeshEndFace(m_mesh);
 
 	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
-	this->create(collision, mass);
+	this->create(collision, mass, m_initialFreezeState, m_damping);
 
 	NewtonReleaseCollision(world, collision);
 	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)

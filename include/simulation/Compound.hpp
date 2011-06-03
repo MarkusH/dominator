@@ -52,6 +52,7 @@ public:
 	virtual void setMatrix(const Mat4f& matrix);
 
 	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
+	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const Object& object);

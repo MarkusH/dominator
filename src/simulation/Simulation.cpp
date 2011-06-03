@@ -155,6 +155,9 @@ void Simulation::init()
 	convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 	add(convex);
 
+	add (__Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow"));
+	add (__Object::createBox(Vec3f(0.0f, 2.0f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow"));
+
 	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 	add(m_environment);
 }
@@ -325,15 +328,86 @@ void Simulation::mouseMove(int x, int y)
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	m_pointer = m_camera.pointer(x, y);
-	if (button == util::MIDDLE) {
+	if (button == util::MIDDLE && down) {
 		Vec3f view = m_camera.viewVector();
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position.xyz());
-		RigidBody obj =// (rand() % 2) ?
+		RigidBody obj;
+		static int counter = 0;
+		switch (counter++) {
+		case 0:
+			obj = __Object::createBox(matrix, 1.0f, 1.0f, 1.0f, 5.0f, "yellow");
+			break;
+		case 1:
+			obj = __Object::createSphere(matrix, 0.2f, 50.0f, "wood_matt");
+			break;
+		case 2:
+			obj = __Object::createCapsule(matrix, 0.5f, 5.0f, 1.0f, "yellow");
+			break;
+		case 3:
+			obj = __Object::createCone(matrix, 0.5f, 1.0f, 1.0f, "yellow");
+			break;
+		case 4:
+			obj = __Object::createCylinder(matrix, 0.5f, 1.0f, 1.0f, "yellow");
+			break;
+		case 5:
+			std::cout << "chamfer "<< std::endl;
+			obj = __Object::createChamferCylinder(matrix, 2.0f, 0.5f, 1.0f, "yellow");
+			break;
+		}
+		if (counter == 6)
+			counter = 0;
 				//__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
-				__Object::createSphere(matrix, 0.1f, 1.0f, "wood_matt");
-		obj->setVelocity(view * 2.0f);
+				//__Object::createSphere(matrix, 0.1f, 1.0f, "wood_matt");
+		//obj->setVelocity(view * 20.0f);
 		add(obj);
+	} else if (button == util::RIGHT && down) {
+		RigidBody obj0, obj1;
+		const int linksCount = 15;
+		Vec3f size(1.0f, 0.05f, 0.15f);
+		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
+		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
+		Compound rope = Compound(new __Compound());
+		// create a long vertical rope with limits
+		for (int i = 0; i < linksCount; i ++) {
+			// create the a graphic character (use a visualObject as our body
+
+			//create the rigid body
+			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
+			rope->add(obj1);
+			float dampValue = 0.0f;
+			NewtonBodySetLinearDamping(obj1->m_body, dampValue);
+
+			dampValue = 0.1f;
+			Vec3f angularDamp(dampValue, dampValue, dampValue);
+			NewtonBodySetAngularDamping (obj1->m_body, &angularDamp[0]);
+
+			Vec3f pivot = location.getW();
+			pivot.y += (size.x - size.y) * 0.5f;
+
+	#if 0
+			dFloat coneAngle = 15.0 * 3.141592f / 180.0f;
+			dFloat twistAngle = 5.0 * 3.141592f / 180.0f;
+			dMatrix pinAndPivot (GetIdentityMatrix());
+			pinAndPivot.m_front = location.m_front.Scale (-1.0f);
+			pinAndPivot.m_up = location.m_up;
+			pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
+			pinAndPivot.m_posit = pivot;
+			CustomConeLimitedBallAndSocket* joint;
+			joint = new CustomConeLimitedBallAndSocket(twistAngle, coneAngle, pinAndPivot, link1, link0);
+	#else
+			rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
+	#endif
+
+			obj0 = obj1;
+			location._42 -= (size.x - size.y);
+		}
+		Vec3f pivot = location.getW();
+		pivot.y += (size.x - size.y) * 0.5f;
+		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "rope");
+		rope->add(obj1);
+		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
+		add(rope);
 	}
 	/*
 	if (!m_objects.size()) {
@@ -498,13 +572,13 @@ void Simulation::render()
 	}
 */
 
-	//if (m_selectedObject) {
+	if (m_selectedObject) {
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			//if (*itr == m_selectedObject)
+			if (*itr == m_selectedObject)
 			(*itr)->render();
 		}
-	//}
+	}
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);

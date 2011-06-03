@@ -64,7 +64,6 @@ public:
 	static Hinge load(const std::list<Object>& list/*node*/);
 };
 
-//TODO unfinished!
 class __BallAndSocket : public __Joint {
 protected:
 	CustomBallAndSocket* m_joint;

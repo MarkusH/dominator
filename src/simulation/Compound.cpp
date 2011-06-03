@@ -72,6 +72,18 @@ Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Obj
 	return result;
 }
 
+BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent)
+{
+	if (child && child != parent) {
+		Vec3f pin = pinDir % m_matrix;
+		BallAndSocket ball = __BallAndSocket::create(pivot, pin, child, parent);
+		m_joints.push_back(ball);
+		return ball;
+	}
+	BallAndSocket result;
+	return result;
+}
+
 void __Compound::add(Object object)
 {
 	object->setID(m_nextID++);
