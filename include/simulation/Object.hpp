@@ -56,6 +56,12 @@ public:
 	int getID() const { return m_id; }
 	void setID(int id) { m_id = id; }
 
+	/** @param state The new freeze state of the body */
+	virtual void setFreezeState(int state) { };
+
+	/** @return The freeze state of the body */
+	virtual int getFreezeState() { return 0; }
+
 	/**
 	 * Checks whether this object contains the given NewtonBody.
 	 *
@@ -124,9 +130,13 @@ public:
  */
 class __RigidBody : public __Object, public Body {
 protected:
+	/** The material name of the body. It is a key in the map of the MaterialMgr */
 	std::string m_material;
+
 	/** defines if the body is freezed at creation time 0 = no, 1 = yes */
-	int m_initialFreezeState;
+	int m_freezeState;
+
+	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
 public:
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f());
@@ -135,6 +145,9 @@ public:
 
 	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
+
+	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
+	virtual int getFreezeState() { return m_freezeState; }
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const Object& object);

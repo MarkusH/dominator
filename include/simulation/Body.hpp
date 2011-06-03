@@ -62,7 +62,13 @@ public:
 	 *
 	 * @param matrix The new matrix
 	 */
-	void setMatrix(const Mat4f& matrix);
+	virtual void setMatrix(const Mat4f& matrix);
+
+	/** @param state The new freeze state */
+	virtual void setFreezeState(int state);
+
+	/** @return The freeze state of the body */
+	virtual int getFreezeState();
 
 	/**
 	 * Sets the velocity of this body. Note that m_body has
@@ -103,6 +109,16 @@ inline void Body::setMatrix(const Mat4f& matrix)
 inline void Body::setVelocity(const Vec3f& vel) const
 {
 	NewtonBodySetVelocity(m_body, &vel[0]);
+}
+
+inline void Body::setFreezeState(int state)
+{
+	NewtonBodySetFreezeState(m_body, state);
+}
+
+inline int Body::getFreezeState()
+{
+	return NewtonBodyGetFreezeState(m_body);
 }
 
 }

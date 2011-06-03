@@ -203,18 +203,18 @@ RigidBody __Object::createCone(const Vec3f& position, float radius, float height
 
 
 __RigidBody::__RigidBody(Type type, NewtonBody* body, const std::string& material, int freezeState, const Vec4f& damping)
-	: __Object(type), Body(body), m_material(material), m_initialFreezeState(freezeState), m_damping(damping)
+	: __Object(type), Body(body), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
 }
 
 __RigidBody::__RigidBody(Type type, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
-	: __Object(type), Body(matrix), m_material(material), m_initialFreezeState(freezeState), m_damping(damping)
+	: __Object(type), Body(matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 {
 }
 
 __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
-	: __Object(type), Body(body, matrix), m_material(material), m_initialFreezeState(freezeState), m_damping(damping)
+	: __Object(type), Body(body, matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
 }
@@ -241,7 +241,7 @@ void __RigidBody::save(const __RigidBody& body /* node */)
 	}
 	// set attribute "material" to body.m_material
 	// set attribute "mass" to body.getMass()
-	// set attribute "freezeState" to m_initialFreezeState
+	// set attribute "freezeState" to m_freezeState
 	// set attribute "damping" to m_damping.str()
 }
 
@@ -250,7 +250,7 @@ RigidBody __RigidBody::load(/*node */)
 	// mass = get mass attribute
 	// material = get material attribute
 	// matrix.assign(matrix string)
-	// get initialfreezestate
+	// get m_freezeState
 	// get damping
 
 	// if node.type = "box"
@@ -419,7 +419,7 @@ __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& m
 	Mat4f identity = Mat4f::identity();
 	NewtonCollision* collision = NewtonCreateConvexHull(world, m_vertexCount, m_vertices[0], sizeof(Lib3dsVector), 0.002f, materialID, identity[0]);
 	//std::cout << collision << std::endl;
-	this->create(collision, mass, m_initialFreezeState, m_damping);
+	this->create(collision, mass, m_freezeState, m_damping);
 	NewtonReleaseCollision(world, collision);
 }
 
@@ -527,7 +527,7 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 	//NewtonMeshEndFace(m_mesh);
 
 	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
-	this->create(collision, mass, m_initialFreezeState, m_damping);
+	this->create(collision, mass, m_freezeState, m_damping);
 
 	NewtonReleaseCollision(world, collision);
 	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
