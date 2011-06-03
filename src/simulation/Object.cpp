@@ -88,17 +88,17 @@ RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radi
 
 RigidBody __Object::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
 {
-	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f());
+	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
 {
-	return __Object::createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f());
+	return __Object::createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
 {
-	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material, 0, Vec4f());
+	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
@@ -118,7 +118,7 @@ RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, fl
 
 RigidBody __Object::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
 {
-	return createBox(Mat4f::translate(position), w, h, d, mass, material, 0, Vec4f());
+	return createBox(Mat4f::translate(position), w, h, d, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
@@ -138,7 +138,7 @@ RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float heig
 
 RigidBody __Object::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
+	return createCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
@@ -158,7 +158,7 @@ RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, flo
 
 RigidBody __Object::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
+	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
@@ -178,7 +178,7 @@ RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float heigh
 
 RigidBody __Object::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createCapsule(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
+	return createCapsule(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
@@ -198,7 +198,7 @@ RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, 
 
 RigidBody __Object::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
-	return createCone(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f());
+	return createCone(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
 

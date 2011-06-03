@@ -155,8 +155,14 @@ void Simulation::init()
 	convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 	add(convex);
 
-	add (__Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow"));
-	add (__Object::createBox(Vec3f(0.0f, 2.0f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow"));
+	c = Compound(new __Compound());
+	Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
+	Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow");
+	c->add(obj0);
+	c->add(obj1);
+	c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
+	add(c);
+	c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 0.75f, 0.0f)));
 
 	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 	add(m_environment);
