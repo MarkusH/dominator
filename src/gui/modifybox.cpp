@@ -146,18 +146,11 @@ void ModifyBox::signalLocation(double value)
 void ModifyBox::signalRotation(double value)
 {
 	if (!doUpdate) return;
-	float delta;
 	if (QObject::sender() == m_mbRotX) {
-		delta = value - m_rx;
-		m_rx = value;
 		emit changeRotation(m_mbRotX->value(), m_mbRotY->value(), m_mbRotZ->value());
 	} else if (QObject::sender() == m_mbRotY) {
-		delta = value - m_ry;
-		m_ry = value;
 		emit changeRotation(m_mbRotX->value(), m_mbRotY->value(), m_mbRotZ->value());
 	} else if (QObject::sender() == m_mbRotZ) {
-		delta = value - m_rz;
-		m_rz = value;
 		emit changeRotation(m_mbRotX->value(), m_mbRotY->value(), m_mbRotZ->value());
 	}
 }
