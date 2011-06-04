@@ -108,6 +108,7 @@ void Render::paintGL()
 	frames++;
 	if (m_clock.get() >= 1.0f) {
 		emit framesPerSecondChanged(frames);
+		emit objectsCountChanged(sim::Simulation::instance().getObjectCount());
 		m_clock.reset();
 		frames = 0;
 	}
