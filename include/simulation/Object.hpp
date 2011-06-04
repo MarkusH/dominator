@@ -40,7 +40,7 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE, CYLINDER, CAPSULE, CONE, CHAMFER_CYLINER, CONVEX_HULL, CONVEX_ASSEMBLY, COMPOUND } Type;
+	typedef enum { BOX, SPHERE, CYLINDER, CAPSULE, CONE, CHAMFER_CYLINER, CONVEX_HULL, CONVEX_ASSEMBLY, COMPOUND, TREE_COLLISION } Type;
 
 protected:
 	Type m_type;
@@ -195,7 +195,25 @@ public:
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 };
 
-class __TreeCollision : public __Object {
+class __TreeCollision : public __Object, public Body {
+protected:
+	int m_vertexCount;
+	Lib3dsVector* m_vertices;
+	Lib3dsVector* m_normals;
+	Lib3dsTexel* m_uvs;
+public:
+	__TreeCollision(const Mat4f& matrix, const std::string& fileName);
+	~__TreeCollision();
+
+	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
+	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
+
+	virtual bool contains(const NewtonBody* const body);
+	virtual bool contains(const Object& object);
+
+	virtual void genBuffers(ogl::VertexBuffer& vbo);
+
+	virtual void render();
 };
 
 }

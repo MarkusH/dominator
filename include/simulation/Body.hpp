@@ -41,7 +41,7 @@ public:
 	 * @param damping     The damping coefficients, x,y,z = angular, w = linear damping
 	 * @return            The handle to the NewtonBody
 	 */
-	NewtonBody* create(NewtonCollision* collision, float mass, int freezeState, const Vec4f& damping);
+	NewtonBody* create(NewtonCollision* collision, float mass, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	// TODO: lets see if we need member functions to propagate the events to child classes
 	//virtual void destroyBodyCallback(const NewtonBody* body);

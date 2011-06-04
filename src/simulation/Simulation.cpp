@@ -231,10 +231,11 @@ void Simulation::init()
 		 */
 	}
 
-	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
+	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(200.0f, 0.0f, 20.0f)), "data/models/env.3ds"));
 	add(m_environment);
 
-	//setEnabled(false);
+	setEnabled(false);
 }
 
 void Simulation::clear()
