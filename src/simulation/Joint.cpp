@@ -28,6 +28,12 @@ void __Joint::save(const __Joint& joint /*node*/)
 		// set attribute to "hinge"
 		__Hinge::save((const __Hinge&)joint/*, generatedNode*/);
 		return;
+	case BALL_AND_SOCKET:
+		// don't do anything yet, just fix warnings
+		break;
+	case BALL_AND_SOCKET_LIMITED:
+		// don't do anything yet, just fix warnings
+		break;
 	}
 }
 

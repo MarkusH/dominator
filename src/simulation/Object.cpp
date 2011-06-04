@@ -319,7 +319,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
 			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
 
-		int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
+		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
 		//std::cout << "material " << material << std::endl;
 		//std::cout << "mesh " << material << std::endl;
 
@@ -438,7 +438,7 @@ void __ConvexHull::genBuffers(ogl::VertexBuffer& vbo)
 	//return;
 	// get the offset in floats and vertices
 	const unsigned vertexSize = vbo.floatSize();
-	const unsigned byteSize = vbo.byteSize();
+	//const unsigned byteSize = vbo.byteSize();
 	const unsigned floatOffset = vbo.m_data.size();
 	const unsigned vertexOffset = floatOffset / vertexSize;
 
