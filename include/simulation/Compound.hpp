@@ -38,7 +38,6 @@ class __Compound : public __Object {
 protected:
 	int m_nextID;
 	Mat4f m_matrix;
-	bool m_freezeState;
 	std::list<Object> m_nodes;
 	std::list<Joint> m_joints;
 public:
@@ -52,7 +51,10 @@ public:
 	virtual const Mat4f& getMatrix();
 	virtual void setMatrix(const Mat4f& matrix);
 
+	/** @param state Sets the freeze state of all nodes to state */
 	virtual void setFreezeState(int state);
+
+	/** @return True, if all nodes are in freeze state, False otherwise */
 	virtual int getFreezeState();
 
 	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
@@ -71,11 +73,6 @@ public:
 inline const Mat4f& __Compound::getMatrix()
 {
 	return m_matrix;
-}
-
-inline int __Compound::getFreezeState()
-{
-	return m_freezeState;
 }
 
 }

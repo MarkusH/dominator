@@ -126,46 +126,115 @@ void Simulation::init()
 	add(obj);
 */
 
-	RigidBody boxes[5];
-	RigidBody spheres[5];
+	// newtons cradle
+	{
+		RigidBody boxes[5];
+		RigidBody spheres[5];
 
-	Compound c(new __Compound(Mat4f::translate(Vec3f(0.0f, 15.0f, 10.0f))));
-	RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "black");
-	c->add(top);
+		Compound c(new __Compound(Mat4f::translate(Vec3f(0.0f, 15.0f, 10.0f))));
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "black");
+		c->add(top);
 
-	for (int x = -2; x <= 2; ++x) {
-		boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "blue");
-		spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "red");
+		for (int x = -2; x <= 2; ++x) {
+			boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "blue");
+			spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "red");
 
-		c->add(boxes[x + 2]);
-		c->add(spheres[x + 2]);
+			c->add(boxes[x + 2]);
+			c->add(spheres[x + 2]);
 
-		Vec3f dir(0.0f, 0.0f, 1.0f);
+			Vec3f dir(0.0f, 0.0f, 1.0f);
 
-		c->createHinge(spheres[x + 2]->getMatrix().getW(), dir, boxes[x + 2], spheres[x + 2]);
-		Vec3f pivot = boxes[x + 2]->getMatrix().getW() + Vec3f(0.0f, 2.4f, 0.0f);
-		c->createHinge(pivot, dir, top, boxes[x + 2]);
+			c->createHinge(spheres[x + 2]->getMatrix().getW(), dir, boxes[x + 2], spheres[x + 2]);
+			Vec3f pivot = boxes[x + 2]->getMatrix().getW() + Vec3f(0.0f, 2.4f, 0.0f);
+			c->createHinge(pivot, dir, top, boxes[x + 2]);
+		}
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
 	}
-	add(c);
-	c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
 
-	Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
-	add(convex);
+	// assemlby vs hull comparison
+	{
+		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+		add(convex);
 
-	convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
-	add(convex);
+		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+		add(convex);
+	}
 
-	c = Compound(new __Compound());
-	Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
-	Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow");
-	c->add(obj0);
-	c->add(obj1);
-	c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
-	add(c);
-	c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 0.75f, 0.0f)));
+	// simple seesaw with hinge
+	{
+		Compound c = Compound(new __Compound());
+		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
+		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow");
+		c->add(obj0);
+		c->add(obj1);
+		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 10.0f)));
+	}
+
+	// wagon with tires and hinges
+	{
+		// hinge pinDir is z Axis
+
+		// rotate tires 90 degrees around Y
+		Mat4f rot = Mat4f::rotY(90.0f * PI / 180.0f);
+
+		// chassis size
+		Vec3f size(5.0f, 0.5f, 2.5f);
+
+		// tire size
+		Vec3f tires(0.75f, 0.2f, 0.5f);
+		Compound c = Compound(new __Compound());
+
+		Object chassis = __Object::createBox(Mat4f::identity(), size.x, size.y, size.z, 1.0f, "yellow");
+		c->add(chassis);
+
+		Object fl = __Object::createCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		c->add(fl);
+
+		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
+		Object fr = __Object::createCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		c->add(fr);
+
+		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
+		Object bl = __Object::createCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		c->add(bl);
+
+		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
+		Object br = __Object::createCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		c->add(br);
+
+		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
+		add(c);
+
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 5.0f, 0.0f)));
+
+		/*
+		Compound c = Compound(new __Compound());
+		Object chassis = __Object::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
+		c->add(chassis);
+		Object fl = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		c->add(fl);
+		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
+		Object fr = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		c->add(fr);
+		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
+		Object bl = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		c->add(bl);
+		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
+		Object br = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		c->add(br);
+		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 5.0f, 0.0f)));
+		 */
+	}
 
 	m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 	add(m_environment);
+
+	//setEnabled(false);
 }
 
 void Simulation::clear()
@@ -365,7 +434,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 			counter = 0;
 				//__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
 				//__Object::createSphere(matrix, 0.1f, 1.0f, "wood_matt");
-		//obj->setVelocity(view * 20.0f);
+		obj->setVelocity(view * 10.0f);
 		add(obj);
 	} else if (button == util::RIGHT && down) {
 		RigidBody obj0, obj1;
