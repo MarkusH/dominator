@@ -113,7 +113,7 @@ void Simulation::init()
 
 
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(200.0f, 0.0f, 20.0f)), "data/models/env.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	add(m_environment);
 
 /*
@@ -132,6 +132,7 @@ void Simulation::init()
 */
 
 	// newtons cradle
+	if (0)
 	{
 		RigidBody boxes[5];
 		RigidBody spheres[5];
@@ -155,20 +156,22 @@ void Simulation::init()
 		}
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
+		c->convexCastPlacement();
 	}
 
 	// assemlby vs hull comparison
 	{
-		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
-		add(convex);
-		convex->convexCastPlacement();
+		//Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+		//add(convex);
+		//convex->convexCastPlacement();
 
-		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+		Object convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 		add(convex);
 		convex->convexCastPlacement();
 	}
 
 	// simple seesaw with hinge
+	if (0)
 	{
 		Compound c = Compound(new __Compound());
 		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
@@ -178,9 +181,11 @@ void Simulation::init()
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 10.0f)));
+		c->convexCastPlacement();
 	}
 
 	// wagon with tires and hinges
+	//if (0)
 	{
 		// hinge pinDir is z Axis
 
@@ -190,32 +195,32 @@ void Simulation::init()
 		// chassis size
 		Vec3f size(5.0f, 0.5f, 2.5f);
 
-		// tire size
-		Vec3f tires(0.75f, 0.2f, 0.5f);
+		// tire size, z = mass
+		Vec3f tires(0.75f, 0.2f, 0.1f);
 		Compound c = Compound(new __Compound());
 
-		Object chassis = __Object::createBox(Mat4f::identity(), size.x, size.y, size.z, 1.0f, "yellow");
+		Object chassis = __Object::createBox(Mat4f::identity(), size.x, size.y, size.z, 5.0f, "yellow");
 		c->add(chassis);
 
-		Object fl = __Object::createCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fl = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(fl);
 
 		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __Object::createCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fr = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(fr);
 
 		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __Object::createCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object bl = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(bl);
 
 		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __Object::createCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object br = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(br);
 
 		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
 		add(c);
 
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 5.0f, 0.0f)));
+		c->setMatrix(Mat4f::rotY(PI*0.5f) * Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)));
 		c->convexCastPlacement();
 		/*
 		Compound c = Compound(new __Compound());
@@ -409,6 +414,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	m_pointer = m_camera.pointer(x, y);
 	if (button == util::MIDDLE && down) {
+		setEnabled(true);
 		Vec3f view = m_camera.viewVector();
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position.xyz());
@@ -439,7 +445,8 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 			counter = 0;
 				//__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
 				//__Object::createSphere(matrix, 0.1f, 1.0f, "wood_matt");
-		obj->setVelocity(view * 10.0f);
+		//obj->setVelocity(view * 10.0f);
+		obj->convexCastPlacement();
 		add(obj);
 	} else if (button == util::RIGHT && down) {
 		RigidBody obj0, obj1;

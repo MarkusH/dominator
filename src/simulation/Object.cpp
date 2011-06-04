@@ -745,7 +745,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 			Lib3dsFace* face = &mesh->faceL[cur_face];
 			for(unsigned int i = 0;i < 3; i++) {
 				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
+				//memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
 				//m_vertices[finishedFaces*3 + i][0] *= 10.0f;
 				//m_vertices[finishedFaces*3 + i][1] *= 10.0f;
 				//m_vertices[finishedFaces*3 + i][2] *= 10.0f;
@@ -759,6 +759,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	NewtonTreeCollisionEndBuild(collision, 1);
 
 	this->create(collision, 0.0f);
+	std::cout << "tree collision: " << m_body << std::endl;
 	NewtonReleaseCollision(world, collision);
 }
 
