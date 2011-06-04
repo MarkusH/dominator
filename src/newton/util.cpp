@@ -60,6 +60,49 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z)
 }
 
 
+static unsigned ConvexCastCallback(const NewtonBody* body, const NewtonCollision* collision, void* userData)
+{
+	NewtonBody* other = (NewtonBody*)userData;
+	return (other == body) ? 0 : 1;
+}
+
+
+float getConvexCastPlacement(NewtonBody* body)
+{
+	Mat4f matrix;
+	NewtonBodyGetMatrix(body, matrix[0]);
+	matrix._42 += 200.0f;
+	Vec3f p(matrix.getW());
+	p.y -= 400.0f;
+
+	NewtonWorld* world = NewtonBodyGetWorld(body);
+	NewtonCollision* collision = NewtonBodyGetCollision(body);
+
+	float param;
+	NewtonWorldConvexCastReturnInfo info[16];
+
+	NewtonCollisionInfoRecord collisionInfo;
+	NewtonCollisionGetInfo(collision, &collisionInfo);
+
+	if (collisionInfo.m_collisionType == SERIALIZE_ID_COMPOUND) {
+		float maximum = -200.0f;
+		for (int i = 0; i < collisionInfo.m_compoundCollision.m_chidrenCount; ++i) {
+			NewtonCollision* node = collisionInfo.m_compoundCollision.m_chidren[i];
+			NewtonWorldConvexCast(world, matrix[0], &p[0], node, &param, body, ConvexCastCallback, info, 16, 0);
+			float current = matrix._42 + (p.y - matrix._42) * param;
+			if (current > maximum) maximum = current;
+		}
+		return maximum;
+	} else {
+		NewtonWorldConvexCast(world, matrix[0], &p[0], collision, &param, body, ConvexCastCallback, info, 16, 0);
+
+		matrix._42 += (p.y - matrix._42) * param;
+		return matrix._42;
+	}
+}
+
+
+
 static void debugShowGeometryCollision(void* userData, int vertexCount, const dFloat* faceVertec, int id)
 {
 	int i;

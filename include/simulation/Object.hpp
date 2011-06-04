@@ -63,6 +63,14 @@ public:
 	virtual int getFreezeState() { return 0; }
 
 	/**
+	 * Sets the vertical position of the object according to the convex cast of its collision.
+	 *
+	 * @param apply True, if the new position should be applied, False otherwise
+	 * @return      The new vertical position
+	 */
+	virtual float convexCastPlacement(bool apply = true) = 0;
+
+	/**
 	 * Checks whether this object contains the given NewtonBody.
 	 *
 	 * @param body The NewtonBody to find
@@ -149,6 +157,8 @@ public:
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
 	virtual int getFreezeState() { return m_freezeState; }
 
+	virtual float convexCastPlacement(bool apply = true);
+
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const Object& object);
 
@@ -207,6 +217,8 @@ public:
 
 	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
+
+	virtual float convexCastPlacement(bool apply = true) { return 0.0f; };
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const Object& object);

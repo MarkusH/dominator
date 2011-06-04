@@ -111,6 +111,11 @@ void Simulation::init()
 	int id = NewtonMaterialGetDefaultGroupID(m_world);
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
+
+	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(200.0f, 0.0f, 20.0f)), "data/models/env.3ds"));
+	add(m_environment);
+
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
 	Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
@@ -156,9 +161,11 @@ void Simulation::init()
 	{
 		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 		add(convex);
+		convex->convexCastPlacement();
 
 		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
 		add(convex);
+		convex->convexCastPlacement();
 	}
 
 	// simple seesaw with hinge
@@ -209,7 +216,7 @@ void Simulation::init()
 		add(c);
 
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 5.0f, 0.0f)));
-
+		c->convexCastPlacement();
 		/*
 		Compound c = Compound(new __Compound());
 		Object chassis = __Object::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
@@ -231,9 +238,6 @@ void Simulation::init()
 		 */
 	}
 
-	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(200.0f, 0.0f, 20.0f)), "data/models/env.3ds"));
-	add(m_environment);
 
 	setEnabled(false);
 }

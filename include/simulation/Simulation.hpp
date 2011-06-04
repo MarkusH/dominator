@@ -123,6 +123,9 @@ public:
 	/** @return The camera */
 	ogl::Camera& getCamera();
 
+	/** @return The number of objects in the simulation */
+	unsigned getObjectCount();
+
 
 	/**
 	 * Selects the object at the viewport position (x, y). If
@@ -210,6 +213,11 @@ inline bool Simulation::isEnabled()
 inline ogl::Camera& Simulation::getCamera()
 {
 	return m_camera;
+}
+
+inline unsigned Simulation::getObjectCount()
+{
+	return m_objects.size();
 }
 
 inline Object Simulation::getSelectedObject()

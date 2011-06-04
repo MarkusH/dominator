@@ -33,6 +33,20 @@ __Compound::~__Compound()
 	m_joints.clear();
 }
 
+float __Compound::convexCastPlacement(bool apply)
+{
+	float maximum = -1000.0f;
+	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
+		float current = (*itr)->convexCastPlacement(false);
+		if (current > maximum) maximum = current;
+	}
+	Mat4f matrix = m_matrix;
+	matrix._42 = maximum + 0.0001f;
+	if (apply)
+		setMatrix(matrix);
+	return matrix._42;
+}
+
 void __Compound::save(const __Compound& compound /* node */)
 {
 	// set attribute matrix to m_matrix.str()

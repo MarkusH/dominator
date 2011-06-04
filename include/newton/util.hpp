@@ -40,6 +40,17 @@ NewtonBody* getRayCastBody(const NewtonWorld* world, const Vec3f& origin, const 
 float getVerticalPosition(const NewtonWorld* world, float x, float z);
 
 /**
+ * Does a convex cast of the body and returns the vertical position of
+ * the body so that it just collides with the ground. This function takes
+ * into consideration all collision shapes and bodies of the given world.
+ * This also works with compound collisions.
+ *
+ * @param body The body to use for the convex cast
+ * @return     The new vertical position of the body
+ */
+float getConvexCastPlacement(NewtonBody* body);
+
+/**
  * Renders the specified collision shape, transformed with the given matrix.
  *
  * @param shape  The collision shape to render

@@ -57,6 +57,8 @@ public:
 	/** @return True, if all nodes are in freeze state, False otherwise */
 	virtual int getFreezeState();
 
+	virtual float convexCastPlacement(bool apply = true);
+
 	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
 	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
 

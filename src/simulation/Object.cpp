@@ -219,6 +219,16 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const
 {
 }
 
+float __RigidBody::convexCastPlacement(bool apply)
+{
+	float vertical = newton::getConvexCastPlacement(m_body);
+	Mat4f matrix = m_matrix;
+	matrix._42 = vertical + 0.0001f;
+	if (apply)
+		setMatrix(matrix);
+	return matrix._42;
+}
+
 void __RigidBody::save(const __RigidBody& body /* node */)
 {
 	// set attribute matrix to m_matrix.str()
@@ -724,8 +734,6 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	m_uvs = new Lib3dsTexel[numFaces * 3];
 
 	unsigned finishedFaces = 0;
-	unsigned vOffset = 0;
-
 
 	NewtonCollision* collision = NewtonCreateTreeCollision(world, defaultMaterial);
 	NewtonTreeCollisionBeginBuild(collision);
