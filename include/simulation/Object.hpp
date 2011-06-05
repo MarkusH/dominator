@@ -178,12 +178,12 @@ public:
  */
 class __ConvexHull : public __RigidBody {
 protected:
-	int m_vertexCount;
-	Lib3dsVector* m_vertices;
-	Lib3dsVector* m_normals;
-	Lib3dsTexel* m_uvs;
+	bool m_originalGeometry;
+	NewtonMesh* m_mesh;
+	std::vector<float> m_data;
 public:
-	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	~__ConvexHull();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
@@ -193,40 +193,27 @@ public:
  * A NewtonCompound is generated for each submesh of a 3ds file.
  */
 class __ConvexAssembly : public __RigidBody  {
-protected:
-	int m_vertexCount;
-	Lib3dsVector* m_vertices;
-	Lib3dsVector* m_normals;
-	Lib3dsTexel* m_uvs;
 public:
-	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	/**
+	 * 1) a single mesh of the faces --> no smooth normals
+	 * 2) a mesh for each convex hull --> convex submeshes
+	 * 3) original 3ds data
+	 */
+	typedef enum { ORIGINAL = 0, MESH_EXACT, MESH_ASSEMBLY } RenderingType;
+protected:
+	RenderingType m_renderingType;
+	NewtonMesh* m_mesh;
+	std::vector<float> m_data;
+	std::vector<uint32_t> m_indices;
+	ogl::SubBuffers m_buffers;
+public:
+	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	~__ConvexAssembly();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 };
 
-class __TreeCollision : public __Object, public Body {
-protected:
-	int m_vertexCount;
-	Lib3dsVector* m_vertices;
-	Lib3dsVector* m_normals;
-	Lib3dsTexel* m_uvs;
-public:
-	__TreeCollision(const Mat4f& matrix, const std::string& fileName);
-	~__TreeCollision();
 
-	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
-	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
-
-	virtual float convexCastPlacement(bool apply = true) { return 0.0f; };
-
-	virtual bool contains(const NewtonBody* const body);
-	virtual bool contains(const Object& object);
-
-	virtual void genBuffers(ogl::VertexBuffer& vbo);
-
-	virtual void render();
-};
 
 }
 

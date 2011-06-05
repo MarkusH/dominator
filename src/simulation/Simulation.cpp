@@ -7,6 +7,7 @@
 
 #include <simulation/Simulation.hpp>
 #include <simulation/Compound.hpp>
+#include <simulation/TreeCollision.hpp>
 #include <simulation/Material.hpp>
 #include <opengl/Texture.hpp>
 #include <opengl/Shader.hpp>
@@ -161,11 +162,11 @@ void Simulation::init()
 
 	// assemlby vs hull comparison
 	{
-		//Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
-		//add(convex);
-		//convex->convexCastPlacement();
+		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", false));
+		add(convex);
+		convex->convexCastPlacement();
 
-		Object convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds"));
+		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", __ConvexAssembly::ORIGINAL));
 		add(convex);
 		convex->convexCastPlacement();
 	}
@@ -588,7 +589,7 @@ void Simulation::update()
 		}
 	}
 
-	float step = delta * (m_keyAdapter.shift() ? 10.f : 5.0f);
+	float step = delta * (m_keyAdapter.shift() ? 25.f : 10.0f);
 
 	if (m_keyAdapter.isDown('w')) m_camera.move(step);
 	if (m_keyAdapter.isDown('a')) m_camera.strafe(-step);
@@ -654,6 +655,8 @@ void Simulation::render()
 			glPushMatrix();
 			glMultMatrixf(obj->getMatrix()[0]);
 			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
 			glPopMatrix();
 		}
 	}

@@ -21,8 +21,6 @@ namespace sim {
 __Object::__Object(Type type)
 	: m_type(type)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 __Object::~__Object()
@@ -384,8 +382,8 @@ void __RigidBody::render()
 	newton::showCollisionShape(getCollision(), m_matrix);
 }
 
-__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping)
+__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, bool originalGeometry, int freezeState, const Vec4f& damping)
+	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_originalGeometry(originalGeometry), m_mesh(NULL)
 {
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
@@ -394,195 +392,108 @@ __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& m
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 
+	Lib3dsVector* vertices;
 	int numFaces = 0;
-
+	int vertexCount = 0;
 	// count the faces
 	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next)
 		numFaces += mesh->faces;
 
-	m_vertexCount = numFaces*3;
-	//std::cout << m_vertexCount << std::endl;
-	m_vertices = new Lib3dsVector[numFaces * 3];
-	m_normals = new Lib3dsVector[numFaces * 3];
-	m_uvs = new Lib3dsTexel[numFaces * 3];
+	if (originalGeometry) {
+		vertexCount = numFaces*3;
+		vertices = new Lib3dsVector[vertexCount];
+		Lib3dsVector* normals = new Lib3dsVector[vertexCount];
+		Lib3dsTexel* uvs = new Lib3dsTexel[vertexCount];
 
-	unsigned finishedFaces = 0;
+		unsigned finishedFaces = 0;
 
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-		lib3ds_mesh_calculate_normals(mesh, &m_normals[finishedFaces*3]);
-		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
-			Lib3dsFace* face = &mesh->faceL[cur_face];
-			for(unsigned int i = 0;i < 3;i++) {
-				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				if (mesh->texelL)
-				memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-				m_vertices[finishedFaces*3 + i][0] *= 10.0f;
-				m_vertices[finishedFaces*3 + i][1] *= 10.0f;
-				m_vertices[finishedFaces*3 + i][2] *= 10.0f;
+		// foreach mesh
+		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
+			lib3ds_mesh_calculate_normals(mesh, &normals[finishedFaces*3]);
+			// foreach face
+			for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
+				Lib3dsFace* face = &mesh->faceL[cur_face];
+				// foreach index
+				for(unsigned int i = 0;i < 3;i++) {
+					memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
+					if (mesh->texelL) memcpy(&uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
+				}
+				finishedFaces++;
 			}
-			finishedFaces++;
 		}
-		//std::cout << "mesh" << std::endl;
+
+
+		m_data.reserve(vertexCount * (3+3+2));
+		m_data.resize(vertexCount * (3+3+2));
+		for (int i = 0; i < vertexCount; ++i) {
+			memcpy(&m_data[i * (3+3+2) + 0], uvs[i], 2 * sizeof(float));
+			memcpy(&m_data[i * (3+3+2) + 2], normals[i], 3 * sizeof(float));
+			memcpy(&m_data[i * (3+3+2) + 5], vertices[i], 3 * sizeof(float));
+		}
+
+		lib3ds_file_free(file);
+
+		delete normals;
+		delete uvs;
+	} else {
+		vertexCount = numFaces*3;
+		vertices = new Lib3dsVector[numFaces * 3];
+
+		m_mesh = NewtonMeshCreate(world);
+		NewtonMeshBeginFace(m_mesh);
+
+		unsigned finishedFaces = 0;
+
+		// foreach mesh
+		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
+			// foreach face
+			for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
+				Lib3dsFace* face = &mesh->faceL[cur_face];
+				// foreach index
+				for(unsigned int i = 0;i < 3;i++) {
+					memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
+				}
+				NewtonMeshAddFace(m_mesh, 3, vertices[finishedFaces*3], sizeof(Lib3dsVector), materialID);
+				finishedFaces++;
+			}
+		}
+		lib3ds_file_free(file);
+		NewtonMeshEndFace(m_mesh);
 	}
-	lib3ds_file_free(file);
 
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateConvexHull(world, m_vertexCount, m_vertices[0], sizeof(Lib3dsVector), 0.002f, materialID, identity[0]);
-	//std::cout << collision << std::endl;
+	NewtonCollision* collision = NewtonCreateConvexHull(world, vertexCount, vertices[0], sizeof(Lib3dsVector), 0.002f, materialID, identity[0]);
+	delete vertices;
 	this->create(collision, mass, m_freezeState, m_damping);
 	NewtonReleaseCollision(world, collision);
 }
 
 __ConvexHull::~__ConvexHull()
 {
-	if (m_vertices) delete m_vertices;
-	if (m_normals) delete m_normals;
-	if (m_uvs) delete m_uvs;
+	if (m_mesh) NewtonMeshDestroy(m_mesh);
+	m_data.clear();
 }
 
 void __ConvexHull::genBuffers(ogl::VertexBuffer& vbo)
 {
-	//TODO implement index array for 3ds data
-	// to this to get smooth normals
-	//__RigidBody::genBuffers(vbo);
-	//return;
-	// get the offset in floats and vertices
-	const unsigned vertexSize = vbo.floatSize();
-	//const unsigned byteSize = vbo.byteSize();
-	const unsigned floatOffset = vbo.m_data.size();
-	const unsigned vertexOffset = floatOffset / vertexSize;
-
-	vbo.m_data.reserve(floatOffset + m_vertexCount * vertexSize);
-	vbo.m_data.resize(floatOffset + m_vertexCount * vertexSize);
-
-	for (int i = 0; i < m_vertexCount; ++i) {
-		vbo.m_data[floatOffset + i * vertexSize + 0] = m_uvs[i][0];
-		vbo.m_data[floatOffset + i * vertexSize + 1] = m_uvs[i][0];
-		vbo.m_data[floatOffset + i * vertexSize + 2] = m_normals[i][0];
-		vbo.m_data[floatOffset + i * vertexSize + 3] = m_normals[i][1];
-		vbo.m_data[floatOffset + i * vertexSize + 4] = m_normals[i][2];
-		vbo.m_data[floatOffset + i * vertexSize + 5] = m_vertices[i][0];
-		vbo.m_data[floatOffset + i * vertexSize + 6] = m_vertices[i][1];
-		vbo.m_data[floatOffset + i * vertexSize + 7] = m_vertices[i][2];
-	}
-
-	ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-	subBuffer->material = m_material;
-	subBuffer->object = this;
-
-	subBuffer->dataCount = m_vertexCount;
-	subBuffer->dataOffset = vertexOffset;
-	subBuffer->indexCount = m_vertexCount;
-	subBuffer->indexOffset = vbo.m_indices.size();
-
-	// copy the indices to the global list and add the offset
-	vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-	for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-		vbo.m_indices.push_back(vertexOffset + i);
-
-	vbo.m_buffers.push_back(subBuffer);
-}
-
-
-__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping)
-{
-	//TODO implement index array for 3ds data
-	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
-	if (!file)
-		return;
-
-	const NewtonWorld* world = Simulation::instance().getWorld();
-	int defaultMaterial = MaterialMgr::instance().getID(material);
-	int numFaces = 0;
-
-	// count the faces
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next)
-		numFaces += mesh->faces;
-
-	m_vertexCount = numFaces*3;
-	m_vertices = new Lib3dsVector[numFaces * 3];
-	m_normals = new Lib3dsVector[numFaces * 3];
-	m_uvs = new Lib3dsTexel[numFaces * 3];
-
-	unsigned finishedFaces = 0;
-	unsigned vOffset = 0;
-	Mat4f identity = Mat4f::identity();
-
-	std::vector<NewtonCollision*> collisions;
-	//m_mesh = NewtonMeshCreate(world);
-	//NewtonMeshBeginFace(m_mesh);
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-		unsigned vCount = 0;
-		int faceMaterial = defaultMaterial;
-		lib3ds_mesh_calculate_normals(mesh, &m_normals[finishedFaces*3]);
-		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
-			Lib3dsFace* face = &mesh->faceL[cur_face];
-			for(unsigned int i = 0;i < 3; i++) {
-				vCount++;
-				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-				m_vertices[finishedFaces*3 + i][0] *= 10.0f;
-				m_vertices[finishedFaces*3 + i][1] *= 10.0f;
-				m_vertices[finishedFaces*3 + i][2] *= 10.0f;
-			}
-			faceMaterial = face->material ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
-			//NewtonMeshAddFace(m_mesh, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
-			finishedFaces++;
-		}
-		collisions.push_back(NewtonCreateConvexHull(world, vCount, m_vertices[vOffset], sizeof(Lib3dsVector), 0.002f, faceMaterial, identity[0]));
-		vOffset += vCount;
-	}
-	lib3ds_file_free(file);
-	//NewtonMeshEndFace(m_mesh);
-
-	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
-	this->create(collision, mass, m_freezeState, m_damping);
-
-	NewtonReleaseCollision(world, collision);
-	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
-		NewtonReleaseCollision(world, *itr);
-}
-
-__ConvexAssembly::~__ConvexAssembly()
-{
-	if (m_vertices) delete m_vertices;
-	if (m_normals) delete m_normals;
-	if (m_uvs) delete m_uvs;
-}
-
-void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
-{
-	// WRONG MATERIALS
-	//__RigidBody::genBuffers(vbo);
-	//return;
-
-	NewtonCollisionInfoRecord info;
-	NewtonCollisionGetInfo(NewtonBodyGetCollision(m_body), &info);
-	if (info.m_collisionType != SERIALIZE_ID_COMPOUND)
-		return __RigidBody::genBuffers(vbo);
-
-	for (int i = 0; i < info.m_compoundCollision.m_chidrenCount; ++i) {
-
+	if (!m_originalGeometry) {
 		const unsigned vertexSize = vbo.floatSize();
 		const unsigned byteSize = vbo.byteSize();
 		const unsigned floatOffset = vbo.m_data.size();
 		const unsigned vertexOffset = floatOffset / vertexSize;
 
-		NewtonCollision* collision = info.m_compoundCollision.m_chidren[i];
-		NewtonMesh* collisionMesh = NewtonMeshCreateFromCollision(collision);
-		int shapeID = NewtonCollisionGetUserID(collision);
-		NewtonMeshApplyBoxMapping(collisionMesh, shapeID, shapeID, shapeID);
+		int shapeID = NewtonCollisionGetUserID(NewtonBodyGetCollision(m_body));
+		NewtonMeshApplyBoxMapping(m_mesh, shapeID, shapeID, shapeID);
 
-		//NewtonMeshCalculateVertexNormals(collisionMesh, 45.0f * 3.1416f/180.0f);
+		NewtonMeshCalculateVertexNormals(m_mesh, 45.0f * 3.1416f / 180.0f);
 
 		// allocate the vertex data
-		int vertexCount = NewtonMeshGetPointCount(collisionMesh);
+		int vertexCount = NewtonMeshGetPointCount(m_mesh);
 
 		vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
 		vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
 
-		NewtonMeshGetVertexStreams(collisionMesh,
+		NewtonMeshGetVertexStreams(m_mesh,
 				byteSize, &vbo.m_data[floatOffset + 2 + 3],
 				byteSize, &vbo.m_data[floatOffset + 2],
 				byteSize, &vbo.m_data[floatOffset],
@@ -590,11 +501,11 @@ void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 
 
 		// iterate over the submeshes and store the indices
-		void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
-		for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
-				handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
+		void* const meshCookie = NewtonMeshBeginHandle(m_mesh);
+		for (int handle = NewtonMeshFirstMaterial(m_mesh, meshCookie);
+				handle != -1; handle = NewtonMeshNextMaterial(m_mesh, meshCookie, handle)) {
 
-			int materialID = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
+			int materialID = NewtonMeshMaterialGetMaterial(m_mesh, meshCookie, handle);
 
 			Material* material = MaterialMgr::instance().fromID(materialID);
 
@@ -607,9 +518,9 @@ void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 			subBuffer->dataOffset = vertexOffset;
 
 			// get the indices
-			subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
+			subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(m_mesh, meshCookie, handle);
 			uint32_t* indices = new uint32_t[subBuffer->indexCount];
-			NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
+			NewtonMeshMaterialGetIndexStream(m_mesh, meshCookie, handle, (int*)indices);
 			subBuffer->indexOffset = vbo.m_indices.size();
 
 			// copy the indices to the global list and add the offset
@@ -620,260 +531,335 @@ void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 			delete indices;
 			vbo.m_buffers.push_back(subBuffer);
 		}
-		NewtonMeshEndHandle(collisionMesh, meshCookie);
+		NewtonMeshEndHandle(m_mesh, meshCookie);
 
-		NewtonMeshDestroy(collisionMesh);
+		return;
 	}
 
-
-/*
- *  WRONG NORMALS
 	// get the offset in floats and vertices
 	const unsigned vertexSize = vbo.floatSize();
-	const unsigned byteSize = vbo.byteSize();
+	//const unsigned byteSize = vbo.byteSize();
 	const unsigned floatOffset = vbo.m_data.size();
 	const unsigned vertexOffset = floatOffset / vertexSize;
 
-	NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+	vbo.m_data.reserve(floatOffset + m_data.size());
+	vbo.m_data.resize(floatOffset + m_data.size());
 
-	// create a mesh from the collision
-	NewtonMesh* collisionMesh = m_mesh;
+	memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
 
-	switch (m_type) {
-	case SPHERE:
-		NewtonMeshApplySphericalMapping(collisionMesh, 0);
-		break;
-//	case CYLINDER:
-//		NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
-//		break;
-	case BOX:
-	default:
-		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);
-		break;
-	}
+	ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
+	subBuffer->material = m_material;
+	subBuffer->object = this;
 
-	NewtonMeshCalculateVertexNormals(collisionMesh, 90.0f * 3.1416f/180.0f);
+	subBuffer->dataCount = m_data.size() / vertexSize;
+	subBuffer->dataOffset = vertexOffset;
+	subBuffer->indexCount = subBuffer->dataCount;
+	subBuffer->indexOffset = vbo.m_indices.size();
 
+	// copy the indices to the global list and add the offset
+	vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
+	for (unsigned i = 0; i < subBuffer->indexCount; ++i)
+		vbo.m_indices.push_back(vertexOffset + i);
 
-	// allocate the vertex data
-	int vertexCount = NewtonMeshGetPointCount(collisionMesh);
-
-	vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
-	vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
-
-	NewtonMeshGetVertexStreams(collisionMesh,
-			byteSize, &vbo.m_data[floatOffset + 2 + 3],
-			byteSize, &vbo.m_data[floatOffset + 2],
-			byteSize, &vbo.m_data[floatOffset],
-			byteSize, &vbo.m_data[floatOffset]);
-
-	std::cout << "____" << std::endl;
-	std::cout << vertexCount << std::endl;
-
-
-	// iterate over the submeshes and store the indices
-	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
-	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
-			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
-
-		int materialID = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
-		std::cout << "material " << materialID << std::endl;
-		//std::cout << "mesh " << material << std::endl;
-
-		Material* material = MaterialMgr::instance().fromID(materialID);
-
-		// create a new submesh
-		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-		subBuffer->material = material ? material->name : m_material;
-		subBuffer->object = this;
-
-		subBuffer->dataCount = vertexCount;
-		subBuffer->dataOffset = vertexOffset;
-
-		// get the indices
-		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-		//std::cout << subBuffer->indexCount << std::endl;
-		uint32_t* indices = new uint32_t[subBuffer->indexCount];
-		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
-std::cout << "indices " << subBuffer->indexCount << std::endl;
-		subBuffer->indexOffset = vbo.m_indices.size();
-
-		// copy the indices to the global list and add the offset
-		vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-		for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-			vbo.m_indices.push_back(vertexOffset + indices[i]);
-
-		delete indices;
-		vbo.m_buffers.push_back(subBuffer);
-	}
-	NewtonMeshEndHandle(collisionMesh, meshCookie);
-
-	NewtonMeshDestroy(collisionMesh);
-	*/
+	vbo.m_buffers.push_back(subBuffer);
 }
 
-__TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileName)
-	: __Object(TREE_COLLISION), Body(matrix)
+
+__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType, int freezeState, const Vec4f& damping)
+	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_renderingType(renderingType), m_mesh(NULL)
 {
-	//TODO implement index array for 3ds data
+	//TODO: only create mesh if necessary (renderingtype == mesh_exact
+	// store original data with per-mesh material
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
 		return;
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
-	int defaultMaterial = 0;//MaterialMgr::instance().getID(material);
+	int defaultMaterial = MaterialMgr::instance().getID(material);
 	int numFaces = 0;
 
 	// count the faces
 	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next)
 		numFaces += mesh->faces;
 
-	m_vertexCount = numFaces*3;
-	m_vertices = new Lib3dsVector[numFaces * 3];
-	m_normals = new Lib3dsVector[numFaces * 3];
-	m_uvs = new Lib3dsTexel[numFaces * 3];
+	int vertexCount = numFaces*3;
+
+	Lib3dsVector* vertices = new Lib3dsVector[vertexCount];
+	Lib3dsVector* normals = NULL;
+	Lib3dsTexel* uvs = NULL;
+	if (m_renderingType == ORIGINAL) {
+		normals = new Lib3dsVector[vertexCount];
+		uvs = new Lib3dsTexel[vertexCount];
+	}
 
 	unsigned finishedFaces = 0;
+	unsigned vOffset = 0;
+	Mat4f identity = Mat4f::identity();
 
-	NewtonCollision* collision = NewtonCreateTreeCollision(world, defaultMaterial);
-	NewtonTreeCollisionBeginBuild(collision);
+	std::vector<NewtonCollision*> collisions;
+
+	if (m_renderingType == MESH_EXACT) {
+		m_mesh = NewtonMeshCreate(world);
+		NewtonMeshBeginFace(m_mesh);
+	}
 
 	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
+		unsigned vCount = 0;
 		int faceMaterial = defaultMaterial;
-		lib3ds_mesh_calculate_normals(mesh, &m_normals[finishedFaces*3]);
+		if (m_renderingType == ORIGINAL)
+			lib3ds_mesh_calculate_normals(mesh, &normals[finishedFaces*3]);
 		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
 			Lib3dsFace* face = &mesh->faceL[cur_face];
-			for(unsigned int i = 0;i < 3; i++) {
-				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				//memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-				//m_vertices[finishedFaces*3 + i][0] *= 10.0f;
-				//m_vertices[finishedFaces*3 + i][1] *= 10.0f;
-				//m_vertices[finishedFaces*3 + i][2] *= 10.0f;
+
+			for(unsigned int i = 0; i < 3; i++) {
+				memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
+				if (mesh->texelL && m_renderingType == ORIGINAL)
+					memcpy(&uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
 			}
+
 			faceMaterial = face->material ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
-			NewtonTreeCollisionAddFace(collision, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
+			if (m_renderingType == MESH_EXACT)
+				NewtonMeshAddFace(m_mesh, 3, vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
+
 			finishedFaces++;
 		}
+		vCount += mesh->faces * 3;
+
+		// create a new sub-buffer with the mesh material
+		if (m_renderingType == ORIGINAL) {
+			ogl::SubBuffer* buffer = new ogl::SubBuffer();
+			buffer->object = this;
+			Material* material = MaterialMgr::instance().fromID(faceMaterial);
+			buffer->material = material ? material->name : "";
+
+			buffer->dataCount = finishedFaces*3 - vOffset;
+			buffer->dataOffset = vOffset;
+			buffer->indexCount = buffer->dataCount;
+			buffer->indexOffset = buffer->dataOffset;
+
+			m_buffers.push_back(buffer);
+		}
+
+		collisions.push_back(NewtonCreateConvexHull(world, vCount, vertices[vOffset], sizeof(Lib3dsVector), 0.002f, faceMaterial, identity[0]));
+		vOffset += vCount;
 	}
 	lib3ds_file_free(file);
-	NewtonTreeCollisionEndBuild(collision, 1);
+	if (m_renderingType == MESH_EXACT)
+		NewtonMeshEndFace(m_mesh);
 
-	this->create(collision, 0.0f);
-	std::cout << "tree collision: " << m_body << std::endl;
-	NewtonReleaseCollision(world, collision);
-}
+	// create buffer data
+	if (m_renderingType == ORIGINAL) {
 
-__TreeCollision::~__TreeCollision()
-{
-	if (m_vertices) delete m_vertices;
-	if (m_normals) delete m_normals;
-	if (m_uvs) delete m_uvs;
-}
+		// TODO: we can combine sub-meshes with the same material
+		// because all sub-meshes have the same matrix. We could
+		// sort the subBuffers according to the material and then
+		// combine adjacent subBuffers
 
-void __TreeCollision::genBuffers(ogl::VertexBuffer& vbo)
-{
-	// get the offset in floats and vertices
-	const unsigned vertexSize = vbo.floatSize();
-	const unsigned byteSize = vbo.byteSize();
-	const unsigned floatOffset = vbo.m_data.size();
-	const unsigned vertexOffset = floatOffset / vertexSize;
+		m_data.reserve(vertexCount * (3+3+2));
+		m_data.resize(vertexCount * (3+3+2));
+		for (int i = 0; i < vertexCount; ++i) {
+			memcpy(&m_data[i * (3+3+2) + 0], uvs[i], 2 * sizeof(float));
+			memcpy(&m_data[i * (3+3+2) + 2], normals[i], 3 * sizeof(float));
+			memcpy(&m_data[i * (3+3+2) + 5], vertices[i], 3 * sizeof(float));
+		}
 
-	NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+		m_indices.reserve(vertexCount);
+		for (unsigned i = 0; i < vertexCount; ++i)
+			m_indices.push_back(i);
 
-	// create a mesh from the collision
-	NewtonMesh* collisionMesh = NewtonMeshCreateFromCollision(collision);
-
-	switch (m_type) {
-	case SPHERE:
-		NewtonMeshApplySphericalMapping(collisionMesh, 0);
-		break;
-	case CYLINDER:
-	case CHAMFER_CYLINER:
-		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
-		//break;
-	case BOX:
-	default:
-		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);
-		break;
+		delete normals;
+		delete uvs;
 	}
 
-	//NewtonMeshCalculateVertexNormals(collisionMesh, 60.0f * 3.1416f/180.0f);
+	delete vertices;
 
+	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
+	this->create(collision, mass, m_freezeState, m_damping);
 
-	// allocate the vertex data
-	int vertexCount = NewtonMeshGetPointCount(collisionMesh);
+	NewtonReleaseCollision(world, collision);
+	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
+		NewtonReleaseCollision(world, *itr);
+}
 
-	vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
-	vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
+__ConvexAssembly::~__ConvexAssembly()
+{
+	if (m_mesh) NewtonMeshDestroy(m_mesh);
+	m_data.clear();
+	for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
+		delete *itr;
+	m_buffers.clear();
+	m_indices.clear();
+}
 
-	NewtonMeshGetVertexStreams(collisionMesh,
+void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
+{
+	switch (m_renderingType) {
+	case MESH_EXACT:
+	{
+		// get the offset in floats and vertices
+		const unsigned vertexSize = vbo.floatSize();
+		const unsigned byteSize = vbo.byteSize();
+		const unsigned floatOffset = vbo.m_data.size();
+		const unsigned vertexOffset = floatOffset / vertexSize;
+
+		NewtonMeshApplyBoxMapping(m_mesh, 0, 0, 0);
+		NewtonMeshCalculateVertexNormals(m_mesh, 45.0f * 3.1416f/180.0f);
+
+		// allocate the vertex data
+		int vertexCount = NewtonMeshGetPointCount(m_mesh);
+
+		vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
+		vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
+
+		NewtonMeshGetVertexStreams(m_mesh,
 			byteSize, &vbo.m_data[floatOffset + 2 + 3],
 			byteSize, &vbo.m_data[floatOffset + 2],
 			byteSize, &vbo.m_data[floatOffset],
 			byteSize, &vbo.m_data[floatOffset]);
 
-	//std::cout << "____" << std::endl;
-	//std::cout << vertexCount << std::endl;
+		// iterate over the submeshes and store the indices
+		void* const meshCookie = NewtonMeshBeginHandle(m_mesh);
+		for (int handle = NewtonMeshFirstMaterial(m_mesh, meshCookie);
+			handle != -1; handle = NewtonMeshNextMaterial(m_mesh, meshCookie, handle)) {
+
+			int materialID = NewtonMeshMaterialGetMaterial(m_mesh, meshCookie, handle);
+			Material* material = MaterialMgr::instance().fromID(materialID);
+
+			// create a new submesh
+			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
+			subBuffer->material = material ? material->name : m_material;
+			subBuffer->object = this;
+
+			subBuffer->dataCount = vertexCount;
+			subBuffer->dataOffset = vertexOffset;
+
+			// get the indices
+			subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(m_mesh, meshCookie, handle);
+			uint32_t* indices = new uint32_t[subBuffer->indexCount];
+			NewtonMeshMaterialGetIndexStream(m_mesh, meshCookie, handle, (int*)indices);
+			subBuffer->indexOffset = vbo.m_indices.size();
+
+			// copy the indices to the global list and add the offset
+			vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
+			for (unsigned i = 0; i < subBuffer->indexCount; ++i)
+				vbo.m_indices.push_back(vertexOffset + indices[i]);
+
+			delete indices;
+			vbo.m_buffers.push_back(subBuffer);
+		}
+		NewtonMeshEndHandle(m_mesh, meshCookie);
+		break;
+	}
+	case MESH_ASSEMBLY:
+	{
+		// TODO: we can combine sub-meshes with the same material
+		// because all sub-meshes have the same matrix. We could
+		// sort the collisions according to the shapeIDs and then
+		// combine adjacent sub-meshes
+
+		// foreach convex hull in the compound, create a mesh
+		NewtonCollisionInfoRecord info;
+		NewtonCollisionGetInfo(NewtonBodyGetCollision(m_body), &info);
+		if (info.m_collisionType != SERIALIZE_ID_COMPOUND)
+			return __RigidBody::genBuffers(vbo);
+
+		for (int i = 0; i < info.m_compoundCollision.m_chidrenCount; ++i) {
+
+			const unsigned vertexSize = vbo.floatSize();
+			const unsigned byteSize = vbo.byteSize();
+			const unsigned floatOffset = vbo.m_data.size();
+			const unsigned vertexOffset = floatOffset / vertexSize;
+
+			NewtonCollision* collision = info.m_compoundCollision.m_chidren[i];
+			NewtonMesh* collisionMesh = NewtonMeshCreateFromCollision(collision);
+			int shapeID = NewtonCollisionGetUserID(collision);
+			NewtonMeshApplyBoxMapping(collisionMesh, shapeID, shapeID, shapeID);
+
+			// allocate the vertex data
+			int vertexCount = NewtonMeshGetPointCount(collisionMesh);
+
+			vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
+			vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
+
+			NewtonMeshGetVertexStreams(collisionMesh,
+					byteSize, &vbo.m_data[floatOffset + 2 + 3],
+					byteSize, &vbo.m_data[floatOffset + 2],
+					byteSize, &vbo.m_data[floatOffset],
+					byteSize, &vbo.m_data[floatOffset]);
 
 
-	// iterate over the submeshes and store the indices
-	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
-	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
-			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
+			// iterate over the submeshes and store the indices
+			void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
+			for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
+					handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
 
-		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
-		//std::cout << "material " << material << std::endl;
-		//std::cout << "mesh " << material << std::endl;
+				int materialID = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
 
-		// create a new submesh
-		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-		subBuffer->material = "yellow";
-		subBuffer->object = this;
+				Material* material = MaterialMgr::instance().fromID(materialID);
 
-		subBuffer->dataCount = vertexCount;
-		subBuffer->dataOffset = vertexOffset;
+				// create a new submesh
+				ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
+				subBuffer->material = material ? material->name : m_material;
+				subBuffer->object = this;
 
-		// get the indices
-		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-		//std::cout << subBuffer->indexCount << std::endl;
-		uint32_t* indices = new uint32_t[subBuffer->indexCount];
-		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
-//std::cout << "indices " << subBuffer->indexCount << std::endl;
-		subBuffer->indexOffset = vbo.m_indices.size();
+				subBuffer->dataCount = vertexCount;
+				subBuffer->dataOffset = vertexOffset;
+
+				// get the indices
+				subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
+				uint32_t* indices = new uint32_t[subBuffer->indexCount];
+				NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
+				subBuffer->indexOffset = vbo.m_indices.size();
+
+				// copy the indices to the global list and add the offset
+				vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
+				for (unsigned i = 0; i < subBuffer->indexCount; ++i)
+					vbo.m_indices.push_back(vertexOffset + indices[i]);
+
+				delete indices;
+				vbo.m_buffers.push_back(subBuffer);
+			}
+			NewtonMeshEndHandle(collisionMesh, meshCookie);
+
+			NewtonMeshDestroy(collisionMesh);
+		}
+		break;
+	}
+	case ORIGINAL:
+	{
+		// get the offset in floats and vertices
+		const unsigned vertexSize = vbo.floatSize();
+		//const unsigned byteSize = vbo.byteSize();
+		const unsigned floatOffset = vbo.m_data.size();
+		const unsigned vertexOffset = floatOffset / vertexSize;
+
+		vbo.m_data.reserve(floatOffset + m_data.size());
+		vbo.m_data.resize(floatOffset + m_data.size());
+
+		memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
+
+		for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr) {
+			// todo align offsets
+			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
+			subBuffer->material = (*itr)->material;
+			subBuffer->object = (*itr)->object;
+
+			subBuffer->dataCount = (*itr)->dataCount;
+			subBuffer->dataOffset = (*itr)->dataOffset + vertexOffset;
+			subBuffer->indexCount = (*itr)->indexCount;
+			subBuffer->indexOffset = (*itr)->indexOffset + vbo.m_indices.size();
+
+			vbo.m_buffers.push_back(subBuffer);
+		}
 
 		// copy the indices to the global list and add the offset
-		vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-		for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-			vbo.m_indices.push_back(vertexOffset + indices[i]);
+		vbo.m_indices.reserve(vbo.m_indices.size() + m_indices.size());
+		for (unsigned i = 0; i < m_indices.size(); ++i)
+			vbo.m_indices.push_back(vertexOffset + m_indices[i]);
 
-		delete indices;
-		vbo.m_buffers.push_back(subBuffer);
+		break;
 	}
-	NewtonMeshEndHandle(collisionMesh, meshCookie);
-
-	NewtonMeshDestroy(collisionMesh);
-}
-
-bool __TreeCollision::contains(const NewtonBody* const body)
-{
-	return m_body == body;
-}
-
-bool __TreeCollision::contains(const Object& object)
-{
-	if (object.get() == this)
-		return true;
-	return false;
-}
-
-
-void __TreeCollision::render()
-{
-	if (NewtonBodyGetSleepState(m_body))
-		glColor3f(1.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 0.0f, 0.0f);
-	newton::showCollisionShape(getCollision(), m_matrix);
+	}
 }
 
 }
