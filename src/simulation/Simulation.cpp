@@ -184,8 +184,47 @@ void Simulation::init()
 		c->convexCastPlacement();
 	}
 
+	// rope
+	if (0)
+	{
+		RigidBody obj0, obj1;
+		const int linksCount = 15;
+		Vec3f size(1.0f, 0.05f, 0.15f);
+		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
+		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
+		Compound rope = Compound(new __Compound());
+		// create a long vertical rope with limits
+		for (int i = 0; i < linksCount; i ++) {
+			// create the a graphic character (use a visualObject as our body
+
+			//create the rigid body
+			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
+			rope->add(obj1);
+			float dampValue = 0.0f;
+			NewtonBodySetLinearDamping(obj1->m_body, dampValue);
+
+			dampValue = 0.1f;
+			Vec3f angularDamp(dampValue, dampValue, dampValue);
+			NewtonBodySetAngularDamping (obj1->m_body, &angularDamp[0]);
+
+			Vec3f pivot = location.getW();
+			pivot.y += (size.x - size.y) * 0.5f;
+
+			rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
+			obj0 = obj1;
+			location._42 -= (size.x - size.y);
+		}
+		Vec3f pivot = location.getW();
+		pivot.y += (size.x - size.y) * 0.5f;
+		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "rope");
+		rope->add(obj1);
+		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
+		add(rope);
+
+	}
+
 	// wagon with tires and hinges
-	//if (0)
+	if (1)
 	{
 		// hinge pinDir is z Axis
 
@@ -244,7 +283,7 @@ void Simulation::init()
 	}
 
 
-	setEnabled(false);
+	setEnabled(true);
 }
 
 void Simulation::clear()
@@ -366,7 +405,7 @@ Object Simulation::selectObject(int x, int y)
 	// Get the word coordinates at the viewport position, i.e.
 	// the the 3D position the mouse pointer is
 	Vec3f world = m_camera.pointer(x, y);
-	Vec3f origin = m_camera.m_position.xyz();
+	Vec3f origin = m_camera.m_position;
 
 	// Cast a ray from the camera position in the direction of the
 	// selected world position
@@ -392,8 +431,55 @@ void Simulation::mouseMove(int x, int y)
 		float angleY = (m_mouseAdapter.getY() - y) * 0.1f;
 
 		m_camera.rotate(angleX, Vec3f::yAxis());
-		m_camera.rotate(angleY, m_camera.m_strafe.xyz());
+		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT)) {
+		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+
+		/*
+			if (!m_objects.size()) {
+				Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
+				Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
+				add(obj);
+				std::cout << "sp: " << m_vertexBuffer.m_buffers.size() << std::endl;
+			} else if (m_objects.size() == 1) {
+				// set matrix
+				Mat4f matrix =
+						Mat4f::rotZ(15.0f * PI / 180.0f) *
+						Mat4f::rotX(-90.0f * PI / 180.0f) *
+						Mat4f::rotY(25.0f * PI / 180.0f) *
+						Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
+
+				Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
+				add(obj);
+				std::cout << "bx: " << m_vertexBuffer.m_buffers.size() << std::endl;
+			} else if (m_objects.size() == 2) {
+				m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
+				add(m_environment);
+				std::cout << "env: " << m_vertexBuffer.m_buffers.size() << std::endl;
+			} else {
+
+
+				if (m_selectedObject) {
+					// get euler angles
+
+					Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
+					angles *= 180.0f / PI;
+					std::cout << "angles == " << angles << std::endl;
+					// try to rotate anew, using the generated values
+
+					Mat4f matrix =
+							Mat4f::rotZ(angles.z * PI / 180.0f) *
+							Mat4f::rotX(angles.x * PI / 180.0f) *
+							Mat4f::rotY(angles.y * PI / 180.0f) *
+							Mat4f::translate(m_selectedObject->getMatrix().getW());
+					//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
+					m_selectedObject->setMatrix(matrix);
+
+				}
+
+			}
+		 */
+		/*
 		if (m_selectedObject) {
 			// TODO move object according to the correct world coordinates of the mouse
 			float dx = (x - m_mouseAdapter.getX()) * 0.05f;
@@ -401,10 +487,11 @@ void Simulation::mouseMove(int x, int y)
 			//std::cout << "delta " << dx << std::endl;
 			Mat4f matrix = m_selectedObject->getMatrix();
 			matrix.setW(matrix.getW() +
-					m_camera.m_strafe.xyz().normalized() * dx +
+					m_camera.m_strafe.normalized() * dx +
 					Vec3f::yAxis() * dy);
 			m_selectedObject->setMatrix(matrix);
 		}
+		*/
 	}
 
 	m_pointer = m_camera.pointer(x, y);
@@ -417,7 +504,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		setEnabled(true);
 		Vec3f view = m_camera.viewVector();
 
-		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position.xyz());
+		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position);
 		RigidBody obj;
 		static int counter = 0;
 		switch (counter++) {
@@ -448,98 +535,10 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		//obj->setVelocity(view * 10.0f);
 		obj->convexCastPlacement();
 		add(obj);
-	} else if (button == util::RIGHT && down) {
-		RigidBody obj0, obj1;
-		const int linksCount = 15;
-		Vec3f size(1.0f, 0.05f, 0.15f);
-		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
-		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
-		Compound rope = Compound(new __Compound());
-		// create a long vertical rope with limits
-		for (int i = 0; i < linksCount; i ++) {
-			// create the a graphic character (use a visualObject as our body
 
-			//create the rigid body
-			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
-			rope->add(obj1);
-			float dampValue = 0.0f;
-			NewtonBodySetLinearDamping(obj1->m_body, dampValue);
-
-			dampValue = 0.1f;
-			Vec3f angularDamp(dampValue, dampValue, dampValue);
-			NewtonBodySetAngularDamping (obj1->m_body, &angularDamp[0]);
-
-			Vec3f pivot = location.getW();
-			pivot.y += (size.x - size.y) * 0.5f;
-
-	#if 0
-			dFloat coneAngle = 15.0 * 3.141592f / 180.0f;
-			dFloat twistAngle = 5.0 * 3.141592f / 180.0f;
-			dMatrix pinAndPivot (GetIdentityMatrix());
-			pinAndPivot.m_front = location.m_front.Scale (-1.0f);
-			pinAndPivot.m_up = location.m_up;
-			pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
-			pinAndPivot.m_posit = pivot;
-			CustomConeLimitedBallAndSocket* joint;
-			joint = new CustomConeLimitedBallAndSocket(twistAngle, coneAngle, pinAndPivot, link1, link0);
-	#else
-			rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
-	#endif
-
-			obj0 = obj1;
-			location._42 -= (size.x - size.y);
-		}
-		Vec3f pivot = location.getW();
-		pivot.y += (size.x - size.y) * 0.5f;
-		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "rope");
-		rope->add(obj1);
-		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
-		add(rope);
+	} else if (button == util::RIGHT) {
+		newton::mousePick(m_world, Vec2f(x, y), down);
 	}
-	/*
-	if (!m_objects.size()) {
-		Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
-		Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
-		add(obj);
-		std::cout << "sp: " << m_vertexBuffer.m_buffers.size() << std::endl;
-	} else if (m_objects.size() == 1) {
-		// set matrix
-		Mat4f matrix =
-				Mat4f::rotZ(15.0f * PI / 180.0f) *
-				Mat4f::rotX(-90.0f * PI / 180.0f) *
-				Mat4f::rotY(25.0f * PI / 180.0f) *
-				Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
-
-		Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
-		add(obj);
-		std::cout << "bx: " << m_vertexBuffer.m_buffers.size() << std::endl;
-	} else if (m_objects.size() == 2) {
-		m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-		add(m_environment);
-		std::cout << "env: " << m_vertexBuffer.m_buffers.size() << std::endl;
-	} else {
-
-
-		if (m_selectedObject) {
-			// get euler angles
-
-			Vec3f angles = m_selectedObject->getMatrix().eulerAngles();
-			angles *= 180.0f / PI;
-			std::cout << "angles == " << angles << std::endl;
-			// try to rotate anew, using the generated values
-
-			Mat4f matrix =
-					Mat4f::rotZ(angles.z * PI / 180.0f) *
-					Mat4f::rotX(angles.x * PI / 180.0f) *
-					Mat4f::rotY(angles.y * PI / 180.0f) *
-					Mat4f::translate(m_selectedObject->getMatrix().getW());
-			//std::cout << matrix._11 << " " << matrix._22 << " " << matrix._33 << std::endl;
-			m_selectedObject->setMatrix(matrix);
-
-		}
-
-	}
-	*/
 }
 
 void Simulation::mouseDoubleClick(util::Button button, int x, int y)
@@ -576,6 +575,7 @@ void Simulation::update()
 {
 	float delta = m_clock.get();
 	m_clock.reset();
+	//newton::MousePick(m_world, Vec2f(m_mouseAdapter.getX(), m_mouseAdapter.getY()), m_mouseAdapter.isDown(util::RIGHT), 0.125f, 1.0f);
 
 	static float timeSlice = 0.0f;
 
@@ -598,7 +598,7 @@ void Simulation::update()
 
 void Simulation::applyMaterial(const std::string& material) {
 	const Material* const _mat = MaterialMgr::instance().get(material);
-
+	//TODO only switch shader/texture if necessary
 	if (_mat != NULL) {
 		const Material& mat = *_mat;
 		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
@@ -635,6 +635,16 @@ void Simulation::render()
 
 	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
 		m_vertexBuffer.bind();
+/*
+		const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
+						 0.0f, 0.5f, 0.0f, 0.0f,
+						 0.0f, 0.0f, 0.5f, 0.0f,
+						 0.5f, 0.5f, 0.5f, 1.0f);
+		const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
+		const Mat4f lightModelview;
+
+		const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
+*/
 
 		ogl::SubBuffers::iterator itr = m_vertexBuffer.m_buffers.begin();
 		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {

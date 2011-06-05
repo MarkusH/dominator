@@ -5,8 +5,8 @@
  *      Author: Markus Doellinger
  */
 
-#ifndef UTIL_HPP_
-#define UTIL_HPP_
+#ifndef NEWTON_UTIL_HPP_
+#define NEWTON_UTIL_HPP_
 
 #include <m3d/m3d.hpp>
 #include <Newton.h>
@@ -58,7 +58,19 @@ float getConvexCastPlacement(NewtonBody* body);
  */
 void showCollisionShape(const NewtonCollision* shape, const Mat4f& matrix);
 
+/**
+ * Picks the object under the mouse coordinates and drags it the the world
+ * position at the cursor.
+ *
+ * @param world The NewtonWorld
+ * @param mouse The mouse coordinates
+ * @param down  True, if the button is down, False otherwise
+ * @return      True, if in pick-mode, False otherwise
+ */
+bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down);
+
+
 
 }
 
-#endif /* UTIL_HPP_ */
+#endif /* NEWTON_UTIL_HPP_ */
