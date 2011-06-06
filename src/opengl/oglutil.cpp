@@ -1,11 +1,11 @@
 /*
- * util.cpp
+ * oglutil.cpp
  *
  *  Created on: Jun 5, 2011
  *      Author: Markus Doellinger
  */
 
-#include <opengl/util.hpp>
+#include <opengl/oglutil.hpp>
 #include <GL/glew.h>
 
 namespace ogl {

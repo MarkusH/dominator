@@ -5,11 +5,12 @@
  *      Author: Markus Doellinger
  */
 
+#include <opengl/util.hpp>
 #include <newton/util.hpp>
 #include <iostream>
 #include <dVector.h>
 #include <dMatrix.h>
-#include <opengl/util.hpp>
+
 
 namespace newton {
 
