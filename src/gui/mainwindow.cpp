@@ -165,7 +165,7 @@ void MainWindow::onClosePressed()
 
 void MainWindow::onSavePressed()
 {
-	if (m_filename == "" or QObject::sender() == m_saveas) {
+	if (m_filename == "" || QObject::sender() == m_saveas) {
 		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.tus)");
 	}
 	std::cout << m_filename.toStdString() << std::endl;
