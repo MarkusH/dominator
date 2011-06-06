@@ -564,12 +564,21 @@ void __ConvexHull::genBuffers(ogl::VertexBuffer& vbo)
 	vbo.m_buffers.push_back(subBuffer);
 }
 
+struct MeshEntry {
+	Lib3dsMesh* mesh;
+	int materialID;
+	MeshEntry() { }
+	MeshEntry(Lib3dsMesh* mesh, const char* material, int defaultMaterial) : mesh(mesh) {
+		materialID = material ? MaterialMgr::instance().getID(material) : defaultMaterial;
+	}
+	static bool compare(const MeshEntry& first, const MeshEntry& second) {
+		return first.materialID < second.materialID;
+	}
+};
 
 __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType, int freezeState, const Vec4f& damping)
 	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_renderingType(renderingType), m_mesh(NULL)
 {
-	//TODO: only create mesh if necessary (renderingtype == mesh_exact
-	// store original data with per-mesh material
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
 		return;
@@ -584,6 +593,18 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 
 	int vertexCount = numFaces*3;
 
+	// sort meshes by the material, this way we can combine several meshes
+	// to a single buffer
+	std::list<MeshEntry> sortedMeshes;
+	{
+		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
+			if (mesh->faces > 0) {
+				sortedMeshes.push_back(MeshEntry(mesh, mesh->faceL[0].material, defaultMaterial));
+			}
+		}
+		sortedMeshes.sort(MeshEntry::compare);
+	}
+
 	Lib3dsVector* vertices = new Lib3dsVector[vertexCount];
 	Lib3dsVector* normals = NULL;
 	Lib3dsTexel* uvs = NULL;
@@ -593,7 +614,8 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 	}
 
 	unsigned finishedFaces = 0;
-	unsigned vOffset = 0;
+	unsigned hull_vOffset = 0;
+	unsigned buffer_vOffset = 0;
 	Mat4f identity = Mat4f::identity();
 
 	std::vector<NewtonCollision*> collisions;
@@ -603,11 +625,15 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 		NewtonMeshBeginFace(m_mesh);
 	}
 
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-		unsigned vCount = 0;
-		int faceMaterial = defaultMaterial;
+	for (std::list<MeshEntry>::iterator itr = sortedMeshes.begin(); itr != sortedMeshes.end(); ++itr) {
+		Lib3dsMesh* mesh = itr->mesh;
+
+		unsigned hull_vCount = 0;
+		int faceMaterial = itr->materialID; //defaultMaterial;
+
 		if (m_renderingType == ORIGINAL)
 			lib3ds_mesh_calculate_normals(mesh, &normals[finishedFaces*3]);
+
 		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
 			Lib3dsFace* face = &mesh->faceL[cur_face];
 
@@ -617,31 +643,38 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 					memcpy(&uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
 			}
 
-			faceMaterial = face->material ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
-			if (m_renderingType == MESH_EXACT)
+			if (m_renderingType == MESH_EXACT) {
+				//faceMaterial = face->material ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
 				NewtonMeshAddFace(m_mesh, 3, vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
+			}
 
 			finishedFaces++;
 		}
-		vCount += mesh->faces * 3;
+		hull_vCount += mesh->faces * 3;
 
 		// create a new sub-buffer with the mesh material
 		if (m_renderingType == ORIGINAL) {
-			ogl::SubBuffer* buffer = new ogl::SubBuffer();
-			buffer->object = this;
-			Material* material = MaterialMgr::instance().fromID(faceMaterial);
-			buffer->material = material ? material->name : "";
+			std::list<MeshEntry>::iterator next = itr;
+			++next;
+			// only create it if the next mesh has another material, or this is the last mesh
+			// otherwise combine it with the next mesh
+			if (next == sortedMeshes.end() || next->materialID != faceMaterial) {
+				ogl::SubBuffer* buffer = new ogl::SubBuffer();
+				buffer->object = this;
+				Material* material = MaterialMgr::instance().fromID(faceMaterial);
+				buffer->material = material ? material->name : "";
 
-			buffer->dataCount = finishedFaces*3 - vOffset;
-			buffer->dataOffset = vOffset;
-			buffer->indexCount = buffer->dataCount;
-			buffer->indexOffset = buffer->dataOffset;
-
-			m_buffers.push_back(buffer);
+				buffer->dataCount = finishedFaces*3 - buffer_vOffset;
+				buffer->dataOffset = buffer_vOffset;
+				buffer->indexCount = buffer->dataCount;
+				buffer->indexOffset = buffer->dataOffset;
+				buffer_vOffset = finishedFaces*3;
+				m_buffers.push_back(buffer);
+			}
 		}
 
-		collisions.push_back(NewtonCreateConvexHull(world, vCount, vertices[vOffset], sizeof(Lib3dsVector), 0.002f, faceMaterial, identity[0]));
-		vOffset += vCount;
+		collisions.push_back(NewtonCreateConvexHull(world, hull_vCount, vertices[hull_vOffset], sizeof(Lib3dsVector), 0.002f, faceMaterial, identity[0]));
+		hull_vOffset += hull_vCount;
 	}
 	lib3ds_file_free(file);
 	if (m_renderingType == MESH_EXACT)
@@ -649,12 +682,6 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 
 	// create buffer data
 	if (m_renderingType == ORIGINAL) {
-
-		// TODO: we can combine sub-meshes with the same material
-		// because all sub-meshes have the same matrix. We could
-		// sort the subBuffers according to the material and then
-		// combine adjacent subBuffers
-
 		m_data.reserve(vertexCount * (3+3+2));
 		m_data.resize(vertexCount * (3+3+2));
 		for (int i = 0; i < vertexCount; ++i) {
@@ -664,7 +691,7 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 		}
 
 		m_indices.reserve(vertexCount);
-		for (unsigned i = 0; i < vertexCount; ++i)
+		for (int i = 0; i < vertexCount; ++i)
 			m_indices.push_back(i);
 
 		delete normals;
@@ -839,7 +866,6 @@ void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 		memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
 
 		for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr) {
-			// todo align offsets
 			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
 			subBuffer->material = (*itr)->material;
 			subBuffer->object = (*itr)->object;
