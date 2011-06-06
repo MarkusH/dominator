@@ -5,8 +5,8 @@
  *      Author: Markus Doellinger
  */
 
-#ifndef UTIL_HPP_
-#define UTIL_HPP_
+#ifndef NEWTON_UTIL_HPP_
+#define NEWTON_UTIL_HPP_
 
 #include <m3d/m3d.hpp>
 #include <Newton.h>
@@ -40,6 +40,17 @@ NewtonBody* getRayCastBody(const NewtonWorld* world, const Vec3f& origin, const 
 float getVerticalPosition(const NewtonWorld* world, float x, float z);
 
 /**
+ * Does a convex cast of the body and returns the vertical position of
+ * the body so that it just collides with the ground. This function takes
+ * into consideration all collision shapes and bodies of the given world.
+ * This also works with compound collisions.
+ *
+ * @param body The body to use for the convex cast
+ * @return     The new vertical position of the body
+ */
+float getConvexCastPlacement(NewtonBody* body);
+
+/**
  * Renders the specified collision shape, transformed with the given matrix.
  *
  * @param shape  The collision shape to render
@@ -47,7 +58,19 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z);
  */
 void showCollisionShape(const NewtonCollision* shape, const Mat4f& matrix);
 
+/**
+ * Picks the object under the mouse coordinates and drags it the the world
+ * position at the cursor.
+ *
+ * @param world The NewtonWorld
+ * @param mouse The mouse coordinates
+ * @param down  True, if the button is down, False otherwise
+ * @return      True, if in pick-mode, False otherwise
+ */
+bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down);
+
+
 
 }
 
-#endif /* UTIL_HPP_ */
+#endif /* NEWTON_UTIL_HPP_ */

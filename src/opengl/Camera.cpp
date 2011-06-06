@@ -13,26 +13,34 @@ namespace ogl {
 
 Camera::Camera()
 {
-	m_position = Vec4f(0.0f, 0.0f,  0.0f, 1.0f);
-	m_eye 	   = Vec4f(0.0f, 0.0f, -1.0f, 1.0f);
-	m_up       = Vec4f(0.0f, 1.0f,  0.0f, 1.0f);
-	m_strafe   = Vec4f(0.0f, 0.0f,  0.0f, 1.0f);
+	m_position = Vec3f(0.0f, 0.0f,  0.0f);
+	m_eye 	   = Vec3f(0.0f, 0.0f, -1.0f);
+	m_up       = Vec3f(0.0f, 1.0f,  0.0f);
+	m_strafe   = Vec3f(0.0f, 0.0f,  0.0f);
+	grabMatrix();
 }
 
 Camera::~Camera()
 {
 }
 
+void Camera::grabMatrix()
+{
+	m_matrix = Mat4f::lookAt(m_position, m_eye, m_up);
+	m_inverse = m_matrix.inverse();
+}
+
 void Camera::positionCamera(Vec3f position, Vec3f view, Vec3f up)
 {
-	m_position = Vec4f(position);
-	m_eye      = Vec4f(position + view);
-	m_up       = Vec4f(up);
+	m_position = position;
+	m_eye      = position + view;
+	m_up       = up;
+	grabMatrix();
 }
 
 void Camera::move(float amount)
 {
-	Vec4f view = m_eye - m_position;
+	Vec3f view = m_eye - m_position;
 	view *= amount / view.len();
 
 	//if (view.y < 0.0f && m_position.y <= 0.0f)
@@ -40,6 +48,7 @@ void Camera::move(float amount)
 
 	m_position += view;
 	m_eye += view;
+	grabMatrix();
 }
 
 void Camera::strafe(float amount)
@@ -49,6 +58,7 @@ void Camera::strafe(float amount)
 
 	m_eye.x += m_strafe.x * amount;
 	m_eye.z += m_strafe.z * amount;
+	grabMatrix();
 }
 
 void Camera::rotate(float angle, Vec3f axis)
@@ -69,6 +79,7 @@ void Camera::rotate(float angle, Vec3f axis)
 	m_eye.x = m_position.x + updated.b;
 	m_eye.y = m_position.y + updated.c;
 	m_eye.z = m_position.z + updated.d;
+	grabMatrix();
 }
 
 void Camera::update()
@@ -84,14 +95,11 @@ void Camera::apply()
 	gluLookAt(m_position.x, m_position.y, m_position.z,
 				   m_eye.x,	     m_eye.y,      m_eye.z,
 				    m_up.x,       m_up.y,       m_up.z);
-
-	m_matrix = Mat4f::modelview();
 }
 
 Vec3f Camera::viewVector() const
 {
-	Vec4f v = (m_eye - m_position).normalized();
-	return v.xyz();
+	return (m_eye - m_position).normalized();
 };
 
 Vec3f Camera::pointer() const

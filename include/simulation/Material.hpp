@@ -52,7 +52,7 @@ struct Material {
 	Material(const Material& m);
 
 	void load(rapidxml::xml_node<>* n);
-	//void save(XMLNode) const;
+	void save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const;
 };
 
 /**
@@ -82,7 +82,7 @@ struct MaterialPair {
 	MaterialPair(const MaterialPair& p);
 
 	void load(rapidxml::xml_node<>* n);
-	//void save(XMLNode) const;
+	void save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const;
 };
 
 /**
@@ -226,6 +226,10 @@ public:
 	void processContact(const NewtonJoint* contactJoint,
 						dFloat timestep,
 						int threadIndex);
+
+	static void	GenericContactCallback(const NewtonJoint* contactJoint,
+			dFloat timestep,
+			int threadIndex);
 };
 
 }

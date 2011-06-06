@@ -43,32 +43,31 @@ Body::~Body()
 		NewtonDestroyBody(NewtonBodyGetWorld(m_body), m_body);
 }
 
-NewtonBody* Body::create(NewtonCollision* collision, float mass)
+NewtonBody* Body::create(NewtonCollision* collision, float mass, int freezeState, const Vec4f& damping)
 {
 	Vec4f minBox, maxBox;
 	Vec4f origin, inertia;
 
-	NewtonBody* body = NewtonCreateBody(Simulation::instance().getWorld(),
-			collision, this->m_matrix[0]);
+	m_body = NewtonCreateBody(Simulation::instance().getWorld(), collision, this->m_matrix[0]);
 
-	NewtonBodySetDestructorCallback(body, Body::__destroyBodyCallback);
-
-	NewtonBodySetUserData(body, this);
-	NewtonBodySetMatrix(body, this->m_matrix[0]);
-	NewtonConvexCollisionCalculateInertialMatrix(collision,
-			&inertia[0], &origin[0]);
+	NewtonBodySetUserData(m_body, this);
+	NewtonBodySetMatrix(m_body, this->m_matrix[0]);
+	NewtonConvexCollisionCalculateInertialMatrix(collision, &inertia[0], &origin[0]);
 
 	if (mass != 0.0f)
-		NewtonBodySetMassMatrix(body, mass, mass * inertia.x, mass * inertia.y, mass * inertia.z);
+		NewtonBodySetMassMatrix(m_body, mass, mass * inertia.x, mass * inertia.y, mass * inertia.z);
 
-	NewtonBodySetCentreOfMass(body, &origin[0]);
+	NewtonBodySetCentreOfMass(m_body, &origin[0]);
 
-	NewtonBodySetForceAndTorqueCallback(body, Body::__applyForceAndTorqueCallback);
+	NewtonBodySetForceAndTorqueCallback(m_body, Body::__applyForceAndTorqueCallback);
+	NewtonBodySetTransformCallback(m_body, Body::__setTransformCallback);
+	NewtonBodySetDestructorCallback(m_body, Body::__destroyBodyCallback);
 
-	NewtonBodySetTransformCallback(body, Body::__setTransformCallback);
+	NewtonBodySetFreezeState(m_body, freezeState);
+	NewtonBodySetLinearDamping(m_body, damping.w);
+	NewtonBodySetAngularDamping(m_body, &damping[0]);
 
-	m_body = body;
-	return body;
+	return m_body;
 }
 
 void Body::__destroyBodyCallback(const NewtonBody* body)

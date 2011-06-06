@@ -35,11 +35,13 @@ public:
 	/**
 	 * Creates a new NewtonBody and assigns it to this object.
 	 *
-	 * @param collision The collision of this body
-	 * @param mass		The mass of this body
-	 * @return			The handle to the NewtonBody
+	 * @param collision   The collision of this body
+	 * @param mass        The mass of this body
+	 * @param freezeState 1, if the body should be frozen, 0 otherwise
+	 * @param damping     The damping coefficients, x,y,z = angular, w = linear damping
+	 * @return            The handle to the NewtonBody
 	 */
-	NewtonBody* create(NewtonCollision* collision, float mass);
+	NewtonBody* create(NewtonCollision* collision, float mass, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	// TODO: lets see if we need member functions to propagate the events to child classes
 	//virtual void destroyBodyCallback(const NewtonBody* body);
@@ -60,7 +62,13 @@ public:
 	 *
 	 * @param matrix The new matrix
 	 */
-	void setMatrix(const Mat4f& matrix);
+	virtual void setMatrix(const Mat4f& matrix);
+
+	/** @param state The new freeze state */
+	virtual void setFreezeState(int state);
+
+	/** @return The freeze state of the body */
+	virtual int getFreezeState();
 
 	/**
 	 * Sets the velocity of this body. Note that m_body has
@@ -68,7 +76,7 @@ public:
 	 *
 	 * @param vel The new velocity of the body
 	 */
-	void setVelocity(Vec3f vel) const;
+	void setVelocity(const Vec3f& vel) const;
 
 	/** The body handle */
 	NewtonBody* m_body;
@@ -98,9 +106,19 @@ inline void Body::setMatrix(const Mat4f& matrix)
 	NewtonBodySetMatrix(m_body, matrix[0]);
 }
 
-inline void Body::setVelocity(Vec3f vel) const
+inline void Body::setVelocity(const Vec3f& vel) const
 {
 	NewtonBodySetVelocity(m_body, &vel[0]);
+}
+
+inline void Body::setFreezeState(int state)
+{
+	NewtonBodySetFreezeState(m_body, state);
+}
+
+inline int Body::getFreezeState()
+{
+	return NewtonBodyGetFreezeState(m_body);
 }
 
 }

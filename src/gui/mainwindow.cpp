@@ -18,7 +18,8 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-MainWindow::MainWindow(QApplication *app) {
+MainWindow::MainWindow(QApplication *app)
+{
 
 	QPixmap pixmap("data/splash.png");
 	QSplashScreen splash(pixmap);
@@ -71,18 +72,16 @@ MainWindow::MainWindow(QApplication *app) {
 	splash.finish(this);
 }
 
-void MainWindow::OnClosePressed() {
-	QMessageBox msgBox;
-	msgBox.setText("Do you want to exit DOMINATOR");
-	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-	msgBox.setDefaultButton(QMessageBox::No);
-	int ret = msgBox.exec();
-	if (ret == QMessageBox::Yes) {
-		this->close();
-	}
+void MainWindow::initialize()
+{
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+	m_filename = "";
+
+	this->setWindowTitle("TUStudios - DOMINATOR");
 }
 
-void MainWindow::createMenu() {
+void MainWindow::createMenu()
+{
 	m_menuFile = menuBar()->addMenu("&File");
 
 	m_new = new QAction("&New", this);
@@ -91,21 +90,24 @@ void MainWindow::createMenu() {
 
 	m_open = new QAction("&Open", this);
 	m_open->setShortcuts(QKeySequence::Open);
+	connect(m_open, SIGNAL(triggered()), this, SLOT(onOpenPressed()));
 	m_menuFile->addAction(m_open);
 
 	m_save = new QAction("&Save", this);
 	m_save->setShortcuts(QKeySequence::Save);
+	connect(m_save, SIGNAL(triggered()), this, SLOT(onSavePressed()));
 	m_menuFile->addAction(m_save);
 
 	m_saveas = new QAction("Save &As", this);
 	m_saveas->setShortcuts(QKeySequence::SaveAs);
+	connect(m_saveas, SIGNAL(triggered()), this, SLOT(onSavePressed()));
 	m_menuFile->addAction(m_saveas);
 
 	m_menuFile->addSeparator();
 
 	m_exit = new QAction("E&xit", this);
 	m_exit->setShortcuts(QKeySequence::Quit);
-	connect(m_exit, SIGNAL(triggered()), this, SLOT(OnClosePressed()));
+	connect(m_exit, SIGNAL(triggered()), this, SLOT(onClosePressed()));
 	m_menuFile->addAction(m_exit);
 
 	m_menuHelp = menuBar()->addMenu("&Help");
@@ -118,7 +120,8 @@ void MainWindow::createMenu() {
 	m_menuHelp->addAction(m_info);
 }
 
-void MainWindow::createStatusBar() {
+void MainWindow::createStatusBar()
+{
 	m_framesPerSec = new QLabel("nA");
 	m_framesPerSec->setMinimumSize(m_framesPerSec->sizeHint());
 	m_framesPerSec->setAlignment(Qt::AlignLeft);
@@ -138,16 +141,48 @@ void MainWindow::createStatusBar() {
 	statusBar()->addWidget(m_currentFilename, 2);
 }
 
-void MainWindow::updateFramesPerSecond(int frames) {
+void MainWindow::updateFramesPerSecond(int frames)
+{
 	m_framesPerSec->setText(QString("%1 fps").arg(frames));
 }
 
-void MainWindow::updateObjectsCount(int count) {
+void MainWindow::updateObjectsCount(int count)
+{
 	m_objectsCount->setText(QString("%1").arg(count));
 }
 
-void MainWindow::initialize() {
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+void MainWindow::onClosePressed()
+{
+	QMessageBox msgBox;
+	msgBox.setText("Do you want to exit DOMINATOR");
+	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	msgBox.setDefaultButton(QMessageBox::No);
+	int ret = msgBox.exec();
+	if (ret == QMessageBox::Yes) {
+		this->close();
+	}
+}
 
-	this->setWindowTitle("TUStudios - DOMINATOR");
+void MainWindow::onSavePressed()
+{
+	if (m_filename == "" || QObject::sender() == m_saveas) {
+		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.tus)");
+	}
+	std::cout << m_filename.toStdString() << std::endl;
+	m_currentFilename->setText(m_filename);
+	m_renderWindow->save(m_filename.toStdString());
+}
+
+void MainWindow::onOpenPressed()
+{
+	QFileDialog dialog(this);
+	dialog.setAcceptMode(QFileDialog::AcceptOpen);
+	dialog.setFileMode(QFileDialog::ExistingFile);
+	dialog.setFilter("TUStudios Dominator (*.tus)");
+	if (dialog.exec()) {
+		m_filename = dialog.selectedFiles().first();
+		std::cout << m_filename.toStdString() << std::endl;
+		m_currentFilename->setText(m_filename);
+		m_renderWindow->open(m_filename.toStdString());
+	}
 }

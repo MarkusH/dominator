@@ -17,6 +17,7 @@
 #else
 #include <stdint.h>
 #endif
+#include <iostream>
 
 namespace ogl {
 
@@ -48,6 +49,10 @@ struct SubBuffer {
 		indexOffset = indexCount = 0;
 		dataOffset = dataCount = 0;
 		object = NULL;
+	}
+
+	static bool compare(const SubBuffer* const first, const SubBuffer* const second) {
+		return first->material < second->material;
 	}
 };
 

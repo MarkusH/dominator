@@ -16,6 +16,7 @@
 #include <QtGui/QMenuBar>
 #include <QtGui/QStatusBar>
 #include <QtGui/QAction>
+#include <QtGui/QFileDialog>
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
 
@@ -28,14 +29,16 @@ public:
 	MainWindow(QApplication *app);
 
 private slots:
-	void OnClosePressed();
 	void updateFramesPerSecond(int frames);
 	void updateObjectsCount(int count);
+	void onClosePressed();
+	void onSavePressed();
+	void onOpenPressed();
 
 private:
+	void initialize();
 	void createMenu();
 	void createStatusBar();
-	void initialize();
 
 	Render *m_renderWindow;
 
@@ -59,6 +62,8 @@ private:
 	QLabel *m_framesPerSec;
 	QLabel *m_objectsCount;
 	QLabel *m_currentFilename;
+
+	QString m_filename;
 };
 
 #endif /* MAINWINDOW_HPP_ */

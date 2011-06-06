@@ -7,8 +7,8 @@
 #ifndef RENDER_RENDER_HPP_
 #define RENDER_RENDER_HPP_
 
+#include <GL/glew.h>
 #include <QtCore/QTimer>
-#include <render/model.hpp>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 #include <opengl/Shader.hpp>
@@ -26,6 +26,12 @@ public slots:
 	void renderSize(char axis, float size);
 	void renderLocation(char axis, float position);
 	void renderRotation(float x, float y, float z);
+
+	void save(const std::string& fileName);
+	void open(const std::string& fileName);
+	bool isModified() {
+		return m_modified;
+	}
 
 protected:
 	virtual void initializeGL();
@@ -45,6 +51,7 @@ private:
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;
 	util::QtKeyAdapter m_keyAdapter;
+	bool m_modified;
 
 signals:
 	void framesPerSecondChanged(int);
