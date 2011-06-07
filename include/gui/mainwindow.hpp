@@ -20,7 +20,6 @@
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
 
-
 class Render;
 
 class MainWindow: public QMainWindow {
@@ -31,10 +30,14 @@ public:
 private slots:
 	void updateFramesPerSecond(int frames);
 	void updateObjectsCount(int count);
+	//File
 	void onNewPressed();
 	void onClosePressed();
 	void onSavePressed();
 	void onOpenPressed();
+	//Simulation
+	void onSimulationControlsPressed();
+	//Help
 	void onHelpPressed();
 	void onAboutPressed();
 
@@ -52,6 +55,10 @@ private:
 	QAction* m_open;
 	QAction* m_exit;
 
+	QMenu* m_menuSimulation;
+	QAction* m_play;
+	QAction* m_stop;
+
 	QMenu* m_menuHelp;
 	QAction* m_help;
 	QAction* m_about;
@@ -64,6 +71,7 @@ private:
 
 	QLabel* m_framesPerSec;
 	QLabel* m_objectsCount;
+	QLabel* m_simulationStatus;
 	QLabel* m_currentFilename;
 
 	QString m_filename;

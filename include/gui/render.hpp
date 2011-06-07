@@ -25,9 +25,8 @@ public:
 	void init();
 	void save(const std::string& fileName);
 	void open(const std::string& fileName);
-	bool isModified() {
-		return m_modified;
-	}
+	void controlSimulation(const bool status);
+	bool isModified();
 
 public slots:
 	void renderSize(char axis, float size);
@@ -60,5 +59,10 @@ signals:
 	void objectSelected(const m3d::Mat4f*);
 	void objectSelected(bool);
 };
+
+inline bool Render::isModified()
+{
+	return m_modified;
+}
 
 #endif /* RENDER_RENDER_HPP_ */

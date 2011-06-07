@@ -163,6 +163,7 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 void Render::init()
 {
 	sim::Simulation::instance().init();
+	sim::Simulation::instance().setEnabled(false);
 }
 
 void Render::save(const std::string& fileName)
@@ -175,6 +176,11 @@ void Render::open(const std::string& fileName)
 {
 	sim::Simulation::instance().load(fileName);
 	m_modified = false;
+}
+
+void Render::controlSimulation(const bool status)
+{
+	sim::Simulation::instance().setEnabled(status);
 }
 
 void Render::renderSize(char axis, float size)

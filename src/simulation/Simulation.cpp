@@ -284,7 +284,7 @@ void Simulation::init()
 	}
 
 
-	setEnabled(true);
+//	setEnabled(true);
 }
 
 void Simulation::clear()
@@ -502,7 +502,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
 	m_pointer = m_camera.pointer(x, y);
 	if (button == util::MIDDLE && down) {
-		setEnabled(true);
+		//setEnabled(true);
 		Vec3f view = m_camera.viewVector();
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position);

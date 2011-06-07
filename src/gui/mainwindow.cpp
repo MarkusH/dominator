@@ -83,6 +83,7 @@ void MainWindow::initialize()
 
 void MainWindow::createMenu()
 {
+	// File
 	m_menuFile = menuBar()->addMenu("&File");
 
 	m_new = new QAction("&New", this);
@@ -112,6 +113,22 @@ void MainWindow::createMenu()
 	connect(m_exit, SIGNAL(triggered()), this, SLOT(onClosePressed()));
 	m_menuFile->addAction(m_exit);
 
+	// Simulation
+	m_menuSimulation = menuBar()->addMenu("&Simulation");
+
+	m_play = new QAction("&Play", this);
+	m_play->setEnabled(true);
+	m_play->setShortcut(Qt::Key_F9);
+	connect(m_play, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_play);
+
+	m_stop = new QAction("&Stop", this);
+	m_stop->setEnabled(false);
+	m_stop->setShortcut(Qt::Key_F9);
+	connect(m_stop, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_stop);
+
+	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
 
 	m_help = new QAction("&Help", this);
@@ -138,6 +155,11 @@ void MainWindow::createStatusBar()
 	m_objectsCount->setAlignment(Qt::AlignLeft);
 	m_objectsCount->setToolTip("There is 1 object in the world");
 	statusBar()->addWidget(m_objectsCount, 2);
+
+	m_simulationStatus = new QLabel("");
+	m_simulationStatus->setMinimumSize(m_simulationStatus->sizeHint());
+	m_simulationStatus->setAlignment(Qt::AlignLeft);
+	statusBar()->addWidget(m_simulationStatus, 2);
 
 	m_currentFilename = new QLabel("unsaved document");
 	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
@@ -196,6 +218,23 @@ void MainWindow::onOpenPressed()
 		m_currentFilename->setText(m_filename);
 		m_renderWindow->open(m_filename.toStdString());
 	}
+}
+
+void MainWindow::onSimulationControlsPressed()
+{
+	bool set_active;
+	if (QObject::sender() == m_play) {
+		set_active = true;
+		m_simulationStatus->setText("Simulation started");
+	} else if (QObject::sender() == m_stop) {
+		set_active = false;
+		m_simulationStatus->setText("Simulation stopped");
+	} else {
+		return;
+	}
+	m_play->setEnabled(!set_active);
+	m_stop->setEnabled(set_active);
+	m_renderWindow->controlSimulation(set_active);
 }
 
 void MainWindow::onHelpPressed()
