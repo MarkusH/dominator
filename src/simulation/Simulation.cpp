@@ -13,6 +13,7 @@
 #include <opengl/Shader.hpp>
 #include <iostream>
 #include <newton/util.hpp>
+#include <simulation/Domino.hpp>
 
 namespace sim {
 
@@ -504,8 +505,9 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	if (button == util::MIDDLE && down) {
 		setEnabled(true);
 		Vec3f view = m_camera.viewVector();
-
+/*
 		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position);
+
 		RigidBody obj;
 		static int counter = 0;
 		switch (counter++) {
@@ -536,7 +538,11 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		//obj->setVelocity(view * 10.0f);
 		obj->convexCastPlacement();
 		add(obj);
+		*/
 
+		Mat4f matrix(Vec3f::yAxis(), view, m_pointer);
+		Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "yellow");
+		add(domino);
 	} else if (button == util::RIGHT) {
 		newton::mousePick(m_world, Vec2f(x, y), down);
 	}

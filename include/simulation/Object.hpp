@@ -40,7 +40,21 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE, CYLINDER, CAPSULE, CONE, CHAMFER_CYLINER, CONVEX_HULL, CONVEX_ASSEMBLY, COMPOUND, TREE_COLLISION } Type;
+	typedef enum {
+		DOMINO_SMALL = 0,
+		DOMINO_MIDDLE,
+		DOMINO_LARGE,
+		BOX,
+		SPHERE,
+		CYLINDER,
+		CAPSULE,
+		CONE,
+		CHAMFER_CYLINER,
+		CONVEX_HULL,
+		CONVEX_ASSEMBLY,
+		COMPOUND,
+		TREE_COLLISION
+	} Type;
 
 protected:
 	Type m_type;
