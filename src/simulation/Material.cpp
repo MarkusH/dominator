@@ -118,7 +118,7 @@ void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* d
 
 MaterialPair::MaterialPair()
 {
-	id0 = id1 = 0;
+	mat0 = mat1 = 0;
 	elasticity = 0.4f;
 	staticFriction = 0.9f;
 	kineticFriction = 0.5f;
@@ -126,8 +126,8 @@ MaterialPair::MaterialPair()
 }
 
 MaterialPair::MaterialPair(const MaterialPair& p)
-	: id0(p.id0),
-	  id1(p.id1),
+	: mat0(p.mat0),
+	  mat1(p.mat1),
 	  elasticity(p.elasticity),
 	  staticFriction(p.staticFriction),
 	  kineticFriction(p.kineticFriction),
@@ -143,8 +143,8 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 	MaterialMgr& m = MaterialMgr::instance();
 	for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
 		std::string attribute = attr->name();
-		if( attribute == "mat0" )			id0 = m.getID(attr->value());
-		if( attribute == "mat1" )			id1 = m.getID(attr->value());
+		if( attribute == "mat0" )			mat0 = m.getID(attr->value());
+		if( attribute == "mat1" )			mat1 = m.getID(attr->value());
 		if( attribute == "elasticity" )		elasticity = atof(attr->value());
 		if( attribute == "staticFriction" )	staticFriction = atof(attr->value());
 		if( attribute == "kineticFriction")	kineticFriction = atof(attr->value());
@@ -164,27 +164,27 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	materials->append_node(node);
 
 	// allocate string for mat0 and create attribute
-	if (m.fromID(id0) != NULL) {
-		const char* pId0 = doc->allocate_string(m.fromID(id0)->name.c_str());
-		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
-		node->append_attribute(attrId0);
+	if (m.fromID(mat0) != NULL) {
+		const char* pMat0 = doc->allocate_string(m.fromID(mat0)->name.c_str());
+		xml_attribute<>* attrMat0 = doc->allocate_attribute("mat0", pMat0);
+		node->append_attribute(attrMat0);
 	}
 	else {
-		const char* pId0 = doc->allocate_string("");
-		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
-		node->append_attribute(attrId0);
+		const char* pMat0 = doc->allocate_string("");
+		xml_attribute<>* attrMat0 = doc->allocate_attribute("mat0", pMat0);
+		node->append_attribute(attrMat0);
 	}
 
 	// allocate string for mat1 and create attribute
-	if (m.fromID(id1) != NULL) {
-		const char* pId1 = doc->allocate_string(m.fromID(id1)->name.c_str());
-		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
-		node->append_attribute(attrId1);
+	if (m.fromID(mat1) != NULL) {
+		const char* pMat1 = doc->allocate_string(m.fromID(mat1)->name.c_str());
+		xml_attribute<>* attrMat1 = doc->allocate_attribute("mat1", pMat1);
+		node->append_attribute(attrMat1);
 	}
 	else {
-		const char* pId1 = doc->allocate_string("");
-		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
-		node->append_attribute(attrId1);
+		const char* pMat1 = doc->allocate_string("");
+		xml_attribute<>* attrMat1 = doc->allocate_attribute("mat1", pMat1);
+		node->append_attribute(attrMat1);
 	}
 
 
@@ -329,15 +329,15 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 										float softness)
 {
 	MaterialPair pair;
-	pair.id0 = getID(mat0);
-	pair.id1 = getID(mat1);
+	pair.mat0 = getID(mat0);
+	pair.mat1 = getID(mat1);
 	pair.elasticity = elasticity;
 	pair.staticFriction = staticFriction;
 	pair.kineticFriction = kineticFriction;
 	pair.softness = softness;
-	m_pairs[std::make_pair(pair.id0, pair.id1)] = pair;
+	m_pairs[std::make_pair(pair.mat0, pair.mat1)] = pair;
 
-	return std::make_pair(pair.id0, pair.id1);
+	return std::make_pair(pair.mat0, pair.mat1);
 }
 
 
@@ -368,7 +368,7 @@ bool MaterialMgr::load(const char* fileName)
 			if(name == "pair") {
 				MaterialPair p;
 				p.load(node);
-				m_pairs[std::make_pair(p.id0, p.id1)] = p;
+				m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
 			}
 		}
 	
@@ -381,7 +381,7 @@ bool MaterialMgr::load(const char* fileName)
 		// foreach pair tag
 			// MaterialPair pair;
 			// pair.load(elem);
-			// m_pairs[std::make_pair(pair.id0, pair.id1)] = pair;
+			// m_pairs[std::make_pair(pair.mat0, pair.mat1)] = pair;
 
 		return true;
 	}
@@ -436,16 +436,16 @@ bool MaterialMgr::save(const char* fileName)
 }
 
 
-MaterialPair& MaterialMgr::getPair(int id0, int id1)
+MaterialPair& MaterialMgr::getPair(int mat0, int mat1)
 {
-	if (id0 > id1) {
-		int tmp = id0;
-		id0 = id1;
-		id1 = tmp;
+	if (mat0 > mat1) {
+		int tmp = mat0;
+		mat0 = mat1;
+		mat1 = tmp;
 	}
 	// search for interaction
 	std::map<std::pair<int, int>, MaterialPair>::iterator it;
-	it = m_pairs.find(std::make_pair(id0, id1));
+	it = m_pairs.find(std::make_pair(mat0, mat1));
 
 	if (it == m_pairs.end())
 		// return default pair
@@ -458,7 +458,7 @@ MaterialPair& MaterialMgr::getPair(int id0, int id1)
 
 void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep, int threadIndex)
 {
-	int id0, id1;
+	int mat0, mat1;
 
 	// get the contact material
 	NewtonMaterial* material;
@@ -474,21 +474,21 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		material = NewtonContactGetMaterial(contact);
 
 		// get the first id from the body
-		id0 = NewtonMaterialGetBodyCollisionID(material, body0);
-		if (id0 == 0)
-			id0	= NewtonMaterialGetContactFaceAttribute(material);
+		mat0 = NewtonMaterialGetBodyCollisionID(material, body0);
+		if (mat0 == 0)
+			mat0 = NewtonMaterialGetContactFaceAttribute(material);
 
 		// get the second id
-		id1 = NewtonMaterialGetBodyCollisionID(material, body1);
-		if (id1 == 0)
-			id1	= NewtonMaterialGetContactFaceAttribute(material);
+		mat1 = NewtonMaterialGetBodyCollisionID(material, body1);
+		if (mat1 == 0)
+			mat1 = NewtonMaterialGetContactFaceAttribute(material);
 
 		// get the pair for the materials, or the default pair
-		MaterialPair& pair = getPair(id0, id1);
+		MaterialPair& pair = getPair(mat0, mat1);
 
-		//if (id0 > 0 && id1 > 0 && (id0 < 200 || id1 < 200))
-		//	if ((fromID(id0) && fromID(id0)->name == "wood_matt") || (fromID(id1) && fromID(id1)->name == "wood_matt"))
-		//std::cout << "pair " << id0 << ", " << id1 << std::endl;
+		//if (mat0 > 0 && mat1 > 0 && (mat0 < 200 || mat1 < 200))
+		//	if ((fromID(mat0) && fromID(mat0)->name == "wood_matt") || (fromID(mat1) && fromID(mat1)->name == "wood_matt"))
+		//std::cout << "pair " << mat0 << ", " << mat1 << std::endl;
 
 		// set the material properties for this contact
 		NewtonMaterialSetContactElasticity(material, pair.elasticity);
