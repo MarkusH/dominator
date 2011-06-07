@@ -8,6 +8,7 @@
 
 #include <gui/mainwindow.hpp>
 #include <gui/render.hpp>
+#include <gui/dialogs.hpp>
 #include <QtGui/QPixmap>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
@@ -21,7 +22,7 @@
 MainWindow::MainWindow(QApplication *app)
 {
 
-	QPixmap pixmap("data/splash.png");
+	QPixmap pixmap = QPixmap("data/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.show();
 	app->processEvents();
@@ -86,6 +87,7 @@ void MainWindow::createMenu()
 
 	m_new = new QAction("&New", this);
 	m_new->setShortcuts(QKeySequence::New);
+	connect(m_new, SIGNAL(triggered()), this, SLOT(onNewPressed()));
 	m_menuFile->addAction(m_new);
 
 	m_open = new QAction("&Open", this);
@@ -114,10 +116,13 @@ void MainWindow::createMenu()
 
 	m_help = new QAction("&Help", this);
 	m_help->setShortcuts(QKeySequence::HelpContents);
+	connect(m_help, SIGNAL(triggered()), this, SLOT(onHelpPressed()));
 	m_menuHelp->addAction(m_help);
 
-	m_info = new QAction("&Info", this);
-	m_menuHelp->addAction(m_info);
+	m_about = new QAction("&Info", this);
+	m_about->setShortcut(Qt::ALT + Qt::Key_F1);
+	connect(m_about, SIGNAL(triggered()), this, SLOT(onAboutPressed()));
+	m_menuHelp->addAction(m_about);
 }
 
 void MainWindow::createStatusBar()
@@ -149,6 +154,12 @@ void MainWindow::updateFramesPerSecond(int frames)
 void MainWindow::updateObjectsCount(int count)
 {
 	m_objectsCount->setText(QString("%1").arg(count));
+}
+
+void MainWindow::onNewPressed()
+{
+	// TODO: check for m_renderWindow->isModified()
+	m_renderWindow->init();
 }
 
 void MainWindow::onClosePressed()
@@ -185,4 +196,14 @@ void MainWindow::onOpenPressed()
 		m_currentFilename->setText(m_filename);
 		m_renderWindow->open(m_filename.toStdString());
 	}
+}
+
+void MainWindow::onHelpPressed()
+{
+}
+
+void MainWindow::onAboutPressed()
+{
+	AboutDialog* about = new AboutDialog(this);
+	about->exec();
 }

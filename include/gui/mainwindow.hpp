@@ -26,42 +26,45 @@ class Render;
 class MainWindow: public QMainWindow {
 Q_OBJECT
 public:
-	MainWindow(QApplication *app);
+	MainWindow(QApplication* app);
 
 private slots:
 	void updateFramesPerSecond(int frames);
 	void updateObjectsCount(int count);
+	void onNewPressed();
 	void onClosePressed();
 	void onSavePressed();
 	void onOpenPressed();
+	void onHelpPressed();
+	void onAboutPressed();
 
 private:
 	void initialize();
 	void createMenu();
 	void createStatusBar();
 
-	Render *m_renderWindow;
+	Render* m_renderWindow;
 
-	QMenu *m_menuFile;
-	QAction *m_new;
-	QAction *m_save;
-	QAction *m_saveas;
-	QAction *m_open;
-	QAction *m_exit;
+	QMenu* m_menuFile;
+	QAction* m_new;
+	QAction* m_save;
+	QAction* m_saveas;
+	QAction* m_open;
+	QAction* m_exit;
 
-	QMenu *m_menuHelp;
-	QAction *m_help;
-	QAction *m_info;
+	QMenu* m_menuHelp;
+	QAction* m_help;
+	QAction* m_about;
 
-	ToolBox *m_toolBox;
+	ToolBox* m_toolBox;
 
-	ModifyBox *m_modifyBox;
+	ModifyBox* m_modifyBox;
 
-	QSplitter *m_splitter;
+	QSplitter* m_splitter;
 
-	QLabel *m_framesPerSec;
-	QLabel *m_objectsCount;
-	QLabel *m_currentFilename;
+	QLabel* m_framesPerSec;
+	QLabel* m_objectsCount;
+	QLabel* m_currentFilename;
 
 	QString m_filename;
 };

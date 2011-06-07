@@ -18,7 +18,7 @@
 
 using namespace m3d;
 
-Render::Render(QWidget *parent) :
+Render::Render(QWidget* parent) :
 	QGLWidget(parent)
 {
 	m_modified = true;
@@ -73,7 +73,7 @@ void Render::initializeGL()
 	glCullFace(GL_BACK);
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
-	sim::Simulation::instance().init();
+	init();
 
 	m_clock.reset();
 }
@@ -158,6 +158,11 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 	} else {
 		emit objectSelected(false);
 	}
+}
+
+void Render::init()
+{
+	sim::Simulation::instance().init();
 }
 
 void Render::save(const std::string& fileName)

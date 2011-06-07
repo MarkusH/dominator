@@ -20,18 +20,19 @@
 class Render: public QGLWidget {
 Q_OBJECT
 public:
-	Render(QWidget *parent = 0);
+	Render(QWidget* parent = 0);
 
-public slots:
-	void renderSize(char axis, float size);
-	void renderLocation(char axis, float position);
-	void renderRotation(float x, float y, float z);
-
+	void init();
 	void save(const std::string& fileName);
 	void open(const std::string& fileName);
 	bool isModified() {
 		return m_modified;
 	}
+
+public slots:
+	void renderSize(char axis, float size);
+	void renderLocation(char axis, float position);
+	void renderRotation(float x, float y, float z);
 
 protected:
 	virtual void initializeGL();
