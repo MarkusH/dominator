@@ -18,25 +18,15 @@
 
 using namespace m3d;
 
-Render::Render(QString *filename, QWidget *parent) :
+Render::Render(QWidget *parent) :
 	QGLWidget(parent)
 {
+	m_modified = true;
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
-	load(filename);
 	setFocusPolicy(Qt::WheelFocus);
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
 	m_timer->start();
-}
-
-void Render::load(QString *filename)
-{
-	try {
-		model = new Model3DS(filename->toUtf8().constData());
-		std::cout << "loaded " << filename->toUtf8().constData() << std::endl;
-	} catch (std::string& error_str) {
-		std::cerr << "Error: " << error_str << std::endl;
-	}
 }
 
 void Render::initializeGL()
@@ -85,8 +75,6 @@ void Render::initializeGL()
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
 	sim::Simulation::instance().init();
 
-	// Generate Vertex Buffer Objects
-	model->CreateVBO();
 	m_clock.reset();
 }
 
@@ -121,6 +109,8 @@ void Render::paintGL()
 	frames++;
 	if (m_clock.get() >= 1.0f) {
 		emit framesPerSecondChanged(frames);
+		emit
+		objectsCountChanged(sim::Simulation::instance().getObjectCount());
 		m_clock.reset();
 		frames = 0;
 	}
@@ -161,71 +151,77 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 	m_mouseAdapter.mouseEvent(event);
 
 	if (sim::Simulation::instance().getSelectedObject()) {
-		std::cout
-				<< sim::Simulation::instance().getSelectedObject()->getMatrix()
-				<< std::endl;
+		std::cout << sim::Simulation::instance().getSelectedObject()->getMatrix() << std::endl;
 		emit objectSelected(true);
-		emit objectSelected(
-				&sim::Simulation::instance().getSelectedObject()->getMatrix());
+		std::cout << "get " << sim::Simulation::instance().getSelectedObject()->getMatrix().eulerAngles() << std::endl;
+		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
 		emit objectSelected(false);
 	}
 }
 
-void Render::renderSize(char axis, int size)
+void Render::save(const std::string& fileName)
+{
+	sim::Simulation::instance().save(fileName);
+	m_modified = false;
+}
+
+void Render::open(const std::string& fileName)
+{
+	sim::Simulation::instance().load(fileName);
+	m_modified = false;
+}
+
+void Render::renderSize(char axis, float size)
 {
 	std::cout << axis << " size " << size << std::endl;
-	switch (axis) {
-	case 'x':
-		m_matrix._11 = (float) size / 10.0;
-		break;
-	case 'y':
-		m_matrix._22 = (float) size / 10.0;
-		break;
-	case 'z':
-		m_matrix._33 = (float) size / 10.0;
-		break;
+	if (sim::Simulation::instance().getSelectedObject()) {
+		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
+		m3d::Mat4f helper = m3d::Mat4f::identity();
+		switch (axis) {
+		case 'x':
+			helper._11 = size;
+			break;
+		case 'y':
+			helper._22 = size;
+			break;
+		case 'z':
+			helper._33 = size;
+			break;
+		}
+		matrix = helper * matrix;
+		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
 
-void Render::renderLocation(char axis, int position)
+void Render::renderLocation(char axis, float position)
 {
 	std::cout << axis << " position " << position << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix =
-				sim::Simulation::instance().getSelectedObject()->getMatrix();
+		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		switch (axis) {
 		case 'x':
-			matrix._41 = (float) position / 10.0;
+			matrix._41 = position;
 			break;
 		case 'y':
-			matrix._42 = (float) position / 10.0;
+			matrix._42 = position;
 			break;
 		case 'z':
-			matrix._43 = (float) position / 10.0;
+			matrix._43 = position;
 			break;
 		}
 		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
 
-void Render::renderRotation(char axis, int angle)
+void Render::renderRotation(float x, float y, float z)
 {
-	std::cout << axis << " angle " << angle << std::endl;
+	std::cout << " angle " << x << " " << y << " " << z << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix =
-				sim::Simulation::instance().getSelectedObject()->getMatrix();
-		switch (axis) {
-		case 'x':
-			matrix %= Mat4f::rotX(angle * PI / 180.0f);
-			break;
-		case 'y':
-			matrix %= Mat4f::rotY(angle * PI / 180.0f);
-			break;
-		case 'z':
-			matrix %= Mat4f::rotZ(angle * PI / 180.0f);
-			break;
-		}
-		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+
+		Mat4f matrix = Mat4f::rotZ(z * PI / 180.0f) * Mat4f::rotX(x * PI / 180.0f) * Mat4f::rotY(y * PI / 180.0f) * Mat4f::translate(obj->getMatrix().getW());
+
+		obj->setMatrix(matrix);
 	}
 }

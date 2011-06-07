@@ -10,7 +10,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QSpinBox>
+#include <QtGui/QDoubleSpinBox>
 #include <QtGui/QLabel>
 #include <QtCore/QPoint>
 #include <QtCore/QObject>
@@ -33,27 +33,29 @@ protected:
 private:
 	QPoint m_moveOffset;
 
-	QSpinBox* m_mbSizeX;
-	QSpinBox* m_mbSizeY;
-	QSpinBox* m_mbSizeZ;
-	QSpinBox* m_mbLocX;
-	QSpinBox* m_mbLocY;
-	QSpinBox* m_mbLocZ;
-	QSpinBox* m_mbRotX;
-	QSpinBox* m_mbRotY;
-	QSpinBox* m_mbRotZ;
+	QDoubleSpinBox* m_mbSizeX;
+	QDoubleSpinBox* m_mbSizeY;
+	QDoubleSpinBox* m_mbSizeZ;
+	QDoubleSpinBox* m_mbLocX;
+	QDoubleSpinBox* m_mbLocY;
+	QDoubleSpinBox* m_mbLocZ;
+	QDoubleSpinBox* m_mbRotX;
+	QDoubleSpinBox* m_mbRotY;
+	QDoubleSpinBox* m_mbRotZ;
 
-	int m_rx, m_ry, m_rz;
+	float m_rx, m_ry, m_rz;
+
+	static const int precision = 3;
 
 private slots:
-	void signalSize(int value);
-	void signalLocation(int value);
-	void signalRotation(int value);
+	void signalSize(double value);
+	void signalLocation(double value);
+	void signalRotation(double value);
 
 signals:
-	void changeSize(char, int);
-	void changeLocation(char, int);
-	void changeRotation(char, int);
+	void changeSize(char, float);
+	void changeLocation(char, float);
+	void changeRotation(float, float, float);
 };
 
 #endif /* MODIFYBOX_HPP_ */

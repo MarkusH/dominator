@@ -7,8 +7,8 @@
 #ifndef RENDER_RENDER_HPP_
 #define RENDER_RENDER_HPP_
 
+#include <GL/glew.h>
 #include <QtCore/QTimer>
-#include <render/model.hpp>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
 #include <opengl/Shader.hpp>
@@ -20,13 +20,18 @@
 class Render: public QGLWidget {
 Q_OBJECT
 public:
-	Render(QString *filename = 0, QWidget *parent = 0);
-	void load(QString *filename);
+	Render(QWidget *parent = 0);
 
 public slots:
-	void renderSize(char axis, int size);
-	void renderLocation(char axis, int position);
-	void renderRotation(char axis, int angle);
+	void renderSize(char axis, float size);
+	void renderLocation(char axis, float position);
+	void renderRotation(float x, float y, float z);
+
+	void save(const std::string& fileName);
+	void open(const std::string& fileName);
+	bool isModified() {
+		return m_modified;
+	}
 
 protected:
 	virtual void initializeGL();
@@ -42,14 +47,15 @@ protected:
 
 private:
 	QTimer *m_timer;
-	Model3DS * model;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;
 	util::QtKeyAdapter m_keyAdapter;
+	bool m_modified;
 
 signals:
 	void framesPerSecondChanged(int);
+	void objectsCountChanged(int);
 	void objectSelected(const m3d::Mat4f*);
 	void objectSelected(bool);
 };

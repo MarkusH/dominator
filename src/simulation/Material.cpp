@@ -16,13 +16,21 @@
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
 #include <fstream> // for file I/O
-#include <boost/lexical_cast.hpp>
-
+#include <iostream>
+#include <string.h>
 
 namespace sim {
 
 MaterialMgr* MaterialMgr::s_instance = NULL;
 
+template<typename T>
+char* toString(T value)
+{
+	std::stringstream sst;
+	sst << value;
+	sst.seekg(0, std::ios::beg);
+	return strdup(sst.str().c_str());
+}
 Material::Material(const std::string& name)
 		: name(name)
 {
@@ -95,9 +103,11 @@ void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* d
 	node->append_attribute(attrSp);
 
 	// allocate string for shininess and create attribute
-	char* pShininess = doc->allocate_string(boost::lexical_cast<std::string>(shininess).c_str());
+	//char* pShininess = doc->allocate_string(boost::lexical_cast<std::string>(shininess).c_str());
+	char* pShininess = doc->allocate_string(toString(shininess));
 	xml_attribute<>* attrSh = doc->allocate_attribute("shininess", pShininess);
 	node->append_attribute(attrSh);
+	//free(pShininess);
 
 	
 	// save properties
@@ -153,35 +163,58 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	xml_node<>* node = doc->allocate_node(node_element, "pair");
 	materials->append_node(node);
 
-	// allocate string for texture and create attribute
-	char* pId0 = doc->allocate_string("test");
-	xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
-	node->append_attribute(attrId0);
+	// allocate string for mat0 and create attribute
+	if (m.fromID(id0) != NULL) {
+		const char* pId0 = doc->allocate_string(m.fromID(id0)->name.c_str());
+		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+		node->append_attribute(attrId0);
+	}
+	else {
+		const char* pId0 = doc->allocate_string("");
+		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+		node->append_attribute(attrId0);
+	}
 
-	// allocate string for shader and create attribute
-	char* pId1 = doc->allocate_string("test");
-	xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
-	node->append_attribute(attrId1);
+	// allocate string for mat1 and create attribute
+	if (m.fromID(id1) != NULL) {
+		const char* pId1 = doc->allocate_string(m.fromID(id1)->name.c_str());
+		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+		node->append_attribute(attrId1);
+	}
+	else {
+		const char* pId1 = doc->allocate_string("");
+		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+		node->append_attribute(attrId1);
+	}
 
-	// allocate string for ambient and create attribute
-	char* pElasticity = doc->allocate_string(boost::lexical_cast<std::string>(elasticity).c_str());
+
+	// allocate string for elasticity and create attribute
+	//char* pElasticity = doc->allocate_string(boost::lexical_cast<std::string>(elasticity).c_str());
+	char* pElasticity = doc->allocate_string(toString(elasticity));
 	xml_attribute<>* attrE = doc->allocate_attribute("elasticity", pElasticity);
 	node->append_attribute(attrE);
+	//free(pElasticity);
 
-	// allocate string for diffuse and create attribute
-	char* pStaticFriction = doc->allocate_string(boost::lexical_cast<std::string>(staticFriction).c_str());
+	// allocate string for static friction and create attribute
+	//char* pStaticFriction = doc->allocate_string(boost::lexical_cast<std::string>(staticFriction).c_str());
+	char* pStaticFriction = doc->allocate_string(toString(staticFriction));
 	xml_attribute<>* attrSF = doc->allocate_attribute("staticFriction", pStaticFriction);
 	node->append_attribute(attrSF);
+	//free(pStaticFriction);
 
-	// allocate string for specular and create attribute
-	char* pKineticFriction = doc->allocate_string(boost::lexical_cast<std::string>(kineticFriction).c_str());
+	// allocate string for kinetic friction and create attribute
+	//char* pKineticFriction = doc->allocate_string(boost::lexical_cast<std::string>(kineticFriction).c_str());
+	char* pKineticFriction = doc->allocate_string(toString(kineticFriction));
 	xml_attribute<>* attrKF = doc->allocate_attribute("kineticFriction", pKineticFriction);
 	node->append_attribute(attrKF);
+	//free(pKineticFriction);
 
-	// allocate string for shininess and create attribute
-	char* pSoftness = doc->allocate_string(boost::lexical_cast<std::string>(softness).c_str());
+	// allocate string for softness and create attribute
+	//char* pSoftness = doc->allocate_string(boost::lexical_cast<std::string>(softness).c_str());
+	char* pSoftness = doc->allocate_string(toString(softness));
 	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
 	node->append_attribute(attrS);
+	//free(pSoftness);
 
 }
 
@@ -333,9 +366,9 @@ bool MaterialMgr::load(const char* fileName)
 				add(mat);
 			}
 			if(name == "pair") {
-				MaterialPair pair;
-				pair.load(node);
-				m_pairs[std::make_pair(pair.id0, pair.id1)] = pair;
+				MaterialPair p;
+				p.load(node);
+				m_pairs[std::make_pair(p.id0, p.id1)] = p;
 			}
 		}
 	
@@ -396,6 +429,9 @@ bool MaterialMgr::save(const char* fileName)
 	myfile << s;
 	myfile.close();
 
+	// //frees all memory allocated to the nodes
+	doc.clear();
+
 	return true;
 }
 
@@ -450,6 +486,10 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		// get the pair for the materials, or the default pair
 		MaterialPair& pair = getPair(id0, id1);
 
+		//if (id0 > 0 && id1 > 0 && (id0 < 200 || id1 < 200))
+		//	if ((fromID(id0) && fromID(id0)->name == "wood_matt") || (fromID(id1) && fromID(id1)->name == "wood_matt"))
+		//std::cout << "pair " << id0 << ", " << id1 << std::endl;
+
 		// set the material properties for this contact
 		NewtonMaterialSetContactElasticity(material, pair.elasticity);
 		NewtonMaterialSetContactSoftness(material, pair.softness);
@@ -462,4 +502,10 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 
 }
 
+void MaterialMgr::GenericContactCallback(const NewtonJoint* contactJoint,
+		dFloat timestep,
+		int threadIndex)
+{
+	instance().processContact(contactJoint, timestep, threadIndex);
+}
 }
