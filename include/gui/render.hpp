@@ -47,7 +47,7 @@ protected:
 	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
 private:
-	QTimer *m_timer;
+	QTimer* m_timer;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;

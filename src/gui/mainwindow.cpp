@@ -19,7 +19,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-MainWindow::MainWindow(QApplication *app)
+MainWindow::MainWindow(QApplication* app)
 {
 
 	QPixmap pixmap = QPixmap("data/splash.png");

@@ -36,7 +36,7 @@ ToolBox::ToolBox(QWidget *parent) {
 	setLayout(layout);
 }
 
-void ToolBox::addWidget(QWidget * widget, int stretch, Qt::Alignment alignment) {
+void ToolBox::addWidget(QWidget* widget, int stretch, Qt::Alignment alignment) {
 	layout->addWidget(widget, stretch, alignment);
 	setLayout(layout);
 }

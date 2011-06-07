@@ -116,32 +116,32 @@ void Render::paintGL()
 	}
 }
 
-void Render::keyPressEvent(QKeyEvent *event)
+void Render::keyPressEvent(QKeyEvent* event)
 {
 	m_keyAdapter.keyEvent(event);
 }
 
-void Render::keyReleaseEvent(QKeyEvent *event)
+void Render::keyReleaseEvent(QKeyEvent* event)
 {
 	m_keyAdapter.keyEvent(event);
 }
 
-void Render::mouseMoveEvent(QMouseEvent *event)
+void Render::mouseMoveEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mousePressEvent(QMouseEvent *event)
+void Render::mousePressEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mouseReleaseEvent(QMouseEvent *event)
+void Render::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::wheelEvent(QWheelEvent *event)
+void Render::wheelEvent(QWheelEvent* event)
 {
 	m_mouseAdapter.mouseWheelEvent(event);
 }
