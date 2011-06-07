@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger
  */
 
-#include <opengl/util.hpp>
+#include <opengl/oglutil.hpp>
 #include <newton/util.hpp>
 #include <iostream>
 #include <dVector.h>
