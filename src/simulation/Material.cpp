@@ -166,24 +166,24 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	// allocate string for mat0 and create attribute
 	if (m.fromID(id0) != NULL) {
 		const char* pId0 = doc->allocate_string(m.fromID(id0)->name.c_str());
-		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+		xml_attribute<>* attrId0 = doc->allocate_attribute("mat0", pId0);
 		node->append_attribute(attrId0);
 	}
 	else {
 		const char* pId0 = doc->allocate_string("");
-		xml_attribute<>* attrId0 = doc->allocate_attribute("id0", pId0);
+		xml_attribute<>* attrId0 = doc->allocate_attribute("mat0", pId0);
 		node->append_attribute(attrId0);
 	}
 
 	// allocate string for mat1 and create attribute
 	if (m.fromID(id1) != NULL) {
 		const char* pId1 = doc->allocate_string(m.fromID(id1)->name.c_str());
-		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+		xml_attribute<>* attrId1 = doc->allocate_attribute("mat1", pId1);
 		node->append_attribute(attrId1);
 	}
 	else {
 		const char* pId1 = doc->allocate_string("");
-		xml_attribute<>* attrId1 = doc->allocate_attribute("id1", pId1);
+		xml_attribute<>* attrId1 = doc->allocate_attribute("mat1", pId1);
 		node->append_attribute(attrId1);
 	}
 
