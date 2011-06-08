@@ -62,7 +62,7 @@ Object __Object::load(rapidxml::xml_node<>* node)
 {
 	// load m_id from "id"
 
-	if(node->name() == "compound")	return __Compound::load(node);
+	if(std::string(node->name()) == "compound")	return __Compound::load(node);
 	else return __RigidBody::load(node);
 }
 
@@ -270,7 +270,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 
 	//attribute matrix
 	attr = attr->next_attribute();
-	Mat4f& matrix = Mat4f();
+	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
 	/* set dimensions for box */
@@ -307,7 +307,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	int freezeState = atoi(attr->value());
 
 	//attribute damping
-	Vec4f& damping = Vec4f();
+	Vec4f damping = Vec4f();
 	damping.assign(attr->value());
 
 	//attribute material

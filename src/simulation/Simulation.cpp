@@ -5,6 +5,10 @@
  *      Author: Markus Doellinger
  */
 
+#include <xml/rapidxml.hpp>
+#include <xml/rapidxml_utils.hpp>
+#include <xml/rapidxml_print.hpp>
+#include <fstream>
 #include <simulation/Simulation.hpp>
 #include <simulation/Compound.hpp>
 #include <simulation/TreeCollision.hpp>
@@ -13,8 +17,6 @@
 #include <opengl/Shader.hpp>
 #include <iostream>
 #include <newton/util.hpp>
-#include <xml/rapidxml.hpp>
-#include <xml/rapidxml_utils.hpp>
 
 namespace sim {
 
@@ -90,7 +92,7 @@ void Simulation::save(const std::string& fileName)
 
 	// save document
 	std::ofstream myfile;
-	myfile.open (fileName);
+	myfile.open (fileName.c_str());
 	myfile << s;
 	myfile.close();
 
