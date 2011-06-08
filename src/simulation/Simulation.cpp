@@ -59,17 +59,44 @@ Simulation::~Simulation()
 
 void Simulation::save(const std::string& fileName)
 {
-	// create document and root node "level" or "simulation", depends on you
+	using namespace rapidxml;
+	// create document
+	xml_document<> doc;
 
+	// create XML declaration
+	xml_node<>* declaration = doc.allocate_node(node_declaration);
+	doc.append_node(declaration);
+	declaration->append_attribute(doc.allocate_attribute("version", "1.0"));
+    declaration->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+
+
+	// create root element "level"
+	xml_node<>* level = doc.allocate_node(node_element, "level");
+	doc.append_node(level);
+
+	/*
 	ObjectList::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
 		// add node paramenter to save method
 		__Object::save(*itr->get());
-	}
+	}*/
 
 	// save attribute "gravity" to m_gravity
 	// save attribute "environment" to
 	// 		m_environment ? m_environment->getID() : -1
+
+	std::string s;
+	print(std::back_inserter(s), doc, 0);
+
+	// save document
+	std::ofstream myfile;
+	myfile.open (fileName);
+	myfile << s;
+	myfile.close();
+
+	// frees all memory allocated to the nodes
+	doc.clear();
+
 }
 
 void Simulation::load(const std::string& fileName)
@@ -77,6 +104,9 @@ void Simulation::load(const std::string& fileName)
 	using namespace rapidxml;
 
 	file<char> f(fileName.c_str());
+
+	//for step into
+	//file<char> f("data/levels/level.xml");
 	char* m = f.data();
 	
 	xml_document<> doc;
@@ -403,6 +433,7 @@ void Simulation::remove(Object object)
 
 void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
 {
+	// TODO in this function Windows is throwing exceptions in the second call
 	//std::cout << begin->first << " " << end->first << std::endl;
 	for (ObjectList::iterator itr = begin; itr != end; ++itr) {
 	//	std::cout << "id " << itr->first << std::endl;

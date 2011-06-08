@@ -429,7 +429,7 @@ bool MaterialMgr::save(const char* fileName)
 	myfile << s;
 	myfile.close();
 
-	// //frees all memory allocated to the nodes
+	// frees all memory allocated to the nodes
 	doc.clear();
 
 	return true;
