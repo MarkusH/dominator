@@ -162,6 +162,7 @@ void Simulation::init()
 	}
 
 	// assemlby vs hull comparison
+	if (0)
 	{
 		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", false));
 		add(convex);
@@ -226,7 +227,7 @@ void Simulation::init()
 	}
 
 	// wagon with tires and hinges
-	if (1)
+	if (0)
 	{
 		// hinge pinDir is z Axis
 
@@ -541,7 +542,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		*/
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_pointer);
-		Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "yellow");
+		Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
 		add(domino);
 	} else if (button == util::RIGHT) {
 		newton::mousePick(m_world, Vec2f(x, y), down);

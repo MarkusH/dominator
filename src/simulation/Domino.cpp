@@ -10,40 +10,12 @@
 #include <simulation/Simulation.hpp>
 #include <simulation/Material.hpp>
 
-/*
- * Use this to create a convex domino. It is a box shape, where the 4
- * bottom vertices are aligned to the ground using a RayCast.
- *
- * Pro:
- * 	It looks more credible, because the domino fits to the ground
- *  Even when not freezing the body at creation time, they remain standing on
- *  	ramps (they still fall, if the angle is too steep)
- *
- * Cons:
- * 	This is not realistic, all dominos are perfect boxes, normally
- *  There are many many domino shapes, so we cannot reuse the collisions and we
- *  	must add data to the VBO for many dominos (slower).
- *
- *
- * Comment the define to create dominos in box shapes. The box is not aligned
- * 	to the ground, but it is positioned, so that it does not intersect the ground.
- *
- * Pro:
- * 	We only need three collisions (small, middle, large) and three entries in
- * 		the VBO (superior performance)
- *  This is realistic, because dominos are boxes
- *
- * Cons:
- *   We have to freeze the domino at creation time, otherwise they fall even on
- *   	ramps with a flat angle
- *   When freezing them, they stand upright even on really steep ramps. This is
- *   	unrealistic and one can see that they stand on a single edge, the rest is
- *   	in the air. (we may unfreeze the body at creation time, if the difference
- *   	in the ground level at the 4 bottom vertices exceeds a threshold
- */
-//#define CONVEX_DOMINO
-
 namespace sim {
+
+#ifndef CONVEX_DOMINO
+NewtonCollision* __Domino::s_domino_collision[3] = { NULL, NULL, NULL };
+#endif
+Vec3f __Domino::s_domino_size[3] = { Vec3f(3.0f, 8.0f, 0.5f) * 0.75f, Vec3f(3.0f, 8.0f, 0.5f), Vec3f(3.0f, 8.0f, 0.5f) * 1.25f };
 
 #ifdef CONVEX_DOMINO
 __Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material)
@@ -60,16 +32,27 @@ __Domino::~__Domino()
 {
 }
 
-Domino __Domino::createDomino(const Type& type, const Mat4f& matrix, float mass, const std::string& material)
+#ifndef CONVEX_DOMINO
+NewtonCollision*  __Domino::getCollision(Type type, int materialID)
+{
+	const NewtonWorld* world = Simulation::instance().getWorld();
+	Mat4f identity = Mat4f::identity();
+	Vec3f size = s_domino_size[type];
+
+	return s_domino_collision[type] ? s_domino_collision[type] :
+			(s_domino_collision[type] = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]));
+}
+#endif
+
+Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material)
 {
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	const float VERTICAL_DELTA = 0.0001f;
 	const int materialID = MaterialMgr::instance().getID(material);
 
-	Vec3f size = Vec3f(3.0f, 8.0f, 0.5f);
-	size *= (type == DOMINO_LARGE) ? 1.25f : (type == DOMINO_SMALL) ? 0.75f : 1.0f;
+	type = std::min(type, DOMINO_LARGE);
+	Vec3f size = s_domino_size[type];
 	Vec3f sz = size * 0.5f;
-
 
 	Mat4f mat(matrix);
 	Vec3f p0 = mat.getW();
@@ -120,7 +103,9 @@ Domino __Domino::createDomino(const Type& type, const Mat4f& matrix, float mass,
 	Vec3f pos = mat.getW();
 	pos.y = std::max(std::max(std::max(p[0][0].y, p[1][0].y), p[2][0].y), p[3][0].y) + size.y * 0.5f;
 	mat.setW(pos);
-	NewtonCollision* collision = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
+
+	NewtonCollision* collision = getCollision(type, materialID); //NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
+
 	Domino result = Domino(new __Domino(type, mat, material));
 	result->create(collision, mass, result->m_freezeState, result->m_damping);
 	NewtonReleaseCollision(world, collision);

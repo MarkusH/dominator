@@ -150,6 +150,12 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 		if( attribute == "kineticFriction")	kineticFriction = atof(attr->value());
 		if( attribute == "softness")		softness = atof(attr->value());
 	}
+
+	if (id0 > id1) {
+		int tmp = id0;
+		id0 = id1;
+		id1 = tmp;
+	}
 }
 
 
@@ -331,6 +337,13 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 	MaterialPair pair;
 	pair.id0 = getID(mat0);
 	pair.id1 = getID(mat1);
+
+	if (pair.id0 > pair.id1) {
+		int tmp = pair.id0;
+		pair.id0 = pair.id1;
+		pair.id1 = tmp;
+	}
+
 	pair.elasticity = elasticity;
 	pair.staticFriction = staticFriction;
 	pair.kineticFriction = kineticFriction;
