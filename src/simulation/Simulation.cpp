@@ -337,10 +337,6 @@ void Simulation::remove(const Object& object)
 	std::set<__Object*> deleted;
 
 	//TODO: think about what happens if a domino is inside a compound
-	// add small middle large to first three buffers of vbo
-
-	// delete only the buffer and not the data, if it is a domino
-	/*
 	if (object->getType() <= __Object::DOMINO_LARGE) {
 		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin(); it != m_vertexBuffer.m_buffers.end(); ++it) {
 			if ((*it)->object == object.get()) {
@@ -350,50 +346,67 @@ void Simulation::remove(const Object& object)
 			}
 		}
 	} else {
-	*/
 		// iterate over all sub-buffers and check if it has to be deleted
 		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin();
 				it != m_vertexBuffer.m_buffers.end(); ) {
 
 			__Object* curObj = (__Object*)(*it)->object;
-
-			// adjust the offsets according to the previously deleted buffers
-			(*it)->indexOffset -= indexOffset;
-			(*it)->dataOffset -= dataOffset;
-
-			// delete the data associated with the object
-			if (object->contains(curObj)) {
-				const unsigned co = (*it)->indexOffset;
-				const unsigned cc = (*it)->indexCount;
-				indexOffset += cc;
-
-				// delete vertices
-				if (deleted.find(curObj) == deleted.end()) {
-					const unsigned vo = (*it)->dataOffset * m_vertexBuffer.floatSize();
-					const unsigned vc = (*it)->dataCount * m_vertexBuffer.floatSize();
-					dataOffset += (*it)->dataCount;
-					m_vertexBuffer.m_data.erase(m_vertexBuffer.m_data.begin() + vo,
-							m_vertexBuffer.m_data.begin() + vo + vc);
-					deleted.insert(curObj);
-				}
-
-				// delete indices
-				m_vertexBuffer.m_indices.erase(m_vertexBuffer.m_indices.begin() + co,
-						m_vertexBuffer.m_indices.begin() + co + cc);
-
-				// delete sub-mesh
-				delete (*it);
-				it = m_vertexBuffer.m_buffers.erase(it);
-			} else {
-				// adjust the indices of the object, because vertices were deleted
-				if (dataOffset > 0) {
-					for (unsigned i = 0; i < (*it)->indexCount; ++i)
-						m_vertexBuffer.m_indices[i + (*it)->indexOffset] -= dataOffset;
-				}
+			if (curObj == NULL) {
 				++it;
+				continue;
 			}
-		}
-	//}
+
+			// Check if a domino is inside a compound (it cannot be a single domino,
+			// because we checked that prior to the for-loop
+			if (curObj->getType() <= __Object::DOMINO_LARGE) {
+				if (object->contains(curObj)) {
+					// delete sub-mesh
+					delete (*it);
+					it = m_vertexBuffer.m_buffers.erase(it);
+				}
+				// do not adjust anything, because domino data is stored globally
+				++it;
+			} else {
+
+				// adjust the offsets according to the previously deleted buffers
+				(*it)->indexOffset -= indexOffset;
+				(*it)->dataOffset -= dataOffset;
+
+				// delete the data associated with the object
+				if (object->contains(curObj)) {
+					const unsigned co = (*it)->indexOffset;
+					const unsigned cc = (*it)->indexCount;
+					indexOffset += cc;
+
+					// delete vertices
+					if (deleted.find(curObj) == deleted.end()) {
+						const unsigned vo = (*it)->dataOffset * m_vertexBuffer.floatSize();
+						const unsigned vc = (*it)->dataCount * m_vertexBuffer.floatSize();
+						dataOffset += (*it)->dataCount;
+						m_vertexBuffer.m_data.erase(m_vertexBuffer.m_data.begin() + vo,
+								m_vertexBuffer.m_data.begin() + vo + vc);
+						deleted.insert(curObj);
+					}
+
+					// delete indices
+					m_vertexBuffer.m_indices.erase(m_vertexBuffer.m_indices.begin() + co,
+							m_vertexBuffer.m_indices.begin() + co + cc);
+
+					// delete sub-mesh
+					delete (*it);
+					it = m_vertexBuffer.m_buffers.erase(it);
+				} else {
+					// adjust the indices of the object, because vertices were deleted
+					if (dataOffset > 0) {
+						for (unsigned i = 0; i < (*it)->indexCount; ++i)
+							m_vertexBuffer.m_indices[i + (*it)->indexOffset] -= dataOffset;
+					}
+					++it;
+				} /* end check if object has to be deleted */
+			} /* end check if domino is in compound */
+		} /* end for-loop */
+	} /* end check if object is domino */
+
 	m_objects.remove(object);
 
 	if (m_environment == object)
@@ -607,8 +620,10 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		}
 		if (m_selectedObject && m_selectedObject == m_environment)
 			m_selectedObject = Object();
-		//if (m_selectedObject)
-		//	remove(m_selectedObject);
+		if (m_selectedObject) {
+			remove(m_selectedObject);
+			std::cout << "obj_count = " << m_objects.size() << ", buffers = " << m_vertexBuffer.m_buffers.size() << std::endl;
+		}
 	}
 }
 
