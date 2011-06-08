@@ -15,6 +15,7 @@
 #include <lib3ds/mesh.h>
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
+#include <stdio.h>
 
 namespace sim {
 
@@ -57,14 +58,12 @@ void __Object::save(const __Object& object /* node */)
 }
 
 
-Object __Object::load(/* node */)
+Object __Object::load(rapidxml::xml_node<>* node)
 {
 	// load m_id from "id"
 
-	// if type == compound
-	// 		return __Compound::load(node)
-
-	return __RigidBody::load(/*node*/);
+	if(node->name() == "compound")	return __Compound::load(node);
+	else return __RigidBody::load(node);
 }
 
 
@@ -253,8 +252,75 @@ void __RigidBody::save(const __RigidBody& body /* node */)
 	// set attribute "damping" to m_damping.str()
 }
 
-RigidBody __RigidBody::load(/*node */)
+RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 {
+	using namespace rapidxml;
+
+	// TODO maybe defaults?
+	float w, h, d; // box
+	float x, y, z; // sphere
+
+	//attribute id
+	xml_attribute<>* attr = node->first_attribute();
+
+	
+	//attribute type
+	attr = attr->next_attribute();
+	std::string type = attr->value();
+
+	//attribute matrix
+	attr = attr->next_attribute();
+	Mat4f& matrix = Mat4f();
+	matrix.assign(attr->value());
+
+	/* set dimensions for box */
+	if(type == "box" ) {
+		//attribute width
+		attr = attr->next_attribute();
+		w = atof(attr->value());
+
+		//attribute height
+		attr = attr->next_attribute();
+		h = atof(attr->value());
+
+		//attribute depth
+		attr = attr->next_attribute();
+		d = atof(attr->value());
+	}/* set dimensions for box END */
+
+	/* set dimensions for sphere */
+	if( type == "sphere" ) {
+		//attribute x
+		attr = attr->next_attribute();
+		x = atof(attr->value());
+
+		//attribute y
+		attr = attr->next_attribute();
+		y = atof(attr->value());
+
+		//attribute z
+		attr = attr->next_attribute();
+		z = atof(attr->value());
+	}/* set dimensions for sphere END */
+
+	//attribute freezeState
+	int freezeState = atoi(attr->value());
+
+	//attribute damping
+	Vec4f& damping = Vec4f();
+	damping.assign(attr->value());
+
+	//attribute material
+	attr = attr->next_attribute();
+	std::string material = attr->value();
+
+	//attribute mass
+	attr = attr->next_attribute();
+	float mass = atof(attr->value());
+
+	if( type == "box" ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
+	if( type == "sphere" ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
+
 	// mass = get mass attribute
 	// material = get material attribute
 	// matrix.assign(matrix string)

@@ -13,6 +13,8 @@
 #include <opengl/Shader.hpp>
 #include <iostream>
 #include <newton/util.hpp>
+#include <xml/rapidxml.hpp>
+#include <xml/rapidxml_utils.hpp>
 
 namespace sim {
 
@@ -70,14 +72,25 @@ void Simulation::save(const std::string& fileName)
 	// 		m_environment ? m_environment->getID() : -1
 }
 
-void Simulation::load(const std::string&fileName)
+void Simulation::load(const std::string& fileName)
 {
-	// parse document
+	using namespace rapidxml;
 
-	// for each node object
-	// add node paramenter to save method
-	Object object = __Object::load();
-	add(object, object->getID());
+	file<char> f(fileName.c_str());
+	char* m = f.data();
+	
+	xml_document<> doc;
+	doc.parse<0>(m);
+
+	// this is important so we don't parse the level tag but the object and compound tags
+	xml_node<>* nodes = doc.first_node();
+
+	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
+		Object object = __Object::load(node);
+		add(object, object->getID());
+	}
+
+	
 
 	// load gravity
 	// load "environment"

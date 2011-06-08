@@ -169,7 +169,7 @@ public:
 	void remove(Object object);
 
 	void save(const std::string& fileName);
-	void load(const std::string&fileName);
+	void load(const std::string& fileName);
 
 
 	virtual void mouseMove(int x, int y);

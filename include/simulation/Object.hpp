@@ -17,6 +17,7 @@
 #include <simulation/Body.hpp>
 #include <opengl/VertexBuffer.hpp>
 #include <lib3ds/file.h>
+#include <xml/rapidxml.hpp>
 
 namespace sim {
 
@@ -113,7 +114,7 @@ public:
 	 *
 	 * @return   The generated object
 	 */
-	static Object load(/* node */);
+	static Object load(rapidxml::xml_node<>* node);
 
 	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	static RigidBody createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
@@ -167,7 +168,7 @@ public:
 	virtual void render();
 
 	static void save(const __RigidBody& body /* node */);
-	static RigidBody load(/*node */);
+	static RigidBody load(rapidxml::xml_node<>* node);
 
 	friend class __Object;
 };

@@ -37,15 +37,13 @@ void __Joint::save(const __Joint& joint /*node*/)
 	}
 }
 
-Joint __Joint::load(const std::list<Object>& list/*node*/ )
+Joint __Joint::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
-	// get type of node
-
-	// if type == "hinge"
-	// 		return Hinge::load(list, node);
-
-	Joint result;
-	return result;
+	//type attribute
+	if( node->first_attribute()->value() == "hinge" ) return __Hinge::load(list, node);
+	//TODO make sure a value is always returned
+	//Joint result;
+	//return result;
 }
 
 __Hinge::__Hinge(Vec3f pivot, Vec3f pinDir,
@@ -85,10 +83,31 @@ void __Hinge::save(const __Hinge& hinge /* node */)
 	// set attribute "pinDir" to  hinge.pinDir.str()
 }
 
-Hinge __Hinge::load(const std::list<Object>& list/* node */)
+Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
+	using namespace rapidxml;
+
 	Vec3f pivot, pinDir;
 	int parentID = -1, childID = -1;
+
+	//type attribute
+	xml_attribute<>* attr = node->first_attribute();
+
+	//parentID attribute
+	attr = attr->next_attribute();
+	parentID = atoi(attr->value());
+
+	//childID attribute
+	attr = attr->next_attribute();
+	childID = atoi(attr->value());
+
+	//pivot attribute
+	attr = attr->next_attribute();
+	pivot.assign(attr->value());
+
+	//pinDir attribute
+	attr = attr->next_attribute();
+	pinDir.assign(attr->value());
 
 	// parentID = attribute "parentID"
 	// childID = attribute "childID"

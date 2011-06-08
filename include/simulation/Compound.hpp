@@ -68,7 +68,7 @@ public:
 	virtual void render();
 
 	static void save(const __Compound& compound /* node */);
-	static Compound load(/*node */);
+	static Compound load(rapidxml::xml_node<>* node);
 };
 
 

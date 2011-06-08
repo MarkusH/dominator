@@ -58,11 +58,24 @@ void __Compound::save(const __Compound& compound /* node */)
 	// 		__Joint::save(joint, node)
 }
 
-Compound __Compound::load(/*node */)
+Compound __Compound::load(rapidxml::xml_node<>* nodes)
 {
 	Compound result = Compound(new __Compound());
 	// load m_matrix
-
+	
+	using namespace rapidxml;
+	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
+		if(node->name() == "object") {
+			Object obj = __Object::load(node);
+	 		result->add(obj);
+		}
+		if(node->name() == "joint") {
+			//std::list<Object>& list = std::list<Object>(result->m_nodes);
+			Joint joint;
+			joint->load(result->m_nodes, node);
+	 		result->m_joints.push_back(joint);
+		}
+	}
 	// foreach element "object" in node
 	// 		Object obj = __Object::load(element)
 	// 		result->add(obj)

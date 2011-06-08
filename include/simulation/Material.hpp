@@ -81,7 +81,7 @@ struct MaterialPair {
 	 */
 	MaterialPair(const MaterialPair& p);
 
-	void load(rapidxml::xml_node<>* n);
+	void load(rapidxml::xml_node<>* node);
 	void save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const;
 };
 

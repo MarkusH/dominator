@@ -43,7 +43,7 @@ public:
 	__Joint(Type type);
 
 	static void save(const __Joint& joint /*node*/);
-	Joint load(const std::list<Object>& list/*node*/);
+	Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
 class __Hinge : public __Joint, public CustomHinge {
@@ -60,8 +60,8 @@ public:
 
 	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
 
-	static void save(const __Hinge& hinge /* node */);
-	static Hinge load(const std::list<Object>& list/*node*/);
+	static void save(const __Hinge& hinge/*, rapidxml::xml_node<>* node*/);
+	static Hinge load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
 class __BallAndSocket : public __Joint {
