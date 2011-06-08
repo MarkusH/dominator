@@ -122,11 +122,17 @@ void MainWindow::createMenu()
 	connect(m_play, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
 	m_menuSimulation->addAction(m_play);
 
+	m_menuSimulation->addSeparator();
+
 	m_stop = new QAction("&Stop", this);
 	m_stop->setEnabled(false);
 	m_stop->setShortcut(Qt::Key_F9);
 	connect(m_stop, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
 	m_menuSimulation->addAction(m_stop);
+
+	m_gravity = new QAction("&Gravity", this);
+	connect(m_gravity, SIGNAL(triggered()), this, SLOT(onGravityPressed()));
+	m_menuSimulation->addAction(m_gravity);
 
 	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
@@ -235,6 +241,12 @@ void MainWindow::onSimulationControlsPressed()
 	m_play->setEnabled(!set_active);
 	m_stop->setEnabled(set_active);
 	m_renderWindow->controlSimulation(set_active);
+}
+
+void MainWindow::onGravityPressed()
+{
+	GravityDialog* dialog = new GravityDialog(m_renderWindow->getGravity(), this);
+	m_renderWindow->setGravity(dialog->run());
 }
 
 void MainWindow::onHelpPressed()

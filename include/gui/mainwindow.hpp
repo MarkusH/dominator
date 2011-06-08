@@ -37,6 +37,7 @@ private slots:
 	void onOpenPressed();
 	//Simulation
 	void onSimulationControlsPressed();
+	void onGravityPressed();
 	//Help
 	void onHelpPressed();
 	void onAboutPressed();
@@ -58,6 +59,7 @@ private:
 	QMenu* m_menuSimulation;
 	QAction* m_play;
 	QAction* m_stop;
+	QAction* m_gravity;
 
 	QMenu* m_menuHelp;
 	QAction* m_help;

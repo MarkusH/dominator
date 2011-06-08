@@ -152,7 +152,8 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 
 	if (sim::Simulation::instance().getSelectedObject()) {
 		std::cout << sim::Simulation::instance().getSelectedObject()->getMatrix() << std::endl;
-		emit objectSelected(true);
+		emit
+		objectSelected(true);
 		std::cout << "get " << sim::Simulation::instance().getSelectedObject()->getMatrix().eulerAngles() << std::endl;
 		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
@@ -235,4 +236,14 @@ void Render::renderRotation(float x, float y, float z)
 
 		obj->setMatrix(matrix);
 	}
+}
+
+float Render::getGravity()
+{
+	return sim::Simulation::instance().getGravity();
+}
+
+void Render::setGravity(const float gravity)
+{
+	sim::Simulation::instance().setGravity(gravity);
 }

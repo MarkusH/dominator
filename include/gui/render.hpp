@@ -26,6 +26,8 @@ public:
 	void save(const std::string& fileName);
 	void open(const std::string& fileName);
 	void controlSimulation(const bool status);
+	float getGravity();
+	void setGravity(const float gravity);
 	bool isModified();
 
 public slots:
