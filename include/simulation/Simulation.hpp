@@ -166,7 +166,7 @@ public:
 	 *
 	 * @param object The object to remove
 	 */
-	void remove(Object object);
+	void remove(const Object& object);
 
 	void save(const std::string& fileName);
 	void load(const std::string&fileName);

@@ -471,6 +471,7 @@ MaterialPair& MaterialMgr::getPair(int id0, int id1)
 
 void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep, int threadIndex)
 {
+	//std::cout << "\tmaterial begin" << std::endl;
 	int id0, id1;
 
 	// get the contact material
@@ -512,7 +513,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		//TODO: get impact information and play a sound
 	}
 
-
+	//std::cout << "\tmaterial end" << std::endl;
 }
 
 void MaterialMgr::GenericContactCallback(const NewtonJoint* contactJoint,

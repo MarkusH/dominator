@@ -63,7 +63,7 @@ public:
 	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
 
 	virtual bool contains(const NewtonBody* const body);
-	virtual bool contains(const Object& object);
+	virtual bool contains(const __Object* object);
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 	virtual void render();
 

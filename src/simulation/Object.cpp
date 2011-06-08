@@ -25,9 +25,9 @@ __Object::__Object(Type type)
 
 __Object::~__Object()
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	std::cout << "delete object" << std::endl;
-#endif
+//#endif
 }
 
 
@@ -365,9 +365,9 @@ bool __RigidBody::contains(const NewtonBody* const body)
 	return m_body == body;
 }
 
-bool __RigidBody::contains(const Object& object)
+bool __RigidBody::contains(const __Object* object)
 {
-	if (object.get() == this)
+	if (object == this)
 		return true;
 	return false;
 }
@@ -569,7 +569,7 @@ struct MeshEntry {
 	int materialID;
 	MeshEntry() { }
 	MeshEntry(Lib3dsMesh* mesh, const char* material, int defaultMaterial) : mesh(mesh) {
-		materialID = material ? MaterialMgr::instance().getID(material) : defaultMaterial;
+		materialID = material && material[0] ? MaterialMgr::instance().getID(material) : defaultMaterial;
 	}
 	static bool compare(const MeshEntry& first, const MeshEntry& second) {
 		return first.materialID < second.materialID;
@@ -644,7 +644,7 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 			}
 
 			if (m_renderingType == MESH_EXACT) {
-				//faceMaterial = face->material ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
+				//faceMaterial = face->material && face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
 				NewtonMeshAddFace(m_mesh, 3, vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
 			}
 

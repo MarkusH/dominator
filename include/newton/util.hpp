@@ -50,6 +50,7 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z);
  */
 float getConvexCastPlacement(NewtonBody* body);
 
+
 /**
  * Renders the specified collision shape, transformed with the given matrix.
  *

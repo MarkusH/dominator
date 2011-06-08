@@ -29,8 +29,9 @@ __Compound::__Compound(const Vec3f& position)
 
 __Compound::~__Compound()
 {
-	m_nodes.clear();
-	m_joints.clear();
+	std::cout << "delete compound" << std::endl;
+	//m_nodes.clear();
+	//m_joints.clear();
 }
 
 float __Compound::convexCastPlacement(bool apply)
@@ -148,9 +149,9 @@ bool __Compound::contains(const NewtonBody* const body)
 	return false;
 }
 
-bool __Compound::contains(const Object& object)
+bool __Compound::contains(const __Object* object)
 {
-	if (object.get() == this)
+	if (object == this)
 		return true;
 	for (std::list<Object>::iterator itr = m_nodes.begin();
 			itr != m_nodes.end(); ++itr) {

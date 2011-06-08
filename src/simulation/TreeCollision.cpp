@@ -76,8 +76,8 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 				//m_vertices[finishedFaces*3 + i][1] *= 10.0f;
 				//m_vertices[finishedFaces*3 + i][2] *= 10.0f;
 			}
-			faceMaterial = face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
-			std::cout << faceMaterial << std::endl;
+			faceMaterial = face->material && face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
+			//std::cout << faceMaterial << std::endl;
 			NewtonTreeCollisionAddFace(collision, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
 			finishedFaces++;
 		}
@@ -186,9 +186,9 @@ bool __TreeCollision::contains(const NewtonBody* const body)
 	return m_body == body;
 }
 
-bool __TreeCollision::contains(const Object& object)
+bool __TreeCollision::contains(const __Object* object)
 {
-	if (object.get() == this)
+	if (object == this)
 		return true;
 	return false;
 }

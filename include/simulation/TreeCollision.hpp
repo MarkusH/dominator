@@ -28,7 +28,7 @@ public:
 	virtual float convexCastPlacement(bool apply = true) { return 0.0f; };
 
 	virtual bool contains(const NewtonBody* const body);
-	virtual bool contains(const Object& object);
+	virtual bool contains(const __Object* object);
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 

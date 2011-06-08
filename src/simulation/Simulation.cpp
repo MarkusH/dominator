@@ -90,7 +90,6 @@ void Simulation::load(const std::string&fileName)
 void Simulation::init()
 {
 	clear();
-
 	m_camera.positionCamera(Vec3f(0.0f, 10.0f, 0.0f), -Vec3f::zAxis(), Vec3f::yAxis());
 
 	m_world = NewtonCreate();
@@ -106,12 +105,12 @@ void Simulation::init()
 	NewtonSetSolverModel(m_world, 1);
 	NewtonSetFrictionModel(m_world, 1);
 	NewtonSetThreadsCount(m_world, 2);
-
-	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 1);
-
+	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 0);
 
 	int id = NewtonMaterialGetDefaultGroupID(m_world);
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
+
+	__Domino::genDominoBuffers(m_vertexBuffer);
 
 
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
@@ -134,7 +133,7 @@ void Simulation::init()
 */
 
 	// newtons cradle
-	if (0)
+	if (1)
 	{
 		RigidBody boxes[5];
 		RigidBody spheres[5];
@@ -162,7 +161,7 @@ void Simulation::init()
 	}
 
 	// assemlby vs hull comparison
-	if (0)
+	if (1)
 	{
 		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", false));
 		add(convex);
@@ -174,7 +173,7 @@ void Simulation::init()
 	}
 
 	// simple seesaw with hinge
-	if (0)
+	if (1)
 	{
 		Compound c = Compound(new __Compound());
 		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
@@ -188,7 +187,7 @@ void Simulation::init()
 	}
 
 	// rope
-	if (0)
+	if (1)
 	{
 		RigidBody obj0, obj1;
 		const int linksCount = 15;
@@ -227,7 +226,7 @@ void Simulation::init()
 	}
 
 	// wagon with tires and hinges
-	if (0)
+	if (1)
 	{
 		// hinge pinDir is z Axis
 
@@ -264,6 +263,7 @@ void Simulation::init()
 
 		c->setMatrix(Mat4f::rotY(PI*0.5f) * Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)));
 		c->convexCastPlacement();
+
 		/*
 		Compound c = Compound(new __Compound());
 		Object chassis = __Object::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
@@ -315,8 +315,9 @@ int Simulation::add(const Object& object, int id)
 	return m_nextID-1;
 }
 
-void Simulation::remove(Object object)
+void Simulation::remove(const Object& object)
 {
+	std::cout << "remove" << std::endl;
 	// check if it is a compound, if so we have to check whether
 	// one of its children is in a sub-mesh
 
@@ -335,49 +336,64 @@ void Simulation::remove(Object object)
 	// multiple sub-meshes with the same data and different materials
 	std::set<__Object*> deleted;
 
-	// iterate over all sub-buffers and check if it has to be deleted
-	for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin();
-			it != m_vertexBuffer.m_buffers.end(); ) {
+	//TODO: think about what happens if a domino is inside a compound
+	// add small middle large to first three buffers of vbo
 
-		__Object* curObj = (__Object*)(*it)->object;
-
-		// adjust the offsets according to the previously deleted buffers
-		(*it)->indexOffset -= indexOffset;
-		(*it)->dataOffset -= dataOffset;
-
-		// delete the data associated with the object
-		if (curObj->contains(object)) {
-			const unsigned co = (*it)->indexOffset;
-			const unsigned cc = (*it)->indexCount;
-			indexOffset += cc;
-
-			// delete vertices
-			if (deleted.find(curObj) == deleted.end()) {
-				const unsigned vo = (*it)->dataOffset * m_vertexBuffer.floatSize();
-				const unsigned vc = (*it)->dataCount * m_vertexBuffer.floatSize();
-				dataOffset += (*it)->dataCount;
-				m_vertexBuffer.m_data.erase(m_vertexBuffer.m_data.begin() + vo,
-						m_vertexBuffer.m_data.begin() + vo + vc);
-				deleted.insert(curObj);
+	// delete only the buffer and not the data, if it is a domino
+	/*
+	if (object->getType() <= __Object::DOMINO_LARGE) {
+		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin(); it != m_vertexBuffer.m_buffers.end(); ++it) {
+			if ((*it)->object == object.get()) {
+				delete (*it);
+				m_vertexBuffer.m_buffers.erase(it);
+				break;
 			}
-
-			// delete indices
-			m_vertexBuffer.m_indices.erase(m_vertexBuffer.m_indices.begin() + co,
-					m_vertexBuffer.m_indices.begin() + co + cc);
-
-			// delete sub-mesh
-			delete (*it);
-			it = m_vertexBuffer.m_buffers.erase(it);
-		} else {
-			// adjust the indices of the object, because vertices were deleted
-			if (dataOffset > 0) {
-				for (unsigned i = 0; i < (*it)->indexCount; ++i)
-					m_vertexBuffer.m_indices[i + (*it)->indexOffset] -= dataOffset;
-			}
-			++it;
 		}
-	}
+	} else {
+	*/
+		// iterate over all sub-buffers and check if it has to be deleted
+		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin();
+				it != m_vertexBuffer.m_buffers.end(); ) {
 
+			__Object* curObj = (__Object*)(*it)->object;
+
+			// adjust the offsets according to the previously deleted buffers
+			(*it)->indexOffset -= indexOffset;
+			(*it)->dataOffset -= dataOffset;
+
+			// delete the data associated with the object
+			if (object->contains(curObj)) {
+				const unsigned co = (*it)->indexOffset;
+				const unsigned cc = (*it)->indexCount;
+				indexOffset += cc;
+
+				// delete vertices
+				if (deleted.find(curObj) == deleted.end()) {
+					const unsigned vo = (*it)->dataOffset * m_vertexBuffer.floatSize();
+					const unsigned vc = (*it)->dataCount * m_vertexBuffer.floatSize();
+					dataOffset += (*it)->dataCount;
+					m_vertexBuffer.m_data.erase(m_vertexBuffer.m_data.begin() + vo,
+							m_vertexBuffer.m_data.begin() + vo + vc);
+					deleted.insert(curObj);
+				}
+
+				// delete indices
+				m_vertexBuffer.m_indices.erase(m_vertexBuffer.m_indices.begin() + co,
+						m_vertexBuffer.m_indices.begin() + co + cc);
+
+				// delete sub-mesh
+				delete (*it);
+				it = m_vertexBuffer.m_buffers.erase(it);
+			} else {
+				// adjust the indices of the object, because vertices were deleted
+				if (dataOffset > 0) {
+					for (unsigned i = 0; i < (*it)->indexCount; ++i)
+						m_vertexBuffer.m_indices[i + (*it)->indexOffset] -= dataOffset;
+				}
+				++it;
+			}
+		}
+	//}
 	m_objects.remove(object);
 
 	if (m_environment == object)
@@ -436,6 +452,7 @@ void Simulation::mouseMove(int x, int y)
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT)) {
+		std::cout << "pickMove" << std::endl;
 		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 
 		/*
@@ -452,7 +469,7 @@ void Simulation::mouseMove(int x, int y)
 						Mat4f::rotY(25.0f * PI / 180.0f) *
 						Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
 
-				Object obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
+				Object obj = __Object::createBox(matr	std::cout << "pick" << std::endl;ix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 				add(obj);
 				std::cout << "bx: " << m_vertexBuffer.m_buffers.size() << std::endl;
 			} else if (m_objects.size() == 2) {
@@ -502,6 +519,7 @@ void Simulation::mouseMove(int x, int y)
 
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
+	Vec3f old = m_pointer;
 	m_pointer = m_camera.pointer(x, y);
 	if (button == util::MIDDLE && down) {
 		setEnabled(true);
@@ -542,9 +560,34 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		*/
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_pointer);
-		Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
+		__Domino::Type type = __Domino::DOMINO_SMALL;
+		/*
+		switch (rand() % 3) {
+		case 0:
+			break;
+		case 1:
+			type = __Domino::DOMINO_MIDDLE;
+			break;
+		case 2:
+			type = __Domino::DOMINO_LARGE;
+
+		}
+		Domino domino = __Domino::createDomino(type, matrix, 1.0f, "domino");
 		add(domino);
+		 */
+
+		Vec3f dir = (m_pointer - old);
+		float len = dir.len();
+		dir.normalize();
+		matrix = Mat4f(Vec3f::yAxis(), dir, old);
+		for (float d = 0.0f; d <= len; d += 3.5f) {
+			matrix.setW(old + dir * d);
+			Domino domino = __Domino::createDomino(type, matrix, 1.0f, "domino");
+			add(domino);
+		//	std::cout << "add" << std::endl;
+		}
 	} else if (button == util::RIGHT) {
+		std::cout << "pickDown" << std::endl;
 		newton::mousePick(m_world, Vec2f(x, y), down);
 	}
 }
@@ -564,6 +607,8 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		}
 		if (m_selectedObject && m_selectedObject == m_environment)
 			m_selectedObject = Object();
+		//if (m_selectedObject)
+		//	remove(m_selectedObject);
 	}
 }
 
@@ -591,7 +636,9 @@ void Simulation::update()
 		timeSlice += delta * 1000.0f;
 
 		while (timeSlice > 12.0f) {
+			//std::cout << "begin update" << std::endl;
 			NewtonUpdate(m_world, (12.0f / 1000.0f) * 20.0f);
+			//std::cout << "end update" << std::endl;
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
@@ -655,9 +702,11 @@ void Simulation::render()
 */
 
 		ogl::SubBuffers::iterator itr = m_vertexBuffer.m_buffers.begin();
+		//++itr; ++itr; ++itr;
 		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {
-			ogl::SubBuffer* buf = (*itr);
+			const ogl::SubBuffer* buf = (*itr);
 			__Object* obj = (__Object*)buf->object;
+			if (!obj) continue;
 			applyMaterial(buf->material);
 			glPushMatrix();
 			glMultMatrixf(obj->getMatrix()[0]);
@@ -682,8 +731,8 @@ void Simulation::render()
 	if (m_selectedObject) {
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			if (*itr == m_selectedObject)
-			(*itr)->render();
+			//if (*itr == m_selectedObject)
+				//(*itr)->render();
 		}
 	}
 

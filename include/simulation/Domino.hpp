@@ -63,6 +63,12 @@ public:
 	__Domino(Type type, const Mat4f& matrix, const std::string& material = "");
 	virtual ~__Domino();
 
+#ifndef CONVEX_DOMINO
+	virtual void genBuffers(ogl::VertexBuffer& vbo);
+
+	static void genDominoBuffers(ogl::VertexBuffer& vbo);
+#endif
+
 	static Domino createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material = "");
 };
 

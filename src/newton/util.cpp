@@ -230,6 +230,7 @@ static void PhysicsApplyPickForce (const NewtonBody* body, float timestep, int t
 
 bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down)
 {
+	return false;
 	dMatrix matrix;
 
 	if (down) {
@@ -256,9 +257,10 @@ bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down)
 				rayLocalNormal = matrix.UnrotateVector(rayLocalNormal);
 
 				// save the transform call back
-				chainForceCallBack = NewtonBodyGetForceAndTorqueCallback (pickedBody);
-				_ASSERTE (chainForceCallBack != PhysicsApplyPickForce);
-
+				if (NewtonBodyGetForceAndTorqueCallback (pickedBody) != PhysicsApplyPickForce) {
+					chainForceCallBack = NewtonBodyGetForceAndTorqueCallback (pickedBody);
+					_ASSERTE (chainForceCallBack != PhysicsApplyPickForce);
+				}
 				// set a new call back
 				NewtonBodySetForceAndTorqueCallback (pickedBody, PhysicsApplyPickForce);
 			}
