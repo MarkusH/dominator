@@ -60,7 +60,7 @@ struct Material {
  */
 struct MaterialPair {
 	/** The id of the two materials */
-	int id0, id1;
+	int mat0, mat1;
 
 	float elasticity;
 	float staticFriction;
@@ -210,11 +210,11 @@ public:
 	 * Retrieves the material pair of the given material ids. If
 	 * there is none, returns the default pair.
 	 *
-	 * @param id0 The first id
-	 * @param id1 The second id
+	 * @param mat0 The first id
+	 * @param mat1 The second id
 	 * @return The material pair or the default pair
 	 */
-	MaterialPair& getPair(int id0, int id1);
+	MaterialPair& getPair(int mat0, int mat1);
 
 	/**
 	 * The Newton callback called when a contact is being resolved.
