@@ -470,7 +470,8 @@ void Simulation::mouseMove(int x, int y)
 			Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
 			Vec3f pos2 = m_camera.pointer(x, y);
 #ifdef MOUSE_ROTATE
-			cur_drag = pos2;
+			//cur_drag = pos2;
+			cur_drag = start_mat.getW() + (pos2-start_mat.getW()).normalized() * (start_drag-start_mat.getW()).len();
 #endif
 #ifdef PLANE_MOVE
 			Vec3f R1, R2, S1, S2;
@@ -587,8 +588,14 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 	m_pointer = m_camera.pointer(x, y);
 	if (button == util::LEFT) {
 		m_selectedObject = selectObject(x, y);
-		if (m_selectedObject && m_selectedObject == m_environment)
-			m_selectedObject = Object();
+		if (m_selectedObject) {
+			if (m_selectedObject == m_environment)
+				m_selectedObject = Object();
+#ifdef MOUSE_ROTATE
+			start_mat = m_selectedObject->getMatrix();
+#endif
+		}
+
 	}
 }
 
@@ -714,7 +721,6 @@ void Simulation::render()
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glColor4f(1.0f, 1.0, 1.0f, 0.5f);
-		glDisable(GL_CULL_FACE);
 		//if (m_mouseAdapter.isDown(util::RIGHT)) {
 
 			Vec3f pos = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
