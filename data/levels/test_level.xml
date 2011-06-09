@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level>
+	<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, -4, 0, 1" width=" " height=" " depth=" " freezeState="0" damping=" " material=" " mass=" "/>
+	<compound id="1" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 15, -10, 1">
+		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 8, 32, -20, 1" width=" " height=" " depth=" " freezeState="0" damping=" " material=" " mass=" "/>
+		<object id="1" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 8, 30, -20, 1" radius_x=" " radius_y=" " radius_z=" " freezeState="0" damping=" " material=" " mass=" "/>
+		<joint type="hinge" parentID="0" childID="1" pivot="-8, 15, -10" pinDir="0, 0, 1"/>
+	</compound>
+</level>
+

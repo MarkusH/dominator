@@ -42,7 +42,7 @@ public:
 
 	__Joint(Type type);
 
-	static void save(const __Joint& joint /*node*/);
+	static void save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
@@ -60,7 +60,7 @@ public:
 
 	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
 
-	static void save(const __Hinge& hinge/*, rapidxml::xml_node<>* node*/);
+	static void save(const __Hinge& hinge, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static Hinge load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 

@@ -107,7 +107,7 @@ public:
 	 *
 	 * @param object The object itself
 	 */
-	static void save(__Object& object, rapidxml::xml_document<>* doc);
+	static void save(__Object& object, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc);
 
 	/**
 	 * Loads an object from the given node.

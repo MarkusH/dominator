@@ -67,7 +67,7 @@ public:
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 	virtual void render();
 
-	static void save(const __Compound& compound, rapidxml::xml_node<>* node/* node */);
+	static void save(__Compound& compound, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc);
 	static Compound load(rapidxml::xml_node<>* node);
 };
 

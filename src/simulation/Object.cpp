@@ -16,17 +16,9 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
 #include <stdio.h>
+#include <util/ToString.hpp>
 
 namespace sim {
-
-template<typename T>
-char* toString(T value)
-{
-	std::stringstream sst;
-	sst << value;
-	sst.seekg(0, std::ios::beg);
-	return strdup(sst.str().c_str());
-}
 
 __Object::__Object(Type type)
 	: m_type(type)
@@ -41,14 +33,23 @@ __Object::~__Object()
 }
 
 
-void __Object::save(__Object& object, rapidxml::xml_document<>* doc)
+void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
 {
 	using namespace rapidxml;
 
 	// declarations
 	xml_node<>* node;
-	char *pId, *pType, *pMatrix;
-	xml_attribute<> *attrI, *attrT, *attrM;
+	char *pId, *pType, *pMatrix, *pFreezeState, *pDamping, *pMaterial, *pMass;
+	xml_attribute<> *attrI, *attrT, *attrM, *attrFS, *attrDamp, *attrMat, *attrMass;
+
+	// sphere only
+	char *pRadiusX, *pRadiusY, *pRadiusZ;
+	xml_attribute<> *attrX, *attrY, *attrZ;
+
+	// box only
+	char *pWidth, *pHeight, *pDepth;
+	xml_attribute<> *attrW, *attrH, *attrD;
+	
 
 	//TODO save convex hull, convex assembly
 
@@ -56,11 +57,11 @@ void __Object::save(__Object& object, rapidxml::xml_document<>* doc)
 	case BOX:
 		// create and append object node
 		node = doc->allocate_node(node_element, "object");
-		doc->append_node(node);
+		parent->insert_node(0, node);
 
 		// create object attributes
 		// set attribute "id" to m_id
-		pId = doc->allocate_string(toString(object.getID()));
+		pId = doc->allocate_string(util::toString(object.getID()));
 		attrI = doc->allocate_attribute("id", pId);
 		node->append_attribute(attrI);
 
@@ -70,25 +71,50 @@ void __Object::save(__Object& object, rapidxml::xml_document<>* doc)
 		node->append_attribute(attrT);
 
 		// set attribute "matrix"
-		pMatrix = doc->allocate_string(toString(object.getMatrix()));
+		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
-		// width
-		// height
-		// depth
-		// freezeState
-		// damping
-		// material
-		// mass
+
+		// TODO width
+		pWidth = doc->allocate_string(" ");
+		attrW = doc->allocate_attribute("width", pWidth);
+		node->append_attribute(attrW);
+		// TODO height
+		pHeight = doc->allocate_string(" ");
+		attrH = doc->allocate_attribute("height", pHeight);
+		node->append_attribute(attrH);
+		// TODO depth
+		pDepth = doc->allocate_string(" ");
+		attrD = doc->allocate_attribute("depth", pDepth);
+		node->append_attribute(attrD);
+
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(object.getFreezeState()));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+
+		// TODO damping
+		pDamping = doc->allocate_string(" ");
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
+		// TODO material
+		pMaterial = doc->allocate_string(" ");
+		attrMat = doc->allocate_attribute("material", pMaterial);
+		node->append_attribute(attrMat);
+		// TODO mass
+		pMass = doc->allocate_string(" ");
+		attrMass = doc->allocate_attribute("mass", pMass);
+		node->append_attribute(attrMass);
+
 		break;
 	case SPHERE:
 		// create and append object node
 		node = doc->allocate_node(node_element, "object");
-		doc->append_node(node);
+		parent->insert_node(0, node);
 
 		// create object attributes
 		// set attribute "id" to m_id
-		pId = doc->allocate_string(toString(object.getID()));
+		pId = doc->allocate_string(util::toString(object.getID()));
 		attrI = doc->allocate_attribute("id", pId);
 		node->append_attribute(attrI);
 
@@ -98,35 +124,59 @@ void __Object::save(__Object& object, rapidxml::xml_document<>* doc)
 		node->append_attribute(attrT);
 
 		// set attribute "matrix"
-		pMatrix = doc->allocate_string(toString(object.getMatrix()));
+		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
 
-		// radius_x
-		// radius_y
-		// radius_z
-		// freezeState
-		// damping
-		// material
-		// mass
+		// TODO radius_x
+		pRadiusX = doc->allocate_string(" ");
+		attrX = doc->allocate_attribute("radius_x", pRadiusX);
+		node->append_attribute(attrX);
+		// TODO radius_y
+		pRadiusY = doc->allocate_string(" ");
+		attrY = doc->allocate_attribute("radius_y", pRadiusY);
+		node->append_attribute(attrY);
+		// TODO radius_z
+		pRadiusZ = doc->allocate_string(" ");
+		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
+		node->append_attribute(attrZ);
+
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(object.getFreezeState()));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+
+		// TODO damping
+		pDamping = doc->allocate_string(" ");
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
+		// TODO material
+		pMaterial = doc->allocate_string(" ");
+		attrMat = doc->allocate_attribute("material", pMaterial);
+		node->append_attribute(attrMat);
+		// TODO mass
+		pMass = doc->allocate_string(" ");
+		attrMass = doc->allocate_attribute("mass", pMass);
+		node->append_attribute(attrMass);
+
 		break;
 	case COMPOUND:
 		node = doc->allocate_node(node_element, "compound");
-		doc->append_node(node);
+		parent->insert_node(0, node);
 
 		// create object attributes
 		// set attribute "id" to m_id
-		pId = doc->allocate_string(toString(object.getID()));
+		pId = doc->allocate_string(util::toString(object.getID()));
 		attrI = doc->allocate_attribute("id", pId);
 		node->append_attribute(attrI);
 
 		// set attribute "matrix"
-		pMatrix = doc->allocate_string(toString(object.getMatrix()));
+		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
 		
 		// load compound members
-		//__Compound::save((__Compound&)object, node, doc);
+		__Compound::save((__Compound&)object, node, doc);
 
 		return;
 	default:

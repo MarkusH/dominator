@@ -8,6 +8,7 @@
 #include <simulation/Object.hpp>
 #include <simulation/Joint.hpp>
 #include <iostream>
+#include <util/ToString.hpp>
 
 
 namespace sim {
@@ -18,15 +19,17 @@ __Joint::__Joint(Type type)
 
 }
 
-void __Joint::save(const __Joint& joint /*node*/)
+void __Joint::save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
 {
-	// generate child node "joint" and append it to node
-
+	//TODO: for testing only
+	__Hinge::save((const __Hinge&)joint, parent, doc);
+		return;
+	
 	//TODO: save BallAndSocket joints, too
 	switch (joint.type) {
 	case HINGE:
-		// set attribute to "hinge"
-		__Hinge::save((const __Hinge&)joint/*, generatedNode*/);
+	
+		__Hinge::save((const __Hinge&)joint, parent, doc);
 		return;
 	case BALL_AND_SOCKET:
 		// don't do anything yet, just fix warnings
@@ -40,7 +43,7 @@ void __Joint::save(const __Joint& joint /*node*/)
 Joint __Joint::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
 	//type attribute
-	if( node->first_attribute()->value() == "hinge" ) return __Hinge::load(list, node);
+	if( std::string(node->first_attribute()->value()) == "hinge" ) return __Hinge::load(list, node);
 	//TODO make sure a value is always returned
 	//Joint result;
 	//return result;
@@ -72,15 +75,39 @@ Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Obje
 	return result;
 }
 
-void __Hinge::save(const __Hinge& hinge /* node */)
+void __Hinge::save(const __Hinge& hinge, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
 {
-	//int parentID = hinge.parent ? hinge.parent->getID() : -1;
-	//int childID = hinge.child->getID();
+	using namespace rapidxml;
 
-	// set attribute "parentID" to parentID
-	// set attribute "childID" to  childID
-	// set attribute "pivot" to  hinge.pivot.str()
-	// set attribute "pinDir" to  hinge.pinDir.str()
+	xml_node<>* node = doc->allocate_node(node_element, "joint");
+	sibling->append_node(node);
+	
+	// type attribute
+	char* pType = doc->allocate_string("hinge");
+	xml_attribute<>* attrT = doc->allocate_attribute("type", pType);
+	node->append_attribute(attrT);
+		
+	// parentID attribute
+	int parentID = hinge.parent ? hinge.parent->getID() : -1;
+	char* pParentID = doc->allocate_string(util::toString(parentID));
+	xml_attribute<>* attrP = doc->allocate_attribute("parentID", pParentID);
+	node->append_attribute(attrP);
+	
+	// childID attribute
+	int childID = hinge.child->getID(); // error occurs at getID() -33686019
+	char* pChildID = doc->allocate_string(util::toString(childID));
+	xml_attribute<>* attrC = doc->allocate_attribute("childID", pChildID);
+	node->append_attribute(attrC);
+	
+	// pivot attribute
+	char* pPivot = doc->allocate_string(hinge.pivot.str().c_str()); // hinge.pivot contains bullshit
+	xml_attribute<>* attrPi = doc->allocate_attribute("pivot", pPivot);
+	node->append_attribute(attrPi);
+
+	// pinDir attribute
+	char* pPinDir = doc->allocate_string(hinge.pinDir.str().c_str()); // hinge.pinDir doesn't contain the value at load
+	xml_attribute<>* attrPD = doc->allocate_attribute("pinDir", pPinDir);
+	node->append_attribute(attrPD);
 }
 
 Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)

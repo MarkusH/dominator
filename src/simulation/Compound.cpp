@@ -47,13 +47,19 @@ float __Compound::convexCastPlacement(bool apply)
 	return matrix._42;
 }
 
-void __Compound::save(const __Compound& compound, rapidxml::xml_node<>* node)
+void __Compound::save(__Compound& compound, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc)
 {
 	// foreach child_node
-	// 		__Object::save(child_node, node, doc)
+	for (std::list<Object>::iterator itr = compound.m_nodes.begin();
+				itr != compound.m_nodes.end(); ++itr) {
+					__Object::save(*itr->get(), node, doc);
+	}
 
 	// foreach joint
-	// 		__Joint::save(joint, node, doc)
+	for (std::list<Joint>::iterator itr = compound.m_joints.begin();
+				itr != compound.m_joints.end(); ++itr) {
+					__Joint::save(*itr->get(), node, doc);
+	}
 }
 
 Compound __Compound::load(rapidxml::xml_node<>* nodes)
