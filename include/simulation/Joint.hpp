@@ -43,7 +43,7 @@ public:
 	__Joint(Type type);
 
 	static void save(const __Joint& joint /*node*/);
-	Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
+	static Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
 class __Hinge : public __Joint, public CustomHinge {

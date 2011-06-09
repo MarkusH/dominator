@@ -76,12 +76,12 @@ void Simulation::save(const std::string& fileName)
 	xml_node<>* level = doc.allocate_node(node_element, "level");
 	doc.append_node(level);
 
-	/*
+	
 	ObjectList::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
 		// add node paramenter to save method
-		__Object::save(*itr->get());
-	}*/
+		__Object::save(*itr->get(), &doc);
+	}
 
 	// save attribute "gravity" to m_gravity
 	// save attribute "environment" to
@@ -119,6 +119,8 @@ void Simulation::load(const std::string& fileName)
 
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 		Object object = __Object::load(node);
+		// load m_id from "id"
+		object->setID(atoi(node->first_attribute()->value()));
 		add(object, object->getID());
 	}
 
@@ -159,8 +161,10 @@ void Simulation::init()
 
 
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
-	add(m_environment);
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	//add(m_environment);
+	load("data/levels/level.xml");
+	save("data/levels/test_level.xml");
 
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
@@ -206,8 +210,9 @@ void Simulation::init()
 	}
 
 	// assemlby vs hull comparison
+	if(0)
 	{
-		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", false));
+		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", true));
 		add(convex);
 		convex->convexCastPlacement();
 
@@ -270,7 +275,7 @@ void Simulation::init()
 	}
 
 	// wagon with tires and hinges
-	if (1)
+	if (0)
 	{
 		// hinge pinDir is z Axis
 
@@ -329,7 +334,7 @@ void Simulation::init()
 	}
 
 
-	setEnabled(true);
+	setEnabled(false);
 }
 
 void Simulation::clear()

@@ -1,10 +1,12 @@
 <?xml version="1.0" ?>
 <level>
-    <object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, -4, 0, 1" width="2000.0" height="2.0" depth="2000.0" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="white" mass="0.0" />
-    <compound id="2" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 15, -10, 1">
-        <!-- always put your objects in front of the joint -->
-        <object id="0" type="box" matrix="1, 0, -0, 0; -0, 1, -0.0, 0; 0, 0.0, 1, 0; 8, 17.0, -10.0, 1" width="0.05" height="5.0" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05" />
-        <object id="1" type="sphere" matrix="1, 0, -0, 0; -0, 1, -0.0, 0; 0, 0.0, 1, 0; 8, 15.0, -10.0, 1" radius_x="2.0" radius_y="2.0" radius_z="2.0" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2.0" />
-        <joint type="hinge" parentID="0" childID="1" pivot="-8, 15, -10" pinDir="0, 0, 1" />
-    </compound>
+  <!--
+  <object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, -4, 0, 1" width="20.0" height="2.0" depth="20.0" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="white" mass="0.0" />
+  -->
+  <compound id="2" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 15, -10, 1">
+    <!-- always put your objects in front of the joint -->
+    <object id="0" type="box" matrix="1, 0, -0, 0; -0, 1, -0.0, 0; 0, 0.0, 1, 0; 8, 17.0, -10.0, 1" width="0.05" height="5.0" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05" />
+    <object id="1" type="sphere" matrix="1, 0, -0, 0; -0, 1, -0.0, 0; 0, 0.0, 1, 0; 8, 15.0, -10.0, 1" radius_x="2.0" radius_y="2.0" radius_z="2.0" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2.0" />
+    <joint type="hinge" parentID="0" childID="1" pivot="-8, 15, -10" pinDir="0, 0, 1" />
+  </compound>
 </level>

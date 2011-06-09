@@ -47,32 +47,39 @@ float __Compound::convexCastPlacement(bool apply)
 	return matrix._42;
 }
 
-void __Compound::save(const __Compound& compound /* node */)
+void __Compound::save(const __Compound& compound, rapidxml::xml_node<>* node)
 {
-	// set attribute matrix to m_matrix.str()
-
 	// foreach child_node
-	// 		__Object::save(child_node, node)
+	// 		__Object::save(child_node, node, doc)
 
 	// foreach joint
-	// 		__Joint::save(joint, node)
+	// 		__Joint::save(joint, node, doc)
 }
 
 Compound __Compound::load(rapidxml::xml_node<>* nodes)
 {
+	using namespace rapidxml;
+
 	Compound result = Compound(new __Compound());
 	// load m_matrix
+
+	// type attribute
+	xml_attribute<>* attr = nodes->first_attribute();
+
+	// matrix attribute
+	attr = attr->next_attribute();
+	result->m_matrix.assign(attr->value());
 	
-	using namespace rapidxml;
+	
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-		if(node->name() == "object") {
+		std::string type = node->name();
+		if(type == "object") {
 			Object obj = __Object::load(node);
 	 		result->add(obj);
 		}
-		if(node->name() == "joint") {
+		if(type == "joint") {
 			//std::list<Object>& list = std::list<Object>(result->m_nodes);
-			Joint joint;
-			joint->load(result->m_nodes, node);
+			Joint joint = __Joint::load(result->m_nodes, node);
 	 		result->m_joints.push_back(joint);
 		}
 	}

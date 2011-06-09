@@ -19,6 +19,15 @@
 
 namespace sim {
 
+template<typename T>
+char* toString(T value)
+{
+	std::stringstream sst;
+	sst << value;
+	sst.seekg(0, std::ios::beg);
+	return strdup(sst.str().c_str());
+}
+
 __Object::__Object(Type type)
 	: m_type(type)
 {
@@ -32,23 +41,93 @@ __Object::~__Object()
 }
 
 
-void __Object::save(const __Object& object /* node */)
+void __Object::save(__Object& object, rapidxml::xml_document<>* doc)
 {
-	// create new node and append it to the given node
+	using namespace rapidxml;
 
-	// set attribute "id" to m_id
+	// declarations
+	xml_node<>* node;
+	char *pId, *pType, *pMatrix;
+	xml_attribute<> *attrI, *attrT, *attrM;
 
 	//TODO save convex hull, convex assembly
+
 	switch (object.m_type) {
 	case BOX:
+		// create and append object node
+		node = doc->allocate_node(node_element, "object");
+		doc->append_node(node);
+
+		// create object attributes
+		// set attribute "id" to m_id
+		pId = doc->allocate_string(toString(object.getID()));
+		attrI = doc->allocate_attribute("id", pId);
+		node->append_attribute(attrI);
+
 		// set attribute "type" to  "box"
+		pType = doc->allocate_string("box");
+		attrT = doc->allocate_attribute("type", pType);
+		node->append_attribute(attrT);
+
+		// set attribute "matrix"
+		pMatrix = doc->allocate_string(toString(object.getMatrix()));
+		attrM = doc->allocate_attribute("matrix", pMatrix);
+		node->append_attribute(attrM);
+		// width
+		// height
+		// depth
+		// freezeState
+		// damping
+		// material
+		// mass
 		break;
 	case SPHERE:
+		// create and append object node
+		node = doc->allocate_node(node_element, "object");
+		doc->append_node(node);
+
+		// create object attributes
+		// set attribute "id" to m_id
+		pId = doc->allocate_string(toString(object.getID()));
+		attrI = doc->allocate_attribute("id", pId);
+		node->append_attribute(attrI);
+
 		// set attribute "type" to  "sphere"
+		pType = doc->allocate_string("sphere");
+		attrT = doc->allocate_attribute("type", pType);
+		node->append_attribute(attrT);
+
+		// set attribute "matrix"
+		pMatrix = doc->allocate_string(toString(object.getMatrix()));
+		attrM = doc->allocate_attribute("matrix", pMatrix);
+		node->append_attribute(attrM);
+
+		// radius_x
+		// radius_y
+		// radius_z
+		// freezeState
+		// damping
+		// material
+		// mass
 		break;
 	case COMPOUND:
-		// set attribute "type" to  "compound"
-		//__Compound::save(object, generatedNode);
+		node = doc->allocate_node(node_element, "compound");
+		doc->append_node(node);
+
+		// create object attributes
+		// set attribute "id" to m_id
+		pId = doc->allocate_string(toString(object.getID()));
+		attrI = doc->allocate_attribute("id", pId);
+		node->append_attribute(attrI);
+
+		// set attribute "matrix"
+		pMatrix = doc->allocate_string(toString(object.getMatrix()));
+		attrM = doc->allocate_attribute("matrix", pMatrix);
+		node->append_attribute(attrM);
+		
+		// load compound members
+		//__Compound::save((__Compound&)object, node, doc);
+
 		return;
 	default:
 		return;
@@ -60,8 +139,6 @@ void __Object::save(const __Object& object /* node */)
 
 Object __Object::load(rapidxml::xml_node<>* node)
 {
-	// load m_id from "id"
-
 	if(std::string(node->name()) == "compound")	return __Compound::load(node);
 	else return __RigidBody::load(node);
 }
@@ -260,9 +337,8 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float w, h, d; // box
 	float x, y, z; // sphere
 
-	//attribute id
+	//attribute id is set in __Object::load()
 	xml_attribute<>* attr = node->first_attribute();
-
 	
 	//attribute type
 	attr = attr->next_attribute();
@@ -304,9 +380,11 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	}/* set dimensions for sphere END */
 
 	//attribute freezeState
+	attr = attr->next_attribute();
 	int freezeState = atoi(attr->value());
 
 	//attribute damping
+	attr = attr->next_attribute();
 	Vec4f damping = Vec4f();
 	damping.assign(attr->value());
 
