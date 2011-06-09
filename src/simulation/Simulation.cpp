@@ -80,7 +80,7 @@ void Simulation::save(const std::string& fileName)
 	ObjectList::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
 		// add node paramenter to save method
-		__Object::save(*itr->get(), &doc);
+		__Object::save(*itr->get(), level, &doc);
 	}
 
 	// save attribute "gravity" to m_gravity

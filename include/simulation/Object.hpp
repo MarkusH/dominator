@@ -167,7 +167,7 @@ public:
 
 	virtual void render();
 
-	static void save(const __RigidBody& body /* node */);
+	static void save(const __RigidBody& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static RigidBody load(rapidxml::xml_node<>* node);
 
 	friend class __Object;

@@ -52,7 +52,6 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	
 
 	//TODO save convex hull, convex assembly
-
 	switch (object.m_type) {
 	case BOX:
 		// create and append object node
@@ -75,36 +74,8 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
 
-		// TODO width
-		pWidth = doc->allocate_string(" ");
-		attrW = doc->allocate_attribute("width", pWidth);
-		node->append_attribute(attrW);
-		// TODO height
-		pHeight = doc->allocate_string(" ");
-		attrH = doc->allocate_attribute("height", pHeight);
-		node->append_attribute(attrH);
-		// TODO depth
-		pDepth = doc->allocate_string(" ");
-		attrD = doc->allocate_attribute("depth", pDepth);
-		node->append_attribute(attrD);
-
-		// set attribute freezeState
-		pFreezeState = doc->allocate_string(util::toString(object.getFreezeState()));
-		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-		node->append_attribute(attrFS);
-
-		// TODO damping
-		pDamping = doc->allocate_string(" ");
-		attrDamp = doc->allocate_attribute("damping", pDamping);
-		node->append_attribute(attrDamp);
-		// TODO material
-		pMaterial = doc->allocate_string(" ");
-		attrMat = doc->allocate_attribute("material", pMaterial);
-		node->append_attribute(attrMat);
-		// TODO mass
-		pMass = doc->allocate_string(" ");
-		attrMass = doc->allocate_attribute("mass", pMass);
-		node->append_attribute(attrMass);
+		// load body data
+		__RigidBody::save((__RigidBody&) object, node, doc);
 
 		break;
 	case SPHERE:
@@ -127,37 +98,9 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
-
-		// TODO radius_x
-		pRadiusX = doc->allocate_string(" ");
-		attrX = doc->allocate_attribute("radius_x", pRadiusX);
-		node->append_attribute(attrX);
-		// TODO radius_y
-		pRadiusY = doc->allocate_string(" ");
-		attrY = doc->allocate_attribute("radius_y", pRadiusY);
-		node->append_attribute(attrY);
-		// TODO radius_z
-		pRadiusZ = doc->allocate_string(" ");
-		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
-		node->append_attribute(attrZ);
-
-		// set attribute freezeState
-		pFreezeState = doc->allocate_string(util::toString(object.getFreezeState()));
-		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-		node->append_attribute(attrFS);
-
-		// TODO damping
-		pDamping = doc->allocate_string(" ");
-		attrDamp = doc->allocate_attribute("damping", pDamping);
-		node->append_attribute(attrDamp);
-		// TODO material
-		pMaterial = doc->allocate_string(" ");
-		attrMat = doc->allocate_attribute("material", pMaterial);
-		node->append_attribute(attrMat);
-		// TODO mass
-		pMass = doc->allocate_string(" ");
-		attrMass = doc->allocate_attribute("mass", pMass);
-		node->append_attribute(attrMass);
+		
+		// load body data
+		__RigidBody::save((__RigidBody&) object, node, doc);
 
 		break;
 	case COMPOUND:
@@ -183,7 +126,7 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		return;
 	}
 
-	__RigidBody::save((const __RigidBody&)object /*generatedNode*/);
+	//__RigidBody::save((const __RigidBody&)object);
 }
 
 
@@ -353,30 +296,77 @@ float __RigidBody::convexCastPlacement(bool apply)
 	return matrix._42;
 }
 
-void __RigidBody::save(const __RigidBody& body /* node */)
+void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc)
 {
-	// set attribute matrix to m_matrix.str()
+	using namespace rapidxml;
+
+	char *pFreezeState, *pDamping, *pMaterial, *pMass;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass;
+
+	// sphere only
+	char *pRadiusX, *pRadiusY, *pRadiusZ;
+	xml_attribute<> *attrX, *attrY, *attrZ;
+
+	// box only
+	char *pWidth, *pHeight, *pDepth;
+	xml_attribute<> *attrW, *attrH, *attrD;
 
 	NewtonCollisionInfoRecord info;
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
+
 	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
+
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
-		// set attribute "width" to info.m_box.m_x
-		// set attribute "height" to info.m_box.m_y
-		// set attribute "depth" to info.m_box.m_z
+		// set attribute width
+		pWidth = doc->allocate_string(util::toString(info.m_box.m_x));
+		attrW = doc->allocate_attribute("width", pWidth);
+		node->append_attribute(attrW);
+		// set attribute height
+		pHeight = doc->allocate_string(util::toString(info.m_box.m_y));
+		attrH = doc->allocate_attribute("height", pHeight);
+		node->append_attribute(attrH);
+		// set attribute depth
+		pDepth = doc->allocate_string(util::toString(info.m_box.m_z));
+		attrD = doc->allocate_attribute("depth", pDepth);
+		node->append_attribute(attrD);
 		break;
 	case SERIALIZE_ID_SPHERE:
-		// set attribute "radius_x" to info.m_sphere.m_r0
-		// set attribute "radius_y" to info.m_sphere.m_r1
-		// set attribute "radius_z" to info.m_sphere.m_r2
+		// set attribute radius_x
+		pRadiusX = doc->allocate_string(util::toString(info.m_sphere.m_r0));
+		attrX = doc->allocate_attribute("radius_x", pRadiusX);
+		node->append_attribute(attrX);
+		// set attribute radius_y
+		pRadiusY = doc->allocate_string(util::toString(info.m_sphere.m_r1));
+		attrY = doc->allocate_attribute("radius_y", pRadiusY);
+		node->append_attribute(attrY);
+		// set attribute radius_z
+		pRadiusZ = doc->allocate_string(util::toString(info.m_sphere.m_r2));
+		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
+		node->append_attribute(attrZ);
 		break;
 	}
-	// set attribute "material" to body.m_material
-	// set attribute "mass" to body.getMass()
-	// set attribute "freezeState" to m_freezeState
-	// set attribute "damping" to m_damping.str()
+
+	// set attribute freezeState
+	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+	attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+	node->append_attribute(attrFS);
+
+	// set attribute damping
+	pDamping = doc->allocate_string(util::toString(body.m_damping));
+	attrDamp = doc->allocate_attribute("damping", pDamping);
+	node->append_attribute(attrDamp);
+	
+	// set attribute material
+	pMaterial = doc->allocate_string(body.m_material.c_str());
+	attrMat = doc->allocate_attribute("material", pMaterial);
+	node->append_attribute(attrMat);
+	
+	// set attribute mass
+	pMass = doc->allocate_string(util::toString(body.getMass()));
+	attrMass = doc->allocate_attribute("mass", pMass);
+	node->append_attribute(attrMass);
 }
 
 RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
