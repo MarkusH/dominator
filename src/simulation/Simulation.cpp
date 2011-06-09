@@ -621,8 +621,8 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		if (m_selectedObject && m_selectedObject == m_environment)
 			m_selectedObject = Object();
 		if (m_selectedObject) {
-			remove(m_selectedObject);
-			std::cout << "obj_count = " << m_objects.size() << ", buffers = " << m_vertexBuffer.m_buffers.size() << std::endl;
+			//remove(m_selectedObject);
+			//std::cout << "obj_count = " << m_objects.size() << ", buffers = " << m_vertexBuffer.m_buffers.size() << std::endl;
 		}
 	}
 }
@@ -664,6 +664,11 @@ void Simulation::update()
 	if (m_keyAdapter.isDown('a')) m_camera.strafe(-step);
 	if (m_keyAdapter.isDown('s')) m_camera.move(-step);
 	if (m_keyAdapter.isDown('d')) m_camera.strafe(step);
+
+	if (m_selectedObject && m_keyAdapter.isDown(0x7F)) {
+		remove(m_selectedObject);
+		m_selectedObject = Object();
+	}
 }
 
 void Simulation::applyMaterial(const std::string& material) {
@@ -746,8 +751,8 @@ void Simulation::render()
 	if (m_selectedObject) {
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			//if (*itr == m_selectedObject)
-				//(*itr)->render();
+			if (*itr == m_selectedObject)
+				(*itr)->render();
 		}
 	}
 
