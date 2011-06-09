@@ -15,10 +15,10 @@
 #include <newton/util.hpp>
 
 // Mouse pick during running simulation
-#define MOUSE_PICK
+//#define MOUSE_PICK
 
 // Move object during pause
-//#define PLANE_MOVE
+#define PLANE_MOVE
 	// Move object along billboard plane, if not set move along ground
 	//#define BILLBOARD_PLANE
 
@@ -518,6 +518,7 @@ void Simulation::mouseMove(int x, int y)
 			Mat4f matrix = m_selectedObject->getMatrix();
 			matrix.setW(matrix.getW() + (pos3 - pos1));
 			m_selectedObject->setMatrix(matrix);
+			m_selectedObject->convexCastPlacement();
 #endif
 		}
 
