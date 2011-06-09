@@ -7,8 +7,6 @@
 #include <iostream>
 
 #include <gui/mainwindow.hpp>
-#include <gui/render.hpp>
-#include <gui/dialogs.hpp>
 #include <QtGui/QPixmap>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
@@ -44,13 +42,13 @@ MainWindow::MainWindow(QApplication* app)
 	m_toolBox->addWidget(m_modifyBox);
 	app->processEvents();
 
-	m_renderWindow = new Render(this);
-	m_renderWindow->setMinimumWidth(400);
-	m_renderWindow->show();
+	m_renderWidget = new RenderWidget(this);
+	m_renderWidget->setMinimumWidth(400);
+	m_renderWidget->show();
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);
-	m_splitter->insertWidget(1, m_renderWindow);
+	m_splitter->insertWidget(1, m_renderWidget);
 
 	QList<int> sizes;
 	sizes.append(200);
@@ -62,14 +60,14 @@ MainWindow::MainWindow(QApplication* app)
 
 	setCentralWidget(m_splitter);
 
-	connect(m_renderWindow, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
-	connect(m_renderWindow, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
-	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
-	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
+	connect(m_renderWidget, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
+	connect(m_renderWidget, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
+	connect(m_renderWidget, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
+	connect(m_renderWidget, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
-	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWindow, SLOT(renderSize(char, float)));
-	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWindow, SLOT(renderLocation(char, float)));
-	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWindow, SLOT(renderRotation(float, float, float)));
+	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWidget, SLOT(renderSize(char, float)));
+	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWidget, SLOT(renderLocation(char, float)));
+	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWidget, SLOT(renderRotation(float, float, float)));
 
 	showMaximized();
 	splash.finish(this);
@@ -193,7 +191,7 @@ void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
 
 void MainWindow::onNewPressed()
 {
-	// TODO: check for m_renderWindow->isModified()
+	// TODO: check for m_renderWidget->isModified()
 	sim::Simulation::instance().init();
 	sim::Simulation::instance().setEnabled(false);
 }

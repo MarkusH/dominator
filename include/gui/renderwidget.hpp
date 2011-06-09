@@ -1,11 +1,11 @@
 /*
- * render/render.hpp
+ * render/renderwidget.hpp
  *
  *      Author: Markus Holtermann
  */
 
-#ifndef RENDER_RENDER_HPP_
-#define RENDER_RENDER_HPP_
+#ifndef RENDERWIDGET_HPP_
+#define RENDERWIDGET_HPP_
 
 #include <GL/glew.h>
 #include <QtCore/QTimer>
@@ -17,10 +17,10 @@
 #include <util/InputAdapters.hpp>
 #include <QtGui/QWheelEvent>
 
-class Render: public QGLWidget {
+class RenderWidget: public QGLWidget {
 Q_OBJECT
 public:
-	Render(QWidget* parent = 0);
+	RenderWidget(QWidget* parent = 0);
 
 public slots:
 	void renderSize(char axis, float size);
@@ -53,4 +53,4 @@ signals:
 	void objectSelected(bool);
 };
 
-#endif /* RENDER_RENDER_HPP_ */
+#endif /* RENDERWIDGET_HPP_ */

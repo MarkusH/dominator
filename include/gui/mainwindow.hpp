@@ -17,11 +17,11 @@
 #include <QtGui/QStatusBar>
 #include <QtGui/QAction>
 #include <QtGui/QFileDialog>
+#include <gui/renderwidget.hpp>
+#include <gui/dialogs.hpp>
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
 #include <simulation/Simulation.hpp>
-
-class Render;
 
 class MainWindow: public QMainWindow {
 Q_OBJECT
@@ -50,7 +50,7 @@ private:
 	void createStatusBar();
 	bool isModified();
 
-	Render* m_renderWindow;
+	RenderWidget* m_renderWidget;
 
 	QMenu* m_menuFile;
 	QAction* m_new;
