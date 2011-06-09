@@ -29,8 +29,8 @@ __Compound::__Compound(const Vec3f& position)
 
 __Compound::~__Compound()
 {
-	m_nodes.clear();
-	m_joints.clear();
+	//m_nodes.clear();
+	//m_joints.clear();
 }
 
 float __Compound::convexCastPlacement(bool apply)

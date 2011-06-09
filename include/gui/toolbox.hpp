@@ -15,16 +15,16 @@
 class ToolBox: public QWidget {
 Q_OBJECT
 public:
-	ToolBox(QWidget *parent = 0);
-	void addWidget(QWidget *widget, int stretch = 0, Qt::Alignment alignment = 0);
+	ToolBox(QWidget* parent = 0);
+	void addWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = 0);
 
 private:
-	QComboBox *m_tb3DOjects;
-	QComboBox *m_tbStones;
-	QComboBox *m_tbTemplate;
-	QComboBox *m_tbTexture;
+	QComboBox* m_tb3DOjects;
+	QComboBox* m_tbStones;
+	QComboBox* m_tbTemplate;
+	QComboBox* m_tbTexture;
 
-	QVBoxLayout *layout;
+	QVBoxLayout* layout;
 };
 
 #endif /* TOOLBOX_HPP_ */

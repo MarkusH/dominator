@@ -18,7 +18,7 @@
 
 using namespace m3d;
 
-Render::Render(QWidget *parent) :
+Render::Render(QWidget* parent) :
 	QGLWidget(parent)
 {
 	m_modified = true;
@@ -73,7 +73,7 @@ void Render::initializeGL()
 	glCullFace(GL_BACK);
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
-	sim::Simulation::instance().init();
+	init();
 
 	m_clock.reset();
 }
@@ -116,32 +116,32 @@ void Render::paintGL()
 	}
 }
 
-void Render::keyPressEvent(QKeyEvent *event)
+void Render::keyPressEvent(QKeyEvent* event)
 {
 	m_keyAdapter.keyEvent(event);
 }
 
-void Render::keyReleaseEvent(QKeyEvent *event)
+void Render::keyReleaseEvent(QKeyEvent* event)
 {
 	m_keyAdapter.keyEvent(event);
 }
 
-void Render::mouseMoveEvent(QMouseEvent *event)
+void Render::mouseMoveEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mousePressEvent(QMouseEvent *event)
+void Render::mousePressEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mouseReleaseEvent(QMouseEvent *event)
+void Render::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::wheelEvent(QWheelEvent *event)
+void Render::wheelEvent(QWheelEvent* event)
 {
 	m_mouseAdapter.mouseWheelEvent(event);
 }
@@ -152,12 +152,19 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 
 	if (sim::Simulation::instance().getSelectedObject()) {
 		std::cout << sim::Simulation::instance().getSelectedObject()->getMatrix() << std::endl;
-		emit objectSelected(true);
+		emit
+		objectSelected(true);
 		std::cout << "get " << sim::Simulation::instance().getSelectedObject()->getMatrix().eulerAngles() << std::endl;
 		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
 		emit objectSelected(false);
 	}
+}
+
+void Render::init()
+{
+	sim::Simulation::instance().init();
+	sim::Simulation::instance().setEnabled(false);
 }
 
 void Render::save(const std::string& fileName)
@@ -170,6 +177,11 @@ void Render::open(const std::string& fileName)
 {
 	sim::Simulation::instance().load(fileName);
 	m_modified = false;
+}
+
+void Render::controlSimulation(const bool status)
+{
+	sim::Simulation::instance().setEnabled(status);
 }
 
 void Render::renderSize(char axis, float size)
@@ -224,4 +236,14 @@ void Render::renderRotation(float x, float y, float z)
 
 		obj->setMatrix(matrix);
 	}
+}
+
+float Render::getGravity()
+{
+	return sim::Simulation::instance().getGravity();
+}
+
+void Render::setGravity(const float gravity)
+{
+	sim::Simulation::instance().setGravity(gravity);
 }

@@ -8,6 +8,7 @@
 
 #include <gui/mainwindow.hpp>
 #include <gui/render.hpp>
+#include <gui/dialogs.hpp>
 #include <QtGui/QPixmap>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
@@ -18,10 +19,10 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-MainWindow::MainWindow(QApplication *app)
+MainWindow::MainWindow(QApplication* app)
 {
 
-	QPixmap pixmap("data/splash.png");
+	QPixmap pixmap = QPixmap("data/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.show();
 	app->processEvents();
@@ -82,10 +83,12 @@ void MainWindow::initialize()
 
 void MainWindow::createMenu()
 {
+	// File
 	m_menuFile = menuBar()->addMenu("&File");
 
 	m_new = new QAction("&New", this);
 	m_new->setShortcuts(QKeySequence::New);
+	connect(m_new, SIGNAL(triggered()), this, SLOT(onNewPressed()));
 	m_menuFile->addAction(m_new);
 
 	m_open = new QAction("&Open", this);
@@ -110,14 +113,39 @@ void MainWindow::createMenu()
 	connect(m_exit, SIGNAL(triggered()), this, SLOT(onClosePressed()));
 	m_menuFile->addAction(m_exit);
 
+	// Simulation
+	m_menuSimulation = menuBar()->addMenu("&Simulation");
+
+	m_play = new QAction("&Play", this);
+	m_play->setEnabled(true);
+	m_play->setShortcut(Qt::Key_F9);
+	connect(m_play, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_play);
+
+	m_menuSimulation->addSeparator();
+
+	m_stop = new QAction("&Stop", this);
+	m_stop->setEnabled(false);
+	m_stop->setShortcut(Qt::Key_F9);
+	connect(m_stop, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_stop);
+
+	m_gravity = new QAction("&Gravity", this);
+	connect(m_gravity, SIGNAL(triggered()), this, SLOT(onGravityPressed()));
+	m_menuSimulation->addAction(m_gravity);
+
+	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
 
 	m_help = new QAction("&Help", this);
 	m_help->setShortcuts(QKeySequence::HelpContents);
+	connect(m_help, SIGNAL(triggered()), this, SLOT(onHelpPressed()));
 	m_menuHelp->addAction(m_help);
 
-	m_info = new QAction("&Info", this);
-	m_menuHelp->addAction(m_info);
+	m_about = new QAction("&Info", this);
+	m_about->setShortcut(Qt::ALT + Qt::Key_F1);
+	connect(m_about, SIGNAL(triggered()), this, SLOT(onAboutPressed()));
+	m_menuHelp->addAction(m_about);
 }
 
 void MainWindow::createStatusBar()
@@ -134,6 +162,11 @@ void MainWindow::createStatusBar()
 	m_objectsCount->setToolTip("There is 1 object in the world");
 	statusBar()->addWidget(m_objectsCount, 2);
 
+	m_simulationStatus = new QLabel("");
+	m_simulationStatus->setMinimumSize(m_simulationStatus->sizeHint());
+	m_simulationStatus->setAlignment(Qt::AlignLeft);
+	statusBar()->addWidget(m_simulationStatus, 2);
+
 	m_currentFilename = new QLabel("unsaved document");
 	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
 	m_currentFilename->setAlignment(Qt::AlignRight);
@@ -149,6 +182,12 @@ void MainWindow::updateFramesPerSecond(int frames)
 void MainWindow::updateObjectsCount(int count)
 {
 	m_objectsCount->setText(QString("%1").arg(count));
+}
+
+void MainWindow::onNewPressed()
+{
+	// TODO: check for m_renderWindow->isModified()
+	m_renderWindow->init();
 }
 
 void MainWindow::onClosePressed()
@@ -185,4 +224,37 @@ void MainWindow::onOpenPressed()
 		m_currentFilename->setText(m_filename);
 		m_renderWindow->open(m_filename.toStdString());
 	}
+}
+
+void MainWindow::onSimulationControlsPressed()
+{
+	bool set_active;
+	if (QObject::sender() == m_play) {
+		set_active = true;
+		m_simulationStatus->setText("Simulation started");
+	} else if (QObject::sender() == m_stop) {
+		set_active = false;
+		m_simulationStatus->setText("Simulation stopped");
+	} else {
+		return;
+	}
+	m_play->setEnabled(!set_active);
+	m_stop->setEnabled(set_active);
+	m_renderWindow->controlSimulation(set_active);
+}
+
+void MainWindow::onGravityPressed()
+{
+	GravityDialog* dialog = new GravityDialog(m_renderWindow->getGravity(), this);
+	m_renderWindow->setGravity(dialog->run());
+}
+
+void MainWindow::onHelpPressed()
+{
+}
+
+void MainWindow::onAboutPressed()
+{
+	AboutDialog* about = new AboutDialog(this);
+	about->exec();
 }

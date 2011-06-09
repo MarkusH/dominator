@@ -20,18 +20,20 @@
 class Render: public QGLWidget {
 Q_OBJECT
 public:
-	Render(QWidget *parent = 0);
+	Render(QWidget* parent = 0);
+
+	void init();
+	void save(const std::string& fileName);
+	void open(const std::string& fileName);
+	void controlSimulation(const bool status);
+	float getGravity();
+	void setGravity(const float gravity);
+	bool isModified();
 
 public slots:
 	void renderSize(char axis, float size);
 	void renderLocation(char axis, float position);
 	void renderRotation(float x, float y, float z);
-
-	void save(const std::string& fileName);
-	void open(const std::string& fileName);
-	bool isModified() {
-		return m_modified;
-	}
 
 protected:
 	virtual void initializeGL();
@@ -46,7 +48,7 @@ protected:
 	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
 private:
-	QTimer *m_timer;
+	QTimer* m_timer;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;
@@ -59,5 +61,10 @@ signals:
 	void objectSelected(const m3d::Mat4f*);
 	void objectSelected(bool);
 };
+
+inline bool Render::isModified()
+{
+	return m_modified;
+}
 
 #endif /* RENDER_RENDER_HPP_ */
