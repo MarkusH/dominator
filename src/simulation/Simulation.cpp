@@ -14,21 +14,14 @@
 #include <iostream>
 #include <newton/util.hpp>
 
-// Mouse pick during running simulation
-//#define MOUSE_PICK
-
-// Move object during pause
-#define PLANE_MOVE
-	// Move object along billboard plane, if not set move along ground
-	//#define BILLBOARD_PLANE
-
-// Rotate object using mouse
-// CAUTION: do not leave the surface you first clicked on
-//#define MOUSE_ROTATE
-
 namespace sim {
 
 Simulation* Simulation::s_instance = NULL;
+
+static Mat4f rot_mat_start;
+static Vec3f rot_drag_start;
+static Vec3f rot_drag_cur;
+static Vec2i rot_mouse;
 
 void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 								util::MouseAdapter& mouseAdapter)
@@ -54,6 +47,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_mouseAdapter(mouseAdapter),
 	  m_nextID(0)
 {
+	m_interactionType = INT_MOVE_GROUND;
 	m_world = NULL;
 	m_enabled = true;
 	m_gravity = -9.81f * 4.0f;
@@ -295,11 +289,7 @@ void Simulation::init()
 		 */
 	}
 
-#ifdef MOUSE_PICK
-	setEnabled(true);
-#else
 	setEnabled(false);
-#endif
 }
 
 void Simulation::clear()
@@ -439,13 +429,6 @@ Object Simulation::selectObject(int x, int y)
 	return result;
 }
 
-#ifdef MOUSE_ROTATE
-Mat4f start_mat;
-Vec3f start_drag;
-Vec3f cur_drag;
-float mx, my;
-#endif
-
 void Simulation::mouseMove(int x, int y)
 {
 	if (m_mouseAdapter.isDown(util::LEFT)) {
@@ -455,11 +438,11 @@ void Simulation::mouseMove(int x, int y)
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT)) {
-#ifdef MOUSE_PICK
-		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
-#endif
+		if (m_enabled)
+			newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 
-		if (m_selectedObject) {
+		// handle interaction mode if object is selected and in pause mode
+		if (m_selectedObject && !m_enabled) {
 
 			// get first position of the mouse (last pos) on the object using pointer
 			// get the second pos of the mouse (cur pos) in the world
@@ -469,61 +452,63 @@ void Simulation::mouseMove(int x, int y)
 
 			Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
 			Vec3f pos2 = m_camera.pointer(x, y);
-#ifdef MOUSE_ROTATE
-			//cur_drag = pos2;
-			cur_drag = start_mat.getW() + (pos2-start_mat.getW()).normalized() * (start_drag-start_mat.getW()).len();
-#endif
-#ifdef PLANE_MOVE
-			Vec3f R1, R2, S1, S2;
-			{
-				Vec4<GLint> viewport = Vec4<GLint>::viewport();
-				GLfloat z;
-				float _y = viewport.w - y;
-				Mat4d mvmatrix = Mat4d::modelview();
-				Mat4d projmatrix = Mat4d::projection();
 
-				// get new ray
-				double dX, dY, dZ;
-				gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-				gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+			if (m_interactionType == INT_ROTATE) {
+				//rot_drag_cur = pos2;
+				rot_drag_cur = rot_mat_start.getW() + (pos2-rot_mat_start.getW()).normalized() * (rot_drag_start-rot_mat_start.getW()).len();
 
-				// get old ray
-				_y = viewport.w - m_mouseAdapter.getY();
-				gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-				gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-			}
+			} else if (m_interactionType == INT_MOVE_GROUND || m_interactionType == INT_MOVE_BILLBOARD) {
+				Vec3f R1, R2, S1, S2;
+				{
+					Vec4<GLint> viewport = Vec4<GLint>::viewport();
+					float _y = viewport.w - y;
+					Mat4d mvmatrix = Mat4d::modelview();
+					Mat4d projmatrix = Mat4d::projection();
 
-			// billboard matrix
-			Vec3f look = m_camera.m_position - pos1;
-			Vec3f right = Vec3f::yAxis() % look;
-			Vec3f up = Vec3f::yAxis();
+					// get new ray
+					double dX, dY, dZ;
+					gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+					R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+					gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+					R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
 
-			// billboard plane
-#ifdef BILLBOARD_PLANE
-			Vec3f p1 = pos1;
-			Vec3f p2 = pos1 + Vec3f::yAxis();
-			Vec3f p3 = pos1 + m_camera.m_strafe;
-#else
-			// bottom plane
-			Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
-			Vec3f p2 = pos1 + Vec3f::xAxis();
-			Vec3f p3 = pos1 + Vec3f::zAxis();
-#endif
-			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
-			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
+					// get old ray
+					_y = viewport.w - m_mouseAdapter.getY();
+					gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+					S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+					gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+					S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+				}
 
-			Mat4f matrix = m_selectedObject->getMatrix();
-			matrix.setW(matrix.getW() + (pos3 - pos1));
-			m_selectedObject->setMatrix(matrix);
-			m_selectedObject->convexCastPlacement();
-#endif
-		}
+				// billboard matrix
+				Vec3f look = m_camera.m_position - pos1;
+				Vec3f right = Vec3f::yAxis() % look;
+				Vec3f up = Vec3f::yAxis();
 
-	}
+				// bottom plane
+				Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
+				Vec3f p2 = pos1 + Vec3f::xAxis();
+				Vec3f p3 = pos1 + Vec3f::zAxis();
+
+				if (m_interactionType == INT_MOVE_BILLBOARD) {
+					// billboard plane
+					p1 = pos1;
+					p2 = pos1 + Vec3f::yAxis();
+					p3 = pos1 + m_camera.m_strafe;
+				}
+
+				pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
+				Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
+
+				Mat4f matrix = m_selectedObject->getMatrix();
+				matrix.setW(matrix.getW() + (pos3 - pos1));
+				m_selectedObject->setMatrix(matrix);
+
+				if (m_interactionType == INT_MOVE_GROUND)
+					m_selectedObject->convexCastPlacement();
+			} /* end MOVE_GROUND, MOVE_BILLBOARD */
+		} /* end selectedObject && !enabled */
+	} /* end button */
 
 	m_pointer = m_camera.pointer(x, y);
 }
@@ -533,16 +518,13 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	//std::cout << "down" << std::endl;
 	m_pointer = m_camera.pointer(x, y);
 
-#ifdef MOUSE_ROTATE
-	if (button == util::RIGHT && m_selectedObject) {
-		start_drag = m_pointer;
-		start_mat = m_selectedObject->getMatrix();
-		mx = x; my = y;
+	if (m_interactionType == INT_ROTATE && button == util::RIGHT && m_selectedObject && !m_enabled) {
+		rot_drag_start = m_pointer;
+		rot_mat_start = m_selectedObject->getMatrix();
+		rot_mouse = Vec2i(x, y);
 	}
-#endif
 
 	if (button == util::MIDDLE && down) {
-		//setEnabled(true);
 		Vec3f view = m_camera.viewVector();
 
 		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position);
@@ -577,9 +559,8 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		add(obj);
 
 	} else if (button == util::RIGHT) {
-#ifdef MOUSE_PICK
-		newton::mousePick(m_world, Vec2f(x, y), down);
-#endif
+		if (m_enabled)
+			newton::mousePick(m_world, Vec2f(x, y), down);
 	}
 }
 
@@ -588,21 +569,18 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 	m_pointer = m_camera.pointer(x, y);
 	if (button == util::LEFT) {
 		m_selectedObject = selectObject(x, y);
-		if (m_selectedObject) {
-			if (m_selectedObject == m_environment)
-				m_selectedObject = Object();
-#ifdef MOUSE_ROTATE
-			start_mat = m_selectedObject->getMatrix();
-#endif
-		}
+		if (m_selectedObject == m_environment)
+			m_selectedObject = Object();
 
+		if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled)
+			rot_mat_start = m_selectedObject->getMatrix();
 	}
 }
 
 void Simulation::mouseWheel(int delta) {
 	float step = delta / 800.0f;
 
-	if (m_selectedObject) {
+	if (m_selectedObject && !m_enabled) {
 		Mat4f matrix = m_selectedObject->getMatrix();
 		matrix.setW(matrix.getW() + m_camera.viewVector() * step);
 		m_selectedObject->setMatrix(matrix);
@@ -704,85 +682,41 @@ void Simulation::render()
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
-	/*
-	ObjectMap::iterator itr = m_objects.find(m_selectedObject);
-	if (itr != m_objects.end()) {
-		itr->second->render();
-	}
-*/
-
 	if (m_selectedObject) {
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
 			if (*itr == m_selectedObject)
 			(*itr)->render();
 		}
-#ifdef PLANE_MOVE
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glColor4f(1.0f, 1.0, 1.0f, 0.5f);
-		//if (m_mouseAdapter.isDown(util::RIGHT)) {
-
-			Vec3f pos = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
-			Vec3f look = m_camera.m_position - pos;
-			Vec3f right = m_camera.m_up % look;
-			Vec3f up = look % right;
-
-			Vec3f position = pos * Mat4f::modelview();// * Mat4f(right, up, look, Vec3f());
-			Mat4f matrix = Mat4f(right, up, look, Vec3f());
-
-			float scale = 50.0f;
-			glPushMatrix();
-			glLoadIdentity();
-			//glMultMatrixf(matrix[0]);
-			//glBegin(GL_QUADS);
-			//glTexCoord2f(0.0f, 0.0f); glVertex3f(position[0] - scale, position[1] - scale, position[2]);
-			//glTexCoord2f(0.0f, 1.0f); glVertex3f(position[0] - scale, position[1] + scale, position[2]);
-			//glTexCoord2f(1.0f, 1.0f); glVertex3f(position[0] + scale, position[1] + scale, position[2]);
-			//glTexCoord2f(1.0f, 0.0f); glVertex3f(position[0] + scale, position[1] - scale, position[2]);
-			//glEnd();
-			glPopMatrix();
-		//}
-
-			glDisable(GL_BLEND);
-#endif
 	}
 
-#ifdef MOUSE_ROTATE
 	glDepthMask(GL_FALSE);
 	glColor3f(1.0f, 0.0f, 1.0f);
-	if (m_selectedObject) {
-		Vec3f origin = m_selectedObject->getMatrix().getW();
-		Vec3f axis = (start_drag - origin) % (cur_drag - origin);
 
-		float angle = (start_drag - origin).normalized() * (cur_drag - origin).normalized();
+	if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled) {
+		Vec3f origin = m_selectedObject->getMatrix().getW();
+		Vec3f axis = (rot_drag_start - origin) % (rot_drag_cur - origin);
+
+		float angle = (rot_drag_start - origin).normalized() * (rot_drag_cur - origin).normalized();
 		angle = acos(angle);// * 180.0f / PI;
-		int md = abs(mx -m_mouseAdapter.getX()) + abs(my -m_mouseAdapter.getY());
-		if (md >2&&angle > 0.01f && angle < PI) {
-			//std::cout << "angle = " << (start_drag - cur_drag).len() << std::endl;
+		int md = abs(rot_mouse.x - m_mouseAdapter.getX()) + abs(rot_mouse.y -m_mouseAdapter.getY());
+		if (md > 2 && angle > 0.01f && angle < PI) {
 			Mat4f mat = Mat4f::rotAxis(axis, -angle);
 			Vec3f euler = mat.eulerAngles();
-			//if (euler.x < 2.0f)
-			//	mat = Mat4f::rotAxis(Vec3f::xAxis(), -euler.x) * mat;
-			//if (euler.y < 2.0f)
-			//	mat = Mat4f::rotAxis(Vec3f::yAxis(), -euler.y) * mat;
-			//if (euler.z < 2.0f)
-			//	mat = Mat4f::rotAxis(Vec3f::zAxis(), -euler.z) * mat;
-			mat = start_mat * mat;
-			mat.setW(start_mat.getW());
+			mat = rot_mat_start * mat;
+			mat.setW(rot_mat_start.getW());
 			m_selectedObject->setMatrix(mat);
 		}
 		axis = axis.normalized() * 50.0f + origin;
 		glBegin(GL_POINTS);
-		glVertex3fv(&start_drag[0]);
-		glVertex3fv(&cur_drag[0]);
+		glVertex3fv(&rot_drag_start[0]);
+		glVertex3fv(&rot_drag_cur[0]);
 		glEnd();
 		glBegin(GL_LINES);
 			glVertex3fv(&(m_selectedObject->getMatrix().getW()[0]));
 			glVertex3fv(&axis.x);
 		glEnd();
 	}
-#endif
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);
