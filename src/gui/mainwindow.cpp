@@ -21,6 +21,7 @@
 
 MainWindow::MainWindow(QApplication* app)
 {
+	m_modified = true;
 
 	QPixmap pixmap = QPixmap("data/splash.png");
 	QSplashScreen splash(pixmap);
@@ -193,7 +194,8 @@ void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
 void MainWindow::onNewPressed()
 {
 	// TODO: check for m_renderWindow->isModified()
-	m_renderWindow->init();
+	sim::Simulation::instance().init();
+	sim::Simulation::instance().setEnabled(false);
 }
 
 void MainWindow::onClosePressed()
@@ -215,7 +217,8 @@ void MainWindow::onSavePressed()
 	}
 	std::cout << m_filename.toStdString() << std::endl;
 	m_currentFilename->setText(m_filename);
-	m_renderWindow->save(m_filename.toStdString());
+	sim::Simulation::instance().save(m_filename.toStdString());
+	m_modified = false;
 }
 
 void MainWindow::onOpenPressed()
@@ -228,7 +231,8 @@ void MainWindow::onOpenPressed()
 		m_filename = dialog.selectedFiles().first();
 		std::cout << m_filename.toStdString() << std::endl;
 		m_currentFilename->setText(m_filename);
-		m_renderWindow->open(m_filename.toStdString());
+		sim::Simulation::instance().load(m_filename.toStdString());
+		m_modified = false;
 	}
 }
 
@@ -246,13 +250,13 @@ void MainWindow::onSimulationControlsPressed()
 	}
 	m_play->setEnabled(!set_active);
 	m_stop->setEnabled(set_active);
-	m_renderWindow->controlSimulation(set_active);
+	sim::Simulation::instance().setEnabled(set_active);
 }
 
 void MainWindow::onGravityPressed()
 {
-	GravityDialog* dialog = new GravityDialog(m_renderWindow->getGravity(), this);
-	m_renderWindow->setGravity(dialog->run());
+	GravityDialog* dialog = new GravityDialog(sim::Simulation::instance().getGravity(), this);
+	sim::Simulation::instance().setGravity(dialog->run());
 }
 
 void MainWindow::onHelpPressed()

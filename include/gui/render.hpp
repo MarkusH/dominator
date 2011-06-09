@@ -22,14 +22,6 @@ Q_OBJECT
 public:
 	Render(QWidget* parent = 0);
 
-	void init();
-	void save(const std::string& fileName);
-	void open(const std::string& fileName);
-	void controlSimulation(const bool status);
-	float getGravity();
-	void setGravity(const float gravity);
-	bool isModified();
-
 public slots:
 	void renderSize(char axis, float size);
 	void renderLocation(char axis, float position);
@@ -53,7 +45,6 @@ private:
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;
 	util::QtKeyAdapter m_keyAdapter;
-	bool m_modified;
 
 signals:
 	void framesPerSecondChanged(int);
@@ -61,10 +52,5 @@ signals:
 	void objectSelected(const m3d::Mat4f*);
 	void objectSelected(bool);
 };
-
-inline bool Render::isModified()
-{
-	return m_modified;
-}
 
 #endif /* RENDER_RENDER_HPP_ */

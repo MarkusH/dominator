@@ -48,6 +48,7 @@ private:
 	void initialize();
 	void createMenu();
 	void createStatusBar();
+	bool isModified();
 
 	Render* m_renderWindow;
 
@@ -79,6 +80,12 @@ private:
 	QLabel* m_currentFilename;
 
 	QString m_filename;
+	bool m_modified;
 };
+
+inline bool MainWindow::isModified()
+{
+	return m_modified;
+}
 
 #endif /* MAINWINDOW_HPP_ */

@@ -21,7 +21,6 @@ using namespace m3d;
 Render::Render(QWidget* parent) :
 	QGLWidget(parent)
 {
-	m_modified = true;
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	setFocusPolicy(Qt::WheelFocus);
 	m_timer = new QTimer(this);
@@ -73,7 +72,8 @@ void Render::initializeGL()
 	glCullFace(GL_BACK);
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
-	init();
+	sim::Simulation::instance().init();
+	sim::Simulation::instance().setEnabled(false);
 
 	m_clock.reset();
 }
@@ -161,29 +161,6 @@ void Render::mouseDoubleClickEvent(QMouseEvent* event)
 	}
 }
 
-void Render::init()
-{
-	sim::Simulation::instance().init();
-	sim::Simulation::instance().setEnabled(false);
-}
-
-void Render::save(const std::string& fileName)
-{
-	sim::Simulation::instance().save(fileName);
-	m_modified = false;
-}
-
-void Render::open(const std::string& fileName)
-{
-	sim::Simulation::instance().load(fileName);
-	m_modified = false;
-}
-
-void Render::controlSimulation(const bool status)
-{
-	sim::Simulation::instance().setEnabled(status);
-}
-
 void Render::renderSize(char axis, float size)
 {
 	std::cout << axis << " size " << size << std::endl;
@@ -236,14 +213,4 @@ void Render::renderRotation(float x, float y, float z)
 
 		obj->setMatrix(matrix);
 	}
-}
-
-float Render::getGravity()
-{
-	return sim::Simulation::instance().getGravity();
-}
-
-void Render::setGravity(const float gravity)
-{
-	sim::Simulation::instance().setGravity(gravity);
 }
