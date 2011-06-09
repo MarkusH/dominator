@@ -135,7 +135,7 @@ void showCollisionShape(const NewtonCollision* shape, const Mat4f& matrix)
 
 
 #define MOUSE_PICK_DAMP			 10.0f
-#define MOUSE_PICK_STIFFNESS	 100.0f
+#define MOUSE_PICK_STIFFNESS	 80.0f
 //#define MOUSE_PICK_STIFFNESS	 50.0f
 
 static float pickedParam;
