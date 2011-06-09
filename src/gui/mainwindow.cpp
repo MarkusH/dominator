@@ -65,6 +65,7 @@ MainWindow::MainWindow(QApplication* app)
 	connect(m_renderWindow, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
 	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
 	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
+	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
 	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWindow, SLOT(renderSize(char, float)));
 	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWindow, SLOT(renderLocation(char, float)));
 	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWindow, SLOT(renderRotation(float, float, float)));
@@ -182,6 +183,11 @@ void MainWindow::updateFramesPerSecond(int frames)
 void MainWindow::updateObjectsCount(int count)
 {
 	m_objectsCount->setText(QString("%1").arg(count));
+}
+
+void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
+	std::cout << type << std::endl;
+	sim::Simulation::instance().setInteractionType(type);
 }
 
 void MainWindow::onNewPressed()

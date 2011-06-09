@@ -19,6 +19,7 @@
 #include <QtGui/QFileDialog>
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
+#include <simulation/Simulation.hpp>
 
 class Render;
 
@@ -30,6 +31,7 @@ public:
 private slots:
 	void updateFramesPerSecond(int frames);
 	void updateObjectsCount(int count);
+	void selectInteraction(sim::Simulation::InteractionType type);
 	//File
 	void onNewPressed();
 	void onClosePressed();
