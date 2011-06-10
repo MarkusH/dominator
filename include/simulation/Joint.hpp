@@ -42,6 +42,17 @@ public:
 
 	__Joint(Type type);
 
+	/**
+	 * This method is called whenever the matrix of the parent bodies changes.
+	 * All sub-classes have to ensure that their pin and pivot points are updated
+	 * according to the changes. The changes must not be forwarded to Newton but
+	 * are required for XML serialization.
+	 *
+	 * @param inverse The old matrix, but inverted
+	 * @param matrix  The new matrix
+	 */
+	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix) { };
+
 	static void save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
@@ -57,6 +68,8 @@ public:
 	Vec3f pinDir;
 	Object child;
 	Object parent;
+
+	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
 
 	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
 

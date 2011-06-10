@@ -60,6 +60,16 @@ __Hinge::__Hinge(Vec3f pivot, Vec3f pinDir,
 
 }
 
+void __Hinge::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
+{
+	Mat4f tmp = inverse;
+	tmp.setW(Vec3f());
+	pinDir *= tmp;
+	pinDir = pinDir % matrix;
+
+	pivot *= inverse * matrix;
+}
+
 Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
 {
 	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());

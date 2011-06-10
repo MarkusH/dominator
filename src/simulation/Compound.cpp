@@ -74,10 +74,14 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 
 	// matrix attribute
 	attr = attr->next_attribute();
+
+	// Cache the matrix because the subsequent add() method would
+	// multiply the matrix of the nodes with the matrix of the
+	// compound. This would not be correct because the matrix of
+	// the nodes is already in global space
 	Mat4f matrix;
 	matrix.assign(attr->value());
 	result->m_matrix = Mat4f::identity();
-	//result->m_matrix.assign(attr->value());
 	
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 		std::string type = node->name();
@@ -92,6 +96,8 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 		}
 	}
 
+	result->m_matrix = matrix;
+
 	// foreach element "object" in node
 	// 		Object obj = __Object::load(element)
 	// 		result->add(obj)
@@ -99,7 +105,7 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	// foreach element "joint" in node
 	// 		Joint joint = __Joint::load(element)
 	// 		result->m_joints.push_back(joint)
-	result->m_matrix = matrix;
+
 	return result;
 }
 
@@ -137,12 +143,20 @@ void __Compound::add(Object object)
 
 void __Compound::setMatrix(const Mat4f& matrix)
 {
+	// We have to renew the matrix of all nodes by
+	// untransforming them first with the old matrix
+	// and then transforming them with the new one
 	Mat4f inverse = m_matrix.inverse();
 	for (std::list<Object>::iterator itr = m_nodes.begin();
 				itr != m_nodes.end(); ++itr) {
 		Mat4f newMatrix = (*itr)->getMatrix();
 		newMatrix *= inverse * matrix;
 		(*itr)->setMatrix(newMatrix);
+	}
+	// The joints need to be update
+	for (std::list<Joint>::iterator itr = m_joints.begin();
+				itr != m_joints.end(); ++itr) {
+		(*itr)->updateMatrix(inverse, matrix);
 	}
 	m_matrix = matrix;
 }

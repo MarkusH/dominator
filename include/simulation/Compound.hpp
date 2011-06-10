@@ -32,7 +32,9 @@ typedef std::tr1::shared_ptr<__Compound> Compound;
  * that after that all objects have a global position which is not relative to the compound.
  * When moving the compound, the children will be moved accordingly.
  *
- * After adding the compound to the simulation, new objects should not be added.
+ * After adding the compound to the simulation, new objects should not be added. DO NOT EVER
+ * ROTATE THE COMPOUND AROUND ANYTHING BUT THE ORIGIN OF THE COMPOUND. This would destroy the
+ * joints during serialization.
  */
 class __Compound : public __Object {
 protected:

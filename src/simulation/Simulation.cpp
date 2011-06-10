@@ -187,13 +187,13 @@ void Simulation::init()
 		RigidBody boxes[5];
 		RigidBody spheres[5];
 
-		Compound c(new __Compound(Mat4f::translate(Vec3f(0.0f, 15.0f, 10.0f))));
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "black");
+		Compound c(new __Compound(Mat4f::identity()));//translate(Vec3f(0.0f, 5.0f, -10.0f))));
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "cradle");
 		c->add(top);
 
 		for (int x = -2; x <= 2; ++x) {
-			boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "blue");
-			spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "red");
+			boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
+			spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "cradle");
 
 			c->add(boxes[x + 2]);
 			c->add(spheres[x + 2]);
@@ -205,8 +205,9 @@ void Simulation::init()
 			c->createHinge(pivot, dir, top, boxes[x + 2]);
 		}
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::rotY(45.0f * PI / 180.0f));
-		c->convexCastPlacement();
+		//Mat4f::rotY(90.0f * PI / 180.0f) *
+		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 5.0f, -10.0f)));
+		//c->convexCastPlacement();
 	}
 
 	// assemlby vs hull comparison
@@ -564,7 +565,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 			obj = __Object::createBox(matrix, 1.0f, 1.0f, 1.0f, 5.0f, "yellow");
 			break;
 		case 1:
-			obj = __Object::createSphere(matrix, 0.2f, 50.0f, "wood_matt");
+			obj = __Object::createSphere(matrix, 0.2f, 5.0f, "wood_matt");
 			break;
 		case 2:
 			obj = __Object::createCapsule(matrix, 0.5f, 5.0f, 1.0f, "yellow");
@@ -580,12 +581,12 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 			obj = __Object::createChamferCylinder(matrix, 2.0f, 0.5f, 1.0f, "yellow");
 			break;
 		}
-		if (counter == 6)
+		if (counter == 2)
 			counter = 0;
 				//__Object::createBox(matrix, 1.0f, 1.0f, 6.0f, 1.0f, "yellow") :
 				//__Object::createSphere(matrix, 0.1f, 1.0f, "wood_matt");
-		//obj->setVelocity(view * 10.0f);
-		obj->convexCastPlacement();
+		obj->setVelocity(view * 10.0f);
+		//obj->convexCastPlacement();
 		add(obj);
 
 	} else if (button == util::RIGHT) {
