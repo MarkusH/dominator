@@ -185,7 +185,6 @@ void MainWindow::updateObjectsCount(int count)
 }
 
 void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
-	std::cout << type << std::endl;
 	sim::Simulation::instance().setInteractionType(type);
 }
 
@@ -213,7 +212,6 @@ void MainWindow::onSavePressed()
 	if (m_filename == "" || QObject::sender() == m_saveas) {
 		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.tus)");
 	}
-	std::cout << m_filename.toStdString() << std::endl;
 	m_currentFilename->setText(m_filename);
 	sim::Simulation::instance().save(m_filename.toStdString());
 	m_modified = false;
@@ -227,7 +225,6 @@ void MainWindow::onOpenPressed()
 	dialog.setFilter("TUStudios Dominator (*.tus)");
 	if (dialog.exec()) {
 		m_filename = dialog.selectedFiles().first();
-		std::cout << m_filename.toStdString() << std::endl;
 		m_currentFilename->setText(m_filename);
 		sim::Simulation::instance().load(m_filename.toStdString());
 		m_modified = false;

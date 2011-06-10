@@ -47,7 +47,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_mouseAdapter(mouseAdapter),
 	  m_nextID(0)
 {
-	m_interactionType = INT_MOVE_GROUND;
+	m_interactionType = INT_NONE;
 	m_world = NULL;
 	m_enabled = true;
 	m_gravity = -9.81f * 4.0f;
@@ -547,7 +547,6 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 			obj = __Object::createCylinder(matrix, 0.5f, 1.0f, 1.0f, "yellow");
 			break;
 		case 5:
-			std::cout << "chamfer "<< std::endl;
 			obj = __Object::createChamferCylinder(matrix, 2.0f, 0.5f, 1.0f, "yellow");
 			break;
 		}

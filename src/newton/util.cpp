@@ -68,7 +68,6 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z)
 
 static unsigned ConvexCastCallback(const NewtonBody* body, const NewtonCollision* collision, void* userData)
 {
-	//std::cout << body << std::endl;
 	NewtonBody* other = (NewtonBody*)userData;
 	return (other == body) ? 0 : 1;
 }
@@ -76,7 +75,6 @@ static unsigned ConvexCastCallback(const NewtonBody* body, const NewtonCollision
 
 float getConvexCastPlacement(NewtonBody* body)
 {
-	//std::cout << "convex cast for_ " << body << std::endl;
 	Mat4f matrix;
 	NewtonBodyGetMatrix(body, matrix[0]);
 	matrix._42 += 200.0f;
@@ -105,7 +103,6 @@ float getConvexCastPlacement(NewtonBody* body)
 		NewtonWorldConvexCast(world, matrix[0], &p[0], collision, &param, body, ConvexCastCallback, info, 16, 0);
 
 		matrix._42 += (p.y - matrix._42) * param;
-		//std::cout << "placement is " << matrix._42 << std::endl;
 		return matrix._42;
 	}
 }

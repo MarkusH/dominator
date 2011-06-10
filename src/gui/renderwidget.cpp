@@ -32,7 +32,8 @@ void RenderWidget::initializeGL()
 {
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
-		std::cout << "could not initialize GLEW" << std::endl;
+		std::cerr << "could not initialize GLEW" << std::endl;
+		exit(1);
 	}
 
 	// load per-pixel lighting shader
@@ -151,10 +152,7 @@ void RenderWidget::mouseDoubleClickEvent(QMouseEvent* event)
 	m_mouseAdapter.mouseEvent(event);
 
 	if (sim::Simulation::instance().getSelectedObject()) {
-		std::cout << sim::Simulation::instance().getSelectedObject()->getMatrix() << std::endl;
-		emit
-		objectSelected(true);
-		std::cout << "get " << sim::Simulation::instance().getSelectedObject()->getMatrix().eulerAngles() << std::endl;
+		emit objectSelected(true);
 		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
 		emit objectSelected(false);
@@ -163,7 +161,6 @@ void RenderWidget::mouseDoubleClickEvent(QMouseEvent* event)
 
 void RenderWidget::renderSize(char axis, float size)
 {
-	std::cout << axis << " size " << size << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		m3d::Mat4f helper = m3d::Mat4f::identity();
@@ -185,7 +182,6 @@ void RenderWidget::renderSize(char axis, float size)
 
 void RenderWidget::renderLocation(char axis, float position)
 {
-	std::cout << axis << " position " << position << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		switch (axis) {
@@ -205,7 +201,6 @@ void RenderWidget::renderLocation(char axis, float position)
 
 void RenderWidget::renderRotation(float x, float y, float z)
 {
-	std::cout << " angle " << x << " " << y << " " << z << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 
