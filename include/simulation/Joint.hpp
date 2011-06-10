@@ -93,7 +93,12 @@ public:
 
 	~__BallAndSocket();
 
+	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
+
 	static BallAndSocket create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
+
+	static void save(const __BallAndSocket& ball, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static BallAndSocket load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 }
 

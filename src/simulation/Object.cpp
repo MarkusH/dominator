@@ -51,7 +51,12 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	xml_attribute<> *attrW, *attrH, *attrD;
 	
 
-	//TODO save convex hull, convex assembly
+	//TODO We could combine all primitive objects (BOX, SPHERE, CYLINDER, CAPSULE,
+	// CONE, CHAMFER_CYLINER) in this switch statement. Only the type attribute is
+	// different
+	// Handle the other primitives here (also call __Rigidbody::save)
+	// Handle __ConvexAssembly and __ConvexHull here and call the respective
+	// __Convex..::save() method
 	switch (object.m_type) {
 	case BOX:
 		// create and append object node
@@ -132,6 +137,8 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 
 Object __Object::load(rapidxml::xml_node<>* node)
 {
+	//TODO check if it is convex assembly or convex hull and
+	// call their load methods
 	if(std::string(node->name()) == "compound")	return __Compound::load(node);
 	else return __RigidBody::load(node);
 }
@@ -316,6 +323,8 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	NewtonCollisionGetInfo(collision, &info);
 
 	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
+	// use the respective SERIALIZE_IDs for that, each of the remaining primitives
+	// has radius and height attributes
 
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
@@ -419,6 +428,8 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		z = atof(attr->value());
 	}/* set dimensions for sphere END */
 
+	//TODO load the other primitives here
+
 	//attribute freezeState
 	attr = attr->next_attribute();
 	int freezeState = atoi(attr->value());
@@ -436,6 +447,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
+	//TODO return the other primitives here
 	if( type == "box" ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
 	if( type == "sphere" ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
 
@@ -567,7 +579,7 @@ void __RigidBody::render()
 }
 
 __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, bool originalGeometry, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_originalGeometry(originalGeometry), m_mesh(NULL)
+	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_originalGeometry(originalGeometry), m_mesh(NULL), m_fileName(fileName)
 {
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
@@ -650,6 +662,30 @@ __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& m
 	delete vertices;
 	this->create(collision, mass, m_freezeState, m_damping);
 	NewtonReleaseCollision(world, collision);
+}
+
+void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
+{
+	// TODO implement:
+	// mass
+	// material
+	// freezeState
+	// damping
+	// filename
+	// originalGeometry (as int)
+}
+
+ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
+{
+	// TODO implement:
+	// mass = get mass attribute
+	// material = get material attribute
+	// matrix.assign(matrix string)
+	// get m_freezeState
+	// get damping
+	// get filename
+	// get originalGeometry (from int)
+	// return ConvexHull(new __ConvexHull(matrix, mass, material, fileName, originalGeometry, freezeState, damping)
 }
 
 __ConvexHull::~__ConvexHull()
@@ -761,7 +797,7 @@ struct MeshEntry {
 };
 
 __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_renderingType(renderingType), m_mesh(NULL)
+	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_renderingType(renderingType), m_mesh(NULL), m_fileName(fileName)
 {
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
@@ -890,6 +926,30 @@ __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::s
 	NewtonReleaseCollision(world, collision);
 	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
 		NewtonReleaseCollision(world, *itr);
+}
+
+void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
+{
+	// TODO implement:
+	// mass
+	// material
+	// freezeState
+	// damping
+	// filename
+	// renderingType (as int)
+}
+
+ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
+{
+	// TODO implement:
+	// mass = get mass attribute
+	// material = get material attribute
+	// matrix.assign(matrix string)
+	// get m_freezeState
+	// get damping
+	// get filename
+	// get renderingType (from int)
+	// return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, fileName, renderingType, freezeState, damping)
 }
 
 __ConvexAssembly::~__ConvexAssembly()

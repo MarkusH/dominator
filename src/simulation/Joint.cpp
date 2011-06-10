@@ -22,6 +22,7 @@ __Joint::__Joint(Type type)
 void __Joint::save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
 {
 	//TODO: for testing only
+	// wtf is this shit, does that interfere if we want to save BallAndSocket?
 	__Hinge::save((const __Hinge&)joint, parent, doc);
 		return;
 	
@@ -32,10 +33,10 @@ void __Joint::save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml:
 		__Hinge::save((const __Hinge&)joint, parent, doc);
 		return;
 	case BALL_AND_SOCKET:
-		// don't do anything yet, just fix warnings
+		// save ball and socket
 		break;
 	case BALL_AND_SOCKET_LIMITED:
-		// don't do anything yet, just fix warnings
+		// save ball and socket
 		break;
 	}
 }
@@ -45,6 +46,7 @@ Joint __Joint::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	//type attribute
 	if( std::string(node->first_attribute()->value()) == "hinge" ) return __Hinge::load(list, node);
 	//TODO make sure a value is always returned
+	// load ballandsocket
 	//Joint result;
 	//return result;
 }
@@ -181,6 +183,26 @@ __BallAndSocket::~__BallAndSocket()
 {
 	if (m_joint)
 		delete m_joint;
+}
+
+void __BallAndSocket::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
+{
+	Mat4f tmp = inverse;
+	tmp.setW(Vec3f());
+	pinDir *= tmp;
+	pinDir = pinDir % matrix;
+
+	pivot *= inverse * matrix;
+}
+
+void __BallAndSocket::save(const __BallAndSocket& ball, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
+{
+	//TODO this is exactly the same as with the hinge, only the type attribute varies
+}
+
+BallAndSocket __BallAndSocket::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
+{
+	//TODO this is exactly the same as with the hinge, only the type attribute varies
 }
 
 BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)

@@ -27,6 +27,12 @@ typedef std::tr1::shared_ptr<__Object> Object;
 class __RigidBody;
 typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
 
+class __ConvexAssembly;
+typedef std::tr1::shared_ptr<__ConvexAssembly> ConvexAssembly;
+
+class __ConvexHull;
+typedef std::tr1::shared_ptr<__ConvexHull> ConvexHull;
+
 /**
  * An __Object is an abstract class that represents all objects
  * in the simulation. It defines the type of the object and provides
@@ -198,12 +204,16 @@ protected:
 	bool m_originalGeometry;
 	NewtonMesh* m_mesh;
 	std::vector<float> m_data;
+	std::string m_fileName;
 public:
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	~__ConvexHull();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
+
+	static void save(const __ConvexHull& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static ConvexHull load(rapidxml::xml_node<>* node);
 };
 
 /**
@@ -223,11 +233,15 @@ protected:
 	std::vector<float> m_data;
 	std::vector<uint32_t> m_indices;
 	ogl::SubBuffers m_buffers;
+	std::string m_fileName;
 public:
 	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	~__ConvexAssembly();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
+
+	static void save(const __ConvexAssembly& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static ConvexAssembly load(rapidxml::xml_node<>* node);
 };
 
 
