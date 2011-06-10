@@ -17,7 +17,7 @@
 #include <xml/rapidxml_print.hpp>
 #include <fstream> // for file I/O
 #include <string.h>
-#include <util/ToString.hpp>
+#include <util/toString.hpp>
 
 namespace sim {
 

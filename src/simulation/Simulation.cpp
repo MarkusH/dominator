@@ -163,8 +163,8 @@ void Simulation::init()
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
 	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//add(m_environment);
-	load("data/levels/level.xml");
-	save("data/levels/test_level.xml");
+	//load("data/levels/level.xml");
+	//save("data/levels/test_level.xml");
 
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
@@ -182,7 +182,7 @@ void Simulation::init()
 */
 
 	// newtons cradle
-	if (0)
+	if (1)
 	{
 		RigidBody boxes[5];
 		RigidBody spheres[5];
@@ -333,8 +333,8 @@ void Simulation::init()
 		 */
 	}
 
-
-	setEnabled(false);
+	save("data/levels/test_level.xml");
+	setEnabled(true);
 }
 
 void Simulation::clear()
@@ -356,11 +356,11 @@ int Simulation::add(const Object& object)
 
 int Simulation::add(const Object& object, int id)
 {
-	object->setID(m_nextID++);
+	object->setID(id);
 	ObjectList::iterator begin = m_objects.insert(m_objects.end(), object);
 
 	upload(begin, m_objects.end());
-	return m_nextID-1;
+	return id;
 }
 
 void Simulation::remove(Object object)

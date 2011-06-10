@@ -74,8 +74,10 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 
 	// matrix attribute
 	attr = attr->next_attribute();
-	result->m_matrix.assign(attr->value());
-	
+	Mat4f matrix;
+	matrix.assign(attr->value());
+	result->m_matrix = Mat4f::identity();
+	//result->m_matrix.assign(attr->value());
 	
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 		std::string type = node->name();
@@ -89,6 +91,7 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	 		result->m_joints.push_back(joint);
 		}
 	}
+
 	// foreach element "object" in node
 	// 		Object obj = __Object::load(element)
 	// 		result->add(obj)
@@ -96,7 +99,7 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	// foreach element "joint" in node
 	// 		Joint joint = __Joint::load(element)
 	// 		result->m_joints.push_back(joint)
-
+	result->m_matrix = matrix;
 	return result;
 }
 

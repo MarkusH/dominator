@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level>
-	<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, -4, 0, 1" width="20" height="2" depth="20" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="white" mass="0"/>
-	<object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 0, 0, 1" width="10" height="1" depth="10" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="0"/>
-	<compound id="2" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 15, -10, 1">
-		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 8, 32, -20, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05"/>
-		<object id="1" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 8, 30, -20, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2"/>
-		<joint type="hinge" parentID="0" childID="1" pivot="-8, 15, -10" pinDir="0, 0, 1"/>
+	<compound id="0" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 7.07107, 22.2502, 7.07107, 1">
+		<object id="0" type="box" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 7.07107, 26.7502, 7.07107, 1" width="20" height="0.5" depth="0.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="black" mass="0"/>
+		<object id="1" type="box" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 1.41421, 24.2502, 12.7279, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05"/>
+		<object id="2" type="sphere" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 1.41421, 22.2502, 12.7279, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2"/>
+		<object id="3" type="box" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 4.24264, 24.2502, 9.89949, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05"/>
+		<object id="4" type="sphere" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 4.24264, 22.2502, 9.89949, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2"/>
+		<object id="5" type="box" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 7.07107, 24.2502, 7.07107, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05"/>
+		<object id="6" type="sphere" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 7.07107, 22.2502, 7.07107, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2"/>
+		<object id="7" type="box" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 9.89949, 24.2502, 4.24264, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05"/>
+		<object id="8" type="sphere" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 9.89949, 22.2502, 4.24264, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2"/>
+		<object id="9" type="box" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 12.7279, 24.2502, 1.41421, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="blue" mass="0.05"/>
+		<object id="10" type="sphere" matrix="0.707107, 0, -0.707107, 0; 0, 1, 0, 0; 0.707107, 0, 0.707107, 0; 12.7279, 22.2502, 1.41421, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="red" mass="2"/>
+		<joint type="hinge" parentID="2" childID="1" pivot="-8, 15, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="1" childID="0" pivot="-8, 19.4, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="4" childID="3" pivot="-4, 15, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="3" childID="0" pivot="-4, 19.4, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="6" childID="5" pivot="0, 15, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="5" childID="0" pivot="0, 19.4, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="8" childID="7" pivot="4, 15, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="7" childID="0" pivot="4, 19.4, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="10" childID="9" pivot="8, 15, 10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="9" childID="0" pivot="8, 19.4, 10" pinDir="0, 0, 1"/>
 	</compound>
 </level>
 

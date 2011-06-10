@@ -8,7 +8,7 @@
 #include <simulation/Object.hpp>
 #include <simulation/Joint.hpp>
 #include <iostream>
-#include <util/ToString.hpp>
+#include <util/toString.hpp>
 
 
 namespace sim {

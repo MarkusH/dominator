@@ -16,7 +16,7 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
 #include <stdio.h>
-#include <util/ToString.hpp>
+#include <util/toString.hpp>
 
 namespace sim {
 
