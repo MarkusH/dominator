@@ -740,8 +740,8 @@ void Simulation::render()
 	if (m_selectedObject) {
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			//if (*itr == m_selectedObject)
-				//(*itr)->render();
+			if (*itr == m_selectedObject)
+				(*itr)->render();
 		}
 	}
 
