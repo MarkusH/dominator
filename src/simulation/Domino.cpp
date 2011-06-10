@@ -22,7 +22,7 @@ __Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material)
 	: __RigidBody(type, matrix, material, 0, Vec4f(0.4f, 0.4f, 0.4f, 0.4f))
 #else
 __Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material)
-	: __RigidBody(type, matrix, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f))
+	: __RigidBody(type, matrix, material, 1, Vec4f(0.1f, 0.1f, 0.1f, 0.1f))
 #endif
 {
 
@@ -41,12 +41,9 @@ NewtonCollision*  __Domino::getCollision(Type type, int materialID)
 	Mat4f identity = Mat4f::identity();
 	Vec3f size = s_domino_size[type];
 	if (!s_domino_collision[type]) {
-		std::cout << "create " << type << std::endl;
 		s_domino_collision[type] = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
 	}
 	return s_domino_collision[type];
-	return s_domino_collision[type] ? s_domino_collision[type] :
-			(s_domino_collision[type] = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]));
 }
 #endif
 

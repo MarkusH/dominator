@@ -7,7 +7,6 @@
 #include <iostream>
 
 #include <gui/mainwindow.hpp>
-#include <gui/render.hpp>
 #include <QtGui/QPixmap>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QMessageBox>
@@ -18,10 +17,11 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-MainWindow::MainWindow(QApplication *app)
+MainWindow::MainWindow(QApplication* app)
 {
+	m_modified = true;
 
-	QPixmap pixmap("data/splash.png");
+	QPixmap pixmap = QPixmap("data/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.show();
 	app->processEvents();
@@ -42,13 +42,13 @@ MainWindow::MainWindow(QApplication *app)
 	m_toolBox->addWidget(m_modifyBox);
 	app->processEvents();
 
-	m_renderWindow = new Render(this);
-	m_renderWindow->setMinimumWidth(400);
-	m_renderWindow->show();
+	m_renderWidget = new RenderWidget(this);
+	m_renderWidget->setMinimumWidth(400);
+	m_renderWidget->show();
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);
-	m_splitter->insertWidget(1, m_renderWindow);
+	m_splitter->insertWidget(1, m_renderWidget);
 
 	QList<int> sizes;
 	sizes.append(200);
@@ -60,13 +60,14 @@ MainWindow::MainWindow(QApplication *app)
 
 	setCentralWidget(m_splitter);
 
-	connect(m_renderWindow, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
-	connect(m_renderWindow, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
-	connect(m_renderWindow, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
-	connect(m_renderWindow, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
-	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWindow, SLOT(renderSize(char, float)));
-	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWindow, SLOT(renderLocation(char, float)));
-	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWindow, SLOT(renderRotation(float, float, float)));
+	connect(m_renderWidget, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
+	connect(m_renderWidget, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
+	connect(m_renderWidget, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
+	connect(m_renderWidget, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
+	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
+	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWidget, SLOT(renderSize(char, float)));
+	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWidget, SLOT(renderLocation(char, float)));
+	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWidget, SLOT(renderRotation(float, float, float)));
 
 	showMaximized();
 	splash.finish(this);
@@ -82,10 +83,12 @@ void MainWindow::initialize()
 
 void MainWindow::createMenu()
 {
+	// File
 	m_menuFile = menuBar()->addMenu("&File");
 
 	m_new = new QAction("&New", this);
 	m_new->setShortcuts(QKeySequence::New);
+	connect(m_new, SIGNAL(triggered()), this, SLOT(onNewPressed()));
 	m_menuFile->addAction(m_new);
 
 	m_open = new QAction("&Open", this);
@@ -110,14 +113,39 @@ void MainWindow::createMenu()
 	connect(m_exit, SIGNAL(triggered()), this, SLOT(onClosePressed()));
 	m_menuFile->addAction(m_exit);
 
+	// Simulation
+	m_menuSimulation = menuBar()->addMenu("&Simulation");
+
+	m_play = new QAction("&Play", this);
+	m_play->setEnabled(true);
+	m_play->setShortcut(Qt::Key_F9);
+	connect(m_play, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_play);
+
+	m_menuSimulation->addSeparator();
+
+	m_stop = new QAction("&Stop", this);
+	m_stop->setEnabled(false);
+	m_stop->setShortcut(Qt::Key_F9);
+	connect(m_stop, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_stop);
+
+	m_gravity = new QAction("&Gravity", this);
+	connect(m_gravity, SIGNAL(triggered()), this, SLOT(onGravityPressed()));
+	m_menuSimulation->addAction(m_gravity);
+
+	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
 
 	m_help = new QAction("&Help", this);
 	m_help->setShortcuts(QKeySequence::HelpContents);
+	connect(m_help, SIGNAL(triggered()), this, SLOT(onHelpPressed()));
 	m_menuHelp->addAction(m_help);
 
-	m_info = new QAction("&Info", this);
-	m_menuHelp->addAction(m_info);
+	m_about = new QAction("&Info", this);
+	m_about->setShortcut(Qt::ALT + Qt::Key_F1);
+	connect(m_about, SIGNAL(triggered()), this, SLOT(onAboutPressed()));
+	m_menuHelp->addAction(m_about);
 }
 
 void MainWindow::createStatusBar()
@@ -134,6 +162,11 @@ void MainWindow::createStatusBar()
 	m_objectsCount->setToolTip("There is 1 object in the world");
 	statusBar()->addWidget(m_objectsCount, 2);
 
+	m_simulationStatus = new QLabel("");
+	m_simulationStatus->setMinimumSize(m_simulationStatus->sizeHint());
+	m_simulationStatus->setAlignment(Qt::AlignLeft);
+	statusBar()->addWidget(m_simulationStatus, 2);
+
 	m_currentFilename = new QLabel("unsaved document");
 	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
 	m_currentFilename->setAlignment(Qt::AlignRight);
@@ -149,6 +182,17 @@ void MainWindow::updateFramesPerSecond(int frames)
 void MainWindow::updateObjectsCount(int count)
 {
 	m_objectsCount->setText(QString("%1").arg(count));
+}
+
+void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
+	sim::Simulation::instance().setInteractionType(type);
+}
+
+void MainWindow::onNewPressed()
+{
+	// TODO: check for m_renderWidget->isModified()
+	sim::Simulation::instance().init();
+	sim::Simulation::instance().setEnabled(false);
 }
 
 void MainWindow::onClosePressed()
@@ -168,9 +212,9 @@ void MainWindow::onSavePressed()
 	if (m_filename == "" || QObject::sender() == m_saveas) {
 		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.tus)");
 	}
-	std::cout << m_filename.toStdString() << std::endl;
 	m_currentFilename->setText(m_filename);
-	m_renderWindow->save(m_filename.toStdString());
+	sim::Simulation::instance().save(m_filename.toStdString());
+	m_modified = false;
 }
 
 void MainWindow::onOpenPressed()
@@ -181,8 +225,41 @@ void MainWindow::onOpenPressed()
 	dialog.setFilter("TUStudios Dominator (*.tus)");
 	if (dialog.exec()) {
 		m_filename = dialog.selectedFiles().first();
-		std::cout << m_filename.toStdString() << std::endl;
 		m_currentFilename->setText(m_filename);
-		m_renderWindow->open(m_filename.toStdString());
+		sim::Simulation::instance().load(m_filename.toStdString());
+		m_modified = false;
 	}
+}
+
+void MainWindow::onSimulationControlsPressed()
+{
+	bool set_active;
+	if (QObject::sender() == m_play) {
+		set_active = true;
+		m_simulationStatus->setText("Simulation started");
+	} else if (QObject::sender() == m_stop) {
+		set_active = false;
+		m_simulationStatus->setText("Simulation stopped");
+	} else {
+		return;
+	}
+	m_play->setEnabled(!set_active);
+	m_stop->setEnabled(set_active);
+	sim::Simulation::instance().setEnabled(set_active);
+}
+
+void MainWindow::onGravityPressed()
+{
+	GravityDialog* dialog = new GravityDialog(sim::Simulation::instance().getGravity(), this);
+	sim::Simulation::instance().setGravity(dialog->run());
+}
+
+void MainWindow::onHelpPressed()
+{
+}
+
+void MainWindow::onAboutPressed()
+{
+	AboutDialog* about = new AboutDialog(this);
+	about->exec();
 }

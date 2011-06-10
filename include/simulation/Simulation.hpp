@@ -24,6 +24,8 @@ using namespace m3d;
 typedef std::list<Object> ObjectList;
 
 class Simulation : public util::MouseListener {
+public:
+	typedef enum { INT_NONE = 0, INT_ROTATE, INT_MOVE_GROUND, INT_MOVE_BILLBOARD, INT_DOMINO_CURVE } InteractionType;
 private:
 	static Simulation* s_instance;
 	Simulation(util::KeyAdapter& keyAdapter,
@@ -34,6 +36,8 @@ protected:
 	// input adapters
 	util::KeyAdapter& m_keyAdapter;
 	util::MouseAdapter& m_mouseAdapter;
+
+	InteractionType m_interactionType;
 
 	util::Clock m_clock;
 
@@ -126,6 +130,11 @@ public:
 	/** @return The number of objects in the simulation */
 	unsigned getObjectCount();
 
+	/** @return The current interaction type */
+	InteractionType getInteractionType();
+
+	/** @param type The new interaction type */
+	void setInteractionType(InteractionType type);
 
 	/**
 	 * Selects the object at the viewport position (x, y). If
@@ -223,6 +232,16 @@ inline unsigned Simulation::getObjectCount()
 inline Object Simulation::getSelectedObject()
 {
 	return m_selectedObject;
+}
+
+inline Simulation::InteractionType Simulation::getInteractionType()
+{
+	return m_interactionType;
+}
+
+inline void Simulation::setInteractionType(InteractionType type)
+{
+	m_interactionType = type;
 }
 
 }

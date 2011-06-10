@@ -29,7 +29,9 @@ __Compound::__Compound(const Vec3f& position)
 
 __Compound::~__Compound()
 {
+#ifdef _DEBUG
 	std::cout << "delete compound" << std::endl;
+#endif
 	//m_nodes.clear();
 	//m_joints.clear();
 }

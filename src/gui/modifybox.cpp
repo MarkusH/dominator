@@ -7,13 +7,13 @@
 #include <gui/modifybox.hpp>
 #include <iostream>
 
-ModifyBox::ModifyBox(QWidget *parent) :
+ModifyBox::ModifyBox(QWidget* parent) :
 	QWidget(parent)
 {
 
 	m_rx = m_ry = m_rz = 0;
 
-	QVBoxLayout *layout = new QVBoxLayout();
+	QVBoxLayout* layout = new QVBoxLayout();
 
 	layout->addWidget(new QLabel("Size:"));
 
@@ -102,17 +102,17 @@ ModifyBox::ModifyBox(QWidget *parent) :
 
 }
 
-void ModifyBox::mouseMoveEvent(QMouseEvent * event)
+void ModifyBox::mouseMoveEvent(QMouseEvent* event)
 {
 	move(mapToParent(event->pos()) - m_moveOffset);
 }
 
-void ModifyBox::mousePressEvent(QMouseEvent * event)
+void ModifyBox::mousePressEvent(QMouseEvent* event)
 {
 	m_moveOffset = event->pos();
 }
 
-void ModifyBox::mouseReleaseEvent(QMouseEvent * event)
+void ModifyBox::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_moveOffset = QPoint();
 }

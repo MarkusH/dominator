@@ -17,53 +17,75 @@
 #include <QtGui/QStatusBar>
 #include <QtGui/QAction>
 #include <QtGui/QFileDialog>
+#include <gui/renderwidget.hpp>
+#include <gui/dialogs.hpp>
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
-
-
-class Render;
+#include <simulation/Simulation.hpp>
 
 class MainWindow: public QMainWindow {
 Q_OBJECT
 public:
-	MainWindow(QApplication *app);
+	MainWindow(QApplication* app);
 
 private slots:
 	void updateFramesPerSecond(int frames);
 	void updateObjectsCount(int count);
+	void selectInteraction(sim::Simulation::InteractionType type);
+	//File
+	void onNewPressed();
 	void onClosePressed();
 	void onSavePressed();
 	void onOpenPressed();
+	//Simulation
+	void onSimulationControlsPressed();
+	void onGravityPressed();
+	//Help
+	void onHelpPressed();
+	void onAboutPressed();
 
 private:
 	void initialize();
 	void createMenu();
 	void createStatusBar();
+	bool isModified();
 
-	Render *m_renderWindow;
+	RenderWidget* m_renderWidget;
 
-	QMenu *m_menuFile;
-	QAction *m_new;
-	QAction *m_save;
-	QAction *m_saveas;
-	QAction *m_open;
-	QAction *m_exit;
+	QMenu* m_menuFile;
+	QAction* m_new;
+	QAction* m_save;
+	QAction* m_saveas;
+	QAction* m_open;
+	QAction* m_exit;
 
-	QMenu *m_menuHelp;
-	QAction *m_help;
-	QAction *m_info;
+	QMenu* m_menuSimulation;
+	QAction* m_play;
+	QAction* m_stop;
+	QAction* m_gravity;
 
-	ToolBox *m_toolBox;
+	QMenu* m_menuHelp;
+	QAction* m_help;
+	QAction* m_about;
 
-	ModifyBox *m_modifyBox;
+	ToolBox* m_toolBox;
 
-	QSplitter *m_splitter;
+	ModifyBox* m_modifyBox;
 
-	QLabel *m_framesPerSec;
-	QLabel *m_objectsCount;
-	QLabel *m_currentFilename;
+	QSplitter* m_splitter;
+
+	QLabel* m_framesPerSec;
+	QLabel* m_objectsCount;
+	QLabel* m_simulationStatus;
+	QLabel* m_currentFilename;
 
 	QString m_filename;
+	bool m_modified;
 };
+
+inline bool MainWindow::isModified()
+{
+	return m_modified;
+}
 
 #endif /* MAINWINDOW_HPP_ */
