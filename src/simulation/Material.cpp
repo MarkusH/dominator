@@ -142,6 +142,12 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 		if( attribute == "kineticFriction")	kineticFriction = atof(attr->value());
 		if( attribute == "softness")		softness = atof(attr->value());
 	}
+
+	if (mat0 > mat1) {
+		int tmp = mat0;
+		mat0 = mat1;
+		mat1 = tmp;
+	}
 }
 
 
@@ -323,6 +329,13 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 	MaterialPair pair;
 	pair.mat0 = getID(mat0);
 	pair.mat1 = getID(mat1);
+
+	if (pair.mat0 > pair.mat1) {
+		int tmp = pair.mat0;
+		pair.mat0 = pair.mat1;
+		pair.mat1 = tmp;
+	}
+
 	pair.elasticity = elasticity;
 	pair.staticFriction = staticFriction;
 	pair.kineticFriction = kineticFriction;
@@ -491,7 +504,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		//TODO: get impact information and play a sound
 	}
 
-
+	//std::cout << "\tmaterial end" << std::endl;
 }
 
 void MaterialMgr::GenericContactCallback(const NewtonJoint* contactJoint,

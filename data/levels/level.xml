@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level>
-	<compound id="0" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 5, 4.37114e-07, 1">
-		<object id="0" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 9.5, 4.37114e-07, 1" width="20" height="0.5" depth="0.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0"/>
-		<object id="1" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 7, 8, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="2" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 5, 8, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="3" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 7, 4, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="4" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 5, 4, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="5" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 7, 4.37114e-07, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="6" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 5, 4.37114e-07, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="7" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 7, -4, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="8" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 5, -4, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="9" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 7, -8, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="10" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -10, 5, -8, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<joint type="hinge" parentID="2" childID="1" pivot="-10, 5, 8" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="1" childID="0" pivot="-10, 9.4, 8" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="4" childID="3" pivot="-10, 5, 4" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="3" childID="0" pivot="-10, 9.4, 4" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="6" childID="5" pivot="-10, 5, 4.37114e-07" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="5" childID="0" pivot="-10, 9.4, 4.37114e-07" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="8" childID="7" pivot="-10, 5, -4" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="7" childID="0" pivot="-10, 9.4, -4" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="10" childID="9" pivot="-10, 5, -8" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="9" childID="0" pivot="-10, 9.4, -8" pinDir="1, 0, -4.37114e-08"/>
+	<compound id="0" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -8.35301, 11.4275, -10, 1">
+		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -8.35301, 15.9275, -10, 1" width="20" height="0.5" depth="0.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0"/>
+		<object id="1" type="box" matrix="0.985575, -0.169238, 0.000324013, 0; 0.169238, 0.985575, -6.4294e-05, 0; -0.000308459, 0.000118202, 1, 0; -16.7653, 13.4447, -9.99984, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
+		<object id="2" type="sphere" matrix="0.996284, -0.0861275, 1.4301e-05, 0; 0.0861275, 0.996284, -0.000419313, 0; 2.18665e-05, 0.000418987, 1, 0; -17.1055, 11.4571, -9.99972, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
+		<object id="3" type="box" matrix="0.997922, -0.0644376, -0.000166464, 0; 0.0644376, 0.997922, -0.000282892, 0; 0.000184347, 0.000271578, 1, 0; -12.5097, 13.4161, -9.99932, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
+		<object id="4" type="sphere" matrix="0.160219, 0.987081, -0.000659767, 0; -0.987081, 0.160219, 0.000466593, 0; 0.000566273, 0.000576487, 1, 0; -12.6392, 11.404, -9.99877, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
+		<object id="5" type="box" matrix="0.998599, -0.0529127, -0.000310248, 0; 0.0529126, 0.998599, -0.000301887, 0; 0.000325787, 0.000285048, 1, 0; -8.48105, 13.4145, -9.99928, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
+		<object id="6" type="sphere" matrix="-0.99, -0.141065, 0.00100277, 0; 0.141066, -0.99, 0.00046206, 0; 0.000927561, 0.000598895, 0.999999, 0; -8.58717, 11.4011, -9.99868, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
+		<object id="7" type="box" matrix="0.999979, -0.00647881, -0.000130519, 0; 0.00647877, 0.999979, -0.000305381, 0; 0.000132495, 0.000304529, 1, 0; -4.36761, 13.4112, -9.99926, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
+		<object id="8" type="sphere" matrix="-0.439368, 0.898307, -0.000696614, 0; -0.898307, -0.439368, -3.92608e-05, 0; -0.000341338, 0.000608523, 1, 0; -4.38027, 11.395, -9.99866, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
+		<object id="9" type="box" matrix="0.995446, 0.0953223, -0.000200692, 0; -0.0953224, 0.995446, -0.00021459, 0; 0.000179323, 0.000232743, 1, 0; -0.119699, 13.4212, -9.99948, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
+		<object id="10" type="sphere" matrix="0.263384, -0.964691, 0.000539031, 0; 0.964691, 0.263384, -6.01424e-05, 0; -8.39532e-05, 0.000535839, 1, 0; 0.072249, 11.4138, -9.99906, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
+		<joint type="hinge" parentID="2" childID="1" pivot="-16.353, 11.4275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="1" childID="0" pivot="-16.353, 15.8275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="4" childID="3" pivot="-12.353, 11.4275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="3" childID="0" pivot="-12.353, 15.8275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="6" childID="5" pivot="-8.35301, 11.4275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="5" childID="0" pivot="-8.35301, 15.8275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="8" childID="7" pivot="-4.35301, 11.4275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="7" childID="0" pivot="-4.35301, 15.8275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="10" childID="9" pivot="-0.353008, 11.4275, -10" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="9" childID="0" pivot="-0.353008, 15.8275, -10" pinDir="0, 0, 1"/>
 	</compound>
+	<object id="0" type="box" matrix="-0.260293, -0.188099, 0.94703, 0; -0.906498, -0.290092, -0.30677, 0; 0.332429, -0.938331, -0.0950027, 0; 1.489, -2004.12, -16.1237, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="5"/>
+	<object id="1" type="sphere" matrix="0.861123, 0.381275, -0.336299, 0; -0.482486, 0.404405, -0.776958, 0; -0.160233, 0.831316, 0.532202, 0; -42.9916, -2000.68, -35.4337, 1" radius_x="0.2" radius_y="0.2" radius_z="0.2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood_matt" mass="5"/>
+	<object id="2" type="box" matrix="0.0335079, 0.222836, 0.97428, 0; 0.0463778, 0.973431, -0.224237, 0; -0.998362, 0.0526987, 0.022283, 0; -19.0362, -2004.12, -43.6972, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="5"/>
+	<object id="3" type="sphere" matrix="-0.127433, 3.99351e-06, 0.991847, 0; -0.158321, 0.987178, -0.020345, 0; -0.97913, -0.159622, -0.125798, 0; -27.1808, -2003.55, -41.7437, 1" radius_x="0.2" radius_y="0.2" radius_z="0.2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood_matt" mass="5"/>
+	<object id="4" type="box" matrix="-0.886209, -0.0366421, 0.461835, 0; 0.233757, -0.896037, 0.377461, 0; 0.39999, 0.442466, 0.802641, 0; -21.2201, -2001.96, -33.6746, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="5"/>
+	<object id="5" type="sphere" matrix="0.00887704, 5.97984e-05, 0.999961, 0; -0.463548, -0.886062, 0.00416809, 0; 0.886027, -0.463567, -0.00783789, 0; -32.224, -2001.94, -9.95122, 1" radius_x="0.2" radius_y="0.2" radius_z="0.2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood_matt" mass="5"/>
+	<object id="6" type="box" matrix="-0.0814544, -0.688804, 0.720357, 0; -0.509983, 0.64978, 0.563652, 0; -0.856319, -0.321458, -0.404206, 0; 5.58315, -2001.54, -40.6969, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="5"/>
+	<object id="7" type="sphere" matrix="0.0689731, 0.826635, -0.558496, 0; 0.48212, -0.517734, -0.706762, 0; -0.873386, -0.220514, -0.434247, 0; -21.922, -1810.02, 4.00205, 1" radius_x="0.2" radius_y="0.2" radius_z="0.2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood_matt" mass="5"/>
+	<object id="8" type="box" matrix="0.0712079, -0.00299248, 0.997457, 0; -0.997461, 0.00047195, 0.0712098, 0; -0.000683904, -0.999995, -0.00295138, 0; -3.34459, 16.6764, -10.0634, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="5"/>
 </level>
 

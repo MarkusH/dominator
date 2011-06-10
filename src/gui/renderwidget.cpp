@@ -1,10 +1,10 @@
 /*
- * render/render.cpp
+ * render/renderwidget.cpp
  *
  *      Author: Markus Holtermann
  */
 
-#include <gui/render.hpp>
+#include <gui/renderwidget.hpp>
 #include <m3d/m3d.hpp>
 #include <util/Clock.hpp>
 #include <iostream>
@@ -18,10 +18,9 @@
 
 using namespace m3d;
 
-Render::Render(QWidget *parent) :
+RenderWidget::RenderWidget(QWidget* parent) :
 	QGLWidget(parent)
 {
-	m_modified = true;
 	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	setFocusPolicy(Qt::WheelFocus);
 	m_timer = new QTimer(this);
@@ -29,11 +28,12 @@ Render::Render(QWidget *parent) :
 	m_timer->start();
 }
 
-void Render::initializeGL()
+void RenderWidget::initializeGL()
 {
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
-		std::cout << "could not initialize GLEW" << std::endl;
+		std::cerr << "could not initialize GLEW" << std::endl;
+		exit(1);
 	}
 
 	// load per-pixel lighting shader
@@ -74,11 +74,12 @@ void Render::initializeGL()
 
 	sim::Simulation::createInstance(m_keyAdapter, m_mouseAdapter);
 	sim::Simulation::instance().init();
+	sim::Simulation::instance().setEnabled(false);
 
 	m_clock.reset();
 }
 
-void Render::resizeGL(int width, int height)
+void RenderWidget::resizeGL(int width, int height)
 {
 	// Reset the viewport
 	glViewport(0, 0, width, height);
@@ -92,7 +93,7 @@ void Render::resizeGL(int width, int height)
 	glLoadIdentity();
 }
 
-void Render::paintGL()
+void RenderWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
@@ -116,65 +117,50 @@ void Render::paintGL()
 	}
 }
 
-void Render::keyPressEvent(QKeyEvent *event)
+void RenderWidget::keyPressEvent(QKeyEvent* event)
 {
 	m_keyAdapter.keyEvent(event);
 }
 
-void Render::keyReleaseEvent(QKeyEvent *event)
+void RenderWidget::keyReleaseEvent(QKeyEvent* event)
 {
 	m_keyAdapter.keyEvent(event);
 }
 
-void Render::mouseMoveEvent(QMouseEvent *event)
+void RenderWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mousePressEvent(QMouseEvent *event)
+void RenderWidget::mousePressEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::mouseReleaseEvent(QMouseEvent *event)
+void RenderWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 }
 
-void Render::wheelEvent(QWheelEvent *event)
+void RenderWidget::wheelEvent(QWheelEvent* event)
 {
 	m_mouseAdapter.mouseWheelEvent(event);
 }
 
-void Render::mouseDoubleClickEvent(QMouseEvent* event)
+void RenderWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
 	m_mouseAdapter.mouseEvent(event);
 
 	if (sim::Simulation::instance().getSelectedObject()) {
-		std::cout << sim::Simulation::instance().getSelectedObject()->getMatrix() << std::endl;
 		emit objectSelected(true);
-		std::cout << "get " << sim::Simulation::instance().getSelectedObject()->getMatrix().eulerAngles() << std::endl;
 		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
 	} else {
 		emit objectSelected(false);
 	}
 }
 
-void Render::save(const std::string& fileName)
+void RenderWidget::renderSize(char axis, float size)
 {
-	sim::Simulation::instance().save(fileName);
-	m_modified = false;
-}
-
-void Render::open(const std::string& fileName)
-{
-	sim::Simulation::instance().load(fileName);
-	m_modified = false;
-}
-
-void Render::renderSize(char axis, float size)
-{
-	std::cout << axis << " size " << size << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		m3d::Mat4f helper = m3d::Mat4f::identity();
@@ -194,9 +180,8 @@ void Render::renderSize(char axis, float size)
 	}
 }
 
-void Render::renderLocation(char axis, float position)
+void RenderWidget::renderLocation(char axis, float position)
 {
-	std::cout << axis << " position " << position << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		switch (axis) {
@@ -214,9 +199,8 @@ void Render::renderLocation(char axis, float position)
 	}
 }
 
-void Render::renderRotation(float x, float y, float z)
+void RenderWidget::renderRotation(float x, float y, float z)
 {
-	std::cout << " angle " << x << " " << y << " " << z << std::endl;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 

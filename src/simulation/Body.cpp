@@ -72,17 +72,20 @@ NewtonBody* Body::create(NewtonCollision* collision, float mass, int freezeState
 
 void Body::__destroyBodyCallback(const NewtonBody* body)
 {
-
+	//std::cout << "\tdestroy callback " << body << std::endl;
 }
 
 void Body::__setTransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex)
 {
+	//std::cout << "\ttransform " << threadIndex << " " << body << std::endl;
 	Body* _body = (Body*)NewtonBodyGetUserData(body);
 	_body->m_matrix = Mat4f(matrix);
+	//std::cout << "\ttransform end " << threadIndex << " " << body << std::endl;
 }
 
 void Body::__applyForceAndTorqueCallback(const NewtonBody* body, dFloat timestep, int threadIndex)
 {
+	//std::cout << "\tforce " << threadIndex << " " << body << std::endl;
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
@@ -91,6 +94,7 @@ void Body::__applyForceAndTorqueCallback(const NewtonBody* body, dFloat timestep
 	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
 	Vec4f gravityForce(0.0f, mass * Simulation::instance().getGravity(), 0.0f, 1.0f);
 	NewtonBodySetForce(body, &gravityForce[0]);
+	//std::cout << "\tforce end " << threadIndex << " " << body << std::endl;
 }
 
 }

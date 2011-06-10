@@ -1,11 +1,11 @@
 /*
- * render/render.hpp
+ * render/renderwidget.hpp
  *
  *      Author: Markus Holtermann
  */
 
-#ifndef RENDER_RENDER_HPP_
-#define RENDER_RENDER_HPP_
+#ifndef RENDERWIDGET_HPP_
+#define RENDERWIDGET_HPP_
 
 #include <GL/glew.h>
 #include <QtCore/QTimer>
@@ -17,21 +17,15 @@
 #include <util/InputAdapters.hpp>
 #include <QtGui/QWheelEvent>
 
-class Render: public QGLWidget {
+class RenderWidget: public QGLWidget {
 Q_OBJECT
 public:
-	Render(QWidget *parent = 0);
+	RenderWidget(QWidget* parent = 0);
 
 public slots:
 	void renderSize(char axis, float size);
 	void renderLocation(char axis, float position);
 	void renderRotation(float x, float y, float z);
-
-	void save(const std::string& fileName);
-	void open(const std::string& fileName);
-	bool isModified() {
-		return m_modified;
-	}
 
 protected:
 	virtual void initializeGL();
@@ -46,12 +40,11 @@ protected:
 	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
 private:
-	QTimer *m_timer;
+	QTimer* m_timer;
 	m3d::Mat4f m_matrix;
 	util::Clock m_clock;
 	util::QtMouseAdapter m_mouseAdapter;
 	util::QtKeyAdapter m_keyAdapter;
-	bool m_modified;
 
 signals:
 	void framesPerSecondChanged(int);
@@ -60,4 +53,4 @@ signals:
 	void objectSelected(bool);
 };
 
-#endif /* RENDER_RENDER_HPP_ */
+#endif /* RENDERWIDGET_HPP_ */

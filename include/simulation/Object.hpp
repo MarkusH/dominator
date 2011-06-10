@@ -41,7 +41,21 @@ typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
  */
 class __Object {
 public:
-	typedef enum { BOX, SPHERE, CYLINDER, CAPSULE, CONE, CHAMFER_CYLINER, CONVEX_HULL, CONVEX_ASSEMBLY, COMPOUND, TREE_COLLISION } Type;
+	typedef enum {
+		DOMINO_SMALL = 0,
+		DOMINO_MIDDLE,
+		DOMINO_LARGE,
+		BOX,
+		SPHERE,
+		CYLINDER,
+		CAPSULE,
+		CONE,
+		CHAMFER_CYLINER,
+		CONVEX_HULL,
+		CONVEX_ASSEMBLY,
+		COMPOUND,
+		TREE_COLLISION
+	} Type;
 
 protected:
 	Type m_type;
@@ -50,6 +64,8 @@ protected:
 public:
 	__Object(Type type);
 	virtual ~__Object();
+
+	const Type& getType() { return m_type; }
 
 	virtual const Mat4f& getMatrix() = 0;
 	virtual void setMatrix(const Mat4f& matrix) = 0;
@@ -85,7 +101,7 @@ public:
 	 * @param object
 	 * @return
 	 */
-	virtual bool contains(const Object& object) = 0;
+	virtual bool contains(const __Object* object) = 0;
 
 	/**
 	 * Generates the vertices, uv-coordinates, normals and indices (buffers)
@@ -161,7 +177,7 @@ public:
 	virtual float convexCastPlacement(bool apply = true);
 
 	virtual bool contains(const NewtonBody* const body);
-	virtual bool contains(const Object& object);
+	virtual bool contains(const __Object* object);
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
