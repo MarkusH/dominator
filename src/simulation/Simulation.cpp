@@ -427,15 +427,20 @@ void Simulation::remove(const Object& object)
 	upload(m_objects.end(), m_objects.end());
 }
 
+static bool isSharedBuffer(const ogl::SubBuffer* const buffer)
+{
+	return buffer->object == NULL;
+}
+
 void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
 {
-	//std::cout << begin->first << " " << end->first << std::endl;
 	for (ObjectList::iterator itr = begin; itr != end; ++itr) {
-	//	std::cout << "id " << itr->first << std::endl;
 		(*itr)->genBuffers(m_vertexBuffer);
 	}
 	m_vertexBuffer.upload();
-	//TODO: sort materials
+	m_sortedBuffers.assign(m_vertexBuffer.m_buffers.begin(), m_vertexBuffer.m_buffers.end());
+	m_sortedBuffers.remove_if(isSharedBuffer);
+	m_sortedBuffers.sort();
 }
 
 Object Simulation::selectObject(int x, int y)
@@ -703,35 +708,41 @@ void Simulation::render()
 	m_camera.update();
 	m_camera.apply();
 
-	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
-		m_vertexBuffer.bind();
+	m_vertexBuffer.bind();
 
 /*
-		const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
-						 0.0f, 0.5f, 0.0f, 0.0f,
-						 0.0f, 0.0f, 0.5f, 0.0f,
-						 0.5f, 0.5f, 0.5f, 1.0f);
-		const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
-		const Mat4f lightModelview;
+	const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
+					 0.0f, 0.5f, 0.0f, 0.0f,
+					 0.0f, 0.0f, 0.5f, 0.0f,
+					 0.5f, 0.5f, 0.5f, 1.0f);
+	const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
+	const Mat4f lightModelview;
 
-		const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
+	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
 */
 
-		ogl::SubBuffers::iterator itr = m_vertexBuffer.m_buffers.begin();
-		//++itr; ++itr; ++itr;
-		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {
-			const ogl::SubBuffer* buf = (*itr);
-			__Object* obj = (__Object*)buf->object;
-			if (!obj) continue;
-			applyMaterial(buf->material);
-			glPushMatrix();
-			glMultMatrixf(obj->getMatrix()[0]);
-			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
-			glPopMatrix();
-		}
+	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
+	std::string material = "";
+	if (*itr) {
+		material = (*itr)->material;
 	}
+	applyMaterial(material);
+	for ( ; itr != m_sortedBuffers.end(); ++itr) {
+		const ogl::SubBuffer* const buf = (*itr);
+		const __Object* const obj = (const __Object* const)buf->object;
+		if (material != buf->material) {
+			material = buf->material;
+			applyMaterial(material);
+		}
+
+		glPushMatrix();
+		glMultMatrixf(obj->getMatrix()[0]);
+		glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
+		glPopMatrix();
+	}
+
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);

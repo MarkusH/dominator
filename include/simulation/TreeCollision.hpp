@@ -22,7 +22,7 @@ public:
 	__TreeCollision(const Mat4f& matrix, const std::string& fileName);
 	~__TreeCollision();
 
-	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
+	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual float convexCastPlacement(bool apply = true) { return 0.0f; };

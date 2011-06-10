@@ -66,7 +66,7 @@ public:
 
 	const Type& getType() { return m_type; }
 
-	virtual const Mat4f& getMatrix() = 0;
+	virtual const Mat4f& getMatrix() const = 0;
 	virtual void setMatrix(const Mat4f& matrix) = 0;
 
 	int getID() const { return m_id; }
@@ -167,7 +167,7 @@ public:
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
-	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
+	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }

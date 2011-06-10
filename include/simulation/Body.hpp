@@ -55,7 +55,7 @@ public:
 	NewtonCollision* getCollision() const;
 
 	/** @return The Matrix of this body */
-	virtual const Mat4f& getMatrix();
+	virtual const Mat4f& getMatrix() const;
 
 	/**
 	 * Sets the matrix of this body.
@@ -95,7 +95,7 @@ inline NewtonCollision* Body::getCollision() const
 	return NewtonBodyGetCollision(m_body);
 }
 
-inline const Mat4f& Body::getMatrix()
+inline const Mat4f& Body::getMatrix() const
 {
 	return m_matrix;
 }

@@ -48,7 +48,7 @@ public:
 
 	void add(Object object);
 
-	virtual const Mat4f& getMatrix();
+	virtual const Mat4f& getMatrix() const;
 	virtual void setMatrix(const Mat4f& matrix);
 
 	/** @param state Sets the freeze state of all nodes to state */
@@ -72,7 +72,7 @@ public:
 };
 
 
-inline const Mat4f& __Compound::getMatrix()
+inline const Mat4f& __Compound::getMatrix() const
 {
 	return m_matrix;
 }

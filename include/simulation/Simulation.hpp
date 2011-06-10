@@ -57,7 +57,21 @@ protected:
 	/** The currently selected object, or an empty smart pointer */
 	Object m_selectedObject;
 
+	/**
+	 * The vertex buffer contains the vertices, uvs and normals for all
+	 * objects in the simulation. For each object, there are one or more
+	 * sub-buffers that specify the indices of the related data. The first
+	 * three sub-buffers are reserved for small, middle and large dominos.
+	 * All other dominos reference this data in order to save memory on the
+	 * GPU.
+	 */
 	ogl::VertexBuffer m_vertexBuffer;
+
+	/**
+	 * A list of sorted sub-buffers from the vertex buffer. We cannot sort
+	 * the sub-buffers of the VBO directly because the order is important.
+	 */
+	ogl::SubBuffers m_sortedBuffers;
 
 	/**
 	 * Uploads the vertex data of all objects between begin
