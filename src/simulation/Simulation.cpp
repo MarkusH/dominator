@@ -14,6 +14,7 @@
 #include <iostream>
 #include <newton/util.hpp>
 #include <simulation/Domino.hpp>
+#include <simulation/CRSpline.hpp>
 
 namespace sim {
 
@@ -27,6 +28,7 @@ static Vec2i rot_mouse;
 
 // INT_DOMINO_CURVE
 static Vec3f curve_current;
+static CRSpline curve_spline;
 
 void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 								util::MouseAdapter& mouseAdapter)
@@ -52,7 +54,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_mouseAdapter(mouseAdapter),
 	  m_nextID(0)
 {
-	m_interactionType = INT_NONE;
+	m_interactionType = INT_DOMINO_CURVE;
 	m_world = NULL;
 	m_enabled = true;
 	m_gravity = -9.81f * 4.0f;
@@ -598,7 +600,8 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		add(obj);
 		*/
 
-		if (m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
+		if (m_interactionType == INT_DOMINO_CURVE && !m_enabled && down) {
+			/*
 			Vec3f dir = (m_pointer - old);
 			float len = dir.len();
 			dir.normalize();
@@ -608,6 +611,8 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
 				add(domino);
 			}
+			*/
+			curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
 		}
 	} else if (button == util::RIGHT) {
 		if (m_enabled)
@@ -783,6 +788,7 @@ void Simulation::render()
 			glVertex3fv(&axis.x);
 		glEnd();
 	} else if (m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
+		/*
 		glBegin(GL_POINTS);
 		glVertex3fv(&m_pointer[0]);
 		glVertex3fv(&rot_drag_cur[0]);
@@ -791,6 +797,11 @@ void Simulation::render()
 			glVertex3fv(&m_pointer[0]);
 			glVertex3fv(&curve_current[0]);
 		glEnd();
+		*/
+		curve_spline.update();
+		curve_spline.renderKnots();
+		curve_spline.renderSpline(0.25f);
+		curve_spline.renderPoints(5.0f);
 	}
 
 	glPointSize(5.0f);
