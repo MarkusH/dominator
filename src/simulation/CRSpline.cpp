@@ -107,13 +107,12 @@ std::pair<Vec3f, Vec3f> CRSpline::getPoint(float length)
 
 float CRSpline::update()
 {
+	m_table.clear();
 	if (m_knots.size() < 3) return 0.0f;
     HelpList helpList;
     HelpList::iterator curPoint;
 
     HelpPoint helpPoint;
-
-    m_table.clear();
 
     // add the first help point to the table
     helpPoint.t = 0.0f;
@@ -241,27 +240,6 @@ void CRSpline::renderSpline(float accuracy, const Vec3f& color)
 void CRSpline::renderPoints(float gap, const Vec3f& color, bool tangent, const Vec3f& tangentColor, float tangentLength)
 {
 	if (m_table.size()) {
-		const NewtonWorld* world = Simulation::instance().getWorld();
-
-		/*
-		HelpTable::iterator itr = m_table.begin();
-		while (itr != m_table.end()) {
-			Vec2f p = itr->pos;
-			Vec2f q = p + itr->tangent.normalized() * tangentLength;
-			float y = newton::getVerticalPosition(world, p.x, p.y);
-			glBegin(GL_POINTS);
-			glVertex3f(p.x, y, p.y);
-			glEnd();
-			if (tangent) {
-				glBegin(GL_LINES);
-				glVertex3f(p.x, y, p.y);
-				glVertex3f(q.x, y, p.y);
-				glEnd();
-				++itr;
-			}
-		}
-		*/
-
 		for (float t = 0.0f; t < m_table.back().len; t += gap) {
 			Vec3f p = getPos(t);
 			Vec3f q = p + getTangent(t).normalized() * tangentLength;

@@ -36,7 +36,6 @@ __Domino::~__Domino()
 #ifndef CONVEX_DOMINO
 NewtonCollision*  __Domino::getCollision(Type type, int materialID)
 {
-	//TODO cleanup?
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	Mat4f identity = Mat4f::identity();
 	Vec3f size = s_domino_size[type];

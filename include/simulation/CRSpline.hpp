@@ -78,6 +78,9 @@ public:
 	/** @return The control points of the spline */
 	inline std::vector<Vec2f>& knots();
 
+	/** @return The help points of the spline */
+	inline HelpTable& table();
+
 	/**
 	 * Get the spline parameter at the given length.
 	 *
@@ -147,6 +150,11 @@ public:
 inline std::vector<Vec2f>& CRSpline::knots()
 {
 	return m_knots;
+}
+
+inline CRSpline::HelpTable& CRSpline::table()
+{
+	return m_table;
 }
 
 inline unsigned int CRSpline::BOUND(int index) {

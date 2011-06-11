@@ -613,6 +613,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 			}
 			*/
 			curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
+			std::cout << "add " << curve_spline.knots().size() << std::endl;
 		}
 	} else if (button == util::RIGHT) {
 		if (m_enabled)
@@ -630,6 +631,22 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 
 		if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled)
 			rot_mat_start = m_selectedObject->getMatrix();
+	}
+
+	if (button == util::MIDDLE && m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
+		std::cout << "end " << curve_spline.knots().size() << std::endl;
+		if (curve_spline.knots().size() > 2) {
+			curve_spline.update();
+			for (float t = 0.0f; t < curve_spline.table().back().len; t += 5.0f) {
+				Vec3f p = curve_spline.getPos(t);
+				Vec3f q = curve_spline.getTangent(t).normalized();
+				Mat4f matrix(Vec3f::yAxis(), q, p);
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0, "domino");
+				add(domino);
+			}
+		}
+		curve_spline.knots().clear();
+		curve_spline.update();
 	}
 }
 
