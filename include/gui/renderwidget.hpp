@@ -1,7 +1,7 @@
-/*
- * render/renderwidget.hpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 14, 2011
+ * @file gui/renderwidget.hpp
  */
 
 #ifndef RENDERWIDGET_HPP_

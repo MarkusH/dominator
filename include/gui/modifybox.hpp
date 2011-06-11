@@ -1,7 +1,7 @@
-/*
- * modifybox.hpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 25, 2011
+ * @file gui/modifybox.hpp
  */
 
 #ifndef MODIFYBOX_HPP_

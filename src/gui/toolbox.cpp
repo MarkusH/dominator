@@ -1,7 +1,7 @@
-/*
- * toolbox.cpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 25, 2011
+ * @file gui/toolbox.cpp
  */
 
 #include <gui/toolbox.hpp>

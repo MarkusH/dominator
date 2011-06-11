@@ -1,7 +1,7 @@
-/*
- * toolbox.hpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 25, 2011
+ * @file gui/toolbox.hpp
  */
 
 #ifndef TOOLBOX_HPP_
