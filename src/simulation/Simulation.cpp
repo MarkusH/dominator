@@ -572,17 +572,6 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (m_interactionTypes[button] == INT_DOMINO_CURVE && down && !m_enabled) {
-		/*
-		Vec3f dir = (m_pointer - old);
-		float len = dir.len();
-		dir.normalize();
-		Mat4f matrix(Vec3f::yAxis(), dir, old);
-		for (float d = 0.0f; d <= len; d += 3.5f) {
-			matrix.setW(old + dir * d);
-			Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
-			add(domino);
-		}
-		*/
 		curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
 	}
 
@@ -604,13 +593,43 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		rot_mat_start = m_selectedObject->getMatrix();
 
 	if (m_interactionTypes[button] == INT_DOMINO_CURVE && !m_enabled) {
+		// Remove knots that are too close to each other, this improves the
+		// spline and removes unwanted knots when closing the spline
+		bool stop = false;
+		while (!stop) {
+			stop = true;
+			if (curve_spline.knots().size() > 2) {
+				Vec2f last = curve_spline.knots()[curve_spline.knots().size()-1];
+				Vec2f prev = curve_spline.knots()[curve_spline.knots().size()-2];
+				if ((last - prev).len() <= 0.5f) {
+					curve_spline.knots().pop_back();
+					stop = false;
+				}
+			}
+		}
+		curve_spline.update();
+		// spline
 		if (curve_spline.knots().size() > 2) {
 			curve_spline.update();
-			for (float t = 0.0f; t < curve_spline.table().back().len; t += 5.0f) {
+			for (float t = 0.0f; t < curve_spline.table().back().len; t += 4.5f) {
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
 				Mat4f matrix(Vec3f::yAxis(), q, p);
 				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0, "domino");
+				add(domino);
+			}
+		// line
+		} else if (curve_spline.knots().size() == 2) {
+			Vec3f start = curve_spline.knots()[0].xz3(0.0f);
+			start.y = newton::getVerticalPosition(m_world, start.x, start.z);
+			Vec3f end = curve_spline.knots()[1].xz3(0.0f);
+			end.y = newton::getVerticalPosition(m_world, end.x, end.z);
+			Vec3f dir = (end - start);
+			float len = dir.normalize();
+			Mat4f matrix(Vec3f::yAxis(), dir, start);
+			for (float d = 0.0f; d <= len; d += 4.5f) {
+				matrix.setW(start + dir * d);
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
 				add(domino);
 			}
 		}
