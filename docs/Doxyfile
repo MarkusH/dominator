@@ -76,7 +76,7 @@ LAYOUT_FILE            =
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
-QUIET                  = NO
+QUIET                  = YES
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = NO
 WARN_IF_DOC_ERROR      = YES
@@ -86,7 +86,6 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-#INPUT                  = /home/mark89holt/github.com/dominator/src /home/mark89holt/github.com/dominator/include
 INPUT                  = ../src ../include
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = 
