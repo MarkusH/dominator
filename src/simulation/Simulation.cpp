@@ -344,7 +344,7 @@ void Simulation::remove(const Object& object)
 	// multiple sub-meshes with the same data and different materials
 	std::set<__Object*> deleted;
 
-	//TODO: think about what happens if a domino is inside a compound
+	/// @todo think about what happens if a domino is inside a compound
 	if (object->getType() <= __Object::DOMINO_LARGE) {
 		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin(); it != m_vertexBuffer.m_buffers.end(); ++it) {
 			if ((*it)->object == object.get()) {
@@ -435,7 +435,7 @@ void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::ite
 		(*itr)->genBuffers(m_vertexBuffer);
 	}
 	m_vertexBuffer.upload();
-	//TODO: sort materials
+	/// @todo sort materials
 }
 
 Object Simulation::selectObject(int x, int y)
@@ -668,7 +668,7 @@ void Simulation::update()
 
 void Simulation::applyMaterial(const std::string& material) {
 	const Material* const _mat = MaterialMgr::instance().get(material);
-	//TODO only switch shader/texture if necessary
+	/// @todo only switch shader/texture if necessary
 	if (_mat != NULL) {
 		const Material& mat = *_mat;
 		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);

@@ -116,7 +116,7 @@ Vec3f Camera::pointer(int x, int y) const
 	Vec4<GLint> viewport = Vec4<GLint>::viewport();
 	GLfloat z;
 
-	// TODO: move this from here
+	/// @todo move this from here
 	y = viewport.w - y;
 
 	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);

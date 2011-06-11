@@ -22,7 +22,7 @@ void __Joint::save(const __Joint& joint /*node*/)
 {
 	// generate child node "joint" and append it to node
 
-	//TODO: save BallAndSocket joints, too
+	/// @todo save BallAndSocket joints, too
 	switch (joint.type) {
 	case HINGE:
 		// set attribute to "hinge"

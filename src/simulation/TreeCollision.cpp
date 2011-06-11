@@ -36,7 +36,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	 * Or immediately in ocree? with displaylists, should be better to implement
 	 */
 
-	//TODO implement index array for 3ds data
+	/// @todo implement index array for 3ds data
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
 		return;

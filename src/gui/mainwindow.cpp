@@ -190,7 +190,7 @@ void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
 
 void MainWindow::onNewPressed()
 {
-	// TODO: check for m_renderWidget->isModified()
+	/// @todo check for m_renderWidget->isModified()
 	sim::Simulation::instance().init();
 	sim::Simulation::instance().setEnabled(false);
 }

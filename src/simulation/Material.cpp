@@ -510,7 +510,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 0);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 1);
 
-		//TODO: get impact information and play a sound
+		/// @todo get impact information and play a sound
 	}
 
 	//std::cout << "\tmaterial end" << std::endl;

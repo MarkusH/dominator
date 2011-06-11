@@ -67,7 +67,7 @@ struct MaterialPair {
 	float kineticFriction;
 	float softness;
 
-	//TODO: add sounds
+	/// @todo add sounds
 
 	/**
 	 * Constructs the default material.

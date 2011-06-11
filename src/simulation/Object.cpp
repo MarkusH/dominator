@@ -37,7 +37,7 @@ void __Object::save(const __Object& object /* node */)
 
 	// set attribute "id" to m_id
 
-	//TODO save convex hull, convex assembly
+	/// @todo save convex hull, convex assembly
 	switch (object.m_type) {
 	case BOX:
 		// set attribute "type" to  "box"
@@ -234,7 +234,7 @@ void __RigidBody::save(const __RigidBody& body /* node */)
 	NewtonCollisionInfoRecord info;
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
-	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
+	/// @todo save the other primitives, too: cone, cylinder, chamfercylinder, capsule
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute "width" to info.m_box.m_x
@@ -779,7 +779,7 @@ void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 	}
 	case MESH_ASSEMBLY:
 	{
-		// TODO: we can combine sub-meshes with the same material
+		/// @todo we can combine sub-meshes with the same material
 		// because all sub-meshes have the same matrix. We could
 		// sort the collisions according to the shapeIDs and then
 		// combine adjacent sub-meshes
