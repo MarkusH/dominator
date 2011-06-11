@@ -95,8 +95,9 @@ void Simulation::save(const std::string& fileName)
 	}
 
 	// save attribute "gravity" to m_gravity
-	// save attribute "environment" to
-	// 		m_environment ? m_environment->getID() : -1
+	// save attribute "environment" __treecollision.save(m_environment)
+	if (m_environment)
+		__TreeCollision::save((__TreeCollision&)*m_environment.get(), level, &doc);
 
 	std::string s;
 	print(std::back_inserter(s), doc, 0);
@@ -128,17 +129,24 @@ void Simulation::load(const std::string& fileName)
 	xml_node<>* nodes = doc.first_node();
 
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-		Object object = __Object::load(node);
-		// load m_id from "id"
-		object->setID(atoi(node->first_attribute()->value()));
-		add(object, object->getID());
+		std::string type(node->name());
+		if (type == "object" || type == "compound") {
+			Object object = __Object::load(node);
+			// load m_id from "id"
+			object->setID(atoi(node->first_attribute()->value()));
+			add(object, object->getID());
+		}
 	}
 
-	
+	{
+		xml_node<>* node = nodes->first_node("environment");
+		if (node) {
+			m_environment = __TreeCollision::load(node);
+		}
+	}
 
 	// load gravity
-	// load "environment"
-	// m_environment = (id == -1) ? Object() : retrieve object with id
+	// load "environment" and create tree collision from it
 
 	m_clock.reset();
 }
@@ -784,6 +792,9 @@ void Simulation::render()
 			glPopMatrix();
 		}
 	}
+
+	if (m_environment)
+		m_environment->render();
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);

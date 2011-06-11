@@ -12,12 +12,17 @@
 
 namespace sim {
 
+class __TreeCollision;
+typedef std::tr1::shared_ptr<__TreeCollision> TreeCollision;
+
 class __TreeCollision : public __Object, public Body {
 protected:
 	int m_vertexCount;
 	Lib3dsVector* m_vertices;
 	Lib3dsVector* m_normals;
 	Lib3dsTexel* m_uvs;
+	GLuint m_list;
+	std::string m_fileName;
 public:
 	__TreeCollision(const Mat4f& matrix, const std::string& fileName);
 	~__TreeCollision();
@@ -33,6 +38,9 @@ public:
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
 	virtual void render();
+
+	static void save(__TreeCollision& object, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static TreeCollision load(rapidxml::xml_node<>* node);
 };
 }
 

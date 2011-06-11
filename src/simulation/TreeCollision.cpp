@@ -21,8 +21,9 @@ namespace sim {
 
 
 __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileName)
-	: __Object(TREE_COLLISION), Body(matrix)
+	: __Object(TREE_COLLISION), Body(matrix), m_fileName(fileName)
 {
+	m_list = 0;
 
 	/*
 	 * There are n meshes, each mesh has a global normal, uv, and vertex array
@@ -36,7 +37,6 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	 * Or immediately in ocree? with displaylists, should be better to implement
 	 */
 
-	//TODO implement index array for 3ds data
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
 		return;
@@ -62,6 +62,9 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	NewtonCollision* collision = NewtonCreateTreeCollision(world, defaultMaterial);
 	NewtonTreeCollisionBeginBuild(collision);
 
+	m_list = glGenLists(1);
+	glNewList(m_list, GL_COMPILE);
+	glBegin(GL_TRIANGLES);
 	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
 		data.reserve(data.size() + (mesh->points * (3 + 3 + 2)));
 		data.resize(data.size() + (mesh->points * (3 + 3 + 2)));
@@ -72,16 +75,16 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 			for(unsigned int i = 0;i < 3; i++) {
 				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
 				//memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-				//m_vertices[finishedFaces*3 + i][0] *= 10.0f;
-				//m_vertices[finishedFaces*3 + i][1] *= 10.0f;
-				//m_vertices[finishedFaces*3 + i][2] *= 10.0f;
+				glNormal3fv(m_normals[finishedFaces*3 + i]);
+				glVertex3fv(mesh->pointL[face->points[i]].pos);
 			}
 			faceMaterial = face->material && face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
-			//std::cout << faceMaterial << std::endl;
 			NewtonTreeCollisionAddFace(collision, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
 			finishedFaces++;
 		}
 	}
+	glEnd();
+	glEndList();
 	lib3ds_file_free(file);
 	NewtonTreeCollisionEndBuild(collision, 1);
 
@@ -92,9 +95,31 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 
 __TreeCollision::~__TreeCollision()
 {
+	if (glIsList(m_list))
+		glDeleteLists(m_list, 1);
 	if (m_vertices) delete m_vertices;
 	if (m_normals) delete m_normals;
 	if (m_uvs) delete m_uvs;
+}
+
+void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
+{
+	using namespace rapidxml;
+
+	// declarations
+	xml_node<>* node;
+
+	node = doc->allocate_node(node_element, "environment");
+	parent->insert_node(0, node);
+
+	//TODO: save matrix and fileName
+}
+
+TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
+{
+	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/ramps.3ds"));
+	//TODO load matrix and filename and return "real" environment
+	return result;
 }
 
 void __TreeCollision::genBuffers(ogl::VertexBuffer& vbo)
@@ -196,11 +221,16 @@ bool __TreeCollision::contains(const __Object* object)
 
 void __TreeCollision::render()
 {
+	/*
 	if (NewtonBodyGetSleepState(m_body))
 		glColor3f(1.0f, 1.0f, 0.0f);
 	else
 		glColor3f(1.0f, 0.0f, 0.0f);
+		*/
 	newton::showCollisionShape(getCollision(), m_matrix);
+
+	if (glIsList(m_list))
+		glCallList(m_list);
 }
 
 }
