@@ -185,7 +185,7 @@ void MainWindow::updateObjectsCount(int count)
 }
 
 void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
-	sim::Simulation::instance().setInteractionType(type);
+	sim::Simulation::instance().setInteractionType(util::RIGHT, type);
 }
 
 void MainWindow::onNewPressed()

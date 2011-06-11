@@ -54,7 +54,9 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_mouseAdapter(mouseAdapter),
 	  m_nextID(0)
 {
-	m_interactionType = INT_DOMINO_CURVE;
+	m_interactionTypes[util::LEFT] = INT_NONE;
+	m_interactionTypes[util::RIGHT] = INT_NONE;
+	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
 	m_world = NULL;
 	m_enabled = true;
 	m_gravity = -9.81f * 4.0f;
@@ -478,78 +480,82 @@ void Simulation::mouseMove(int x, int y)
 
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
-	} else if (m_mouseAdapter.isDown(util::RIGHT)) {
-		if (m_enabled)
-			newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+	} else if (m_mouseAdapter.isDown(util::RIGHT) && m_enabled) {
+		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+	}
 
-		// handle interaction mode if object is selected and in pause mode
-		if (m_selectedObject && !m_enabled) {
+	util::Button button = m_mouseAdapter.isDown(util::LEFT) ? util::LEFT :
+		m_mouseAdapter.isDown(util::MIDDLE) ? util::MIDDLE : util::RIGHT;
 
-			// get first position of the mouse (last pos) on the object using pointer
-			// get the second pos of the mouse (cur pos) in the world
-			// shoot a ray from cam pos to second pos and intersect with the plane
-			// move from pos1 to intersection point
-			//
+	// handle interaction mode if object is selected and in pause mode
+	if ((m_interactionTypes[button] == INT_ROTATE ||
+			m_interactionTypes[button] == INT_MOVE_GROUND ||
+			m_interactionTypes[button] == INT_MOVE_BILLBOARD) &&
+			m_selectedObject && !m_enabled) {
 
-			Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
-			Vec3f pos2 = m_camera.pointer(x, y);
+		// get first position of the mouse (last pos) on the object using pointer
+		// get the second pos of the mouse (cur pos) in the world
+		// shoot a ray from cam pos to second pos and intersect with the plane
+		// move from pos1 to intersection point
 
-			if (m_interactionType == INT_ROTATE) {
-				//rot_drag_cur = pos2;
-				rot_drag_cur = rot_mat_start.getW() + (pos2-rot_mat_start.getW()).normalized() * (rot_drag_start-rot_mat_start.getW()).len();
+		Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
+		Vec3f pos2 = m_camera.pointer(x, y);
 
-			} else if (m_interactionType == INT_MOVE_GROUND || m_interactionType == INT_MOVE_BILLBOARD) {
-				Vec3f R1, R2, S1, S2;
-				{
-					Vec4<GLint> viewport = Vec4<GLint>::viewport();
-					float _y = viewport.w - y;
-					Mat4d mvmatrix = Mat4d::modelview();
-					Mat4d projmatrix = Mat4d::projection();
+		if (m_interactionTypes[button] == INT_ROTATE) {
+			//rot_drag_cur = pos2;
+			rot_drag_cur = rot_mat_start.getW() + (pos2-rot_mat_start.getW()).normalized() * (rot_drag_start-rot_mat_start.getW()).len();
 
-					// get new ray
-					double dX, dY, dZ;
-					gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-					gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+		} else if (m_interactionTypes[button] == INT_MOVE_GROUND || m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
+			Vec3f R1, R2, S1, S2;
+			{
+				Vec4<GLint> viewport = Vec4<GLint>::viewport();
+				float _y = viewport.w - y;
+				Mat4d mvmatrix = Mat4d::modelview();
+				Mat4d projmatrix = Mat4d::projection();
 
-					// get old ray
-					_y = viewport.w - m_mouseAdapter.getY();
-					gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-					gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-				}
+				// get new ray
+				double dX, dY, dZ;
+				gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+				gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
 
-				// billboard matrix
-				Vec3f look = m_camera.m_position - pos1;
-				Vec3f right = Vec3f::yAxis() % look;
-				Vec3f up = Vec3f::yAxis();
+				// get old ray
+				_y = viewport.w - m_mouseAdapter.getY();
+				gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+				gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
+				S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+			}
 
-				// bottom plane
-				Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
-				Vec3f p2 = pos1 + Vec3f::xAxis();
-				Vec3f p3 = pos1 + Vec3f::zAxis();
+			// billboard matrix
+			Vec3f look = m_camera.m_position - pos1;
+			Vec3f right = Vec3f::yAxis() % look;
+			Vec3f up = Vec3f::yAxis();
 
-				if (m_interactionType == INT_MOVE_BILLBOARD) {
-					// billboard plane
-					p1 = pos1;
-					p2 = pos1 + Vec3f::yAxis();
-					p3 = pos1 + m_camera.m_strafe;
-				}
+			// bottom plane
+			Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
+			Vec3f p2 = pos1 + Vec3f::xAxis();
+			Vec3f p3 = pos1 + Vec3f::zAxis();
 
-				pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
-				Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
+			if (m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
+				// billboard plane
+				p1 = pos1;
+				p2 = pos1 + Vec3f::yAxis();
+				p3 = pos1 + m_camera.m_strafe;
+			}
 
-				Mat4f matrix = m_selectedObject->getMatrix();
-				matrix.setW(matrix.getW() + (pos3 - pos1));
-				m_selectedObject->setMatrix(matrix);
+			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
+			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
 
-				if (m_interactionType == INT_MOVE_GROUND)
-					m_selectedObject->convexCastPlacement();
-			} /* end MOVE_GROUND, MOVE_BILLBOARD */
-		} /* end selectedObject && !enabled */
-	} /* end button */
+			Mat4f matrix = m_selectedObject->getMatrix();
+			matrix.setW(matrix.getW() + (pos3 - pos1));
+			m_selectedObject->setMatrix(matrix);
+
+			if (m_interactionTypes[button] == INT_MOVE_GROUND)
+				m_selectedObject->convexCastPlacement();
+		} /* end MOVE_GROUND, MOVE_BILLBOARD */
+	} /* end selectedObject && !enabled */
 
 	m_pointer = m_camera.pointer(x, y);
 }
@@ -559,65 +565,29 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	Vec3f old = m_pointer;
 	m_pointer = m_camera.pointer(x, y);
 
-	if (m_interactionType == INT_ROTATE && button == util::RIGHT && m_selectedObject && !m_enabled) {
+	if (m_interactionTypes[button] == INT_ROTATE && m_selectedObject && !m_enabled) {
 		rot_drag_start = m_pointer;
 		rot_mat_start = m_selectedObject->getMatrix();
 		rot_mouse = Vec2i(x, y);
 	}
 
-	if (button == util::MIDDLE && down) {
-		Vec3f view = m_camera.viewVector();
-/*
-		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position);
-
-		RigidBody obj;
-		static int counter = 0;
-		switch (counter++) {
-		case 0:
-			obj = __Object::createBox(matrix, 1.0f, 1.0f, 1.0f, 5.0f, "yellow");
-			break;
-		case 1:
-			obj = __Object::createSphere(matrix, 0.2f, 50.0f, "wood_matt");
-			break;
-		case 2:
-			obj = __Object::createCapsule(matrix, 0.5f, 5.0f, 1.0f, "yellow");
-			break;
-		case 3:
-			obj = __Object::createCone(matrix, 0.5f, 1.0f, 1.0f, "yellow");
-			break;
-		case 4:
-			obj = __Object::createCylinder(matrix, 0.5f, 1.0f, 1.0f, "yellow");
-			break;
-		case 5:
-			obj = __Object::createChamferCylinder(matrix, 2.0f, 0.5f, 1.0f, "yellow");
-			break;
+	if (m_interactionTypes[button] == INT_DOMINO_CURVE && down && !m_enabled) {
+		/*
+		Vec3f dir = (m_pointer - old);
+		float len = dir.len();
+		dir.normalize();
+		Mat4f matrix(Vec3f::yAxis(), dir, old);
+		for (float d = 0.0f; d <= len; d += 3.5f) {
+			matrix.setW(old + dir * d);
+			Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
+			add(domino);
 		}
-		if (counter == 6)
-			counter = 0;
-
-		//obj->setVelocity(view * 10.0f);
-		obj->convexCastPlacement();
-		add(obj);
 		*/
+		curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
+	}
 
-		if (m_interactionType == INT_DOMINO_CURVE && !m_enabled && down) {
-			/*
-			Vec3f dir = (m_pointer - old);
-			float len = dir.len();
-			dir.normalize();
-			Mat4f matrix(Vec3f::yAxis(), dir, old);
-			for (float d = 0.0f; d <= len; d += 3.5f) {
-				matrix.setW(old + dir * d);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
-				add(domino);
-			}
-			*/
-			curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
-			std::cout << "add " << curve_spline.knots().size() << std::endl;
-		}
-	} else if (button == util::RIGHT) {
-		if (m_enabled)
-			newton::mousePick(m_world, Vec2f(x, y), down);
+	if (button == util::RIGHT && m_enabled) {
+		newton::mousePick(m_world, Vec2f(x, y), down);
 	}
 }
 
@@ -628,13 +598,12 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		m_selectedObject = selectObject(x, y);
 		if (m_selectedObject == m_environment)
 			m_selectedObject = Object();
-
-		if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled)
-			rot_mat_start = m_selectedObject->getMatrix();
 	}
 
-	if (button == util::MIDDLE && m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
-		std::cout << "end " << curve_spline.knots().size() << std::endl;
+	if (m_interactionTypes[button] == INT_ROTATE && m_selectedObject && !m_enabled)
+		rot_mat_start = m_selectedObject->getMatrix();
+
+	if (m_interactionTypes[button] == INT_DOMINO_CURVE && !m_enabled) {
 		if (curve_spline.knots().size() > 2) {
 			curve_spline.update();
 			for (float t = 0.0f; t < curve_spline.table().back().len; t += 5.0f) {
@@ -781,7 +750,7 @@ void Simulation::render()
 	glDepthMask(GL_FALSE);
 	glColor3f(1.0f, 0.0f, 1.0f);
 
-	if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled) {
+	if (isActivated(INT_ROTATE) && m_selectedObject && !m_enabled) {
 		Vec3f origin = m_selectedObject->getMatrix().getW();
 		Vec3f axis = (rot_drag_start - origin) % (rot_drag_cur - origin);
 
@@ -804,17 +773,7 @@ void Simulation::render()
 			glVertex3fv(&(m_selectedObject->getMatrix().getW()[0]));
 			glVertex3fv(&axis.x);
 		glEnd();
-	} else if (m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
-		/*
-		glBegin(GL_POINTS);
-		glVertex3fv(&m_pointer[0]);
-		glVertex3fv(&rot_drag_cur[0]);
-		glEnd();
-		glBegin(GL_LINES);
-			glVertex3fv(&m_pointer[0]);
-			glVertex3fv(&curve_current[0]);
-		glEnd();
-		*/
+	} else if (isActivated(INT_DOMINO_CURVE) && !m_enabled) {
 		curve_spline.update();
 		curve_spline.renderKnots();
 		curve_spline.renderSpline(0.25f);
