@@ -68,12 +68,12 @@ private:
 	 * GravityDialog::m_rangeLow defines the internal representation for the
 	 * internal minimum gravity
 	 */
-	float m_rangeLow = -100.0f;
+	static const float m_rangeLow = -100.0f;
 	/**
 	 * GravityDialog::m_rangeHigh defines the internal representation for the
 	 * internal maximum gravity
 	 */
-	float m_rangeHigh = 0.0f;
+	static const float m_rangeHigh = 0.0f;
 };
 
 #endif /* DIALOGS_HPP_ */
