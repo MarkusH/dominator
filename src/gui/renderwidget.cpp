@@ -21,7 +21,6 @@ using namespace m3d;
 RenderWidget::RenderWidget(QWidget* parent) :
 	QGLWidget(parent)
 {
-	m_matrix = Mat4f::translate(Vec3f(0.0f, 0.0f, -5.0f));
 	setFocusPolicy(Qt::WheelFocus);
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
@@ -110,8 +109,7 @@ void RenderWidget::paintGL()
 	frames++;
 	if (m_clock.get() >= 1.0f) {
 		emit framesPerSecondChanged(frames);
-		emit
-		objectsCountChanged(sim::Simulation::instance().getObjectCount());
+		emit objectsCountChanged(sim::Simulation::instance().getObjectCount());
 		m_clock.reset();
 		frames = 0;
 	}

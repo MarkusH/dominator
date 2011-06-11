@@ -10,9 +10,6 @@
 ModifyBox::ModifyBox(QWidget* parent) :
 	QWidget(parent)
 {
-
-	m_rx = m_ry = m_rz = 0;
-
 	QVBoxLayout* layout = new QVBoxLayout();
 
 	layout->addWidget(new QLabel("Size:"));
@@ -100,21 +97,6 @@ ModifyBox::ModifyBox(QWidget* parent) :
 	connect(m_mbRotY, SIGNAL(valueChanged(double)), this, SLOT(signalRotation(double)));
 	connect(m_mbRotZ, SIGNAL(valueChanged(double)), this, SLOT(signalRotation(double)));
 
-}
-
-void ModifyBox::mouseMoveEvent(QMouseEvent* event)
-{
-	move(mapToParent(event->pos()) - m_moveOffset);
-}
-
-void ModifyBox::mousePressEvent(QMouseEvent* event)
-{
-	m_moveOffset = event->pos();
-}
-
-void ModifyBox::mouseReleaseEvent(QMouseEvent* event)
-{
-	m_moveOffset = QPoint();
 }
 
 bool doUpdate = true;

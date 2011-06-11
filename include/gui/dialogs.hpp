@@ -22,6 +22,7 @@ Q_OBJECT
 public:
 	/**
 	 * Constructor
+	 *
 	 * @param parent 	if given, the instance will be set modal in respect
 	 * to the parent widget
 	 */

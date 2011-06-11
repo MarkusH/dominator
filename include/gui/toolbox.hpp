@@ -16,10 +16,23 @@
 #include <QtGui/QButtonGroup>
 #include <simulation/Simulation.hpp>
 
+/**
+ * The ToolBox holds all tools for adding and removing objects to the
+ * sim::Simulation. Additionally one can select an
+ * sim::Simulation::InteractionType
+ */
 class ToolBox: public QWidget {
 Q_OBJECT
 public:
+	/**
+	 * Constructor
+	 *
+	 * @param parent	the parent widget
+	 */
 	ToolBox(QWidget* parent = 0);
+	/**
+	 * We overwrite this method to add a widget to the layout from the outside
+	 */
 	void addWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = 0);
 
 private:
@@ -30,16 +43,52 @@ private:
 	QComboBox* m_tbTemplate;
 	QComboBox* m_tbTexture;
 
+	/**
+	 * ToolBox::m_mouseinteraction is used for single selections of the toggle buttons
+	 * ToolBox::m_moveH, ToolBox::m_moveV and ToolBox::m_rotate
+	 */
 	QButtonGroup* m_mouseinteraction;
+	/**
+	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
+	 * is emitted with sim::Simulation::InteractionType::INT_MOVE_GROUND as parameter.
+	 * If the button is deactivated, the parameter of the signal is
+	 * sim::Simulation::InteractionType::INT_NONE
+	 */
 	QPushButton* m_moveH;
+	/**
+	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
+	 * is emitted with sim::Simulation::InteractionType::INT_MOVE_BILLBOARD as parameter.
+	 * If the button is deactivated, the parameter of the signal is
+	 * sim::Simulation::InteractionType::INT_NONE
+	 */
 	QPushButton* m_moveV;
+	/**
+	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
+	 * is emitted with sim::Simulation::InteractionType::INT_ROTATE as parameter.
+	 * If the button is deactivated, the parameter of the signal is
+	 * sim::Simulation::InteractionType::INT_NONE
+	 */
 	QPushButton* m_rotate;
 
+	/**
+	 * Temporary variable to make the "unselection" of buttons in
+	 * ToolBox::m_mouseinteraction working
+	 */
 	sim::Simulation::InteractionType m_selectedInteraction;
 private slots:
+	/**
+	 * This slot function is invoked by clicking ToolBox::m_moveH,
+	 * ToolBox::m_moveV and ToolBox::m_rotate and emits
+	 * ToolBox::interactionSelected(sim::Simulation::InteractionType)
+	 * as described at the buttons.
+	 */
 	void onInteractionPressed(int button);
 
 signals:
+	/**
+	 * See ToolBox::m_moveH, ToolBox::m_moveV, ToolBox::m_rotate and
+	 * ToolBox::onInteractionPressed(int)
+	 */
 	void interactionSelected(sim::Simulation::InteractionType);
 };
 
