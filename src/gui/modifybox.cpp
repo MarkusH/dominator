@@ -158,7 +158,7 @@ void ModifyBox::signalRotation(double value)
 void ModifyBox::updateData(const m3d::Mat4f* matrix)
 {
 	doUpdate = false;
-	// TODO: this seems to trigger the signals of the spinners
+	/// @todo this seems to trigger the signals of the spinners
 	// we may need to set a boolean in this function that temporarily
 	// disables the handling code in the slots above.
 	if (matrix) {

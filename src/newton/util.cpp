@@ -282,7 +282,7 @@ bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down)
 			// rotate normal to global space
 			rayWorldNormal = matrix.RotateVector(rayLocalNormal);
 
-			//TODO: show the pick points
+			/// @todo show the pick points
 		}
 	} else {
 		mousePickMode = false;
