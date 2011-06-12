@@ -20,6 +20,22 @@
 
 namespace sim {
 
+const char* __Object::TypeStr[] = {
+	"domino",
+	"domino",
+	"domino",
+	"box",
+	"sphere",
+	"cylinder",
+	"capsule",
+	"cone",
+	"chamfercylinder",
+	"hull",
+	"assembly",
+	"compound",
+	"environment"
+};
+
 __Object::__Object(Type type)
 	: m_type(type)
 {
@@ -39,51 +55,19 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 
 	// declarations
 	xml_node<>* node;
-	char *pId, *pType, *pMatrix, *pFreezeState, *pDamping, *pMaterial, *pMass;
-	xml_attribute<> *attrI, *attrT, *attrM, *attrFS, *attrDamp, *attrMat, *attrMass;
+	char *pId, *pType, *pMatrix;
+	xml_attribute<> *attrI, *attrT, *attrM;
 
-	// sphere only
-	char *pRadiusX, *pRadiusY, *pRadiusZ;
-	xml_attribute<> *attrX, *attrY, *attrZ;
-
-	// box only
-	char *pWidth, *pHeight, *pDepth;
-	xml_attribute<> *attrW, *attrH, *attrD;
-	
-
-	//TODO We could combine all primitive objects (BOX, SPHERE, CYLINDER, CAPSULE,
-	// CONE, CHAMFER_CYLINER) in this switch statement. Only the type attribute is
-	// different
-	// Handle the other primitives here (also call __Rigidbody::save)
+	//TODO
 	// Handle __ConvexAssembly and __ConvexHull here and call the respective
 	// __Convex..::save() method
 	switch (object.m_type) {
 	case BOX:
-		// create and append object node
-		node = doc->allocate_node(node_element, "object");
-		parent->insert_node(0, node);
-
-		// create object attributes
-		// set attribute "id" to m_id
-		pId = doc->allocate_string(util::toString(object.getID()));
-		attrI = doc->allocate_attribute("id", pId);
-		node->append_attribute(attrI);
-
-		// set attribute "type" to  "box"
-		pType = doc->allocate_string("box");
-		attrT = doc->allocate_attribute("type", pType);
-		node->append_attribute(attrT);
-
-		// set attribute "matrix"
-		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
-		attrM = doc->allocate_attribute("matrix", pMatrix);
-		node->append_attribute(attrM);
-
-		// load body data
-		__RigidBody::save((__RigidBody&) object, node, doc);
-
-		break;
 	case SPHERE:
+	case CYLINDER:
+	case CAPSULE:
+	case CONE:
+	case CHAMFER_CYLINER:
 		// create and append object node
 		node = doc->allocate_node(node_element, "object");
 		parent->insert_node(0, node);
@@ -94,8 +78,8 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		attrI = doc->allocate_attribute("id", pId);
 		node->append_attribute(attrI);
 
-		// set attribute "type" to  "sphere"
-		pType = doc->allocate_string("sphere");
+		// set attribute "type" to  the correct type string
+		pType = doc->allocate_string(TypeStr[object.m_type]);
 		attrT = doc->allocate_attribute("type", pType);
 		node->append_attribute(attrT);
 
@@ -103,7 +87,7 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
-		
+
 		// load body data
 		__RigidBody::save((__RigidBody&) object, node, doc);
 
@@ -318,6 +302,10 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	char *pWidth, *pHeight, *pDepth;
 	xml_attribute<> *attrW, *attrH, *attrD;
 
+	// chamfer cylinder, cylinder, cone, capsule
+	char *pRadius;
+	xml_attribute<> *attrR;
+
 	NewtonCollisionInfoRecord info;
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
@@ -355,6 +343,16 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
 		node->append_attribute(attrZ);
 		break;
+	case SERIALIZE_ID_CHAMFERCYLINDER:
+		// set attribute height
+		pHeight = doc->allocate_string(util::toString(info.m_chamferCylinder.m_height));
+		attrH = doc->allocate_attribute("height", pHeight);
+		node->append_attribute(attrH);
+		// set attribute radius
+		pRadius = doc->allocate_string(util::toString(info.m_chamferCylinder.m_r));
+		attrR = doc->allocate_attribute("radius", pRadius);
+		node->append_attribute(attrR);
+		break;
 	}
 
 	// set attribute freezeState
@@ -385,6 +383,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	// TODO maybe defaults?
 	float w, h, d; // box
 	float x, y, z; // sphere
+	float radius;  // chamfer cylinder, cylinder, cone, capsule
 
 	//attribute id is set in __Object::load()
 	xml_attribute<>* attr = node->first_attribute();
@@ -399,7 +398,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	matrix.assign(attr->value());
 
 	/* set dimensions for box */
-	if(type == "box" ) {
+	if ( type == TypeStr[BOX] ) {
 		//attribute width
 		attr = attr->next_attribute();
 		w = atof(attr->value());
@@ -414,7 +413,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	}/* set dimensions for box END */
 
 	/* set dimensions for sphere */
-	if( type == "sphere" ) {
+	if ( type == TypeStr[SPHERE] ) {
 		//attribute x
 		attr = attr->next_attribute();
 		x = atof(attr->value());
@@ -427,6 +426,17 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		attr = attr->next_attribute();
 		z = atof(attr->value());
 	}/* set dimensions for sphere END */
+
+	/* set dimensions for chamfer cylinder */
+	if ( type == TypeStr[CHAMFER_CYLINER] ) {
+		//attribute height
+		attr = attr->next_attribute();
+		h = atof(attr->value());
+
+		//attribute radius
+		attr = attr->next_attribute();
+		radius = atof(attr->value());
+	}/* set dimensions for chamfer cylinder END */
 
 	//TODO load the other primitives here
 
@@ -448,8 +458,9 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float mass = atof(attr->value());
 
 	//TODO return the other primitives here
-	if( type == "box" ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
-	if( type == "sphere" ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
+	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
+	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
+	if( type == TypeStr[CHAMFER_CYLINER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
 
 	// mass = get mass attribute
 	// material = get material attribute

@@ -178,7 +178,7 @@ void Simulation::init()
 
 
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	//m_environment = TreeCollision(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//add(m_environment);
 	//load("data/levels/level.xml");
 	//save("data/levels/test_level.xml");

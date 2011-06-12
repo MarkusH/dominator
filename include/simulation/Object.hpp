@@ -62,7 +62,7 @@ public:
 		COMPOUND,
 		TREE_COLLISION
 	} Type;
-
+	static const char* TypeStr[];
 protected:
 	Type m_type;
 	int m_id;
