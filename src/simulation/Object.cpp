@@ -9,6 +9,7 @@
 #include <simulation/Compound.hpp>
 #include <simulation/Material.hpp>
 #include <simulation/Simulation.hpp>
+#include <simulation/Domino.hpp>
 #include <newton/util.hpp>
 #include <iostream>
 #include <lib3ds/file.h>
@@ -21,9 +22,9 @@
 namespace sim {
 
 const char* __Object::TypeStr[] = {
-	"domino",
-	"domino",
-	"domino",
+	"domino_small",
+	"domino_middle",
+	"domino_large",
 	"box",
 	"sphere",
 	"cylinder",
@@ -62,6 +63,28 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	// Handle __ConvexAssembly and __ConvexHull here and call the respective
 	// __Convex..::save() method
 	switch (object.m_type) {
+	case DOMINO_SMALL:
+	case DOMINO_MIDDLE:
+	case DOMINO_LARGE:
+		// create and append object node
+		node = doc->allocate_node(node_element, TypeStr[object.m_type]);
+		parent->insert_node(0, node);
+
+		// create domino attributes
+		// set attribute "id" to m_id
+		pId = doc->allocate_string(util::toString(object.getID()));
+		attrI = doc->allocate_attribute("id", pId);
+		node->append_attribute(attrI);
+
+		// set attribute "matrix"
+		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
+		attrM = doc->allocate_attribute("matrix", pMatrix);
+		node->append_attribute(attrM);
+
+		// load domino data
+		__Domino::save((__Domino&) object, node, doc);
+
+		break;
 	case BOX:
 	case SPHERE:
 	case CYLINDER:
@@ -123,7 +146,10 @@ Object __Object::load(rapidxml::xml_node<>* node)
 {
 	//TODO check if it is convex assembly or convex hull and
 	// call their load methods
-	if(std::string(node->name()) == "compound")	return __Compound::load(node);
+	if (std::string(node->name()) == TypeStr[COMPOUND])	return __Compound::load(node);
+	else if (std::string(node->name()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
+	else if (std::string(node->name()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
+	else if (std::string(node->name()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
 	else return __RigidBody::load(node);
 }
 
