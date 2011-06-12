@@ -171,7 +171,7 @@ signals:
 	 * RenderWidget::m_clock and is connected to
 	 * MainWindow::updateFramesPerSecond(int)
 	 */
-	void updateObjectsCount(int);
+	void objectsCountChanged(int);
 	/**
 	 * objectSelected(m3d::Mat4f) is emitted each time the user has selected
 	 * an object. The signal is connected to ModifyBox::updateData(m3d::Mat4f)
