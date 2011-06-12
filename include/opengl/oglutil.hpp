@@ -13,6 +13,13 @@ using namespace m3d;
 
 namespace ogl {
 
+/**
+ * Draws the given axis-aligned bounding box
+ *
+ * @param min The minimum
+ * @param max The maximum
+ */
+void drawAABB(const Vec3f& min, const Vec3f& max);
 
 /**
  * Returns the world coordinates of the given position on the

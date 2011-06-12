@@ -79,6 +79,14 @@ public:
 	virtual int getFreezeState() { return 0; }
 
 	/**
+	 * Get the axis-aligned bounding box of the object.
+	 *
+	 * @param min The minimum
+	 * @param max The maximum
+	 */
+	virtual void getAABB(Vec3f& min, Vec3f& max) = 0;
+
+	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.
 	 *
 	 * @param apply True, if the new position should be applied, False otherwise
@@ -172,6 +180,8 @@ public:
 
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
 	virtual int getFreezeState() { return m_freezeState; }
+
+	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
 
 	virtual float convexCastPlacement(bool apply = true);
 

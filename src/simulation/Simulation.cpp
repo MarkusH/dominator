@@ -15,6 +15,7 @@
 #include <newton/util.hpp>
 #include <simulation/Domino.hpp>
 #include <simulation/CRSpline.hpp>
+#include <opengl/oglutil.hpp>
 
 namespace sim {
 
@@ -678,7 +679,6 @@ void Simulation::update()
 
 void Simulation::render()
 {
-	m_camera.update();
 	m_camera.apply();
 
 	m_vertexBuffer.bind();
@@ -723,11 +723,20 @@ void Simulation::render()
 	glColor3f(1.0f, 0.0, 0.0f);
 
 	if (m_selectedObject) {
+		Vec3f min, max;
+		int count = 0;
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
 			if (*itr == m_selectedObject)
 				(*itr)->render();
+
+			(*itr)->getAABB(min, max);
+			if (m_camera.checkAABB(min, max)) {
+				ogl::drawAABB(min, max);
+				++count;
+			}
 		}
+		std::cout << "objects: " << m_objects.size() << ", rendered: " << count << std::endl;
 	}
 
 	glDepthMask(GL_FALSE);

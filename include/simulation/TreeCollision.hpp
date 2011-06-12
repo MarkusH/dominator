@@ -25,6 +25,8 @@ public:
 	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
+	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
+
 	virtual float convexCastPlacement(bool apply = true) { return 0.0f; };
 
 	virtual bool contains(const NewtonBody* const body);

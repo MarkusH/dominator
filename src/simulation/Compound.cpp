@@ -36,6 +36,27 @@ __Compound::~__Compound()
 	//m_joints.clear();
 }
 
+void __Compound::getAABB(Vec3f& min, Vec3f& max)
+{
+
+	if (m_nodes.size() > 0) {
+		m_nodes.front()->getAABB(min, max);
+		std::list<Object>::iterator itr = m_nodes.begin();
+		Vec3f _min, _max;
+		for (++itr ; itr != m_nodes.end(); ++itr) {
+			(*itr)->getAABB(_min, _max);
+			min.x = min(min.x, _min.x);
+			min.y = min(min.y, _min.y);
+			min.z = min(min.z, _min.z);
+			max.x = max(max.x, _max.x);
+			max.y = max(max.y, _max.y);
+			max.z = max(max.z, _max.x);
+		}
+	} else {
+		min = max = Vec3f();
+	}
+}
+
 float __Compound::convexCastPlacement(bool apply)
 {
 	float maximum = -1000.0f;

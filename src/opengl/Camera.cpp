@@ -17,17 +17,105 @@ Camera::Camera()
 	m_eye 	   = Vec3f(0.0f, 0.0f, -1.0f);
 	m_up       = Vec3f(0.0f, 1.0f,  0.0f);
 	m_strafe   = Vec3f(0.0f, 0.0f,  0.0f);
-	grabMatrix();
+	update();
 }
 
 Camera::~Camera()
 {
 }
 
-void Camera::grabMatrix()
+bool Camera::checkAABB(const Vec3f& min, const Vec3f& max)
 {
+	Vec3f near;
+	float distance = 0.0f;
+	int count = 0;
+	for (int i = 0; i < 6; ++i) {
+    	near.x = (m_frustum[i][0] > 0.0f) ? max.x : min.x;
+		near.y = (m_frustum[i][1] > 0.0f) ? max.y : min.y;
+		near.z = (m_frustum[i][2] > 0.0f) ? max.z : min.z;
+
+		distance = m_frustum[i][0] * near.x + m_frustum[i][1] * near.y + m_frustum[i][2] * near.z + m_frustum[i][3];
+    	if (distance < 0.0f)
+			return false;
+	}
+	return true;
+}
+
+void Camera::update()
+{
+	m_strafe = (m_eye - m_position) % m_up;
+	m_strafe.normalize();
+
 	m_matrix = Mat4f::lookAt(m_position, m_eye, m_up);
 	m_inverse = m_matrix.inverse();
+
+	Mat4f mvproj = m_matrix * Mat4f::projection();
+
+	// left
+	m_frustum[0][0] = mvproj._14 + mvproj._11;
+    m_frustum[0][1] = mvproj._24 + mvproj._21;
+    m_frustum[0][2] = mvproj._34 + mvproj._31;
+    m_frustum[0][3] = mvproj._44 + mvproj._41;
+    float len = 1.0f / sqrt(m_frustum[0][0] * m_frustum[0][0] + m_frustum[0][1] * m_frustum[0][1] + m_frustum[0][2] * m_frustum[0][2]);
+    m_frustum[0][0] *= len;
+    m_frustum[0][1] *= len;
+    m_frustum[0][2] *= len;
+    m_frustum[0][3] *= len;
+
+    // right
+    m_frustum[1][0] = mvproj._14 - mvproj._11;
+    m_frustum[1][1] = mvproj._24 - mvproj._21;
+    m_frustum[1][2] = mvproj._34 - mvproj._31;
+    m_frustum[1][3] = mvproj._44 - mvproj._41;
+    len = 1.0f / sqrt(m_frustum[1][0] * m_frustum[1][0] + m_frustum[1][1] * m_frustum[1][1] + m_frustum[1][2] * m_frustum[1][2]);
+    m_frustum[1][0] *= len;
+    m_frustum[1][1] *= len;
+    m_frustum[1][2] *= len;
+    m_frustum[1][3] *= len;
+
+    // bottom
+    m_frustum[2][0] = mvproj._14 + mvproj._12;
+    m_frustum[2][1] = mvproj._24 + mvproj._22;
+    m_frustum[2][2] = mvproj._34 + mvproj._32;
+    m_frustum[2][3] = mvproj._44 + mvproj._42;
+    len = 1.0f / sqrt(m_frustum[2][0] * m_frustum[2][0] + m_frustum[2][1] * m_frustum[2][1] + m_frustum[2][2] * m_frustum[2][2]);
+    m_frustum[2][0] *= len;
+    m_frustum[2][1] *= len;
+    m_frustum[2][2] *= len;
+    m_frustum[2][3] *= len;
+
+    // top
+    m_frustum[3][0] = mvproj._14 - mvproj._12;
+    m_frustum[3][1] = mvproj._24 - mvproj._22;
+    m_frustum[3][2] = mvproj._34 - mvproj._32;
+    m_frustum[3][3] = mvproj._44 - mvproj._42;
+    len = 1.0f / sqrt(m_frustum[3][0] * m_frustum[3][0] + m_frustum[3][1] * m_frustum[3][1] + m_frustum[3][2] * m_frustum[3][2]);
+    m_frustum[3][0] *= len;
+    m_frustum[3][1] *= len;
+    m_frustum[3][2] *= len;
+    m_frustum[3][3] *= len;
+
+    // near
+    m_frustum[4][0] = mvproj._14 + mvproj._13;
+    m_frustum[4][1] = mvproj._24 + mvproj._23;
+    m_frustum[4][2] = mvproj._34 + mvproj._33;
+    m_frustum[4][3] = mvproj._44 + mvproj._43;
+    len = 1.0f / sqrt(m_frustum[4][0] * m_frustum[4][0] + m_frustum[4][1] * m_frustum[4][1] + m_frustum[4][2] * m_frustum[4][2]);
+    m_frustum[4][0] *= len;
+    m_frustum[4][1] *= len;
+    m_frustum[4][2] *= len;
+    m_frustum[4][3] *= len;
+
+    // far
+    m_frustum[5][0] = mvproj._14 - mvproj._13;
+    m_frustum[5][1] = mvproj._24 - mvproj._23;
+    m_frustum[5][2] = mvproj._34 - mvproj._33;
+    m_frustum[5][3] = mvproj._44 - mvproj._43;
+    len = 1.0f / sqrt(m_frustum[5][0] * m_frustum[5][0] + m_frustum[5][1] * m_frustum[5][1] + m_frustum[5][2] * m_frustum[5][2]);
+    m_frustum[5][0] *= len;
+    m_frustum[5][1] *= len;
+    m_frustum[5][2] *= len;
+    m_frustum[5][3] *= len;
 }
 
 void Camera::positionCamera(Vec3f position, Vec3f view, Vec3f up)
@@ -35,7 +123,7 @@ void Camera::positionCamera(Vec3f position, Vec3f view, Vec3f up)
 	m_position = position;
 	m_eye      = position + view;
 	m_up       = up;
-	grabMatrix();
+	update();
 }
 
 void Camera::move(float amount)
@@ -48,7 +136,7 @@ void Camera::move(float amount)
 
 	m_position += view;
 	m_eye += view;
-	grabMatrix();
+	update();
 }
 
 void Camera::strafe(float amount)
@@ -58,7 +146,7 @@ void Camera::strafe(float amount)
 
 	m_eye.x += m_strafe.x * amount;
 	m_eye.z += m_strafe.z * amount;
-	grabMatrix();
+	update();
 }
 
 void Camera::rotate(float angle, Vec3f axis)
@@ -79,13 +167,7 @@ void Camera::rotate(float angle, Vec3f axis)
 	m_eye.x = m_position.x + updated.b;
 	m_eye.y = m_position.y + updated.c;
 	m_eye.z = m_position.z + updated.d;
-	grabMatrix();
-}
-
-void Camera::update()
-{
-	m_strafe = (m_eye - m_position) % m_up;
-	m_strafe.normalize();
+	update();
 }
 
 void Camera::apply()
