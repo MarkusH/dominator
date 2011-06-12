@@ -8,6 +8,8 @@
 #include <QtGui/QSizePolicy>
 #include <iostream>
 
+namespace gui {
+
 ToolBox::ToolBox(QWidget *parent)
 {
 	m_selectedInteraction = sim::Simulation::INT_NONE;
@@ -81,4 +83,6 @@ void ToolBox::onInteractionPressed(int button)
 	}
 	m_selectedInteraction = (sim::Simulation::InteractionType) m_mouseinteraction->checkedId();
 	emit interactionSelected(m_selectedInteraction);
+}
+
 }

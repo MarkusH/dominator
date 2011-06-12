@@ -18,6 +18,8 @@
 
 using namespace m3d;
 
+namespace gui {
+
 RenderWidget::RenderWidget(QWidget* parent) :
 	QGLWidget(parent)
 {
@@ -206,4 +208,6 @@ void RenderWidget::renderRotation(float x, float y, float z)
 
 		obj->setMatrix(matrix);
 	}
+}
+
 }

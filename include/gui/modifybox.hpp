@@ -16,6 +16,8 @@
 #include <QtCore/QObject>
 #include <m3d/m3d.hpp>
 
+namespace gui {
+
 /**
  * The ModifyBox is a group of Qt widgets to set specific sizes, positions and
  * rotations to a selected object
@@ -130,4 +132,5 @@ signals:
 	void changeRotation(float, float, float);
 };
 
+}
 #endif /* MODIFYBOX_HPP_ */

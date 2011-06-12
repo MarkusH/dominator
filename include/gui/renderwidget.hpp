@@ -17,6 +17,8 @@
 #include <util/InputAdapters.hpp>
 #include <QtGui/QWheelEvent>
 
+namespace gui {
+
 /**
  * The RenderWidget is a <a href="http://doc.qt.nokia.com/qglwidget.html">QGLWidget</a>
  * that we overwrite with some specific functions
@@ -187,4 +189,5 @@ signals:
 	void objectSelected(bool);
 };
 
+}
 #endif /* RENDERWIDGET_HPP_ */

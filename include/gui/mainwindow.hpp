@@ -23,6 +23,8 @@
 #include <gui/modifybox.hpp>
 #include <simulation/Simulation.hpp>
 
+namespace gui {
+
 class MainWindow: public QMainWindow {
 Q_OBJECT
 public:
@@ -242,6 +244,8 @@ private:
 inline bool MainWindow::isModified()
 {
 	return m_modified;
+}
+
 }
 
 #endif /* MAINWINDOW_HPP_ */

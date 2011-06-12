@@ -16,6 +16,8 @@
 #include <QtGui/QButtonGroup>
 #include <simulation/Simulation.hpp>
 
+namespace gui {
+
 /**
  * The ToolBox holds all tools for adding and removing objects to the
  * sim::Simulation. Additionally one can select an
@@ -91,5 +93,7 @@ signals:
 	 */
 	void interactionSelected(sim::Simulation::InteractionType);
 };
+
+}
 
 #endif /* TOOLBOX_HPP_ */

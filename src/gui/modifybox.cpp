@@ -7,6 +7,8 @@
 #include <gui/modifybox.hpp>
 #include <iostream>
 
+namespace gui {
+
 ModifyBox::ModifyBox(QWidget* parent) :
 	QWidget(parent)
 {
@@ -179,4 +181,6 @@ void ModifyBox::updateData(bool selected)
 	m_mbRotY->setEnabled(selected);
 	m_mbRotZ->setEnabled(selected);
 	doUpdate = true;
+}
+
 }
