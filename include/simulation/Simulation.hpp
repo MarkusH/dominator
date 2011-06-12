@@ -92,14 +92,6 @@ protected:
 	void upload(const ObjectList::iterator& begin, const ObjectList::iterator& end);
 
 	/**
-	 * Applies the given material. If it is not available, disable all
-	 * material properties.
-	 *
-	 * @param material
-	 */
-	void applyMaterial(const std::string& material);
-
-	/**
 	 * Checks if the given interaction type is activated in any button.
 	 *
 	 * @param type An interaction type
@@ -224,6 +216,12 @@ public:
 
 
 // inline methods
+
+inline Simulation& Simulation::instance()
+{
+	return *s_instance;
+};
+
 
 inline NewtonWorld* Simulation::getWorld() const
 {

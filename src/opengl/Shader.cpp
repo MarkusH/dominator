@@ -168,13 +168,6 @@ ShaderMgr::~ShaderMgr()
 {
 }
 
-ShaderMgr& ShaderMgr::instance()
-{
-	if (!s_instance)
-		s_instance = new ShaderMgr();
-	return *s_instance;
-}
-
 void ShaderMgr::destroy()
 {
 	if (s_instance)

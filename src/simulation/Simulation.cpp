@@ -43,11 +43,6 @@ void Simulation::destroyInstance()
 	s_instance = NULL;
 };
 
-Simulation& Simulation::instance()
-{
-	return *s_instance;
-};
-
 Simulation::Simulation(util::KeyAdapter& keyAdapter,
 						util::MouseAdapter& mouseAdapter)
 	: m_keyAdapter(keyAdapter),
@@ -681,38 +676,6 @@ void Simulation::update()
 	}
 }
 
-void Simulation::applyMaterial(const std::string& material) {
-	const Material* const _mat = MaterialMgr::instance().get(material);
-	/// @todo only switch shader/texture if necessary
-	if (_mat != NULL) {
-		const Material& mat = *_mat;
-		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
-
-		if (texture) {
-			glEnable(GL_TEXTURE_2D);
-			texture->bind();
-		} else {
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, &mat.specular[0]);
-		glMaterialf(GL_FRONT, GL_SHININESS, mat.shininess);
-
-		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
-		if (shader) {
-			shader->bind();
-		} else {
-			ogl::__Shader::unbind();
-		}
-
-	} else {
-		glDisable(GL_TEXTURE_2D);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glUseProgram(0);
-	}
-}
-
 void Simulation::render()
 {
 	m_camera.update();
@@ -736,13 +699,14 @@ void Simulation::render()
 	if (*itr) {
 		material = (*itr)->material;
 	}
-	applyMaterial(material);
+	MaterialMgr& mmgr = MaterialMgr::instance();
+	mmgr.applyMaterial(material);
 	for ( ; itr != m_sortedBuffers.end(); ++itr) {
 		const ogl::SubBuffer* const buf = (*itr);
 		const __Object* const obj = (const __Object* const)buf->object;
 		if (material != buf->material) {
 			material = buf->material;
-			applyMaterial(material);
+			mmgr.applyMaterial(material);
 		}
 
 		glPushMatrix();

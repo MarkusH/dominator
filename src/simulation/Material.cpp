@@ -6,6 +6,9 @@
  */
 
 #include <simulation/Material.hpp>
+#include <opengl/Texture.hpp>
+#include <opengl/Shader.hpp>
+#include <GL/glew.h>
 #include <limits.h>
 #ifdef _WIN32
 #include <boost/functional/hash.hpp>
@@ -241,20 +244,43 @@ MaterialMgr::MaterialMgr(const MaterialMgr& other)
 {
 }
 
-
-MaterialMgr& MaterialMgr::instance()
-{
-	if (!s_instance)
-		s_instance = new MaterialMgr();
-	return *s_instance;
-}
-
 void MaterialMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
 }
 
+void MaterialMgr::applyMaterial(const std::string& material) {
+	const Material* const _mat = get(material);
+	/// @todo only switch shader/texture if necessary
+	if (_mat != NULL) {
+		const Material& mat = *_mat;
+		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
+
+		if (texture) {
+			glEnable(GL_TEXTURE_2D);
+			texture->bind();
+		} else {
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, &mat.specular[0]);
+		glMaterialf(GL_FRONT, GL_SHININESS, mat.shininess);
+
+		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
+		if (shader) {
+			shader->bind();
+		} else {
+			ogl::__Shader::unbind();
+		}
+
+	} else {
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glUseProgram(0);
+	}
+}
 
 std::string MaterialMgr::add(const Material& mat)
 {
