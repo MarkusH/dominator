@@ -17,6 +17,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+namespace gui {
 
 MainWindow::MainWindow(QApplication* app)
 {
@@ -269,4 +270,6 @@ void MainWindow::onAboutPressed()
 {
 	AboutDialog* about = new AboutDialog(this);
 	about->exec();
+}
+
 }

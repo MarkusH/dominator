@@ -14,6 +14,8 @@
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QDialogButtonBox>
 
+namespace gui {
+
 /**
  * AboutDialog displays a short about box, naming the authors
  */
@@ -76,4 +78,5 @@ private:
 	static const float m_rangeHigh = 0.0f;
 };
 
+}
 #endif /* DIALOGS_HPP_ */

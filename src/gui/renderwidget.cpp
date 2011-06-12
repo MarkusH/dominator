@@ -18,6 +18,8 @@
 
 using namespace m3d;
 
+namespace gui {
+
 RenderWidget::RenderWidget(QWidget* parent) :
 	QGLWidget(parent)
 {
@@ -109,7 +111,7 @@ void RenderWidget::paintGL()
 	frames++;
 	if (m_clock.get() >= 1.0f) {
 		emit framesPerSecondChanged(frames);
-		emit updateObjectsCount(sim::Simulation::instance().getObjectCount());
+		emit objectsCountChanged(sim::Simulation::instance().getObjectCount());
 		m_clock.reset();
 		frames = 0;
 	}
@@ -206,4 +208,6 @@ void RenderWidget::renderRotation(float x, float y, float z)
 
 		obj->setMatrix(matrix);
 	}
+}
+
 }

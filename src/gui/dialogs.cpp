@@ -6,6 +6,8 @@
 
 #include <gui/dialogs.hpp>
 
+namespace gui {
+
 AboutDialog::AboutDialog(QWidget* parent) :
 	QDialog(parent)
 {
@@ -79,3 +81,4 @@ float GravityDialog::run()
 	}
 }
 
+}

@@ -17,6 +17,8 @@
 #include <util/InputAdapters.hpp>
 #include <QtGui/QWheelEvent>
 
+namespace gui {
+
 /**
  * The RenderWidget is a <a href="http://doc.qt.nokia.com/qglwidget.html">QGLWidget</a>
  * that we overwrite with some specific functions
@@ -171,7 +173,7 @@ signals:
 	 * RenderWidget::m_clock and is connected to
 	 * MainWindow::updateFramesPerSecond(int)
 	 */
-	void updateObjectsCount(int);
+	void objectsCountChanged(int);
 	/**
 	 * objectSelected(m3d::Mat4f) is emitted each time the user has selected
 	 * an object. The signal is connected to ModifyBox::updateData(m3d::Mat4f)
@@ -187,4 +189,5 @@ signals:
 	void objectSelected(bool);
 };
 
+}
 #endif /* RENDERWIDGET_HPP_ */
