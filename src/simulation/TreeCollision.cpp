@@ -24,6 +24,7 @@ namespace sim {
 __TreeCollision::Node::Node(__TreeCollision* tree, Vec3f pos, float size, std::vector<uint32_t>& parentIndices)
 	: tree(tree), pos(pos), size(size)
 {
+	++tree->m_nodeCount;
 	for (unsigned i = 0; i < parentIndices.size(); i += 3) {
 		// if triangle in node then add to indices and remove from parent
 		if (inside(&parentIndices[i])) {
@@ -56,6 +57,15 @@ __TreeCollision::Node::Node(__TreeCollision* tree, Vec3f pos, float size, std::v
 	}
 }
 
+__TreeCollision::Node::~Node()
+{
+	for (std::vector<Node*>::iterator itr = childs.begin(); itr != childs.end(); ++itr) {
+		delete *itr;
+	}
+	--tree->m_nodeCount;
+}
+
+
 bool __TreeCollision::Node::isEmpty() {
 	for (unsigned i = 0; i < childs.size(); ++i)
 		if (!childs[i]->isEmpty())
@@ -74,56 +84,58 @@ bool __TreeCollision::Node::inside(uint32_t* i0) {
 	return false;
 }
 
-void __TreeCollision::Node::drawWireFrame() {
+int __TreeCollision::Node::drawWireFrame(bool test) {
 	Vec3f min = pos, max = pos;
 	min -= Vec3f(size, size, size);
 	max += Vec3f(size, size, size);
-	if (Simulation::instance().getCamera().testAABB(min, max) == 1)
-		glColor3f(1.0f, 1.0f, 0.0f);
-	else
+	ogl::Camera::Visibility v = ogl::Camera::INSIDE;
+	if (test) {
+		v = Simulation::instance().getCamera().testAABB(min, max);
+		if (v == ogl::Camera::OUTSIDE)
+			return 0;
+		if (v == ogl::Camera::INTERSECT)
+			glColor3f(1.0f, 1.0f, 0.0f);
+		else
+			glColor3f(1.0f, 0.0f, 1.0f);
+	} else {
 		glColor3f(1.0f, 0.0f, 1.0f);
-      glVertex3f(pos.x-size,pos.y-size,pos.z-size);
-      glVertex3f(pos.x+size,pos.y-size,pos.z-size);
-      glVertex3f(pos.x-size,pos.y+size,pos.z-size);
-      glVertex3f(pos.x+size,pos.y+size,pos.z-size);
-      glVertex3f(pos.x-size,pos.y-size,pos.z+size);
-      glVertex3f(pos.x+size,pos.y-size,pos.z+size);
-      glVertex3f(pos.x-size,pos.y+size,pos.z+size);
-      glVertex3f(pos.x+size,pos.y+size,pos.z+size);
-
-      glVertex3f(pos.x+size,pos.y+size,pos.z+size);
-      glVertex3f(pos.x+size,pos.y-size,pos.z+size);
-      glVertex3f(pos.x+size,pos.y+size,pos.z-size);
-      glVertex3f(pos.x+size,pos.y-size,pos.z-size);
-      glVertex3f(pos.x-size,pos.y+size,pos.z+size);
-      glVertex3f(pos.x-size,pos.y-size,pos.z+size);
-      glVertex3f(pos.x-size,pos.y+size,pos.z-size);
-      glVertex3f(pos.x-size,pos.y-size,pos.z-size);
-
-      glVertex3f(pos.x+size,pos.y+size,pos.z+size);
-      glVertex3f(pos.x+size,pos.y+size,pos.z-size);
-      glVertex3f(pos.x+size,pos.y-size,pos.z+size);
-      glVertex3f(pos.x+size,pos.y-size,pos.z-size);
-      glVertex3f(pos.x-size,pos.y-size,pos.z+size);
-      glVertex3f(pos.x-size,pos.y-size,pos.z-size);
-      glVertex3f(pos.x-size,pos.y+size,pos.z+size);
-      glVertex3f(pos.x-size,pos.y+size,pos.z-size);
-		for (unsigned i = 0; i < childs.size(); ++i) {
-			childs[i]->drawWireFrame();
-		}
-}
-
-
-__TreeCollision::Node::~Node()
-{
-	for (std::vector<Node*>::iterator itr = childs.begin(); itr != childs.end(); ++itr) {
-		delete *itr;
 	}
-}
+	glVertex3f(pos.x-size,pos.y-size,pos.z-size);
+	glVertex3f(pos.x+size,pos.y-size,pos.z-size);
+	glVertex3f(pos.x-size,pos.y+size,pos.z-size);
+	glVertex3f(pos.x+size,pos.y+size,pos.z-size);
+	glVertex3f(pos.x-size,pos.y-size,pos.z+size);
+	glVertex3f(pos.x+size,pos.y-size,pos.z+size);
+	glVertex3f(pos.x-size,pos.y+size,pos.z+size);
+	glVertex3f(pos.x+size,pos.y+size,pos.z+size);
 
+	glVertex3f(pos.x+size,pos.y+size,pos.z+size);
+	glVertex3f(pos.x+size,pos.y-size,pos.z+size);
+	glVertex3f(pos.x+size,pos.y+size,pos.z-size);
+	glVertex3f(pos.x+size,pos.y-size,pos.z-size);
+	glVertex3f(pos.x-size,pos.y+size,pos.z+size);
+	glVertex3f(pos.x-size,pos.y-size,pos.z+size);
+	glVertex3f(pos.x-size,pos.y+size,pos.z-size);
+	glVertex3f(pos.x-size,pos.y-size,pos.z-size);
+
+	glVertex3f(pos.x+size,pos.y+size,pos.z+size);
+	glVertex3f(pos.x+size,pos.y+size,pos.z-size);
+	glVertex3f(pos.x+size,pos.y-size,pos.z+size);
+	glVertex3f(pos.x+size,pos.y-size,pos.z-size);
+	glVertex3f(pos.x-size,pos.y-size,pos.z+size);
+	glVertex3f(pos.x-size,pos.y-size,pos.z-size);
+	glVertex3f(pos.x-size,pos.y+size,pos.z+size);
+	glVertex3f(pos.x-size,pos.y+size,pos.z-size);
+
+	int result = 1;
+	for (unsigned i = 0; i < childs.size(); ++i) {
+		result += childs[i]->drawWireFrame(v == ogl::Camera::INTERSECT);
+	}
+	return result;
+}
 
 __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileName)
-	: __Object(TREE_COLLISION), Body(matrix), m_node(NULL)
+	: __Object(TREE_COLLISION), Body(matrix), m_nodeCount(0), m_node(NULL)
 {
 
 	/*

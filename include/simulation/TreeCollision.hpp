@@ -12,6 +12,9 @@
 
 namespace sim {
 
+class __TreeCollision;
+typedef std::tr1::shared_ptr<__TreeCollision> TreeCollision;
+
 class __TreeCollision : public __Object, public Body {
 protected:
 
@@ -28,9 +31,10 @@ protected:
 
 		bool isEmpty();
 		bool inside(uint32_t* i0);
-		void drawWireFrame();
+		int drawWireFrame(bool test = true);
 	};
 
+	int m_nodeCount;
 	Node* m_node;
 	// T2F_N3F_V3F
 	std::vector<float> m_data;
