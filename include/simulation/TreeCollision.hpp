@@ -14,6 +14,28 @@ namespace sim {
 
 class __TreeCollision : public __Object, public Body {
 protected:
+
+	struct Node {
+		__TreeCollision* tree;
+		std::vector<Node*> childs;
+		std::vector<uint32_t> indices;
+		GLuint list;
+		Vec3f pos;
+		float size;
+
+		Node(__TreeCollision* tree, Vec3f pos, float size, std::vector<uint32_t>& parentIndices);
+		~Node();
+
+		bool isEmpty();
+		bool inside(uint32_t* i0);
+		void drawWireFrame();
+	};
+
+	Node* m_node;
+	// T2F_N3F_V3F
+	std::vector<float> m_data;
+	std::vector<uint32_t> m_indices;
+
 	int m_vertexCount;
 	Lib3dsVector* m_vertices;
 	Lib3dsVector* m_normals;
@@ -34,6 +56,7 @@ public:
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
+	virtual void createOctree();
 	virtual void render();
 };
 }

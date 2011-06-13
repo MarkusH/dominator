@@ -124,7 +124,8 @@ void Simulation::init()
 
 
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/env.3ds"));
+	((__TreeCollision*)m_environment.get())->createOctree();
 	add(m_environment);
 
 /*
@@ -721,6 +722,8 @@ void Simulation::render()
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
+
+	m_environment->render();
 
 	if (m_selectedObject) {
 		Vec3f min, max;
