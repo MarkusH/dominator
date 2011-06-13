@@ -41,6 +41,34 @@ bool Camera::checkAABB(const Vec3f& min, const Vec3f& max)
 	return true;
 }
 
+Camera::Visibility Camera::testAABB(const Vec3f& min, const Vec3f& max)
+{
+	Visibility result = INSIDE;
+	float distance = 0.0f;
+
+	Vec3f vert;
+
+	for (int i = 0; i < 6; ++i) {
+
+		vert.x = (m_frustum[i][0] >= 0.0f) ? max.x : min.x;
+		vert.y = (m_frustum[i][1] >= 0.0f) ? max.y : min.y;
+		vert.z = (m_frustum[i][2] >= 0.0f) ? max.z : min.z;
+
+		distance = m_frustum[i][0] * vert.x + m_frustum[i][1] * vert.y + m_frustum[i][2] * vert.z + m_frustum[i][3];
+		if (distance < 0)
+			return OUTSIDE;
+
+		vert.x = (m_frustum[i][0] >= 0.0f) ? min.x : max.x;
+		vert.y = (m_frustum[i][1] >= 0.0f) ? min.y : max.y;
+		vert.z = (m_frustum[i][2] >= 0.0f) ? min.z : max.z;
+
+    	distance = m_frustum[i][0] * vert.x + m_frustum[i][1] * vert.y + m_frustum[i][2] * vert.z + m_frustum[i][3];
+		if (distance < 0)
+			result =  INTERSECT;
+	}
+	return result;
+}
+
 void Camera::update()
 {
 	m_strafe = (m_eye - m_position) % m_up;

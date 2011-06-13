@@ -724,19 +724,20 @@ void Simulation::render()
 
 	if (m_selectedObject) {
 		Vec3f min, max;
-		int count = 0;
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			if (*itr == m_selectedObject)
+			if (*itr == m_selectedObject) {
 				(*itr)->render();
-
-			(*itr)->getAABB(min, max);
-			if (m_camera.checkAABB(min, max)) {
-				ogl::drawAABB(min, max);
-				++count;
+				(*itr)->getAABB(min, max);
+				if (m_camera.testAABB(min, max) == 1)
+					glColor3f(1.0f, 1.0f, 0.0f);
+				else
+					glColor3f(1.0f, 0.0, 0.0f);
+				if (m_camera.checkAABB(min, max)) {
+					ogl::drawAABB(min, max);
+				}
 			}
 		}
-		std::cout << "objects: " << m_objects.size() << ", rendered: " << count << std::endl;
 	}
 
 	glDepthMask(GL_FALSE);

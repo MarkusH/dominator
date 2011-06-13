@@ -20,6 +20,8 @@ using namespace m3d;
  */
 class Camera {
 public:
+	typedef enum { OUTSIDE = 0, INTERSECT, INSIDE } Visibility;
+
 	Camera();
 	virtual ~Camera();
 
@@ -113,7 +115,28 @@ public:
 	 */
 	Vec3f pointer(int x, int y) const;
 
+	/**
+	 * Checks whether the given axis-aligned bounding box is partially
+	 * or fully visible. If so, returns True.
+	 *
+	 * @param min The minimum of the AABB
+	 * @param max The maximum of the AABB
+	 * @return    True, if the AABB is (partially) visible, False otherwise
+	 */
 	bool checkAABB(const Vec3f& min, const Vec3f& max);
+
+	/**
+	 * Tests the visibility of the given axis-aligned bounding box.
+	 * Returns Visibility.OUTSIDE if the bounding box is completly
+	 * outside of the frustum. Returns Visibility.INTERSECT if a part
+	 * but not all of the AABB is inside the frustum. Returns
+	 * Visibility.INSIDE if all of the AABB is inside the AABB.
+	 *
+	 * @param min The minimum of the AABB
+	 * @param max The maximum of the AABB
+	 * @return    The visibility of the AABB
+	 */
+	Visibility testAABB(const Vec3f& min, const Vec3f& max);
 };
 
 }
