@@ -17,7 +17,7 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
 
-#define OCTREE_NODE_SIZE 50
+#define OCTREE_NODE_SIZE 10000
 
 namespace sim {
 
@@ -98,7 +98,7 @@ int __TreeCollision::Node::drawWireFrame(bool test) {
 		else
 			glColor3f(1.0f, 0.0f, 1.0f);
 	} else {
-		glColor3f(1.0f, 0.0f, 1.0f);
+		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	glVertex3f(pos.x-size,pos.y-size,pos.z-size);
 	glVertex3f(pos.x+size,pos.y-size,pos.z-size);
@@ -127,7 +127,7 @@ int __TreeCollision::Node::drawWireFrame(bool test) {
 	glVertex3f(pos.x-size,pos.y+size,pos.z+size);
 	glVertex3f(pos.x-size,pos.y+size,pos.z-size);
 
-	int result = 1;
+	int result = indices.size();
 	for (unsigned i = 0; i < childs.size(); ++i) {
 		result += childs[i]->drawWireFrame(v == ogl::Camera::INTERSECT);
 	}
@@ -197,6 +197,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 			finishedFaces++;
 		}
 	}
+	std::cout << numFaces * 3 << " faces" << std::endl;
 	lib3ds_file_free(file);
 	NewtonTreeCollisionEndBuild(collision, 1);
 
@@ -344,7 +345,7 @@ void __TreeCollision::render()
 	newton::showCollisionShape(getCollision(), m_matrix);
 	glBegin(GL_LINES);
 	if (m_node)
-		m_node->drawWireFrame();
+		std::cout << m_node->drawWireFrame() << " of " << m_nodeCount << std::endl;
 	glEnd();
 }
 

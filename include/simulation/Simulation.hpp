@@ -33,6 +33,7 @@ public:
 		INT_ROTATE,			/**< Rotate object using the mouse. */
 		INT_MOVE_GROUND,	/**< Move the object along the ground and perpendicular to the camera. */
 		INT_MOVE_BILLBOARD,	/**< Move the object along the Y-axis and perpendicular to the camera. */
+		INT_ROTATE_GROUND,  /**< Rotate the object around the Y-axis by moving the mouse along the ground plane */
 		INT_DOMINO_CURVE	/**< Create a domino curve by creating multiple control points */
 	} InteractionType;
 private:

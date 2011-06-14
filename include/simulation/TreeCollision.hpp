@@ -53,7 +53,7 @@ public:
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
 
-	virtual float convexCastPlacement(bool apply = true) { return 0.0f; };
+	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL) { return 0.0f; };
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const __Object* object);

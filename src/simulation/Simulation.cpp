@@ -51,7 +51,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_nextID(0)
 {
 	m_interactionTypes[util::LEFT] = INT_NONE;
-	m_interactionTypes[util::RIGHT] = INT_NONE;
+	m_interactionTypes[util::RIGHT] = INT_MOVE_GROUND;
 	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
 	m_world = NULL;
 	m_enabled = true;
@@ -124,7 +124,7 @@ void Simulation::init()
 
 
 	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/env.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	((__TreeCollision*)m_environment.get())->createOctree();
 	add(m_environment);
 
@@ -481,11 +481,15 @@ void Simulation::mouseMove(int x, int y)
 		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 	}
 
-	util::Button button = m_mouseAdapter.isDown(util::LEFT) ? util::LEFT :
-		m_mouseAdapter.isDown(util::MIDDLE) ? util::MIDDLE : util::RIGHT;
+	util::Button button = util::LEFT;
+	if (m_mouseAdapter.isDown(util::MIDDLE))
+		button = util::MIDDLE;
+	if (m_mouseAdapter.isDown(util::RIGHT))
+		button = util::RIGHT;
 
 	// handle interaction mode if object is selected and in pause mode
 	if ((m_interactionTypes[button] == INT_ROTATE ||
+			m_interactionTypes[button] == INT_ROTATE_GROUND ||
 			m_interactionTypes[button] == INT_MOVE_GROUND ||
 			m_interactionTypes[button] == INT_MOVE_BILLBOARD) &&
 			m_selectedObject && !m_enabled) {
@@ -502,7 +506,9 @@ void Simulation::mouseMove(int x, int y)
 			//rot_drag_cur = pos2;
 			rot_drag_cur = rot_mat_start.getW() + (pos2-rot_mat_start.getW()).normalized() * (rot_drag_start-rot_mat_start.getW()).len();
 
-		} else if (m_interactionTypes[button] == INT_MOVE_GROUND || m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
+		} else if (m_interactionTypes[button] == INT_MOVE_GROUND ||
+				m_interactionTypes[button] == INT_MOVE_BILLBOARD ||
+				m_interactionTypes[button] == INT_ROTATE_GROUND) {
 			Vec3f R1, R2, S1, S2;
 			{
 				Vec4<GLint> viewport = Vec4<GLint>::viewport();
@@ -535,6 +541,10 @@ void Simulation::mouseMove(int x, int y)
 			Vec3f p2 = pos1 + Vec3f::xAxis();
 			Vec3f p3 = pos1 + Vec3f::zAxis();
 
+			if (m_interactionTypes[button] == INT_ROTATE_GROUND) {
+
+			}
+
 			if (m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
 				// billboard plane
 				p1 = pos1;
@@ -562,7 +572,8 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	Vec3f old = m_pointer;
 	m_pointer = m_camera.pointer(x, y);
 
-	if (m_interactionTypes[button] == INT_ROTATE && m_selectedObject && !m_enabled) {
+	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
+			&& m_selectedObject && !m_enabled) {
 		rot_drag_start = m_pointer;
 		rot_mat_start = m_selectedObject->getMatrix();
 		rot_mouse = Vec2i(x, y);
@@ -586,7 +597,8 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			m_selectedObject = Object();
 	}
 
-	if (m_interactionTypes[button] == INT_ROTATE && m_selectedObject && !m_enabled)
+	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
+			&& m_selectedObject && !m_enabled)
 		rot_mat_start = m_selectedObject->getMatrix();
 
 	if (m_interactionTypes[button] == INT_DOMINO_CURVE && !m_enabled) {
@@ -723,21 +735,21 @@ void Simulation::render()
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
-	m_environment->render();
+	//m_environment->render();
 
 	if (m_selectedObject) {
 		Vec3f min, max;
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
 			if (*itr == m_selectedObject) {
-				(*itr)->render();
+				//(*itr)->render();
 				(*itr)->getAABB(min, max);
 				if (m_camera.testAABB(min, max) == 1)
 					glColor3f(1.0f, 1.0f, 0.0f);
 				else
 					glColor3f(1.0f, 0.0, 0.0f);
 				if (m_camera.checkAABB(min, max)) {
-					ogl::drawAABB(min, max);
+					//ogl::drawAABB(min, max);
 				}
 			}
 		}

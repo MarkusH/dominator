@@ -39,6 +39,18 @@ Vec3f screenToWorld(const Vec3d& screen);
  */
 Vec3f screenToWorld(const Vec2d& screen);
 
+/**
+ * Shoots a ray at from the screen position to the near and far plane.
+ * Returns the normalized direction vector of the two intersection points.
+ * The intersection points are stored in near and far.
+ *
+ * @param screen The screen coordinates
+ * @param near   The intersection on the near plane
+ * @param far    The intersection on the far plane
+ * @return       The direction vector between near and far
+ */
+Vec3f getScreenRay(const Vec2d& screen, Vec3f& near, Vec3f& far);
+
 }
 
 #endif /* OGL_UTIL_HPP_ */

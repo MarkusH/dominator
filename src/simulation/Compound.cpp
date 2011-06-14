@@ -57,11 +57,15 @@ void __Compound::getAABB(Vec3f& min, Vec3f& max)
 	}
 }
 
-float __Compound::convexCastPlacement(bool apply)
+float __Compound::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
 {
+	std::list<NewtonBody*> temp;
+	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
+		temp.push_back(((__RigidBody*)itr->get())->m_body);
+	}
 	float maximum = -1000.0f;
 	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
-		float current = (*itr)->convexCastPlacement(false);
+		float current = (*itr)->convexCastPlacement(false, &temp);
 		if (current > maximum) maximum = current;
 	}
 	Mat4f matrix = m_matrix;

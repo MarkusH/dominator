@@ -217,9 +217,9 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const
 {
 }
 
-float __RigidBody::convexCastPlacement(bool apply)
+float __RigidBody::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
 {
-	float vertical = newton::getConvexCastPlacement(m_body);
+	float vertical = newton::getConvexCastPlacement(m_body, noCollision);
 	Mat4f matrix = m_matrix;
 	matrix._42 = vertical + 0.0001f;
 	if (apply)

@@ -10,6 +10,7 @@
 
 #include <m3d/m3d.hpp>
 #include <Newton.h>
+#include <list>
 
 namespace newton {
 
@@ -48,8 +49,7 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z);
  * @param body The body to use for the convex cast
  * @return     The new vertical position of the body
  */
-float getConvexCastPlacement(NewtonBody* body);
-
+float getConvexCastPlacement(NewtonBody* body, std::list<NewtonBody*>* noCollision = NULL);
 
 /**
  * Renders the specified collision shape, transformed with the given matrix.

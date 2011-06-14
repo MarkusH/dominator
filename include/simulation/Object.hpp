@@ -92,7 +92,7 @@ public:
 	 * @param apply True, if the new position should be applied, False otherwise
 	 * @return      The new vertical position
 	 */
-	virtual float convexCastPlacement(bool apply = true) = 0;
+	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL) = 0;
 
 	/**
 	 * Checks whether this object contains the given NewtonBody.
@@ -183,7 +183,7 @@ public:
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
 
-	virtual float convexCastPlacement(bool apply = true);
+	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const __Object* object);
