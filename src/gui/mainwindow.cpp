@@ -1,7 +1,7 @@
-/*
- * mainwindow.cpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 13, 2011
+ * @file gui/mainwindow.cpp
  */
 
 #include <iostream>
@@ -17,10 +17,13 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+namespace gui {
+
 MainWindow::MainWindow(QApplication* app)
 {
 	m_modified = true;
 
+	// load the splash screen
 	QPixmap pixmap = QPixmap("data/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.show();
@@ -60,6 +63,7 @@ MainWindow::MainWindow(QApplication* app)
 
 	setCentralWidget(m_splitter);
 
+	// connect the newly created widgets with specific slots
 	connect(m_renderWidget, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
 	connect(m_renderWidget, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
 	connect(m_renderWidget, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
@@ -185,12 +189,12 @@ void MainWindow::updateObjectsCount(int count)
 }
 
 void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
-	sim::Simulation::instance().setInteractionType(type);
+	sim::Simulation::instance().setInteractionType(util::RIGHT, type);
 }
 
 void MainWindow::onNewPressed()
 {
-	// TODO: check for m_renderWidget->isModified()
+	/// @todo check for m_renderWidget->isModified()
 	sim::Simulation::instance().init();
 	sim::Simulation::instance().setEnabled(false);
 }
@@ -254,6 +258,10 @@ void MainWindow::onGravityPressed()
 	sim::Simulation::instance().setGravity(dialog->run());
 }
 
+/**
+ * @todo Implement some kind of help document. Maybe a link to the user
+ * documentation
+ */
 void MainWindow::onHelpPressed()
 {
 }
@@ -262,4 +270,6 @@ void MainWindow::onAboutPressed()
 {
 	AboutDialog* about = new AboutDialog(this);
 	about->exec();
+}
+
 }

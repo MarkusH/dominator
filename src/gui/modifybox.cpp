@@ -1,18 +1,17 @@
-/*
- * modifybox.cpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 25, 2011
+ * @file gui/modifybox.cpp
  */
 
 #include <gui/modifybox.hpp>
 #include <iostream>
 
+namespace gui {
+
 ModifyBox::ModifyBox(QWidget* parent) :
 	QWidget(parent)
 {
-
-	m_rx = m_ry = m_rz = 0;
-
 	QVBoxLayout* layout = new QVBoxLayout();
 
 	layout->addWidget(new QLabel("Size:"));
@@ -102,21 +101,6 @@ ModifyBox::ModifyBox(QWidget* parent) :
 
 }
 
-void ModifyBox::mouseMoveEvent(QMouseEvent* event)
-{
-	move(mapToParent(event->pos()) - m_moveOffset);
-}
-
-void ModifyBox::mousePressEvent(QMouseEvent* event)
-{
-	m_moveOffset = event->pos();
-}
-
-void ModifyBox::mouseReleaseEvent(QMouseEvent* event)
-{
-	m_moveOffset = QPoint();
-}
-
 bool doUpdate = true;
 
 void ModifyBox::signalSize(double value)
@@ -158,7 +142,7 @@ void ModifyBox::signalRotation(double value)
 void ModifyBox::updateData(const m3d::Mat4f* matrix)
 {
 	doUpdate = false;
-	// TODO: this seems to trigger the signals of the spinners
+	/// @todo this seems to trigger the signals of the spinners
 	// we may need to set a boolean in this function that temporarily
 	// disables the handling code in the slots above.
 	if (matrix) {
@@ -197,4 +181,6 @@ void ModifyBox::updateData(bool selected)
 	m_mbRotY->setEnabled(selected);
 	m_mbRotZ->setEnabled(selected);
 	doUpdate = true;
+}
+
 }

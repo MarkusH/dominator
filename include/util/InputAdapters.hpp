@@ -158,6 +158,7 @@ protected:
 	/** The x and y position of the mouse */
 	int m_x, m_y;
 public:
+	MouseAdapter();
 	virtual ~MouseAdapter();
 
 	/**

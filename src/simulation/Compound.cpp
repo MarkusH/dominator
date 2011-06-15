@@ -36,11 +36,36 @@ __Compound::~__Compound()
 	//m_joints.clear();
 }
 
-float __Compound::convexCastPlacement(bool apply)
+void __Compound::getAABB(Vec3f& min, Vec3f& max)
 {
+
+	if (m_nodes.size() > 0) {
+		m_nodes.front()->getAABB(min, max);
+		std::list<Object>::iterator itr = m_nodes.begin();
+		Vec3f _min, _max;
+		for (++itr ; itr != m_nodes.end(); ++itr) {
+			(*itr)->getAABB(_min, _max);
+			min.x = min(min.x, _min.x);
+			min.y = min(min.y, _min.y);
+			min.z = min(min.z, _min.z);
+			max.x = max(max.x, _max.x);
+			max.y = max(max.y, _max.y);
+			max.z = max(max.z, _max.x);
+		}
+	} else {
+		min = max = Vec3f();
+	}
+}
+
+float __Compound::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
+{
+	std::list<NewtonBody*> temp;
+	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
+		temp.push_back(((__RigidBody*)itr->get())->m_body);
+	}
 	float maximum = -1000.0f;
 	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
-		float current = (*itr)->convexCastPlacement(false);
+		float current = (*itr)->convexCastPlacement(false, &temp);
 		if (current > maximum) maximum = current;
 	}
 	Mat4f matrix = m_matrix;

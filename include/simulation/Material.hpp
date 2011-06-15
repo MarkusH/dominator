@@ -67,7 +67,7 @@ struct MaterialPair {
 	float kineticFriction;
 	float softness;
 
-	//TODO: add sounds
+	/// @todo add sounds
 
 	/**
 	 * Constructs the default material.
@@ -119,6 +119,15 @@ public:
 	 * Destroys the instance of the MaterialMgr
 	 */
 	static void destroy();
+
+
+	/**
+	 * Applies the given material. If it is not available, disable all
+	 * material properties.
+	 *
+	 * @param material
+	 */
+	void applyMaterial(const std::string& material);
 
 	/**
 	 * Adds a material to the internal material map and returns the
@@ -231,6 +240,15 @@ public:
 			dFloat timestep,
 			int threadIndex);
 };
+
+
+inline MaterialMgr& MaterialMgr::instance()
+{
+	if (!s_instance)
+		s_instance = new MaterialMgr();
+	return *s_instance;
+}
+
 
 }
 

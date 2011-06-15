@@ -50,7 +50,7 @@ public:
 
 	void add(Object object);
 
-	virtual const Mat4f& getMatrix();
+	virtual const Mat4f& getMatrix() const;
 	virtual void setMatrix(const Mat4f& matrix);
 
 	/** @param state Sets the freeze state of all nodes to state */
@@ -59,7 +59,9 @@ public:
 	/** @return True, if all nodes are in freeze state, False otherwise */
 	virtual int getFreezeState();
 
-	virtual float convexCastPlacement(bool apply = true);
+	virtual void getAABB(Vec3f& min, Vec3f& max);
+
+	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 
 	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
 	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
@@ -74,7 +76,7 @@ public:
 };
 
 
-inline const Mat4f& __Compound::getMatrix()
+inline const Mat4f& __Compound::getMatrix() const
 {
 	return m_matrix;
 }

@@ -68,13 +68,20 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z)
 
 static unsigned ConvexCastCallback(const NewtonBody* body, const NewtonCollision* collision, void* userData)
 {
-	NewtonBody* other = (NewtonBody*)userData;
-	return (other == body) ? 0 : 1;
+	//NewtonBody* other = (NewtonBody*)userData;
+	std::list<NewtonBody*>* others = (std::list<NewtonBody*>*)userData;
+	return std::find(others->begin(), others->end(), body) == others->end();
+	//return (other == body) ? 0 : 1;
 }
 
-
-float getConvexCastPlacement(NewtonBody* body)
+float getConvexCastPlacement(NewtonBody* body, std::list<NewtonBody*>* noCollision)
 {
+	std::list<NewtonBody*> temp;
+	if (noCollision == NULL) {
+		noCollision = &temp;
+	}
+	noCollision->push_back(body);
+
 	Mat4f matrix;
 	NewtonBodyGetMatrix(body, matrix[0]);
 	matrix._42 += 200.0f;
@@ -94,13 +101,13 @@ float getConvexCastPlacement(NewtonBody* body)
 		float maximum = -200.0f;
 		for (int i = 0; i < collisionInfo.m_compoundCollision.m_chidrenCount; ++i) {
 			NewtonCollision* node = collisionInfo.m_compoundCollision.m_chidren[i];
-			NewtonWorldConvexCast(world, matrix[0], &p[0], node, &param, body, ConvexCastCallback, info, 16, 0);
+			NewtonWorldConvexCast(world, matrix[0], &p[0], node, &param, noCollision, ConvexCastCallback, info, 16, 0);
 			float current = matrix._42 + (p.y - matrix._42) * param;
 			if (current > maximum) maximum = current;
 		}
 		return maximum;
 	} else {
-		NewtonWorldConvexCast(world, matrix[0], &p[0], collision, &param, body, ConvexCastCallback, info, 16, 0);
+		NewtonWorldConvexCast(world, matrix[0], &p[0], collision, &param, noCollision, ConvexCastCallback, info, 16, 0);
 
 		matrix._42 += (p.y - matrix._42) * param;
 		return matrix._42;
@@ -282,7 +289,7 @@ bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down)
 			// rotate normal to global space
 			rayWorldNormal = matrix.RotateVector(rayLocalNormal);
 
-			//TODO: show the pick points
+			/// @todo show the pick points
 		}
 	} else {
 		mousePickMode = false;

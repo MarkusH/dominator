@@ -25,11 +25,20 @@ typedef std::list<Object> ObjectList;
 
 class Simulation : public util::MouseListener {
 public:
-	typedef enum { INT_NONE = 0, INT_ROTATE, INT_MOVE_GROUND, INT_MOVE_BILLBOARD, INT_DOMINO_CURVE } InteractionType;
+	/**
+	 * The interaction types.
+	 */
+	typedef enum {
+		INT_NONE = 0,		/**< No interaction. */
+		INT_ROTATE,			/**< Rotate object using the mouse. */
+		INT_MOVE_GROUND,	/**< Move the object along the ground and perpendicular to the camera. */
+		INT_MOVE_BILLBOARD,	/**< Move the object along the Y-axis and perpendicular to the camera. */
+		INT_ROTATE_GROUND,  /**< Rotate the object around the Y-axis by moving the mouse along the ground plane */
+		INT_DOMINO_CURVE	/**< Create a domino curve by creating multiple control points */
+	} InteractionType;
 private:
 	static Simulation* s_instance;
-	Simulation(util::KeyAdapter& keyAdapter,
-				util::MouseAdapter& mouseAdapter);
+	Simulation(util::KeyAdapter& keyAdapter, util::MouseAdapter& mouseAdapter);
 	virtual ~Simulation();
 
 protected:
@@ -37,7 +46,8 @@ protected:
 	util::KeyAdapter& m_keyAdapter;
 	util::MouseAdapter& m_mouseAdapter;
 
-	InteractionType m_interactionType;
+	/** The interaction types for the buttons: util::LEFT util::RIGHT util::MIDDLE */
+	InteractionType m_interactionTypes[3];
 
 	util::Clock m_clock;
 
@@ -57,7 +67,21 @@ protected:
 	/** The currently selected object, or an empty smart pointer */
 	Object m_selectedObject;
 
+	/**
+	 * The vertex buffer contains the vertices, uvs and normals for all
+	 * objects in the simulation. For each object, there are one or more
+	 * sub-buffers that specify the indices of the related data. The first
+	 * three sub-buffers are reserved for small, middle and large dominos.
+	 * All other dominos reference this data in order to save memory on the
+	 * GPU.
+	 */
 	ogl::VertexBuffer m_vertexBuffer;
+
+	/**
+	 * A list of sorted sub-buffers from the vertex buffer. We cannot sort
+	 * the sub-buffers of the VBO directly because the order is important.
+	 */
+	ogl::SubBuffers m_sortedBuffers;
 
 	/**
 	 * Uploads the vertex data of all objects between begin
@@ -69,12 +93,12 @@ protected:
 	void upload(const ObjectList::iterator& begin, const ObjectList::iterator& end);
 
 	/**
-	 * Applies the given material. If it is not available, disable all
-	 * material properties.
+	 * Checks if the given interaction type is activated in any button.
 	 *
-	 * @param material
+	 * @param type An interaction type
+	 * @return     True, if enabled, false otherwise
 	 */
-	void applyMaterial(const std::string& material);
+	bool isActivated(InteractionType type);
 public:
 	/**
 	 * Creates a new instance of the Simulation.
@@ -131,10 +155,10 @@ public:
 	unsigned getObjectCount();
 
 	/** @return The current interaction type */
-	InteractionType getInteractionType();
+	InteractionType getInteractionType(util::Button button);
 
 	/** @param type The new interaction type */
-	void setInteractionType(InteractionType type);
+	void setInteractionType(util::Button button, InteractionType type);
 
 	/**
 	 * Selects the object at the viewport position (x, y). If
@@ -194,6 +218,12 @@ public:
 
 // inline methods
 
+inline Simulation& Simulation::instance()
+{
+	return *s_instance;
+};
+
+
 inline NewtonWorld* Simulation::getWorld() const
 {
 	return m_world;
@@ -234,14 +264,21 @@ inline Object Simulation::getSelectedObject()
 	return m_selectedObject;
 }
 
-inline Simulation::InteractionType Simulation::getInteractionType()
+inline Simulation::InteractionType Simulation::getInteractionType(util::Button button)
 {
-	return m_interactionType;
+	return m_interactionTypes[button];
 }
 
-inline void Simulation::setInteractionType(InteractionType type)
+inline void Simulation::setInteractionType(util::Button button, InteractionType type)
 {
-	m_interactionType = type;
+	m_interactionTypes[button] = type;
+}
+
+inline bool Simulation::isActivated(InteractionType type)
+{
+	return m_interactionTypes[util::LEFT] == type ||
+			m_interactionTypes[util::MIDDLE] == type ||
+			m_interactionTypes[util::RIGHT] == type;
 }
 
 }

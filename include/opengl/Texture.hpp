@@ -122,6 +122,13 @@ void __Texture::stage(GLuint stage)
 	glActiveTexture(stage);
 }
 
+inline
+TextureMgr& TextureMgr::instance()
+{
+	if (!s_instance)
+		s_instance = new TextureMgr();
+	return *s_instance;
+}
 
 }
 
