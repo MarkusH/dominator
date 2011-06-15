@@ -723,6 +723,7 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	// get filename
 	// get originalGeometry (from int)
 	// return ConvexHull(new __ConvexHull(matrix, mass, material, fileName, originalGeometry, freezeState, damping)
+	return ConvexHull();
 }
 
 __ConvexHull::~__ConvexHull()
@@ -987,6 +988,7 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	// get filename
 	// get renderingType (from int)
 	// return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, fileName, renderingType, freezeState, damping)
+	return ConvexAssembly();
 }
 
 __ConvexAssembly::~__ConvexAssembly()

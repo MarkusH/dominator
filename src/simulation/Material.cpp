@@ -43,16 +43,29 @@ Material::Material(const Material& m)
 void Material::load(rapidxml::xml_node<>* const node)
 {
 	using namespace rapidxml;
-	for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
-		std::string attribute = attr->name();
-		if( attribute == "name" )		name = attr->value();
-		if( attribute == "texture" )	texture = attr->value();
-		if( attribute == "shader" )		shader = attr->value();
-		if( attribute == "ambient" )	ambient.assign(attr->value());
-		if( attribute == "diffuse")		diffuse.assign(attr->value());
-		if( attribute == "specular")	specular.assign(attr->value());
-		if( attribute == "shininess")	shininess = atof(attr->value());
-		}
+
+	xml_attribute<> *attr = node->first_attribute();
+	
+	name = attr->value();
+
+	attr = attr->next_attribute();
+	texture = attr->value();
+
+	attr = attr->next_attribute();
+	shader = attr->value();
+
+	attr = attr->next_attribute();
+	ambient.assign(attr->value());
+
+	attr = attr->next_attribute();
+	diffuse.assign(attr->value());
+
+	attr = attr->next_attribute();
+	specular.assign(attr->value());
+	
+	attr = attr->next_attribute();
+	shininess = atof(attr->value());
+
 }
 
 
@@ -133,15 +146,25 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
 	MaterialMgr& m = MaterialMgr::instance();
-	for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
-		std::string attribute = attr->name();
-		if( attribute == "mat0" )			mat0 = m.getID(attr->value());
-		if( attribute == "mat1" )			mat1 = m.getID(attr->value());
-		if( attribute == "elasticity" )		elasticity = atof(attr->value());
-		if( attribute == "staticFriction" )	staticFriction = atof(attr->value());
-		if( attribute == "kineticFriction")	kineticFriction = atof(attr->value());
-		if( attribute == "softness")		softness = atof(attr->value());
-	}
+	
+	xml_attribute<> *attr = node->first_attribute();
+
+	mat0 = m.getID(attr->value());
+
+	attr->next_attribute();
+	mat1 = m.getID(attr->value());
+
+	attr->next_attribute();
+	elasticity = atof(attr->value());
+
+	attr->next_attribute();
+	staticFriction = atof(attr->value());
+
+	attr->next_attribute();
+	kineticFriction = atof(attr->value());
+
+	attr->next_attribute();
+	softness = atof(attr->value());
 
 	if (mat0 > mat1) {
 		int tmp = mat0;

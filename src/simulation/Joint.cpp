@@ -203,6 +203,7 @@ void __BallAndSocket::save(const __BallAndSocket& ball, rapidxml::xml_node<>* si
 BallAndSocket __BallAndSocket::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
 	//TODO this is exactly the same as with the hinge, only the type attribute varies
+	return BallAndSocket();
 }
 
 BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)

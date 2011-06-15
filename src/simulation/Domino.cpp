@@ -45,6 +45,7 @@ Domino __Domino::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
 
+	return Domino();
 	// TODO
 	// load all the stuff
 	// id matrix
