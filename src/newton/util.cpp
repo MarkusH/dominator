@@ -14,6 +14,45 @@
 
 namespace newton {
 
+struct ExplosionData {
+	const NewtonWorld* world;
+	Vec3f position;
+	float strength;
+	float radius;
+};
+
+void explosionCallback(const NewtonBody* body, void* userData)
+{
+	ExplosionData* data = (ExplosionData*)userData;
+	Mat4f matrix;
+	NewtonBodyGetMatrix(body, matrix[0]);
+	const NewtonCollision* collision = NewtonBodyGetCollision(body);
+	Vec3f contact, normal;
+
+	if (NewtonCollisionPointDistance(data->world, &data->position[0], collision, matrix[0], &contact[0], &normal[0], 0)) {
+		float distance = (contact - data->position).lenlen();
+		if (distance <= data->radius) {
+			Vec3f impulse = normal * (-data->strength * (1.0f - distance / data->radius));
+			NewtonBodyAddImpulse(body, &impulse[0], &contact[0]);
+		}
+	}
+}
+
+void applyExplosion(const NewtonWorld* world, const Vec3f& position, float strength, float radius)
+{
+	// an axis-aligned bounding box of the sphere around position with radius
+	Vec3f min = position - Vec3f(radius, radius, radius);
+	Vec3f max = position + Vec3f(radius, radius, radius);
+
+	ExplosionData data;
+	data.position = position;
+	data.strength = strength;
+	data.radius = radius * radius;
+	data.world = world;
+
+	NewtonWorldForEachBodyInAABBDo(world, &min[0], &max[0], explosionCallback, &data);
+}
+
 struct RayCastBodyData {
 	NewtonBody* body;
 	float param;

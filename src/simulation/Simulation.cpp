@@ -645,6 +645,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 
 	if (button == util::RIGHT && m_enabled) {
 		newton::mousePick(m_world, Vec2f(x, y), down);
+		newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
 

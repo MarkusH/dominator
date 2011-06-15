@@ -17,6 +17,16 @@ namespace newton {
 using namespace m3d;
 
 /**
+ * Calculates the forces resulting of the explosion at the given position
+ * with the specified strength. Only bodies in the given radius are affected.
+ *
+ * @param position The position of the explosion
+ * @param strength The strength of the explosion
+ * @param radius   The radius of the explosion
+ */
+void applyExplosion(const NewtonWorld* world, const Vec3f& position, float strength, float radius);
+
+/**
  * Shoots a ray in world from origin in direction dir and returns
  * the first body that was hit. Returns NULL if no body was hit.
  *
