@@ -138,17 +138,17 @@ void Simulation::load(const std::string& fileName)
 		}
 	}
 
+	// load "environment" and create tree collision from it
 	{
 		xml_node<>* node = nodes->first_node("environment");
 		if (node) {
 			m_environment = __TreeCollision::load(node);
-			//TODO dont do this
-			//add(m_environment);
+			((__TreeCollision*)m_environment.get())->createOctree();
 		}
 	}
 
 	// load gravity
-	// load "environment" and create tree collision from it
+
 
 	m_clock.reset();
 }
@@ -179,16 +179,8 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 
 
-	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-
-	//m_environment = TreeCollision(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
-	//add(m_environment);
-	//load("data/levels/level.xml");
-	//save("data/levels/test_level.xml");
-
 	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//((__TreeCollision*)m_environment.get())->createOctree();
-	//add(m_environment);
 
 
 /*
@@ -209,16 +201,17 @@ void Simulation::init()
 	// newtons cradle
 	if (0)
 	{
+		const int radius = 2.0f;
 		RigidBody boxes[5];
 		RigidBody spheres[5];
 
 		Compound c(new __Compound(Mat4f::identity()));//translate(Vec3f(0.0f, 5.0f, -10.0f))));
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "cradle");
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
 		c->add(top);
 
 		for (int x = -2; x <= 2; ++x) {
-			boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
-			spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "cradle");
+			boxes[x + 2] = __Object::createBox(Vec3f(x * radius * 2.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
+			spheres[x + 2] = __Object::createSphere(Vec3f(x * radius * 2.0f, 0.0f, 0.0f), radius, 5.0f, "cradle");
 
 			c->add(boxes[x + 2]);
 			c->add(spheres[x + 2]);
@@ -231,7 +224,7 @@ void Simulation::init()
 		}
 		add(c);
 		//Mat4f::rotY(90.0f * PI / 180.0f) *
-		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 5.0f, -10.0f)));
+		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 2.4f, 100.0f)));
 		//c->convexCastPlacement();
 	}
 
@@ -257,7 +250,7 @@ void Simulation::init()
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 10.0f)));
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 50.0f)));
 		c->convexCastPlacement();
 	}
 
@@ -691,7 +684,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
 				Mat4f matrix(Vec3f::yAxis(), q, p);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0, "domino");
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, "domino");
 				add(domino);
 			}
 		// line
@@ -705,7 +698,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			Mat4f matrix(Vec3f::yAxis(), dir, start);
 			for (float d = 0.0f; d <= len; d += 4.5f) {
 				matrix.setW(start + dir * d);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, "domino");
 				add(domino);
 			}
 		}
@@ -776,7 +769,7 @@ void Simulation::render()
 
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
-	if (*itr) {
+	if (itr != m_sortedBuffers.end()) {
 		material = (*itr)->material;
 	}
 	MaterialMgr& mmgr = MaterialMgr::instance();

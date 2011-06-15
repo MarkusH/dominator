@@ -375,7 +375,9 @@ void __TreeCollision::render()
 
 	glBegin(GL_LINES);
 	if (m_node)
-		std::cout << m_node->drawWireFrame() << " of " << m_nodeCount << std::endl;
+		//std::cout <<
+		m_node->drawWireFrame();
+		//<< " of " << m_nodeCount << std::endl;
 	glEnd();
 
 	if (glIsList(m_list))
