@@ -142,6 +142,8 @@ void Simulation::load(const std::string& fileName)
 		xml_node<>* node = nodes->first_node("environment");
 		if (node) {
 			m_environment = __TreeCollision::load(node);
+			//TODO dont do this
+			//add(m_environment);
 		}
 	}
 
@@ -184,9 +186,9 @@ void Simulation::init()
 	//load("data/levels/level.xml");
 	//save("data/levels/test_level.xml");
 
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
-	((__TreeCollision*)m_environment.get())->createOctree();
-	add(m_environment);
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	//((__TreeCollision*)m_environment.get())->createOctree();
+	//add(m_environment);
 
 
 /*
@@ -299,7 +301,7 @@ void Simulation::init()
 	}
 
 	// wagon with tires and hinges
-	if (1)
+	if (0)
 	{
 		// hinge pinDir is z Axis
 
@@ -800,7 +802,8 @@ void Simulation::render()
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
-	//m_environment->render();
+	if (m_environment)
+		m_environment->render();
 
 	if (m_selectedObject) {
 		Vec3f min, max;

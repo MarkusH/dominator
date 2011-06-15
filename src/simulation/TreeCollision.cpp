@@ -176,17 +176,22 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	NewtonCollision* collision = NewtonCreateTreeCollision(world, defaultMaterial);
 	NewtonTreeCollisionBeginBuild(collision);
 
+	m_list = glGenLists(1);
+	glNewList(m_list, GL_COMPILE);
 	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
 		//data.reserve(data.size() + (mesh->points * (3 + 3 + 2)));
 		//data.resize(data.size() + (mesh->points * (3 + 3 + 2)));
 		int faceMaterial = defaultMaterial;
 		lib3ds_mesh_calculate_normals(mesh, &m_normals[finishedFaces*3]);
+		MaterialMgr::instance().applyMaterial("yellow");
+		glBegin(GL_TRIANGLES);
 		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
 			Lib3dsFace* face = &mesh->faceL[cur_face];
 			for(unsigned int i = 0;i < 3; i++) {
 				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
 				//memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-
+				glNormal3fv(m_normals[finishedFaces*3 + i]);
+				glVertex3fv(m_vertices[finishedFaces*3 + i]);
 				m_data.push_back(mesh->pointL[face->points[i]].pos[0]);
 				m_data.push_back(mesh->pointL[face->points[i]].pos[1]);
 				m_data.push_back(mesh->pointL[face->points[i]].pos[2]);
@@ -196,8 +201,9 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 			NewtonTreeCollisionAddFace(collision, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
 			finishedFaces++;
 		}
+		glEnd();
 	}
-
+	glEndList();
 	lib3ds_file_free(file);
 	NewtonTreeCollisionEndBuild(collision, 1);
 
@@ -371,6 +377,9 @@ void __TreeCollision::render()
 	if (m_node)
 		std::cout << m_node->drawWireFrame() << " of " << m_nodeCount << std::endl;
 	glEnd();
+
+	if (glIsList(m_list))
+		glCallList(m_list);
 }
 
 }
