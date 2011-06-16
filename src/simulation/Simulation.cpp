@@ -568,32 +568,6 @@ void Simulation::mouseMove(int x, int y)
 		} else if (m_interactionTypes[button] == INT_MOVE_GROUND ||
 				m_interactionTypes[button] == INT_MOVE_BILLBOARD ||
 				m_interactionTypes[button] == INT_ROTATE_GROUND) {
-			Vec3f R1, R2, S1, S2;
-			{
-				Vec4<GLint> viewport = Vec4<GLint>::viewport();
-				float _y = viewport.w - y;
-				Mat4d mvmatrix = Mat4d::modelview();
-				Mat4d projmatrix = Mat4d::projection();
-
-				// get new ray
-				double dX, dY, dZ;
-				gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-				gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-
-				// get old ray
-				_y = viewport.w - m_mouseAdapter.getY();
-				gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-				gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-				S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-			}
-
-			// billboard matrix
-			Vec3f look = m_camera.m_position - pos1;
-			Vec3f right = Vec3f::yAxis() % look;
-			Vec3f up = Vec3f::yAxis();
 
 			// bottom plane
 			Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
@@ -604,12 +578,18 @@ void Simulation::mouseMove(int x, int y)
 
 			}
 
+			// billboard plane
 			if (m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
-				// billboard plane
 				p1 = pos1;
 				p2 = pos1 + Vec3f::yAxis();
 				p3 = pos1 + m_camera.m_strafe;
 			}
+
+			// get new and old rays
+			Vec3f R1, R2;
+			Vec3f S1, S2;
+			ogl::getScreenRay(Vec2d(x, y), R1, R2);
+			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2);
 
 			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
 			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
@@ -618,8 +598,9 @@ void Simulation::mouseMove(int x, int y)
 			matrix.setW(matrix.getW() + (pos3 - pos1));
 			m_selectedObject->setMatrix(matrix);
 
-			if (m_interactionTypes[button] == INT_MOVE_GROUND)
+			if (m_interactionTypes[button] == INT_MOVE_GROUND) {
 				m_selectedObject->convexCastPlacement();
+			}
 		} /* end MOVE_GROUND, MOVE_BILLBOARD */
 	} /* end selectedObject && !enabled */
 
