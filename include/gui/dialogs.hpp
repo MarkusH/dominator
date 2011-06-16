@@ -13,6 +13,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QDialogButtonBox>
+#include <QtGui/QMessageBox>
 
 namespace gui {
 
@@ -76,6 +77,17 @@ private:
 	 * internal maximum gravity
 	 */
 	static const float m_rangeHigh = 0.0f;
+};
+
+class MessageDialog: public QMessageBox {
+Q_OBJECT
+public:
+	typedef enum {
+		INFO = 0, /**< displays an "i". */
+		WARNING, /**< displays an "!" */
+		ERROR   /**< displays an "x" */
+	} MessageType;
+	MessageDialog(QString title, QString message, MessageType type = INFO);
 };
 
 }
