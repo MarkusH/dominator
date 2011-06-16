@@ -540,9 +540,8 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		// get the pair for the materials, or the default pair
 		MaterialPair& pair = getPair(mat0, mat1);
 
-		//if (mat0 > 0 && mat1 > 0 && (mat0 < 200 || mat1 < 200))
-		//	if ((fromID(mat0) && fromID(mat0)->name == "wood_matt") || (fromID(mat1) && fromID(mat1)->name == "wood_matt"))
 		//std::cout << "pair " << mat0 << ", " << mat1 << std::endl;
+		//std::cout <<pair.elasticity << std::endl;
 
 		// set the material properties for this contact
 		NewtonMaterialSetContactElasticity(material, pair.elasticity);

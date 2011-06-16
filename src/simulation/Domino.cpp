@@ -222,13 +222,11 @@ Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const 
 	mat.setW(pos);
 
 	// getCollision(type, materialID);
-	NewtonCollision* collision = getCollision(type, materialID);//NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
 
 	Domino result = Domino(new __Domino(type, mat, material));
 	result->create(collision, mass, result->m_freezeState, result->m_damping);
-	//NewtonReleaseCollision(world, collision);
-	//std::cout << NewtonAddCollisionReference(collision) << std::endl;
-	//NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(world, collision);
 
 #endif
 
