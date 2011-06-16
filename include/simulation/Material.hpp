@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <set>
 #include <xml/rapidxml.hpp>
 
 namespace sim {
@@ -120,6 +121,18 @@ public:
 	 */
 	static void destroy();
 
+	/**
+	 * Stores all materials in the given set and returns the number
+	 * of materials stored in it. Usage:
+	 *
+	 * #include <set>
+	 * std::set<std::string> materials;
+	 * MaterialMgr::instance().getMaterials(materials);
+	 *
+	 * @param materials The set in which the materials should be stored
+	 * @return          The number of materials stored in the set
+	 */
+	int getMaterials(std::set<std::string>& materials);
 
 	/**
 	 * Applies the given material. If it is not available, disable all

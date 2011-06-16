@@ -265,6 +265,14 @@ void MaterialMgr::destroy()
 		delete s_instance;
 }
 
+int MaterialMgr::getMaterials(std::set<std::string>& materials)
+{
+	std::map<std::string, Material>::const_iterator itr = m_materials.begin();
+	for ( ; itr != m_materials.end(); ++itr)
+		materials.insert(itr->first);
+	return m_materials.size();
+}
+
 void MaterialMgr::applyMaterial(const std::string& material) {
 	const Material* const _mat = get(material);
 	/// @todo only switch shader/texture if necessary
