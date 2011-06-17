@@ -712,6 +712,12 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		m_selectedObject = selectObject(x, y);
 		if (m_selectedObject == m_environment)
 			m_selectedObject = Object();
+
+		if (m_selectedObject) {
+			//m_selectedObject->genBuffers(m_vertexBuffer);
+			//m_vertexBuffer.upload();
+			m_selectedObject->scale(Vec3f(2.0f, 2.0f, 2.0f));
+		}
 	}
 
 	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
@@ -787,9 +793,7 @@ void Simulation::update()
 		timeSlice += delta * 1000.0f;
 
 		while (timeSlice > 12.0f) {
-			//std::cout << "begin update" << std::endl;
 			NewtonUpdate(m_world, (12.0f / 1000.0f) * 20.0f);
-			//std::cout << "end update" << std::endl;
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
@@ -840,7 +844,7 @@ void Simulation::render()
 		}
 
 		glPushMatrix();
-		glMultMatrixf(obj->getMatrix()[0]);
+		glMultMatrixf(obj->getScaledMatrix()[0]);
 		glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);

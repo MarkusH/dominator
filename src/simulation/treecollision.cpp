@@ -267,7 +267,7 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 {
-	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/hills.3ds"));
+	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/ramps.3ds"));
 	//TODO load matrix and filename and return "real" environment
 	return result;
 }

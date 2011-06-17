@@ -74,6 +74,7 @@ public:
 	const Type& getType() { return m_type; }
 
 	virtual const Mat4f& getMatrix() const = 0;
+	virtual Mat4f getScaledMatrix() const { return getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) = 0;
 
 	int getID() const { return m_id; }
@@ -92,6 +93,8 @@ public:
 	 * @param max The maximum
 	 */
 	virtual void getAABB(Vec3f& min, Vec3f& max) = 0;
+
+	virtual void scale(const Vec3f& scale) { };
 
 	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.
@@ -177,18 +180,23 @@ protected:
 
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
+
+	Vec3f m_scale;
 public:
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
+	virtual Mat4f getScaledMatrix() const { return Mat4f::scale(m_scale) * getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
 	virtual int getFreezeState() { return m_freezeState; }
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
+
+	virtual void scale(const Vec3f& scale);
 
 	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 

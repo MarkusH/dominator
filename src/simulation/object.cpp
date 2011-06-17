@@ -291,17 +291,20 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const std::string& materia
 	: __Object(type), Body(body), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
+	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 __RigidBody::__RigidBody(Type type, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
 	: __Object(type), Body(matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 {
+	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
 	: __Object(type), Body(body, matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
+	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 float __RigidBody::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
@@ -340,6 +343,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
 	// use the respective SERIALIZE_IDs for that, each of the remaining primitives
 	// has radius and height attributes
+	//TODO check if it is a convex hull modifier. if so, extract original collision
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -509,8 +513,32 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	return RigidBody();
 }
 
+void __RigidBody::scale(const Vec3f& scale)
+{
+	m_scale = scale;
+	Mat4f matrix = Mat4f::scale(scale);
+	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+	NewtonCollisionInfoRecord info;
+	NewtonCollisionGetInfo(collision, &info);
+	if (info.m_collisionType == SERIALIZE_ID_CONVEXMODIFIER) {
+		NewtonConvexHullModifierSetMatrix(collision, matrix[0]);
+	} else {
+		const NewtonWorld* world = Simulation::instance().getWorld();
+		NewtonCollision* modifier = NewtonCreateConvexHullModifier(world, collision, NewtonCollisionGetUserID(collision));
+		NewtonBodySetCollision(m_body, modifier);
+		NewtonReleaseCollision(world, modifier);
+		NewtonConvexHullModifierSetMatrix(modifier, matrix[0]);
+
+	}
+}
+
 void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 {
+	// TODO Recreate geometry for an object:
+	// (1) Search for sub-buffers here and get vertexOffset. The number
+	//		of vertices and indices should be the same and the data can
+	//		be replaced. Sub-buffers do not have to be modified.
+
 	// get the offset in floats and vertices
 	const unsigned vertexSize = vbo.floatSize();
 	const unsigned byteSize = vbo.byteSize();
@@ -538,9 +566,30 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 	//NewtonMeshCalculateVertexNormals(collisionMesh, 60.0f * 3.1416f/180.0f);
 
-
 	// allocate the vertex data
-	int vertexCount = NewtonMeshGetPointCount(collisionMesh);
+	unsigned vertexCount = NewtonMeshGetPointCount(collisionMesh);
+
+	ogl::SubBuffers::iterator itr = vbo.m_buffers.begin();
+	for ( ; itr != vbo.m_buffers.end(); ++itr)
+		if (this == (*itr)->object)
+			break;
+
+	if (itr != vbo.m_buffers.end()) {
+		// update data
+		if ((*itr)->dataCount != vertexCount) {
+			std::cerr << "Error: updating geometry failed because vertexCount changed." << std::endl;
+			return;
+		}
+		int offset = (*itr)->dataOffset * vertexSize;
+		NewtonMeshGetVertexStreams(collisionMesh,
+				byteSize, &vbo.m_data[offset + 2 + 3],
+				byteSize, &vbo.m_data[offset + 2],
+				byteSize, &vbo.m_data[offset],
+				byteSize, &vbo.m_data[offset]);
+
+		NewtonMeshDestroy(collisionMesh);
+		return;
+	}
 
 	vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
 	vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
@@ -551,18 +600,10 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 			byteSize, &vbo.m_data[floatOffset],
 			byteSize, &vbo.m_data[floatOffset]);
 
-	//std::cout << "____" << std::endl;
-	//std::cout << vertexCount << std::endl;
-
-
 	// iterate over the submeshes and store the indices
 	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
 	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
 			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
-
-		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
-		//std::cout << "material " << material << std::endl;
-		//std::cout << "mesh " << material << std::endl;
 
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
@@ -574,10 +615,9 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 		// get the indices
 		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-		//std::cout << subBuffer->indexCount << std::endl;
 		uint32_t* indices = new uint32_t[subBuffer->indexCount];
 		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
-//std::cout << "indices " << subBuffer->indexCount << std::endl;
+
 		subBuffer->indexOffset = vbo.m_indices.size();
 
 		// copy the indices to the global list and add the offset
@@ -589,7 +629,6 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		vbo.m_buffers.push_back(subBuffer);
 	}
 	NewtonMeshEndHandle(collisionMesh, meshCookie);
-
 	NewtonMeshDestroy(collisionMesh);
 }
 
