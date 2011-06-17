@@ -8,35 +8,49 @@
 #include <QtGui/QSizePolicy>
 #include <iostream>
 #include <simulation/material.hpp>
+#include <simulation/object.hpp>
 #include <set>
 
 namespace gui {
 
 ToolBox::ToolBox(QWidget *parent)
 {
+	QMenu* menu;
+
 	m_selectedInteraction = sim::Simulation::INT_NONE;
+	m_objectMenu = new QMenu();
+
+	menu = new QMenu("Domino");
+	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL));
+	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE));
+	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE));
+	m_objectMenu->addMenu(menu);
+
+	menu = new QMenu("Primitives");
+	menu->addAction(new QObjectAction("Box", sim::__Object::BOX));
+	menu->addAction(new QObjectAction("Capsule", sim::__Object::CAPSULE));
+	menu->addAction(new QObjectAction("Chamfer Cylinder", sim::__Object::CHAMFER_CYLINER));
+	menu->addAction(new QObjectAction("Cone", sim::__Object::CONE));
+	menu->addAction(new QObjectAction("Cylinder", sim::__Object::CYLINDER));
+	menu->addAction(new QObjectAction("Sphere", sim::__Object::SPHERE));
+	m_objectMenu->addMenu(menu);
+
+	menu = new QMenu("Templates");
+	m_objectMenu->addMenu(menu);
+
+	m_lbMaterials = new QLabel("Material:");
+	m_lbObjects = new QLabel("Object:");
+
+	m_materials = new QComboBox();
+	m_objects = new QPushButton("Add an object");
+	m_objects->setMenu(m_objectMenu);
 
 	setMaximumWidth(250);
 	layout = new QVBoxLayout();
 
-	layout->addWidget(new QLabel("3D objects:"));
-
-	m_objects = new QComboBox();
+	layout->addWidget(m_lbObjects);
 	layout->addWidget(m_objects);
-
-	layout->addWidget(new QLabel("Stones:"));
-
-	m_stones = new QComboBox();
-	layout->addWidget(m_stones);
-
-	layout->addWidget(new QLabel("Templates:"));
-
-	m_templates = new QComboBox();
-	layout->addWidget(m_templates);
-
-	layout->addWidget(new QLabel("Materials:"));
-
-	m_materials = new QComboBox();
+	layout->addWidget(m_lbMaterials);
 	layout->addWidget(m_materials);
 
 	// mouse interaction buttons

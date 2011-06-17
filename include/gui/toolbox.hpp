@@ -14,6 +14,8 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QMenu>
+#include <gui/qutils.hpp>
 #include <simulation/simulation.hpp>
 
 namespace gui {
@@ -41,10 +43,11 @@ public:
 private:
 	QVBoxLayout* layout;
 
-	QComboBox* m_objects;
-	QComboBox* m_stones;
-	QComboBox* m_templates;
 	QComboBox* m_materials;
+	QPushButton* m_objects;
+	QLabel* m_lbMaterials;
+	QLabel* m_lbObjects;
+	QMenu* m_objectMenu;
 
 	/**
 	 * ToolBox::m_mouseinteraction is used for single selections of the toggle buttons
