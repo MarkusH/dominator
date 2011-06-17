@@ -210,7 +210,7 @@ void Camera::apply()
 Vec3f Camera::viewVector() const
 {
 	return (m_eye - m_position).normalized();
-};
+}
 
 Vec3f Camera::pointer() const
 {
@@ -237,6 +237,6 @@ Vec3f Camera::pointer(int x, int y) const
 			&_x, &_y, &_z);
 
 	return Vec3f(_x, _y, _z);
-};
+}
 
 }

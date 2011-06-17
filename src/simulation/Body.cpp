@@ -54,6 +54,9 @@ NewtonBody* Body::create(NewtonCollision* collision, float mass, int freezeState
 	NewtonBodySetMatrix(m_body, this->m_matrix[0]);
 	NewtonConvexCollisionCalculateInertialMatrix(collision, &inertia[0], &origin[0]);
 
+	if (mass < 0.0f)
+		mass = NewtonConvexCollisionCalculateVolume(collision) * 0.5f;
+
 	if (mass != 0.0f)
 		NewtonBodySetMassMatrix(m_body, mass, mass * inertia.x, mass * inertia.y, mass * inertia.z);
 

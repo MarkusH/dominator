@@ -23,6 +23,21 @@ using namespace m3d;
 
 typedef std::list<Object> ObjectList;
 
+/**
+ * An object descriptor that can be used by the GUI to describe
+ * the kind of object the user selected. The create() method will
+ * return a new object of this type.
+ */
+struct ObjectInfo {
+	__Object::Type type;
+	std::string material;
+	std::string fileName;
+	float mass;
+
+	ObjectInfo(__Object::Type type, const std::string& material = "", const std::string& fileName = "");
+	Object create(const Mat4f& matrix) const;
+};
+
 class Simulation : public util::MouseListener {
 public:
 	/**
@@ -34,7 +49,8 @@ public:
 		INT_MOVE_GROUND,	/**< Move the object along the ground and perpendicular to the camera. */
 		INT_MOVE_BILLBOARD,	/**< Move the object along the Y-axis and perpendicular to the camera. */
 		INT_ROTATE_GROUND,  /**< Rotate the object around the Y-axis by moving the mouse along the ground plane */
-		INT_DOMINO_CURVE	/**< Create a domino curve by creating multiple control points */
+		INT_DOMINO_CURVE,	/**< Create a domino curve by creating multiple control points */
+		INT_CREATE_OBJECT
 	} InteractionType;
 private:
 	static Simulation* s_instance;
@@ -188,11 +204,19 @@ public:
 	/**
 	 * Adds the object and assigns the id to it
 	 *
-	 * @param
-	 * @param id
-	 * @return
+	 * @param object The object to add
+	 * @param id     The id of the object
+	 * @return       The id of the object
 	 */
 	int add(const Object& object, int id);
+
+	/**
+	 * Adds a new object that is described by the given info struct.
+	 *
+	 * @param info The object descriptor
+	 * @return     The id of the new object
+	 */
+	int add(const ObjectInfo& info);
 
 	/**
 	 * Removes the object from the simulation.
@@ -221,7 +245,7 @@ public:
 inline Simulation& Simulation::instance()
 {
 	return *s_instance;
-};
+}
 
 
 inline NewtonWorld* Simulation::getWorld() const

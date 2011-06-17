@@ -8,6 +8,9 @@
 
 namespace gui {
 
+const float GravityDialog::m_rangeLow = -100.0f;
+const float GravityDialog::m_rangeHigh = 0.0f;
+
 AboutDialog::AboutDialog(QWidget* parent) :
 	QDialog(parent)
 {

@@ -64,7 +64,7 @@ MouseAdapter::~MouseAdapter()
 void MouseAdapter::addListener(MouseListener* listener)
 {
 	m_listeners.push_back(listener);
-};
+}
 
 void MouseAdapter::removeListener(MouseListener* listener)
 {

@@ -36,18 +36,47 @@ static Vec3f rot_p1, rot_p2, rot_p3;
 static Vec3f curve_current;
 static CRSpline curve_spline;
 
+ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName)
+	: type(type), material(material), fileName(fileName)
+{
+	mass = -1.0f;
+}
+
+Object ObjectInfo::create(const Mat4f& matrix) const
+{
+	Object result;
+	switch (type) {
+	case __Object::DOMINO_SMALL:
+	case __Object::DOMINO_MIDDLE:
+	case __Object::DOMINO_LARGE:
+		result = __Domino::createDomino(type, matrix, mass, material);
+		break;
+	case __Object::BOX:
+		result = __Object::createBox(matrix, 1.0f, 1.0f, 1.0f, mass, material);
+		break;
+	case __Object::SPHERE:
+		result = __Object::createSphere(matrix, 1.0f, mass, material);
+		break;
+	case __Object::COMPOUND:
+		// TODO: create xml document of this->fileName
+		// result = __Object.load(node)
+		break;
+	}
+	return result;
+}
+
 void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 								util::MouseAdapter& mouseAdapter)
 {
 	destroyInstance();
 	s_instance = new Simulation(keyAdapter, mouseAdapter);
-};
+}
 
 void Simulation::destroyInstance()
 {
 	if (s_instance) delete s_instance;
 	s_instance = NULL;
-};
+}
 
 Simulation::Simulation(util::KeyAdapter& keyAdapter,
 						util::MouseAdapter& mouseAdapter)
@@ -56,7 +85,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_nextID(0)
 {
 	m_interactionTypes[util::LEFT] = INT_NONE;
-	m_interactionTypes[util::RIGHT] = INT_ROTATE_GROUND;
+	m_interactionTypes[util::RIGHT] = INT_CREATE_OBJECT;
 	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
 	m_world = NULL;
 	m_enabled = true;
@@ -379,11 +408,22 @@ int Simulation::add(const Object& object)
 
 int Simulation::add(const Object& object, int id)
 {
+	if (!object.get())
+		return -1;
+
 	object->setID(id);
 	ObjectList::iterator begin = m_objects.insert(m_objects.end(), object);
 
 	upload(begin, m_objects.end());
 	return id;
+}
+
+int Simulation::add(const ObjectInfo& info)
+{
+	Mat4f matrix(Vec3f::yAxis(), m_camera.viewVector(), m_pointer);
+	int result = add(info.create(matrix));
+	m_objects.back()->convexCastPlacement();
+	return result;
 }
 
 void Simulation::remove(const Object& object)
@@ -631,6 +671,10 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 		rot_mouse = Vec2i(x, y);
 	}
 
+	if (m_interactionTypes[button] == INT_CREATE_OBJECT && !m_enabled && down) {
+		ObjectInfo info(__Object::BOX, "yellow");
+		add(info);
+	}
 
 	if (m_interactionTypes[button] == INT_DOMINO_CURVE && down && !m_enabled) {
 		curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
@@ -638,7 +682,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 
 	if (button == util::RIGHT && m_enabled) {
 		newton::mousePick(m_world, Vec2f(x, y), down);
-		newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
+		//newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
 

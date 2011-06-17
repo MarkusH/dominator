@@ -114,7 +114,7 @@ void __Texture::unbind()
 {
 	glBindTexture(m_target, 0);
 }
-;
+
 
 inline
 void __Texture::stage(GLuint stage)

@@ -71,12 +71,12 @@ private:
 	 * GravityDialog::m_rangeLow defines the internal representation for the
 	 * internal minimum gravity
 	 */
-	static const float m_rangeLow = -100.0f;
+	static const float m_rangeLow;
 	/**
 	 * GravityDialog::m_rangeHigh defines the internal representation for the
 	 * internal maximum gravity
 	 */
-	static const float m_rangeHigh = 0.0f;
+	static const float m_rangeHigh;
 };
 
 class MessageDialog: public QMessageBox {
