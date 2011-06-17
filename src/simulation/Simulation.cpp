@@ -30,6 +30,7 @@ static Mat4f rot_mat_start;
 static Vec3f rot_drag_start;
 static Vec3f rot_drag_cur;
 static Vec2i rot_mouse;
+static Vec3f rot_p1, rot_p2, rot_p3;
 
 // INT_DOMINO_CURVE
 static Vec3f curve_current;
@@ -55,7 +56,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	  m_nextID(0)
 {
 	m_interactionTypes[util::LEFT] = INT_NONE;
-	m_interactionTypes[util::RIGHT] = INT_MOVE_GROUND;
+	m_interactionTypes[util::RIGHT] = INT_ROTATE_GROUND;
 	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
 	m_world = NULL;
 	m_enabled = true;
@@ -359,6 +360,7 @@ void Simulation::init()
 
 void Simulation::clear()
 {
+	m_sortedBuffers.clear();
 	m_vertexBuffer.flush();
 	m_objects.clear();
 	m_environment = Object();
@@ -574,10 +576,6 @@ void Simulation::mouseMove(int x, int y)
 			Vec3f p2 = pos1 + Vec3f::xAxis();
 			Vec3f p3 = pos1 + Vec3f::zAxis();
 
-			if (m_interactionTypes[button] == INT_ROTATE_GROUND) {
-
-			}
-
 			// billboard plane
 			if (m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
 				p1 = pos1;
@@ -594,9 +592,23 @@ void Simulation::mouseMove(int x, int y)
 			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
 			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
 
-			Mat4f matrix = m_selectedObject->getMatrix();
-			matrix.setW(matrix.getW() + (pos3 - pos1));
-			m_selectedObject->setMatrix(matrix);
+			if (m_interactionTypes[button] == INT_ROTATE_GROUND) {
+				Vec3f com = m_selectedObject->getMatrix().getW();
+				Vec3f axis = (pos1 - com) % (pos3 - com);
+				float factor = axis.y > 0.0f ? -1.0f : 1.0f;
+				float angle = (pos1 - com).normalized() * (pos3 - com).normalized();
+				angle = acos(angle);
+				if (angle == angle) {
+					Mat4f rot = Mat4f::rotAxis(Vec3f::yAxis() * factor, angle);
+					Mat4f matrix = m_selectedObject->getMatrix();
+					matrix = rot * matrix;
+					m_selectedObject->setMatrix(matrix);
+				}
+			} else {
+				Mat4f matrix = m_selectedObject->getMatrix();
+				matrix.setW(matrix.getW() + (pos3 - pos1));
+				m_selectedObject->setMatrix(matrix);
+			}
 
 			if (m_interactionTypes[button] == INT_MOVE_GROUND) {
 				m_selectedObject->convexCastPlacement();
@@ -785,14 +797,14 @@ void Simulation::render()
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
 			if (*itr == m_selectedObject) {
-				//(*itr)->render();
+				(*itr)->render();
 				(*itr)->getAABB(min, max);
 				if (m_camera.testAABB(min, max) == 1)
 					glColor3f(1.0f, 1.0f, 0.0f);
 				else
 					glColor3f(1.0f, 0.0, 0.0f);
 				if (m_camera.checkAABB(min, max)) {
-					//ogl::drawAABB(min, max);
+					ogl::drawAABB(min, max);
 				}
 			}
 		}
