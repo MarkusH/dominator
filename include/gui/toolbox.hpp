@@ -36,14 +36,15 @@ public:
 	 * We overwrite this method to add a widget to the layout from the outside
 	 */
 	void addWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = 0);
+	void loadMaterials(QString filename);
 
 private:
 	QVBoxLayout* layout;
 
-	QComboBox* m_tb3DOjects;
-	QComboBox* m_tbStones;
-	QComboBox* m_tbTemplate;
-	QComboBox* m_tbTexture;
+	QComboBox* m_objects;
+	QComboBox* m_stones;
+	QComboBox* m_templates;
+	QComboBox* m_materials;
 
 	/**
 	 * ToolBox::m_mouseinteraction is used for single selections of the toggle buttons

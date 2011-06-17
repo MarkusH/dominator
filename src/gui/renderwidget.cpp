@@ -40,8 +40,6 @@ void RenderWidget::initializeGL()
 	// load per-pixel lighting shader
 	ogl::ShaderMgr::instance().load("data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
-	sim::MaterialMgr::instance().load("data/materials.xml");
-	sim::MaterialMgr::instance().save("data/materials_test.xml");
 
 	// set some material properties
 	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };

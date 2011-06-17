@@ -7,6 +7,8 @@
 #include <gui/toolbox.hpp>
 #include <QtGui/QSizePolicy>
 #include <iostream>
+#include <simulation/Material.hpp>
+#include <set>
 
 namespace gui {
 
@@ -19,23 +21,23 @@ ToolBox::ToolBox(QWidget *parent)
 
 	layout->addWidget(new QLabel("3D objects:"));
 
-	m_tb3DOjects = new QComboBox();
-	layout->addWidget(m_tb3DOjects);
+	m_objects = new QComboBox();
+	layout->addWidget(m_objects);
 
 	layout->addWidget(new QLabel("Stones:"));
 
-	m_tbStones = new QComboBox();
-	layout->addWidget(m_tbStones);
+	m_stones = new QComboBox();
+	layout->addWidget(m_stones);
 
 	layout->addWidget(new QLabel("Templates:"));
 
-	m_tbTemplate = new QComboBox();
-	layout->addWidget(m_tbTemplate);
+	m_templates = new QComboBox();
+	layout->addWidget(m_templates);
 
-	layout->addWidget(new QLabel("Textures:"));
+	layout->addWidget(new QLabel("Materials:"));
 
-	m_tbTexture = new QComboBox();
-	layout->addWidget(m_tbTexture);
+	m_materials = new QComboBox();
+	layout->addWidget(m_materials);
 
 	// mouse interaction buttons
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -63,6 +65,16 @@ ToolBox::ToolBox(QWidget *parent)
 	layout->addStretch(-1);
 
 	setLayout(layout);
+}
+
+void ToolBox::loadMaterials(QString filename)
+{
+	sim::MaterialMgr::instance().load(filename.toStdString().c_str());
+	std::set<std::string> materials;
+	sim::MaterialMgr::instance().getMaterials(materials);
+	for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
+		m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
+	}
 }
 
 void ToolBox::addWidget(QWidget* widget, int stretch, Qt::Alignment alignment)

@@ -43,6 +43,7 @@ MainWindow::MainWindow(QApplication* app)
 
 	m_toolBox = new ToolBox();
 	m_toolBox->addWidget(m_modifyBox);
+	m_toolBox->loadMaterials("data/materials.xml");
 	app->processEvents();
 
 	m_renderWidget = new RenderWidget(this);
