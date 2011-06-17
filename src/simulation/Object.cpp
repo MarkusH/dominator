@@ -407,7 +407,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	using namespace rapidxml;
 
 	// TODO maybe defaults?
-	int freezeState; Vec4f damping;	// all except dominos use it
+	int freezeState = 0; Vec4f damping(0.1f, 0.1f, 0.1f, 0.1f);	// all except dominos use it
 	float w, h, d;	// box
 	float x, y, z;	// sphere
 	float radius;	// chamfer cylinder, cylinder, cone, capsule
@@ -441,7 +441,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 
 		//attribute freezeState
 		attr = attr->next_attribute();
-		int freezeState = atoi(attr->value());
+		freezeState = atoi(attr->value());
 
 		//attribute damping
 		attr = attr->next_attribute();
@@ -465,7 +465,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 
 		//attribute freezeState
 		attr = attr->next_attribute();
-		int freezeState = atoi(attr->value());
+		freezeState = atoi(attr->value());
 
 		//attribute damping
 		attr = attr->next_attribute();
@@ -485,7 +485,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 
 		//attribute freezeState
 		attr = attr->next_attribute();
-		int freezeState = atoi(attr->value());
+		freezeState = atoi(attr->value());
 
 		//attribute damping
 		attr = attr->next_attribute();
@@ -514,9 +514,9 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
 	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
 	if( type == TypeStr[CHAMFER_CYLINER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material);
-	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material);
-	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material);
+	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material, false);
+	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material, false);
+	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material, false);
 
 	// mass = get mass attribute
 	// material = get material attribute
