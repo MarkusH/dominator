@@ -21,6 +21,10 @@
 
 namespace sim {
 
+/*
+ * only append strings for new Objects in TypeStr!!!
+ * prepending Object strings will break code in __RigidBody::load()
+ */
 const char* __Object::TypeStr[] = {
 	"domino_small",
 	"domino_middle",
@@ -68,7 +72,7 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	case DOMINO_MIDDLE:
 	case DOMINO_LARGE:
 		// create and append object node
-		node = doc->allocate_node(node_element, TypeStr[object.m_type]);
+		node = doc->allocate_node(node_element, "object");
 		parent->insert_node(0, node);
 
 		// create domino attributes
@@ -76,6 +80,11 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		pId = doc->allocate_string(util::toString(object.getID()));
 		attrI = doc->allocate_attribute("id", pId);
 		node->append_attribute(attrI);
+		
+		// set attribute "type"
+		pType = doc->allocate_string(TypeStr[object.m_type]);
+		attrT = doc->allocate_attribute("type", pType);
+		node->append_attribute(attrT);
 
 		// set attribute "matrix"
 		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
@@ -148,9 +157,10 @@ Object __Object::load(rapidxml::xml_node<>* node)
 	//TODO check if it is convex assembly or convex hull and
 	// call their load methods
 	if (std::string(node->name()) == TypeStr[COMPOUND])	return __Compound::load(node);
-	else if (std::string(node->name()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
-	else if (std::string(node->name()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
-	else if (std::string(node->name()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
+	// std::string(node->first_attribute()->next_attribute()->value() gets the second argument
+	//else if (std::string(node->first_attribute()->next_attribute()->value()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
+	//else if (std::string(node->first_attribute()->next_attribute()->value()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
+	//else if (std::string(node->first_attribute()->next_attribute()->value()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
 	else return __RigidBody::load(node);
 }
 
@@ -407,9 +417,11 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	using namespace rapidxml;
 
 	// TODO maybe defaults?
-	float w, h, d; // box
-	float x, y, z; // sphere
-	float radius;  // chamfer cylinder, cylinder, cone, capsule
+	int freezeState; Vec4f damping;	// all except dominos use it
+	float w, h, d;	// box
+	float x, y, z;	// sphere
+	float radius;	// chamfer cylinder, cylinder, cone, capsule
+	Type t; int i;	// domino
 
 	//attribute id is set in __Object::load()
 	xml_attribute<>* attr = node->first_attribute();
@@ -436,6 +448,15 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute depth
 		attr = attr->next_attribute();
 		d = atof(attr->value());
+
+		//attribute freezeState
+		attr = attr->next_attribute();
+		int freezeState = atoi(attr->value());
+
+		//attribute damping
+		attr = attr->next_attribute();
+		Vec4f damping = Vec4f();
+		damping.assign(attr->value());
 	}/* set dimensions for box END */
 
 	/* set dimensions for sphere */
@@ -451,6 +472,15 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute z
 		attr = attr->next_attribute();
 		z = atof(attr->value());
+
+		//attribute freezeState
+		attr = attr->next_attribute();
+		int freezeState = atoi(attr->value());
+
+		//attribute damping
+		attr = attr->next_attribute();
+		Vec4f damping = Vec4f();
+		damping.assign(attr->value());
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder */
@@ -462,18 +492,18 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute radius
 		attr = attr->next_attribute();
 		radius = atof(attr->value());
+
+		//attribute freezeState
+		attr = attr->next_attribute();
+		int freezeState = atoi(attr->value());
+
+		//attribute damping
+		attr = attr->next_attribute();
+		Vec4f damping = Vec4f();
+		damping.assign(attr->value());
 	}/* set dimensions for chamfer cylinder END */
 
 	//TODO load the other primitives here
-
-	//attribute freezeState
-	attr = attr->next_attribute();
-	int freezeState = atoi(attr->value());
-
-	//attribute damping
-	attr = attr->next_attribute();
-	Vec4f damping = Vec4f();
-	damping.assign(attr->value());
 
 	//attribute material
 	attr = attr->next_attribute();
@@ -483,10 +513,20 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
+	// find the Type for the Domino
+	for(i = 0; i < 3; ++i) {
+		if(!strcmp(type.c_str(), TypeStr[i])) {
+			t = (Type) i;
+		}
+	}
+
 	//TODO return the other primitives here
 	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
 	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
 	if( type == TypeStr[CHAMFER_CYLINER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material);
+	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material);
+	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material);
 
 	// mass = get mass attribute
 	// material = get material attribute

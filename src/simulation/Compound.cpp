@@ -97,7 +97,7 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	Compound result = Compound(new __Compound());
 	// load m_matrix
 
-	// type attribute
+	// id attribute
 	xml_attribute<>* attr = nodes->first_attribute();
 
 	// matrix attribute
