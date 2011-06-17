@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger
  */
 
-#include <opengl/Camera.hpp>
+#include <opengl/camera.hpp>
 #include <GL/glew.h>
 
 namespace ogl {

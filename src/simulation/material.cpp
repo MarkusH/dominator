@@ -5,9 +5,9 @@
  *      Author: Markus Doellinger
  */
 
-#include <simulation/Material.hpp>
-#include <opengl/Texture.hpp>
-#include <opengl/Shader.hpp>
+#include <simulation/material.hpp>
+#include <opengl/texture.hpp>
+#include <opengl/shader.hpp>
 #include <GL/glew.h>
 #include <limits.h>
 #ifdef _WIN32
@@ -20,7 +20,7 @@
 #include <xml/rapidxml_print.hpp>
 #include <fstream> // for file I/O
 #include <string.h>
-#include <util/toString.hpp>
+#include <util/tostring.hpp>
 
 namespace sim {
 

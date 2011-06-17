@@ -5,11 +5,11 @@
  *      Author: Markus Doellinger
  */
 
-#include <simulation/Object.hpp>
-#include <simulation/Compound.hpp>
-#include <simulation/Material.hpp>
-#include <simulation/Simulation.hpp>
-#include <simulation/Domino.hpp>
+#include <simulation/object.hpp>
+#include <simulation/compound.hpp>
+#include <simulation/material.hpp>
+#include <simulation/simulation.hpp>
+#include <simulation/domino.hpp>
 #include <newton/util.hpp>
 #include <iostream>
 #include <lib3ds/file.h>
@@ -17,7 +17,7 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
 #include <stdio.h>
-#include <util/toString.hpp>
+#include <util/tostring.hpp>
 
 namespace sim {
 

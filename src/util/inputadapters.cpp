@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger
  */
 
-#include <util/InputAdapters.hpp>
+#include <util/inputadapters.hpp>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>

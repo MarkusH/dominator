@@ -5,8 +5,8 @@
  *      Author: Markus Doellinger
  */
 
-#include <simulation/Body.hpp>
-#include <simulation/Simulation.hpp>
+#include <simulation/body.hpp>
+#include <simulation/simulation.hpp>
 
 namespace sim {
 

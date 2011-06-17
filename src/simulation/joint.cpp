@@ -5,10 +5,10 @@
  *      Author: markus
  */
 
-#include <simulation/Object.hpp>
-#include <simulation/Joint.hpp>
+#include <simulation/object.hpp>
+#include <simulation/joint.hpp>
 #include <iostream>
-#include <util/toString.hpp>
+#include <util/tostring.hpp>
 
 
 namespace sim {

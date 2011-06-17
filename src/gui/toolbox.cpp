@@ -7,7 +7,7 @@
 #include <gui/toolbox.hpp>
 #include <QtGui/QSizePolicy>
 #include <iostream>
-#include <simulation/Material.hpp>
+#include <simulation/material.hpp>
 #include <set>
 
 namespace gui {

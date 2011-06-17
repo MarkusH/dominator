@@ -9,16 +9,16 @@
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
 #include <fstream>
-#include <simulation/Simulation.hpp>
-#include <simulation/Compound.hpp>
-#include <simulation/TreeCollision.hpp>
-#include <simulation/Material.hpp>
-#include <opengl/Texture.hpp>
-#include <opengl/Shader.hpp>
+#include <simulation/simulation.hpp>
+#include <simulation/compound.hpp>
+#include <simulation/treecollision.hpp>
+#include <simulation/material.hpp>
+#include <opengl/texture.hpp>
+#include <opengl/shader.hpp>
 #include <iostream>
 #include <newton/util.hpp>
-#include <simulation/Domino.hpp>
-#include <simulation/CRSpline.hpp>
+#include <simulation/domino.hpp>
+#include <simulation/crspline.hpp>
 #include <opengl/oglutil.hpp>
 
 namespace sim {

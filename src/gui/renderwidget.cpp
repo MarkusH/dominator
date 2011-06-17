@@ -6,15 +6,15 @@
 
 #include <gui/renderwidget.hpp>
 #include <m3d/m3d.hpp>
-#include <util/Clock.hpp>
+#include <util/clock.hpp>
 #include <iostream>
 #include <QtGui/QWidget>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
-#include <simulation/Simulation.hpp>
-#include <opengl/Texture.hpp>
+#include <simulation/simulation.hpp>
+#include <opengl/texture.hpp>
 #include <iostream>
-#include <simulation/Material.hpp>
+#include <simulation/material.hpp>
 
 using namespace m3d;
 

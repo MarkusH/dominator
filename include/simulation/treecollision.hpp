@@ -8,7 +8,7 @@
 #ifndef TREECOLLISION_HPP_
 #define TREECOLLISION_HPP_
 
-#include <simulation/Object.hpp>
+#include <simulation/object.hpp>
 
 namespace sim {
 

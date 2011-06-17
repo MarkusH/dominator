@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger, Robert Waury
  */
 
-#include <opengl/Texture.hpp>
+#include <opengl/texture.hpp>
 #include "stb_image.hpp"
 #ifdef _WIN32
 #define BOOST_FILESYSTEM_VERSION 2

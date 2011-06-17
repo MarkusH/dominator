@@ -14,8 +14,8 @@
 #include <tr1/memory>
 #endif
 #include <string>
-#include <simulation/Body.hpp>
-#include <opengl/VertexBuffer.hpp>
+#include <simulation/body.hpp>
+#include <opengl/vertexbuffer.hpp>
 #include <lib3ds/file.h>
 #include <xml/rapidxml.hpp>
 

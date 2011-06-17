@@ -14,7 +14,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QButtonGroup>
-#include <simulation/Simulation.hpp>
+#include <simulation/simulation.hpp>
 
 namespace gui {
 

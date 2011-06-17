@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger, Robert Waury
  */
 
-#include <util/Clock.hpp>
+#include <util/clock.hpp>
 #ifdef _WIN32
 	#include <windows.h>
 #else

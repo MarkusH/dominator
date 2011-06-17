@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger
  */
 
-#include <opengl/VertexBuffer.hpp>
+#include <opengl/vertexbuffer.hpp>
 
 namespace ogl {
 

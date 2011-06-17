@@ -21,7 +21,7 @@
 #include <gui/dialogs.hpp>
 #include <gui/toolbox.hpp>
 #include <gui/modifybox.hpp>
-#include <simulation/Simulation.hpp>
+#include <simulation/simulation.hpp>
 
 namespace gui {
 

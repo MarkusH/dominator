@@ -8,7 +8,7 @@
 #ifndef DOMINO_HPP_
 #define DOMINO_HPP_
 
-#include <simulation/Object.hpp>
+#include <simulation/object.hpp>
 
 /*
  * Use this to create a convex domino. It is a box shape, where the 4

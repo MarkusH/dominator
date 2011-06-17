@@ -5,10 +5,10 @@
  *      Author: markus
  */
 
-#include <simulation/CRSpline.hpp>
+#include <simulation/crspline.hpp>
 #include <GL/glew.h>
 #include <newton/util.hpp>
-#include <simulation/Simulation.hpp>
+#include <simulation/simulation.hpp>
 
 namespace sim {
 

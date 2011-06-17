@@ -5,11 +5,11 @@
  *      Author: Markus Doellinger
  */
 
-#include <simulation/TreeCollision.hpp>
-#include <simulation/Object.hpp>
-#include <simulation/Compound.hpp>
-#include <simulation/Material.hpp>
-#include <simulation/Simulation.hpp>
+#include <simulation/treecollision.hpp>
+#include <simulation/object.hpp>
+#include <simulation/compound.hpp>
+#include <simulation/material.hpp>
+#include <simulation/simulation.hpp>
 #include <newton/util.hpp>
 #include <iostream>
 #include <lib3ds/file.h>

@@ -5,10 +5,10 @@
  *      Author: markus
  */
 
-#include <simulation/Domino.hpp>
+#include <simulation/domino.hpp>
 #include <newton/util.hpp>
-#include <simulation/Simulation.hpp>
-#include <simulation/Material.hpp>
+#include <simulation/simulation.hpp>
+#include <simulation/material.hpp>
 
 namespace sim {
 

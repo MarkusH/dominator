@@ -11,10 +11,10 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
-#include <opengl/Shader.hpp>
+#include <opengl/shader.hpp>
 #include <m3d/m3d.hpp>
-#include <util/Clock.hpp>
-#include <util/InputAdapters.hpp>
+#include <util/clock.hpp>
+#include <util/inputadapters.hpp>
 #include <QtGui/QWheelEvent>
 
 namespace gui {

@@ -5,7 +5,7 @@
  *      Author: Markus Doellinger, Robert Waury
  */
 
-#include <opengl/Shader.hpp>
+#include <opengl/shader.hpp>
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>

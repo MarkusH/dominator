@@ -9,14 +9,14 @@
 #define COMPOUND_HPP_
 
 #include <m3d/m3d.hpp>
-#include <simulation/Object.hpp>
+#include <simulation/object.hpp>
 #ifdef _WIN32
 #include <boost/tr1/memory.hpp>
 #else
 #include <tr1/memory>
 #endif
 #include <list>
-#include <simulation/Joint.hpp>
+#include <simulation/joint.hpp>
 
 namespace sim {
 

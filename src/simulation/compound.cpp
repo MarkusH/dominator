@@ -5,7 +5,7 @@
  *      Author: markus
  */
 
-#include <simulation/Compound.hpp>
+#include <simulation/compound.hpp>
 
 namespace sim {
 

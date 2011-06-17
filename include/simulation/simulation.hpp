@@ -8,11 +8,11 @@
 #ifndef SIMULATION_HPP_
 #define SIMULATION_HPP_
 
-#include <util/InputAdapters.hpp>
-#include <util/Clock.hpp>
-#include <opengl/Camera.hpp>
-#include <opengl/VertexBuffer.hpp>
-#include <simulation/Object.hpp>
+#include <util/inputadapters.hpp>
+#include <util/clock.hpp>
+#include <opengl/camera.hpp>
+#include <opengl/vertexbuffer.hpp>
+#include <simulation/object.hpp>
 #include <map>
 #include <Newton.h>
 
