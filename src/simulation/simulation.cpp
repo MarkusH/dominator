@@ -57,9 +57,25 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::SPHERE:
 		result = __Object::createSphere(matrix, 1.0f, mass, material);
 		break;
+	case __Object::CYLINDER:
+		result = __Object::createCylinder(matrix, 1.0f, 2.0f, mass, material);
+		break;
+	case __Object::CAPSULE:
+		result = __Object::createCapsule(matrix, 1.0f, 6.0f, mass, material);
+		break;
+	case __Object::CONE:
+		result = __Object::createCone(matrix, 1.0f, 2.0f, mass, material);
+		break;
+	case __Object::CHAMFER_CYLINER:
+		result = __Object::createChamferCylinder(matrix, 5.0f, 1.0f, mass, material);
+		break;
 	case __Object::COMPOUND:
+	case __Object::CONVEX_ASSEMBLY:
+	case __Object::CONVEX_HULL:
 		// TODO: create xml document of this->fileName
 		// result = __Object.load(node)
+		break;
+	default:
 		break;
 	}
 	return result;
@@ -672,7 +688,10 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (m_interactionTypes[button] == INT_CREATE_OBJECT && !m_enabled && down) {
-		ObjectInfo info(__Object::BOX, "yellow");
+		static int tp = 0;
+		ObjectInfo info((__Object::Type)tp++, "yellow");
+		if (tp > __Object::TREE_COLLISION)
+			tp = 0;
 		add(info);
 	}
 

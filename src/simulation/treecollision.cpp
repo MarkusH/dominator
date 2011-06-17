@@ -365,21 +365,14 @@ bool __TreeCollision::contains(const __Object* object)
 
 void __TreeCollision::render()
 {
-	/*
-	if (NewtonBodyGetSleepState(m_body))
-		glColor3f(1.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 0.0f, 0.0f);
-		*/
+/*
 	newton::showCollisionShape(getCollision(), m_matrix);
 
 	glBegin(GL_LINES);
 	if (m_node)
-		//std::cout <<
 		m_node->drawWireFrame();
-		//<< " of " << m_nodeCount << std::endl;
 	glEnd();
-
+*/
 	if (glIsList(m_list))
 		glCallList(m_list);
 }
