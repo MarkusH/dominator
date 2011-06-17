@@ -32,6 +32,7 @@ protected:
 		bool isEmpty();
 		bool inside(uint32_t* i0);
 		int drawWireFrame(bool test = true);
+		int draw(bool test = true);
 	};
 
 	int m_nodeCount;

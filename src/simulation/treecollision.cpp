@@ -17,12 +17,12 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
 
-#define OCTREE_NODE_SIZE 10000
+#define OCTREE_NODE_SIZE 60000
 
 namespace sim {
 
 __TreeCollision::Node::Node(__TreeCollision* tree, Vec3f pos, float size, std::vector<uint32_t>& parentIndices)
-	: tree(tree), pos(pos), size(size)
+	: tree(tree), pos(pos), size(size), list(0)
 {
 	++tree->m_nodeCount;
 	for (unsigned i = 0; i < parentIndices.size(); i += 3) {
@@ -134,6 +134,37 @@ int __TreeCollision::Node::drawWireFrame(bool test) {
 	return result;
 }
 
+int __TreeCollision::Node::draw(bool test) {
+	Vec3f min = pos, max = pos;
+	min -= Vec3f(size, size, size);
+	max += Vec3f(size, size, size);
+	ogl::Camera::Visibility v = ogl::Camera::INSIDE;
+	if (test) {
+		v = Simulation::instance().getCamera().testAABB(min, max);
+		if (v == ogl::Camera::OUTSIDE)
+			return 0;
+	}
+
+	if (list) {
+		glCallList(list);
+		std::cout << "call" << std::endl;
+	} else {
+		list = glGenLists(1);
+		glNewList(list, GL_COMPILE_AND_EXECUTE);
+		glBegin(GL_TRIANGLES);
+		for (unsigned i = 0; i < indices.size(); ++i)
+			glVertex3fv(&tree->m_data[indices[i] * 3]);
+		glEnd();
+		glEndList();
+	}
+
+	int result = 1;
+	for (unsigned i = 0; i < childs.size(); ++i) {
+		result += childs[i]->draw(v == ogl::Camera::INTERSECT);
+	}
+	return result;
+}
+
 __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileName)
 	: __Object(TREE_COLLISION), Body(matrix), m_fileName(fileName), m_nodeCount(0), m_node(NULL)
 {
@@ -236,7 +267,7 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 {
-	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/ramps.3ds"));
+	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/hills.3ds"));
 	//TODO load matrix and filename and return "real" environment
 	return result;
 }
@@ -365,16 +396,23 @@ bool __TreeCollision::contains(const __Object* object)
 
 void __TreeCollision::render()
 {
-/*
-	newton::showCollisionShape(getCollision(), m_matrix);
 
-	glBegin(GL_LINES);
-	if (m_node)
-		m_node->drawWireFrame();
-	glEnd();
-*/
+	//newton::showCollisionShape(getCollision(), m_matrix);
+
+	//glBegin(GL_LINES);
+	//if (m_node)
+	//	m_node->drawWireFrame();
+	//glEnd();
+
+	//MaterialMgr::instance().applyMaterial("yellow");
+
 	if (glIsList(m_list))
 		glCallList(m_list);
+
+
+
+	//if (m_node)
+	//	m_node->draw();
 }
 
 }
