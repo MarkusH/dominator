@@ -71,30 +71,6 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	case DOMINO_SMALL:
 	case DOMINO_MIDDLE:
 	case DOMINO_LARGE:
-		// create and append object node
-		node = doc->allocate_node(node_element, "object");
-		parent->insert_node(0, node);
-
-		// create domino attributes
-		// set attribute "id" to m_id
-		pId = doc->allocate_string(util::toString(object.getID()));
-		attrI = doc->allocate_attribute("id", pId);
-		node->append_attribute(attrI);
-		
-		// set attribute "type"
-		pType = doc->allocate_string(TypeStr[object.m_type]);
-		attrT = doc->allocate_attribute("type", pType);
-		node->append_attribute(attrT);
-
-		// set attribute "matrix"
-		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
-		attrM = doc->allocate_attribute("matrix", pMatrix);
-		node->append_attribute(attrM);
-
-		// load domino data
-		__Domino::save((__Domino&) object, node, doc);
-
-		break;
 	case BOX:
 	case SPHERE:
 	case CYLINDER:
@@ -157,10 +133,6 @@ Object __Object::load(rapidxml::xml_node<>* node)
 	//TODO check if it is convex assembly or convex hull and
 	// call their load methods
 	if (std::string(node->name()) == TypeStr[COMPOUND])	return __Compound::load(node);
-	// std::string(node->first_attribute()->next_attribute()->value() gets the second argument
-	//else if (std::string(node->first_attribute()->next_attribute()->value()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
-	//else if (std::string(node->first_attribute()->next_attribute()->value()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
-	//else if (std::string(node->first_attribute()->next_attribute()->value()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
 	else return __RigidBody::load(node);
 }
 
@@ -328,8 +300,12 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass;
+	char *pMaterial, *pMass;
+	xml_attribute<> *attrMat, *attrMass;
+
+	// dominos don't use these
+	char *pFreezeState, *pDamping;
+	xml_attribute<> *attrFS, *attrDamp;
 
 	// sphere only
 	char *pRadiusX, *pRadiusY, *pRadiusZ;
@@ -364,6 +340,14 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pDepth = doc->allocate_string(util::toString(info.m_box.m_z));
 		attrD = doc->allocate_attribute("depth", pDepth);
 		node->append_attribute(attrD);
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+		// set attribute damping
+		pDamping = doc->allocate_string(util::toString(body.m_damping));
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_SPHERE:
 		// set attribute radius_x
@@ -378,6 +362,14 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pRadiusZ = doc->allocate_string(util::toString(info.m_sphere.m_r2));
 		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
 		node->append_attribute(attrZ);
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+		// set attribute damping
+		pDamping = doc->allocate_string(util::toString(body.m_damping));
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_CHAMFERCYLINDER:
 		// set attribute height
@@ -388,19 +380,17 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pRadius = doc->allocate_string(util::toString(info.m_chamferCylinder.m_r));
 		attrR = doc->allocate_attribute("radius", pRadius);
 		node->append_attribute(attrR);
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+		// set attribute damping
+		pDamping = doc->allocate_string(util::toString(body.m_damping));
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
 		break;
 	}
 
-	// set attribute freezeState
-	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
-	attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-	node->append_attribute(attrFS);
-
-	// set attribute damping
-	pDamping = doc->allocate_string(util::toString(body.m_damping));
-	attrDamp = doc->allocate_attribute("damping", pDamping);
-	node->append_attribute(attrDamp);
-	
 	// set attribute material
 	pMaterial = doc->allocate_string(body.m_material.c_str());
 	attrMat = doc->allocate_attribute("material", pMaterial);

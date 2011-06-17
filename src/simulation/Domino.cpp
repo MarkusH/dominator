@@ -32,26 +32,6 @@ __Domino::~__Domino()
 {
 }
 
-
-void __Domino::save(const __Domino& body, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc)
-{
-	using namespace rapidxml;
-
-	// TODO
-	// save mass, freezestate, damping
-}
-
-Domino __Domino::load(rapidxml::xml_node<>* node)
-{
-	using namespace rapidxml;
-
-	return Domino();
-	// TODO
-	// load all the stuff
-	// id matrix
-	// mass, freezestate, damping
-}
-
 #ifndef CONVEX_DOMINO
 NewtonCollision*  __Domino::getCollision(Type type, int materialID)
 {

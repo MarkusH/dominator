@@ -71,9 +71,6 @@ public:
 	static void freeCollisions();
 #endif
 	static Domino createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material = "");
-
-	static void save(const __Domino& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
-	static Domino load(rapidxml::xml_node<>* node);
 };
 
 }
