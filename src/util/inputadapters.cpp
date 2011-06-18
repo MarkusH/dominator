@@ -9,7 +9,7 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>
-
+#include <iostream>
 //#include <boost/foreach.hpp>
 
 namespace util {
@@ -38,16 +38,17 @@ void QtKeyAdapter::keyEvent(QKeyEvent* event)
 
 	// if the text is empty, it was a special key
 	if (!event->text().isEmpty()) {
-		unsigned char key = event->text().toAscii().at(0);
+		QString text = event->text().toLower();
+		unsigned char key = text.toAscii().at(0);
 		if (event->type() == QEvent::KeyPress)
 			m_pressed.insert(key);
 		else
 		if (event->type() == QEvent::KeyRelease)
 			m_pressed.erase(key);
 	} else {
-		m_alt = event->key() == Qt::Key_Alt;
-		m_ctrl = event->key() == Qt::Key_Control;
-		m_shift = event->key() == Qt::Key_Shift;
+		m_alt = event->key() == Qt::Key_Alt && event->type() == QEvent::KeyPress;
+		m_ctrl = event->key() == Qt::Key_Control && event->type() == QEvent::KeyPress;
+		m_shift = event->key() == Qt::Key_Shift && event->type() == QEvent::KeyPress;
 	}
 }
 
