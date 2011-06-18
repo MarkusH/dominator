@@ -91,7 +91,7 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	case CYLINDER:
 	case CAPSULE:
 	case CONE:
-	case CHAMFER_CYLINER:
+	case CHAMFER_CYLINDER:
 		// create and append object node
 		node = doc->allocate_node(node_element, "object");
 		parent->insert_node(0, node);
@@ -228,7 +228,7 @@ RigidBody __Object::createCylinder(const Vec3f& position, float radius, float he
 
 RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINER, matrix, material, freezeState, damping));
+	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINDER, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
@@ -458,7 +458,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder */
-	if ( type == TypeStr[CHAMFER_CYLINER] ) {
+	if ( type == TypeStr[CHAMFER_CYLINDER] ) {
 		//attribute height
 		attr = attr->next_attribute();
 		h = atof(attr->value());
@@ -490,7 +490,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	//TODO return the other primitives here
 	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
 	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
-	if( type == TypeStr[CHAMFER_CYLINER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CHAMFER_CYLINDER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
 
 	// mass = get mass attribute
 	// material = get material attribute
@@ -513,8 +513,10 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	return RigidBody();
 }
 
-void __RigidBody::scale(const Vec3f& scale)
+bool __RigidBody::scale(const Vec3f& scale)
 {
+	const NewtonWorld* world = Simulation::instance().getWorld();
+	/*
 	m_scale = scale;
 	Mat4f matrix = Mat4f::scale(scale);
 	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
@@ -523,22 +525,63 @@ void __RigidBody::scale(const Vec3f& scale)
 	if (info.m_collisionType == SERIALIZE_ID_CONVEXMODIFIER) {
 		NewtonConvexHullModifierSetMatrix(collision, matrix[0]);
 	} else {
-		const NewtonWorld* world = Simulation::instance().getWorld();
 		NewtonCollision* modifier = NewtonCreateConvexHullModifier(world, collision, NewtonCollisionGetUserID(collision));
 		NewtonBodySetCollision(m_body, modifier);
 		NewtonReleaseCollision(world, modifier);
 		NewtonConvexHullModifierSetMatrix(modifier, matrix[0]);
 
 	}
+	*/
+
+	if (m_type <= DOMINO_LARGE)
+		return false;
+
+	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+	NewtonCollision* scaled = NULL;
+
+	NewtonCollisionInfoRecord info;
+	NewtonCollisionGetInfo(collision, &info);
+	switch (info.m_collisionType) {
+	case SERIALIZE_ID_BOX:
+		scaled = NewtonCreateBox(world, scale.x, scale.y, scale.z, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_SPHERE:
+		scaled = NewtonCreateSphere(world, scale.x, scale.y, scale.z, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CYLINDER:
+		scaled = NewtonCreateCylinder(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CONE:
+		scaled = NewtonCreateCone(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CAPSULE:
+		scaled = NewtonCreateCapsule(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CHAMFERCYLINDER:
+		scaled = NewtonCreateChamferCylinder(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		break;
+	default:
+		return false;
+	}
+	NewtonBodySetCollision(m_body, scaled);
+	Vec3f inertia, origin;
+	float mass;
+	NewtonBodyGetMassMatrix(m_body, &mass, &inertia.x, &inertia.y, &inertia.z);
+	NewtonConvexCollisionCalculateInertialMatrix(scaled, &inertia[0], &origin[0]);
+
+	if (mass != 0.0f) {
+		mass = NewtonConvexCollisionCalculateVolume(scaled) * 0.5f;
+		NewtonBodySetMassMatrix(m_body, mass, mass * inertia.x, mass * inertia.y, mass * inertia.z);
+	}
+
+	NewtonBodySetCentreOfMass(m_body, &origin[0]);
+
+	NewtonReleaseCollision(world, scaled);
+	return true;
 }
 
 void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 {
-	// TODO Recreate geometry for an object:
-	// (1) Search for sub-buffers here and get vertexOffset. The number
-	//		of vertices and indices should be the same and the data can
-	//		be replaced. Sub-buffers do not have to be modified.
-
 	// get the offset in floats and vertices
 	const unsigned vertexSize = vbo.floatSize();
 	const unsigned byteSize = vbo.byteSize();
@@ -555,7 +598,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		NewtonMeshApplySphericalMapping(collisionMesh, 0);
 		break;
 	case CYLINDER:
-	case CHAMFER_CYLINER:
+	case CHAMFER_CYLINDER:
 		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
 		//break;
 	case BOX:
@@ -568,28 +611,6 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 	// allocate the vertex data
 	unsigned vertexCount = NewtonMeshGetPointCount(collisionMesh);
-
-	ogl::SubBuffers::iterator itr = vbo.m_buffers.begin();
-	for ( ; itr != vbo.m_buffers.end(); ++itr)
-		if (this == (*itr)->object)
-			break;
-
-	if (itr != vbo.m_buffers.end()) {
-		// update data
-		if ((*itr)->dataCount != vertexCount) {
-			std::cerr << "Error: updating geometry failed because vertexCount changed." << std::endl;
-			return;
-		}
-		int offset = (*itr)->dataOffset * vertexSize;
-		NewtonMeshGetVertexStreams(collisionMesh,
-				byteSize, &vbo.m_data[offset + 2 + 3],
-				byteSize, &vbo.m_data[offset + 2],
-				byteSize, &vbo.m_data[offset],
-				byteSize, &vbo.m_data[offset]);
-
-		NewtonMeshDestroy(collisionMesh);
-		return;
-	}
 
 	vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
 	vbo.m_data.resize(floatOffset + vertexCount * vertexSize);

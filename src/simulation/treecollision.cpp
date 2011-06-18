@@ -315,7 +315,7 @@ void __TreeCollision::genBuffers(ogl::VertexBuffer& vbo)
 		NewtonMeshApplySphericalMapping(collisionMesh, 0);
 		break;
 	case CYLINDER:
-	case CHAMFER_CYLINER:
+	case CHAMFER_CYLINDER:
 		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
 		//break;
 	case BOX:

@@ -66,7 +66,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::CONE:
 		result = __Object::createCone(matrix, 1.0f, 2.0f, mass, material);
 		break;
-	case __Object::CHAMFER_CYLINER:
+	case __Object::CHAMFER_CYLINDER:
 		result = __Object::createChamferCylinder(matrix, 5.0f, 1.0f, mass, material);
 		break;
 	case __Object::COMPOUND:
@@ -714,9 +714,16 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			m_selectedObject = Object();
 
 		if (m_selectedObject) {
-			//m_selectedObject->genBuffers(m_vertexBuffer);
-			//m_vertexBuffer.upload();
+			// We have to keep a reference of the object in order for it
+			// to remain in memeory
+			Object temp = m_selectedObject;
 			m_selectedObject->scale(Vec3f(2.0f, 2.0f, 2.0f));
+
+			// Remove and add the object because the vertex count may
+			// have changed
+			remove(m_selectedObject);
+			add(temp);
+			m_selectedObject = temp;
 		}
 	}
 
@@ -844,7 +851,7 @@ void Simulation::render()
 		}
 
 		glPushMatrix();
-		glMultMatrixf(obj->getScaledMatrix()[0]);
+		glMultMatrixf(obj->getMatrix()[0]);
 		glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
