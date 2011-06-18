@@ -56,7 +56,7 @@ public:
 		CYLINDER,
 		CAPSULE,
 		CONE,
-		CHAMFER_CYLINER,
+		CHAMFER_CYLINDER,
 		CONVEX_HULL,
 		CONVEX_ASSEMBLY,
 		COMPOUND,
@@ -93,6 +93,20 @@ public:
 	 * @param max The maximum
 	 */
 	virtual void getAABB(Vec3f& min, Vec3f& max) = 0;
+
+	/**
+	 * Scales the object. This does not have any effect on objects besides primitives.
+	 * The scale parameter is used as follows:
+	 *
+	 * BOX:    x = width, y = height, z = depth
+	 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
+	 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
+	 *
+	 * @param scale The new size of the object
+	 * @param add   If True, adds the values of scale to the current size
+	 * @return      True, if the object was scaled, False otherwise
+	 */
+	virtual bool scale(const Vec3f& scale, bool add = false) { return false; };
 
 	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.
@@ -178,6 +192,8 @@ protected:
 
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
+
+	Vec3f m_scale;
 public:
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
@@ -190,6 +206,8 @@ public:
 	virtual int getFreezeState() { return m_freezeState; }
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
+
+	virtual bool scale(const Vec3f& scale, bool add = false);
 
 	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 

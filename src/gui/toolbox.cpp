@@ -29,7 +29,7 @@ ToolBox::ToolBox(QWidget *parent)
 	menu = new QMenu("Primitives");
 	menu->addAction(new QObjectAction("Box", sim::__Object::BOX));
 	menu->addAction(new QObjectAction("Capsule", sim::__Object::CAPSULE));
-	menu->addAction(new QObjectAction("Chamfer Cylinder", sim::__Object::CHAMFER_CYLINER));
+	menu->addAction(new QObjectAction("Chamfer Cylinder", sim::__Object::CHAMFER_CYLINDER));
 	menu->addAction(new QObjectAction("Cone", sim::__Object::CONE));
 	menu->addAction(new QObjectAction("Cylinder", sim::__Object::CYLINDER));
 	menu->addAction(new QObjectAction("Sphere", sim::__Object::SPHERE));

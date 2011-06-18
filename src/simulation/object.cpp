@@ -91,7 +91,7 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	case CYLINDER:
 	case CAPSULE:
 	case CONE:
-	case CHAMFER_CYLINER:
+	case CHAMFER_CYLINDER:
 		// create and append object node
 		node = doc->allocate_node(node_element, "object");
 		parent->insert_node(0, node);
@@ -228,7 +228,7 @@ RigidBody __Object::createCylinder(const Vec3f& position, float radius, float he
 
 RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
-	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINER, matrix, material, freezeState, damping));
+	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINDER, matrix, material, freezeState, damping));
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
@@ -291,17 +291,20 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const std::string& materia
 	: __Object(type), Body(body), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
+	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 __RigidBody::__RigidBody(Type type, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
 	: __Object(type), Body(matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 {
+	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
 	: __Object(type), Body(body, matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
+	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 float __RigidBody::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
@@ -340,6 +343,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
 	// use the respective SERIALIZE_IDs for that, each of the remaining primitives
 	// has radius and height attributes
+	//TODO check if it is a convex hull modifier. if so, extract original collision
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -454,7 +458,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder */
-	if ( type == TypeStr[CHAMFER_CYLINER] ) {
+	if ( type == TypeStr[CHAMFER_CYLINDER] ) {
 		//attribute height
 		attr = attr->next_attribute();
 		h = atof(attr->value());
@@ -486,7 +490,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	//TODO return the other primitives here
 	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
 	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
-	if( type == TypeStr[CHAMFER_CYLINER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CHAMFER_CYLINDER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
 
 	// mass = get mass attribute
 	// material = get material attribute
@@ -509,6 +513,86 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	return RigidBody();
 }
 
+bool __RigidBody::scale(const Vec3f& scale, bool add)
+{
+	const NewtonWorld* world = Simulation::instance().getWorld();
+	if (m_type <= DOMINO_LARGE)
+		return false;
+
+	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+	NewtonCollision* scaled = NULL;
+
+	float x = scale.x;
+	float y = scale.y;
+	float z = scale.z;
+
+	NewtonCollisionInfoRecord info;
+	NewtonCollisionGetInfo(collision, &info);
+	switch (info.m_collisionType) {
+	case SERIALIZE_ID_BOX:
+		if (add) {
+			x += info.m_box.m_x;
+			y += info.m_box.m_y;
+			z += info.m_box.m_z;
+		}
+		scaled = NewtonCreateBox(world, x, y, z, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_SPHERE:
+		if (add) {
+			x += info.m_sphere.m_r0;
+			y += info.m_sphere.m_r1;
+			z += info.m_sphere.m_r2;
+		}
+		scaled = NewtonCreateSphere(world, x, y, z, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CYLINDER:
+		if (add) {
+			x += info.m_cylinder.m_r0;
+			y += info.m_cylinder.m_height;
+		}
+		scaled = NewtonCreateCylinder(world, x, y, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CONE:
+		if (add) {
+			x += info.m_cone.m_r;
+			y += info.m_cone.m_height;
+		}
+		scaled = NewtonCreateCone(world, x, y, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CAPSULE:
+		if (add) {
+			x += info.m_capsule.m_r0;
+			y += info.m_capsule.m_height;
+		}
+		scaled = NewtonCreateCapsule(world, x, y, info.m_collisionUserID, NULL);
+		break;
+	case SERIALIZE_ID_CHAMFERCYLINDER:
+		if (add) {
+			x += info.m_chamferCylinder.m_r;
+			y += info.m_chamferCylinder.m_height;
+		}
+		scaled = NewtonCreateChamferCylinder(world, x, y, info.m_collisionUserID, NULL);
+		break;
+	default:
+		return false;
+	}
+	NewtonBodySetCollision(m_body, scaled);
+	Vec3f inertia, origin;
+	float mass;
+	NewtonBodyGetMassMatrix(m_body, &mass, &inertia.x, &inertia.y, &inertia.z);
+	NewtonConvexCollisionCalculateInertialMatrix(scaled, &inertia[0], &origin[0]);
+
+	if (mass != 0.0f) {
+		mass = NewtonConvexCollisionCalculateVolume(scaled) * 0.5f;
+		NewtonBodySetMassMatrix(m_body, mass, mass * inertia.x, mass * inertia.y, mass * inertia.z);
+	}
+
+	NewtonBodySetCentreOfMass(m_body, &origin[0]);
+
+	NewtonReleaseCollision(world, scaled);
+	return true;
+}
+
 void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 {
 	// get the offset in floats and vertices
@@ -527,7 +611,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		NewtonMeshApplySphericalMapping(collisionMesh, 0);
 		break;
 	case CYLINDER:
-	case CHAMFER_CYLINER:
+	case CHAMFER_CYLINDER:
 		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
 		//break;
 	case BOX:
@@ -538,9 +622,8 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 	//NewtonMeshCalculateVertexNormals(collisionMesh, 60.0f * 3.1416f/180.0f);
 
-
 	// allocate the vertex data
-	int vertexCount = NewtonMeshGetPointCount(collisionMesh);
+	unsigned vertexCount = NewtonMeshGetPointCount(collisionMesh);
 
 	vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
 	vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
@@ -551,18 +634,10 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 			byteSize, &vbo.m_data[floatOffset],
 			byteSize, &vbo.m_data[floatOffset]);
 
-	//std::cout << "____" << std::endl;
-	//std::cout << vertexCount << std::endl;
-
-
 	// iterate over the submeshes and store the indices
 	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
 	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
 			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
-
-		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
-		//std::cout << "material " << material << std::endl;
-		//std::cout << "mesh " << material << std::endl;
 
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
@@ -574,10 +649,9 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 
 		// get the indices
 		subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-		//std::cout << subBuffer->indexCount << std::endl;
 		uint32_t* indices = new uint32_t[subBuffer->indexCount];
 		NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
-//std::cout << "indices " << subBuffer->indexCount << std::endl;
+
 		subBuffer->indexOffset = vbo.m_indices.size();
 
 		// copy the indices to the global list and add the offset
@@ -589,7 +663,6 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		vbo.m_buffers.push_back(subBuffer);
 	}
 	NewtonMeshEndHandle(collisionMesh, meshCookie);
-
 	NewtonMeshDestroy(collisionMesh);
 }
 

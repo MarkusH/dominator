@@ -52,7 +52,7 @@ ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const s
 	case __Object::CAPSULE:
 		size = Vec3f(1.0f, 6.0f, 1.0f);
 		break;
-	case __Object::CHAMFER_CYLINER:
+	case __Object::CHAMFER_CYLINDER:
 		size = Vec3f(5.0f, 1.0f, 1.0f);
 		break;
 	default:
@@ -85,7 +85,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::CONE:
 		result = __Object::createCone(matrix, size.x, size.y, mass, material, freezeState);
 		break;
-	case __Object::CHAMFER_CYLINER:
+	case __Object::CHAMFER_CYLINDER:
 		result = __Object::createChamferCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::COMPOUND:
@@ -585,6 +585,18 @@ void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::ite
 	m_sortedBuffers.sort();
 }
 
+void Simulation::updateObject(const Object& object)
+{
+	// We have to keep a reference of the object in order for it
+	// to remain in memeory
+	bool reselect = m_selectedObject == object;
+	Object temp = object;
+	remove(object);
+	add(temp);
+	if (reselect)
+		m_selectedObject = temp;
+}
+
 Object Simulation::selectObject(int x, int y)
 {
 	m_camera.apply();
@@ -789,9 +801,13 @@ void Simulation::mouseWheel(int delta) {
 	float step = delta / 800.0f;
 
 	if (m_selectedObject && !m_enabled) {
-		Mat4f matrix = m_selectedObject->getMatrix();
-		matrix.setW(matrix.getW() + m_camera.viewVector() * step);
-		m_selectedObject->setMatrix(matrix);
+		Vec3f scale(
+				m_keyAdapter.shift() || m_keyAdapter.alt() ? step * 1.0f : 0.0f,
+				(!m_keyAdapter.shift() && !m_keyAdapter.ctrl()) || m_keyAdapter.alt() ? step * 1.0f : 0.0f,
+				m_keyAdapter.ctrl() || m_keyAdapter.alt() ? step * 1.0f : 0.0f);
+
+		m_selectedObject->scale(scale, true);
+		updateObject(m_selectedObject);
 	} else {
 		m_camera.move(step);
 	}
@@ -808,9 +824,7 @@ void Simulation::update()
 		timeSlice += delta * 1000.0f;
 
 		while (timeSlice > 12.0f) {
-			//std::cout << "begin update" << std::endl;
 			NewtonUpdate(m_world, (12.0f / 1000.0f) * 20.0f);
-			//std::cout << "end update" << std::endl;
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
