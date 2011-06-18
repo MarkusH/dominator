@@ -516,23 +516,6 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 bool __RigidBody::scale(const Vec3f& scale, bool add)
 {
 	const NewtonWorld* world = Simulation::instance().getWorld();
-	/*
-	m_scale = scale;
-	Mat4f matrix = Mat4f::scale(scale);
-	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
-	NewtonCollisionInfoRecord info;
-	NewtonCollisionGetInfo(collision, &info);
-	if (info.m_collisionType == SERIALIZE_ID_CONVEXMODIFIER) {
-		NewtonConvexHullModifierSetMatrix(collision, matrix[0]);
-	} else {
-		NewtonCollision* modifier = NewtonCreateConvexHullModifier(world, collision, NewtonCollisionGetUserID(collision));
-		NewtonBodySetCollision(m_body, modifier);
-		NewtonReleaseCollision(world, modifier);
-		NewtonConvexHullModifierSetMatrix(modifier, matrix[0]);
-
-	}
-	*/
-
 	if (m_type <= DOMINO_LARGE)
 		return false;
 

@@ -23,14 +23,11 @@ void __Joint::save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml:
 {
 	switch (joint.type) {
 	case HINGE:
-	
 		__Hinge::save((const __Hinge&)joint, parent, doc);
 		return;
 	case BALL_AND_SOCKET:
-		// save ball and socket
-		break;
 	case BALL_AND_SOCKET_LIMITED:
-		// save ball and socket
+		__BallAndSocket::save((const __BallAndSocket&)joint, parent, doc);
 		break;
 	}
 }
@@ -39,10 +36,10 @@ Joint __Joint::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
 	//type attribute
 	if( std::string(node->first_attribute()->value()) == "hinge" ) return __Hinge::load(list, node);
-	//TODO make sure a value is always returned
-	// load ballandsocket
-	//Joint result;
-	//return result;
+	if( std::string(node->first_attribute()->value()) == "ballandsocket" ) return __BallAndSocket::load(list, node);
+
+	Joint result;
+	return result;
 }
 
 __Hinge::__Hinge(Vec3f pivot, Vec3f pinDir,

@@ -103,8 +103,9 @@ public:
 	 *
 	 * @param scale The new size of the object
 	 * @param add   If True, adds the values of scale to the current size
+	 * @return      True, if the object was scaled, False otherwise
 	 */
-	virtual bool scale(const Vec3f& scale, bool add = false) { };
+	virtual bool scale(const Vec3f& scale, bool add = false) { return false; };
 
 	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.

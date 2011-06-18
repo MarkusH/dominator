@@ -22,9 +22,9 @@ protected:
 		__TreeCollision* tree;
 		std::vector<Node*> childs;
 		std::vector<uint32_t> indices;
-		GLuint list;
 		Vec3f pos;
 		float size;
+		GLuint list;
 
 		Node(__TreeCollision* tree, Vec3f pos, float size, std::vector<uint32_t>& parentIndices);
 		~Node();
@@ -35,6 +35,7 @@ protected:
 		int draw(bool test = true);
 	};
 
+	std::string m_fileName;
 	int m_nodeCount;
 	Node* m_node;
 	// T2F_N3F_V3F
@@ -46,7 +47,6 @@ protected:
 	Lib3dsVector* m_normals;
 	Lib3dsTexel* m_uvs;
 	GLuint m_list;
-	std::string m_fileName;
 public:
 	__TreeCollision(const Mat4f& matrix, const std::string& fileName);
 	~__TreeCollision();
