@@ -561,6 +561,18 @@ void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::ite
 	m_sortedBuffers.sort();
 }
 
+void Simulation::updateObject(const Object& object)
+{
+	// We have to keep a reference of the object in order for it
+	// to remain in memeory
+	bool reselect = m_selectedObject == object;
+	Object temp = object;
+	remove(object);
+	add(temp);
+	if (reselect)
+		m_selectedObject = temp;
+}
+
 Object Simulation::selectObject(int x, int y)
 {
 	m_camera.apply();
@@ -712,19 +724,6 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		m_selectedObject = selectObject(x, y);
 		if (m_selectedObject == m_environment)
 			m_selectedObject = Object();
-
-		if (m_selectedObject) {
-			// We have to keep a reference of the object in order for it
-			// to remain in memeory
-			Object temp = m_selectedObject;
-			m_selectedObject->scale(Vec3f(2.0f, 2.0f, 2.0f), true);
-
-			// Remove and add the object because the vertex count may
-			// have changed
-			remove(m_selectedObject);
-			add(temp);
-			m_selectedObject = temp;
-		}
 	}
 
 	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
@@ -781,9 +780,13 @@ void Simulation::mouseWheel(int delta) {
 	float step = delta / 800.0f;
 
 	if (m_selectedObject && !m_enabled) {
-		Mat4f matrix = m_selectedObject->getMatrix();
-		matrix.setW(matrix.getW() + m_camera.viewVector() * step);
-		m_selectedObject->setMatrix(matrix);
+		Vec3f scale(
+				m_keyAdapter.shift() || m_keyAdapter.alt() ? step * 1.0f : 0.0f,
+				(!m_keyAdapter.shift() && !m_keyAdapter.ctrl()) || m_keyAdapter.alt() ? step * 1.0f : 0.0f,
+				m_keyAdapter.ctrl() || m_keyAdapter.alt() ? step * 1.0f : 0.0f);
+
+		m_selectedObject->scale(scale, true);
+		updateObject(m_selectedObject);
 	} else {
 		m_camera.move(step);
 	}

@@ -225,6 +225,13 @@ public:
 	 */
 	void remove(const Object& object);
 
+	/**
+	 * Updates the geometry of the object by removing and re-adding it.
+	 *
+	 * @param object The object to update
+	 */
+	void updateObject(const Object& object);
+
 	void save(const std::string& fileName);
 	void load(const std::string& fileName);
 
