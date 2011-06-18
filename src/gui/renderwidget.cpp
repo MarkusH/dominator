@@ -150,15 +150,16 @@ void RenderWidget::mouseDoubleClickEvent(QMouseEvent* event)
 	m_mouseAdapter.mouseEvent(event);
 
 	if (sim::Simulation::instance().getSelectedObject()) {
-		emit objectSelected(true);
-		emit objectSelected(&sim::Simulation::instance().getSelectedObject()->getMatrix());
+		emit objectSelected(sim::Simulation::instance().getSelectedObject());
 	} else {
-		emit objectSelected(false);
+		emit objectSelected();
 	}
 }
 
 void RenderWidget::renderSize(char axis, float size)
 {
+	/// @todo implement scaling of objects
+	/*
 	if (sim::Simulation::instance().getSelectedObject()) {
 		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		m3d::Mat4f helper = m3d::Mat4f::identity();
@@ -176,6 +177,7 @@ void RenderWidget::renderSize(char axis, float size)
 		matrix = helper * matrix;
 		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
+	*/
 }
 
 void RenderWidget::renderLocation(char axis, float position)

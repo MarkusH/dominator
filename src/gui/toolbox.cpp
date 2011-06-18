@@ -5,7 +5,6 @@
  */
 
 #include <gui/toolbox.hpp>
-#include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QSizePolicy>
 #include <simulation/material.hpp>
@@ -17,48 +16,21 @@ namespace gui {
 
 ToolBox::ToolBox(QWidget *parent)
 {
-	QMenu* m_objectMenu = new QMenu();
+	setMaximumWidth(250);
 	m_selectedInteraction = sim::Simulation::INT_NONE;
 
-	QMenu* menu = new QMenu("Domino");
-	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL, true));
-	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE, true));
-	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE, true));
-	m_objectMenu->addMenu(menu);
-
-	menu = new QMenu("Primitives");
-	menu->addAction(new QObjectAction("Box", sim::__Object::BOX));
-	menu->addAction(new QObjectAction("Capsule", sim::__Object::CAPSULE));
-	menu->addAction(new QObjectAction("Chamfer Cylinder", sim::__Object::CHAMFER_CYLINDER));
-	menu->addAction(new QObjectAction("Cone", sim::__Object::CONE));
-	menu->addAction(new QObjectAction("Cylinder", sim::__Object::CYLINDER));
-	menu->addAction(new QObjectAction("Sphere", sim::__Object::SPHERE));
-	m_objectMenu->addMenu(menu);
-
-	menu = new QMenu("Templates");
-	m_objectMenu->addMenu(menu);
-
-	m_objects = new QPushButton("Add an object");
-	m_objects->setMenu(m_objectMenu);
-	connect(m_objectMenu, SIGNAL(triggered(QAction*)), this, SLOT(addObject(QAction*)));
-
-	/* just create the materials combobox. we connect the slot after
-	 * loading the content to prevent crashes due to changed selection list
-	 */
-	m_materials = new QComboBox();
-
-	m_freezeState = new QCheckBox("Freeze");
-	connect(m_freezeState, SIGNAL(stateChanged(int)), this, SLOT(freezeStateChanged(int)));
-
-	m_mass = new QDoubleSpinBox();
-	m_mass->setDecimals(3);
-	m_mass->setRange(0, 1000);
-	m_mass->setSingleStep(1);
-	connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(massChanged(double)));
-
-	setMaximumWidth(250);
 	layout = new QVBoxLayout();
 
+	create_m_objects();
+	create_m_materials();
+	create_m_freezeState();
+	create_m_mass();
+	create_m_buttonbox();
+	create_m_size();
+	create_m_location();
+	create_m_rotation();
+
+	// add all default widgets to the layout
 	layout->addWidget(new QLabel("Object:"));
 	layout->addWidget(m_objects);
 	layout->addWidget(new QLabel("Material:"));
@@ -68,8 +40,185 @@ ToolBox::ToolBox(QWidget *parent)
 	layout->addWidget(new QLabel("Mass:"));
 	layout->addWidget(m_mass);
 
+	layout->addLayout(buttonLayout);
+
+	layout->addStretch(-1);
+
+	setLayout(layout);
+}
+
+bool doUpdate = true;
+
+void ToolBox::create_m_objects()
+{
+	// Create the menu for dominos
+	QMenu* m_objectMenu = new QMenu();
+	QMenu* menu = new QMenu("Domino");
+	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL, true));
+	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE, true));
+	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE, true));
+	m_objectMenu->addMenu(menu);
+
+	// create the menu for primitive objects
+	menu = new QMenu("Primitives");
+	menu->addAction(new QObjectAction("Box", sim::__Object::BOX));
+	menu->addAction(new QObjectAction("Capsule", sim::__Object::CAPSULE));
+	menu->addAction(new QObjectAction("Chamfer Cylinder", sim::__Object::CHAMFER_CYLINDER));
+	menu->addAction(new QObjectAction("Cone", sim::__Object::CONE));
+	menu->addAction(new QObjectAction("Cylinder", sim::__Object::CYLINDER));
+	menu->addAction(new QObjectAction("Sphere", sim::__Object::SPHERE));
+	m_objectMenu->addMenu(menu);
+
+	// create the menu for templates
+	menu = new QMenu("Templates");
+	/// @todo Load templates and add them here
+	m_objectMenu->addMenu(menu);
+
+	m_objects = new QPushButton("Add an object");
+	m_objects->setMenu(m_objectMenu);
+	connect(m_objectMenu, SIGNAL(triggered(QAction*)), this, SLOT(addObject(QAction*)));
+}
+
+void ToolBox::create_m_materials()
+{
+	// just create the materials QComboBox. we connect the slot after loading
+	// the content to prevent crashes due to changed selection list
+	m_materials = new QComboBox();
+}
+
+void ToolBox::create_m_freezeState()
+{
+	// build the QCheckBox for the object's freeze state
+	m_freezeState = new QCheckBox("Freeze");
+	connect(m_freezeState, SIGNAL(stateChanged(int)), this, SLOT(freezeStateChanged(int)));
+}
+
+void ToolBox::create_m_mass()
+{
+	// construct the spin box for the object's mass
+	m_mass = new QDoubleSpinBox();
+	m_mass->setDecimals(3);
+	m_mass->setRange(0, 1000);
+	m_mass->setSingleStep(1);
+	connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(massChanged(double)));
+}
+
+void ToolBox::create_m_size()
+{
+	m_labelSize = new QLabel("Size:");
+
+	m_width = new QDoubleSpinBox();
+	m_width->setDecimals(3);
+	m_width->setRange(0, 100);
+	m_width->setSingleStep(1);
+	connect(m_width, SIGNAL(valueChanged(double)), this, SLOT(updateSize(double)));
+	m_height = new QDoubleSpinBox();
+	m_height->setDecimals(3);
+	m_height->setRange(0, 100);
+	m_height->setSingleStep(1);
+	connect(m_height, SIGNAL(valueChanged(double)), this, SLOT(updateSize(double)));
+	m_depth = new QDoubleSpinBox();
+	m_depth->setDecimals(3);
+	m_depth->setRange(0, 100);
+	m_depth->setSingleStep(1);
+	connect(m_depth, SIGNAL(valueChanged(double)), this, SLOT(updateSize(double)));
+
+	m_modifyWidgetsFull.push_back(m_labelSize);
+	m_modifyWidgetsFull.push_back(m_width);
+	m_modifyWidgetsFull.push_back(m_height);
+	m_modifyWidgetsFull.push_back(m_depth);
+
+	m_modifyWidgets.push_back(m_labelSize);
+	m_modifyWidgets.push_back(m_width);
+	m_modifyWidgets.push_back(m_height);
+}
+
+void ToolBox::create_m_location()
+{
+	m_labelLocation = new QLabel("Location:");
+
+	m_locationX = new QDoubleSpinBox();
+	m_locationX->setDecimals(precision);
+	m_locationX->setRange(-100, 100);
+	m_locationX->setSingleStep(0.1);
+	connect(m_locationX, SIGNAL(valueChanged(double)), this, SLOT(updateLocation(double)));
+
+	m_locationY = new QDoubleSpinBox();
+	m_locationY->setDecimals(precision);
+	m_locationY->setRange(-1000, 1000);
+	m_locationY->setSingleStep(0.1);
+	connect(m_locationY, SIGNAL(valueChanged(double)), this, SLOT(updateLocation(double)));
+
+	m_locationZ = new QDoubleSpinBox();
+	m_locationZ->setDecimals(precision);
+	m_locationZ->setRange(-1000, 1000);
+	m_locationZ->setSingleStep(0.1);
+	connect(m_locationZ, SIGNAL(valueChanged(double)), this, SLOT(updateLocation(double)));
+
+	m_modifyWidgetsFull.push_back(m_labelLocation);
+	m_modifyWidgetsFull.push_back(m_locationX);
+	m_modifyWidgetsFull.push_back(m_locationY);
+	m_modifyWidgetsFull.push_back(m_locationZ);
+
+	m_modifyWidgetsDominos.push_back(m_labelLocation);
+	m_modifyWidgetsDominos.push_back(m_locationX);
+	m_modifyWidgetsDominos.push_back(m_locationY);
+	m_modifyWidgetsDominos.push_back(m_locationZ);
+
+	m_modifyWidgets.push_back(m_labelLocation);
+	m_modifyWidgets.push_back(m_locationX);
+	m_modifyWidgets.push_back(m_locationY);
+	m_modifyWidgets.push_back(m_locationZ);
+}
+
+void ToolBox::create_m_rotation()
+{
+	m_labelRotation = new QLabel("Rotation:");
+
+	m_rotationX = new QDoubleSpinBox();
+	m_rotationX->setDecimals(precision);
+	m_rotationX->setRange(-360, 360);
+	m_rotationX->setSuffix("°");
+	m_rotationX->setSingleStep(0.1);
+	m_rotationX->setWrapping(true);
+	connect(m_rotationX, SIGNAL(valueChanged(double)), this, SLOT(updateRotation(double)));
+
+	m_rotationY = new QDoubleSpinBox();
+	m_rotationY->setDecimals(precision);
+	m_rotationY->setRange(-360, 360);
+	m_rotationY->setSuffix("°");
+	m_rotationY->setSingleStep(0.1);
+	m_rotationY->setWrapping(true);
+	connect(m_rotationY, SIGNAL(valueChanged(double)), this, SLOT(updateRotation(double)));
+
+	m_rotationZ = new QDoubleSpinBox();
+	m_rotationZ->setDecimals(precision);
+	m_rotationZ->setRange(-360, 360);
+	m_rotationZ->setSuffix("°");
+	m_rotationZ->setSingleStep(0.1);
+	m_rotationZ->setWrapping(true);
+	connect(m_rotationZ, SIGNAL(valueChanged(double)), this, SLOT(updateRotation(double)));
+
+	m_modifyWidgetsFull.push_back(m_labelRotation);
+	m_modifyWidgetsFull.push_back(m_rotationX);
+	m_modifyWidgetsFull.push_back(m_rotationY);
+	m_modifyWidgetsFull.push_back(m_rotationZ);
+
+	m_modifyWidgetsDominos.push_back(m_labelRotation);
+	m_modifyWidgetsDominos.push_back(m_rotationX);
+	m_modifyWidgetsDominos.push_back(m_rotationY);
+	m_modifyWidgetsDominos.push_back(m_rotationZ);
+
+	m_modifyWidgets.push_back(m_labelRotation);
+	m_modifyWidgets.push_back(m_rotationX);
+	m_modifyWidgets.push_back(m_rotationY);
+	m_modifyWidgets.push_back(m_rotationZ);
+}
+
+void ToolBox::create_m_buttonbox()
+{
 	// mouse interaction buttons
-	QHBoxLayout* buttonLayout = new QHBoxLayout();
+	buttonLayout = new QHBoxLayout();
 	m_mouseinteraction = new QButtonGroup();
 
 	m_moveH = new QPushButton("Move &Ground");
@@ -89,12 +238,6 @@ ToolBox::ToolBox(QWidget *parent)
 
 	m_mouseinteraction->setParent(this);
 	connect(m_mouseinteraction, SIGNAL(buttonClicked(int)), this, SLOT(onInteractionPressed(int)));
-
-	layout->addLayout(buttonLayout);
-
-	layout->addStretch(-1);
-
-	setLayout(layout);
 }
 
 void ToolBox::loadMaterials(QString filename)
@@ -146,13 +289,109 @@ void ToolBox::materialSelected(int index)
 void ToolBox::freezeStateChanged(int state)
 {
 	std::cout << state << std::endl;
-	sim::Simulation::instance().setNewObjectFreezeState((state == Qt::Checked) ? true: false);
+	sim::Simulation::instance().setNewObjectFreezeState((state == Qt::Checked) ? true : false);
 }
 
 void ToolBox::massChanged(double mass)
 {
 	std::cout << mass << std::endl;
-	sim::Simulation::instance().setNewObjectMass((float)mass);
+	sim::Simulation::instance().setNewObjectMass((float) mass);
+}
+
+void ToolBox::updateSize(double value)
+{
+	if (!doUpdate)
+		return;
+	if (QObject::sender() == m_width) {
+		emit sizeChanged('x', (float) value);
+	} else if (QObject::sender() == m_height) {
+		emit sizeChanged('y', (float) value);
+	} else if (QObject::sender() == m_depth) {
+		emit sizeChanged('z', (float) value);
+	}
+}
+
+void ToolBox::updateLocation(double value)
+{
+	if (!doUpdate)
+		return;
+	if (QObject::sender() == m_locationX) {
+		emit locationChanged('x', (float) value);
+	} else if (QObject::sender() == m_locationY) {
+		emit locationChanged('y', (float) value);
+	} else if (QObject::sender() == m_locationZ) {
+		emit locationChanged('z', (float) value);
+	}
+}
+
+void ToolBox::updateRotation(double value)
+{
+	if (!doUpdate)
+		return;
+	if (QObject::sender() == m_rotationX) {
+		emit rotationChanged(m_rotationX->value(), m_rotationY->value(), m_rotationZ->value());
+	} else if (QObject::sender() == m_rotationY) {
+		emit rotationChanged(m_rotationX->value(), m_rotationY->value(), m_rotationZ->value());
+	} else if (QObject::sender() == m_rotationZ) {
+		emit rotationChanged(m_rotationX->value(), m_rotationY->value(), m_rotationZ->value());
+	}
+}
+
+void ToolBox::updateData(sim::Object object)
+{
+	doUpdate = false;
+
+	const m3d::Mat4f* matrix = &object->getMatrix();
+	if (matrix) {
+		m_width->setValue(matrix->getX().len());
+		m_height->setValue(matrix->getY().len());
+		m_depth->setValue(matrix->getZ().len());
+
+		m_locationX->setValue(matrix->_41);
+		m_locationY->setValue(matrix->_42);
+		m_locationZ->setValue(matrix->_43);
+
+		m_rotationX->setValue(matrix->eulerAngles().x * 180.0f / PI);
+		m_rotationY->setValue(matrix->eulerAngles().y * 180.0f / PI);
+		m_rotationZ->setValue(matrix->eulerAngles().z * 180.0f / PI);
+	}
+
+	if (object->getType() != sim::__Object::NONE) {
+		updateData();
+		int position = layout->indexOf(m_mass) + 1;
+		/**
+		 * BOX: x = width, y = height, z = depth
+		 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
+		 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
+		 */
+		if (object->getType() == sim::__Object::DOMINO_SMALL || object->getType() == sim::__Object::DOMINO_MIDDLE
+				|| object->getType() == sim::__Object::DOMINO_LARGE) {
+			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsDominos.rbegin(); rit != m_modifyWidgetsDominos.rend(); rit++) {
+				layout->insertWidget(position, (QWidget*) *rit);
+			}
+
+		} else if (object->getType() == sim::__Object::BOX || object->getType() == sim::__Object::SPHERE) {
+			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsFull.rbegin(); rit != m_modifyWidgetsFull.rend(); rit++) {
+				layout->insertWidget(position, (QWidget*) *rit);
+			}
+
+		} else if (object->getType() == sim::__Object::CYLINDER || object->getType() == sim::__Object::CONE
+				|| object->getType() == sim::__Object::CAPSULE || object->getType() == sim::__Object::CHAMFER_CYLINDER) {
+			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgets .rbegin(); rit != m_modifyWidgets.rend(); rit++) {
+				layout->insertWidget(position, (QWidget*) *rit);
+			}
+		}
+	}
+	// we may need to set a boolean in this function that temporarily
+	// disables the handling code in the slots above.
+	doUpdate = true;
+}
+
+void ToolBox::updateData()
+{
+	for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsFull.rbegin(); rit != m_modifyWidgetsFull.rend(); rit++) {
+		layout->removeWidget((QWidget*) *rit);
+	}
 }
 
 }

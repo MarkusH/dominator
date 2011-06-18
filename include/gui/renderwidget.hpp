@@ -16,6 +16,7 @@
 #include <util/clock.hpp>
 #include <util/inputadapters.hpp>
 #include <QtGui/QWheelEvent>
+#include <simulation/object.hpp>
 
 namespace gui {
 
@@ -178,15 +179,8 @@ signals:
 	 * objectSelected(m3d::Mat4f) is emitted each time the user has selected
 	 * an object. The signal is connected to ModifyBox::updateData(m3d::Mat4f)
 	 */
-	void objectSelected(const m3d::Mat4f*);
-	/**
-	 * objectSelected(bool) is emitted each time the user has selected
-	 * an object. The signal is connected to ModifyBox::updateData(bool)
-	 *
-	 * @param if the parameter is true, the user selects an object if it is
-	 * false, the user unselects an object
-	 */
-	void objectSelected(bool);
+	void objectSelected(sim::Object);
+	void objectSelected();
 };
 
 }

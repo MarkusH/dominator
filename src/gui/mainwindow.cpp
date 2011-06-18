@@ -37,12 +37,7 @@ MainWindow::MainWindow(QApplication* app)
 	createStatusBar();
 	app->processEvents();
 
-	m_modifyBox = new ModifyBox();
-	m_modifyBox->move(10, 250);
-	app->processEvents();
-
 	m_toolBox = new ToolBox();
-	m_toolBox->addWidget(m_modifyBox);
 	m_toolBox->loadMaterials("data/materials.xml");
 	app->processEvents();
 
@@ -67,12 +62,15 @@ MainWindow::MainWindow(QApplication* app)
 	// connect the newly created widgets with specific slots
 	connect(m_renderWidget, SIGNAL(framesPerSecondChanged(int)), this, SLOT(updateFramesPerSecond(int)));
 	connect(m_renderWidget, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
-	connect(m_renderWidget, SIGNAL(objectSelected(const m3d::Mat4f*)), m_modifyBox, SLOT(updateData(const m3d::Mat4f*)));
-	connect(m_renderWidget, SIGNAL(objectSelected(bool)), m_modifyBox, SLOT(updateData(bool)));
+
+	connect(m_renderWidget, SIGNAL(objectSelected(sim::Object)), m_toolBox, SLOT(updateData(sim::Object)));
+	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(updateData()));
+
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
-	connect(m_modifyBox, SIGNAL(changeSize(char, float)), m_renderWidget, SLOT(renderSize(char, float)));
-	connect(m_modifyBox, SIGNAL(changeLocation(char, float)), m_renderWidget, SLOT(renderLocation(char, float)));
-	connect(m_modifyBox, SIGNAL(changeRotation(float, float, float)), m_renderWidget, SLOT(renderRotation(float, float, float)));
+
+	connect(m_toolBox, SIGNAL(sizeChanged(char, float)), m_renderWidget, SLOT(renderSize(char, float)));
+	connect(m_toolBox, SIGNAL(locationChanged(char, float)), m_renderWidget, SLOT(renderLocation(char, float)));
+	connect(m_toolBox, SIGNAL(rotationChanged(float, float, float)), m_renderWidget, SLOT(renderRotation(float, float, float)));
 
 	showMaximized();
 	splash.finish(this);
@@ -189,7 +187,8 @@ void MainWindow::updateObjectsCount(int count)
 	m_objectsCount->setText(QString("%1").arg(count));
 }
 
-void MainWindow::selectInteraction(sim::Simulation::InteractionType type) {
+void MainWindow::selectInteraction(sim::Simulation::InteractionType type)
+{
 	sim::Simulation::instance().setInteractionType(util::RIGHT, type);
 }
 
