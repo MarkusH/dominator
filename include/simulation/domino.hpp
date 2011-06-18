@@ -60,7 +60,7 @@ protected:
 #endif
 	static Vec3f s_domino_size[3];
 public:
-	__Domino(Type type, const Mat4f& matrix, const std::string& material = "");
+	__Domino(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 1);
 	virtual ~__Domino();
 
 #ifndef CONVEX_DOMINO
@@ -70,7 +70,7 @@ public:
 
 	static void freeCollisions();
 #endif
-	static Domino createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material = "");
+	static Domino createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material = "", int freezeState = 1);
 
 	static void save(const __Domino& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static Domino load(rapidxml::xml_node<>* node);

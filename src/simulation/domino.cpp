@@ -21,8 +21,8 @@ Vec3f __Domino::s_domino_size[3] = { Vec3f(3.0f, 8.0f, 0.5f) * 0.75f, Vec3f(3.0f
 __Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material)
 	: __RigidBody(type, matrix, material, 0, Vec4f(0.4f, 0.4f, 0.4f, 0.4f))
 #else
-__Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material)
-	: __RigidBody(type, matrix, material, 1, Vec4f(0.1f, 0.1f, 0.1f, 0.1f))
+__Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material, int freezeState)
+	: __RigidBody(type, matrix, material, freezeState, Vec4f(0.1f, 0.1f, 0.1f, 0.1f))
 #endif
 {
 
@@ -161,7 +161,7 @@ void __Domino::genDominoBuffers(ogl::VertexBuffer& vbo)
 }
 #endif
 
-Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material)
+Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material, int freezeState)
 {
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	const float VERTICAL_DELTA = 0.0001f;
@@ -224,7 +224,7 @@ Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const 
 	// getCollision(type, materialID);
 	NewtonCollision* collision = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
 
-	Domino result = Domino(new __Domino(type, mat, material));
+	Domino result = Domino(new __Domino(type, mat, material, freezeState));
 	result->create(collision, mass, result->m_freezeState, result->m_damping);
 	NewtonReleaseCollision(world, collision);
 

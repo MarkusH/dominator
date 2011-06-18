@@ -40,6 +40,27 @@ ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const s
 	: type(type), material(material), fileName(fileName)
 {
 	mass = -1.0f;
+	freezeState = false;
+	switch (type) {
+	case __Object::BOX:
+	case __Object::SPHERE:
+		size = Vec3f(1.0f, 1.0f, 1.0f);
+		size = Vec3f(1.0f, 1.0f, 1.0f);
+		break;
+	case __Object::CYLINDER:
+	case __Object::CONE:
+		size = Vec3f(1.0f, 2.0f, 1.0f);
+		break;
+	case __Object::CAPSULE:
+		size = Vec3f(1.0f, 6.0f, 1.0f);
+		break;
+	case __Object::CHAMFER_CYLINER:
+		size = Vec3f(5.0f, 1.0f, 1.0f);
+		break;
+	default:
+		size = Vec3f(1.0f, 1.0f, 1.0f);
+		break;
+	}
 }
 
 Object ObjectInfo::create(const Mat4f& matrix) const
@@ -49,25 +70,25 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::DOMINO_SMALL:
 	case __Object::DOMINO_MIDDLE:
 	case __Object::DOMINO_LARGE:
-		result = __Domino::createDomino(type, matrix, mass, material);
+		result = __Domino::createDomino(type, matrix, mass, material, freezeState);
 		break;
 	case __Object::BOX:
-		result = __Object::createBox(matrix, 1.0f, 1.0f, 1.0f, mass, material);
+		result = __Object::createBox(matrix, size.x, size.y, size.z, mass, material, freezeState);
 		break;
 	case __Object::SPHERE:
-		result = __Object::createSphere(matrix, 1.0f, mass, material);
+		result = __Object::createSphere(matrix, size.x, size.y, size.z, mass, material, freezeState);
 		break;
 	case __Object::CYLINDER:
-		result = __Object::createCylinder(matrix, 1.0f, 2.0f, mass, material);
+		result = __Object::createCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CAPSULE:
-		result = __Object::createCapsule(matrix, 1.0f, 6.0f, mass, material);
+		result = __Object::createCapsule(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CONE:
-		result = __Object::createCone(matrix, 1.0f, 2.0f, mass, material);
+		result = __Object::createCone(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CHAMFER_CYLINER:
-		result = __Object::createChamferCylinder(matrix, 5.0f, 1.0f, mass, material);
+		result = __Object::createChamferCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::COMPOUND:
 	case __Object::CONVEX_ASSEMBLY:

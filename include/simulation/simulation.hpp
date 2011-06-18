@@ -34,6 +34,14 @@ struct ObjectInfo {
 	std::string material;
 	std::string fileName;
 	float mass;
+	int freezeState;
+
+	/**
+	 * BOX: x = width, y = height, z = depth
+	 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
+	 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
+	 */
+	Vec3f size;
 
 	ObjectInfo(__Object::Type type, const std::string& material = "", const std::string& fileName = "");
 	Object create(const Mat4f& matrix) const;
