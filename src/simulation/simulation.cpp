@@ -86,6 +86,9 @@ void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 {
 	destroyInstance();
 	s_instance = new Simulation(keyAdapter, mouseAdapter);
+	s_instance->m_newObjectType = __Object::NONE;
+	s_instance->m_newObjectMaterial = "yellow";
+	s_instance->m_newObjectFilename = "";
 }
 
 void Simulation::destroyInstance()
@@ -225,7 +228,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 
 
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
 
@@ -688,10 +691,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (m_interactionTypes[button] == INT_CREATE_OBJECT && !m_enabled && down) {
-		static int tp = 0;
-		ObjectInfo info((__Object::Type)tp++, "yellow");
-		if (tp > __Object::TREE_COLLISION)
-			tp = 0;
+		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename);
 		add(info);
 	}
 

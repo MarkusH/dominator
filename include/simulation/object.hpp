@@ -60,7 +60,8 @@ public:
 		CONVEX_HULL,
 		CONVEX_ASSEMBLY,
 		COMPOUND,
-		TREE_COLLISION
+		TREE_COLLISION,
+		NONE
 	} Type;
 	static const char* TypeStr[];
 protected:

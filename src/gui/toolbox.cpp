@@ -42,8 +42,10 @@ ToolBox::ToolBox(QWidget *parent)
 	m_lbObjects = new QLabel("Object:");
 
 	m_materials = new QComboBox();
+
 	m_objects = new QPushButton("Add an object");
 	m_objects->setMenu(m_objectMenu);
+	connect(m_objectMenu, SIGNAL(triggered(QAction*)), this, SLOT(addObject(QAction*)));
 
 	setMaximumWidth(250);
 	layout = new QVBoxLayout();
@@ -74,6 +76,7 @@ ToolBox::ToolBox(QWidget *parent)
 
 	m_mouseinteraction->setParent(this);
 	connect(m_mouseinteraction, SIGNAL(buttonClicked(int)), this, SLOT(onInteractionPressed(int)));
+
 	layout->addLayout(buttonLayout);
 
 	layout->addStretch(-1);
@@ -89,6 +92,7 @@ void ToolBox::loadMaterials(QString filename)
 	for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
 		m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
 	}
+	connect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
 }
 
 void ToolBox::addWidget(QWidget* widget, int stretch, Qt::Alignment alignment)
@@ -104,11 +108,23 @@ void ToolBox::onInteractionPressed(int button)
 		m_mouseinteraction->checkedButton()->setChecked(false);
 		m_mouseinteraction->setExclusive(true);
 		m_selectedInteraction = sim::Simulation::INT_NONE;
-		emit interactionSelected(m_selectedInteraction);
+		emit
+		interactionSelected(m_selectedInteraction);
 		return;
 	}
 	m_selectedInteraction = (sim::Simulation::InteractionType) m_mouseinteraction->checkedId();
 	emit interactionSelected(m_selectedInteraction);
+}
+
+void ToolBox::addObject(QAction* action)
+{
+	sim::Simulation::instance().setNewObjectType(((QObjectAction*) action)->getType());
+	m_objects->setText(action->text());
+}
+
+void ToolBox::materialSelected(int index)
+{
+	sim::Simulation::instance().setNewObjectMaterial(m_materials->itemText(index).toStdString());
 }
 
 }

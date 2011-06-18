@@ -22,6 +22,7 @@ public:
 	 *
 	 */
 	QObjectAction(const QString &text, sim::__Object::Type type, QWidget* parent = 0);
+	sim::__Object::Type getType();
 
 private:
 	sim::__Object::Type m_type;
@@ -32,6 +33,11 @@ private slots:
 signals:
 	void triggered(sim::__Object::Type);
 };
+
+inline sim::__Object::Type QObjectAction::getType()
+{
+	return m_type;
+}
 
 }
 #endif /* QUTILSS_HPP_ */

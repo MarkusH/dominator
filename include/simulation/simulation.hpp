@@ -15,6 +15,7 @@
 #include <simulation/object.hpp>
 #include <map>
 #include <Newton.h>
+#include <iostream>
 
 
 namespace sim {
@@ -75,6 +76,9 @@ protected:
 	NewtonWorld* m_world;
 	float m_gravity;
 	bool m_enabled;
+	__Object::Type m_newObjectType;
+	std::string m_newObjectMaterial;
+	std::string m_newObjectFilename;
 
 	int m_nextID;
 	ObjectList m_objects;
@@ -154,6 +158,12 @@ public:
 
 	/** @return True, if the simulation is enabled, false otherwise */
 	bool isEnabled();
+
+	/** @param type Set the type of objects that will be created to type */
+	void setNewObjectType(__Object::Type type);
+
+	void setNewObjectMaterial(const std::string& material);
+	void setNewObjectFilename(const std::string& filename);
 
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;
@@ -271,6 +281,21 @@ inline void Simulation::setEnabled(bool enabled)
 inline bool Simulation::isEnabled()
 {
 	return m_enabled;
+}
+
+inline void Simulation::setNewObjectType(__Object::Type type)
+{
+	m_newObjectType = type;
+}
+
+inline void Simulation::setNewObjectMaterial(const std::string& material)
+{
+	m_newObjectMaterial = material;
+}
+
+inline void Simulation::setNewObjectFilename(const std::string& filename)
+{
+	m_newObjectFilename = filename;
 }
 
 inline ogl::Camera& Simulation::getCamera()

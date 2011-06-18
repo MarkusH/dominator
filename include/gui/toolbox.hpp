@@ -89,6 +89,8 @@ private slots:
 	 * as described at the buttons.
 	 */
 	void onInteractionPressed(int button);
+	void addObject(QAction*);
+	void materialSelected(int index);
 
 signals:
 	/**

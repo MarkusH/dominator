@@ -18,7 +18,6 @@ QObjectAction::QObjectAction(const QString &text, sim::__Object::Type type, QWid
 
 void QObjectAction::sendObjectActionTriggered()
 {
-	std::cout << m_type << std::endl;
 	emit triggered(m_type);
 }
 
