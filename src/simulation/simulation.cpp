@@ -36,11 +36,9 @@ static Vec3f rot_p1, rot_p2, rot_p3;
 static Vec3f curve_current;
 static CRSpline curve_spline;
 
-ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName)
-	: type(type), material(material), fileName(fileName)
+ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState)
+	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState)
 {
-	mass = -1.0f;
-	freezeState = false;
 	switch (type) {
 	case __Object::BOX:
 	case __Object::SPHERE:
@@ -110,6 +108,8 @@ void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 	s_instance->m_newObjectType = __Object::NONE;
 	s_instance->m_newObjectMaterial = "yellow";
 	s_instance->m_newObjectFilename = "";
+	s_instance->m_newObjectMass = -1.0f;
+	s_instance->m_newObjectFreezeState = false;
 }
 
 void Simulation::destroyInstance()
@@ -712,7 +712,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (m_interactionTypes[button] == INT_CREATE_OBJECT && !m_enabled && down) {
-		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename);
+		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename, m_newObjectMass, m_newObjectFreezeState);
 		add(info);
 	}
 

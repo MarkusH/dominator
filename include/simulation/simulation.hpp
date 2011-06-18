@@ -43,7 +43,8 @@ struct ObjectInfo {
 	 */
 	Vec3f size;
 
-	ObjectInfo(__Object::Type type, const std::string& material = "", const std::string& fileName = "");
+	ObjectInfo(__Object::Type type, const std::string& material = "", const std::string& fileName = "",
+			const float mass = -1.0f, const int freezeState = false);
 	Object create(const Mat4f& matrix) const;
 };
 
@@ -87,6 +88,8 @@ protected:
 	__Object::Type m_newObjectType;
 	std::string m_newObjectMaterial;
 	std::string m_newObjectFilename;
+	float m_newObjectMass;
+	int m_newObjectFreezeState;
 
 	int m_nextID;
 	ObjectList m_objects;
@@ -169,9 +172,10 @@ public:
 
 	/** @param type Set the type of objects that will be created to type */
 	void setNewObjectType(__Object::Type type);
-
 	void setNewObjectMaterial(const std::string& material);
 	void setNewObjectFilename(const std::string& filename);
+	void setNewObjectMass(const float mass);
+	void setNewObjectFreezeState(const int freezeState);
 
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;
@@ -304,6 +308,16 @@ inline void Simulation::setNewObjectMaterial(const std::string& material)
 inline void Simulation::setNewObjectFilename(const std::string& filename)
 {
 	m_newObjectFilename = filename;
+}
+
+inline void Simulation::setNewObjectMass(const float mass)
+{
+	m_newObjectMass = mass;
+}
+
+inline void Simulation::setNewObjectFreezeState(const int freezeState)
+{
+	m_newObjectFreezeState = freezeState;
 }
 
 inline ogl::Camera& Simulation::getCamera()

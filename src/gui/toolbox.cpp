@@ -5,22 +5,22 @@
  */
 
 #include <gui/toolbox.hpp>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
 #include <QtGui/QSizePolicy>
-#include <iostream>
 #include <simulation/material.hpp>
 #include <simulation/object.hpp>
+#include <iostream>
 #include <set>
 
 namespace gui {
 
 ToolBox::ToolBox(QWidget *parent)
 {
-	QMenu* menu;
-
+	QMenu* m_objectMenu = new QMenu();
 	m_selectedInteraction = sim::Simulation::INT_NONE;
-	m_objectMenu = new QMenu();
 
-	menu = new QMenu("Domino");
+	QMenu* menu = new QMenu("Domino");
 	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL));
 	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE));
 	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE));
@@ -38,22 +38,35 @@ ToolBox::ToolBox(QWidget *parent)
 	menu = new QMenu("Templates");
 	m_objectMenu->addMenu(menu);
 
-	m_lbMaterials = new QLabel("Material:");
-	m_lbObjects = new QLabel("Object:");
-
-	m_materials = new QComboBox();
-
 	m_objects = new QPushButton("Add an object");
 	m_objects->setMenu(m_objectMenu);
 	connect(m_objectMenu, SIGNAL(triggered(QAction*)), this, SLOT(addObject(QAction*)));
 
+	/* just create the materials combobox. we connect the slot after
+	 * loading the content to prevent crashes due to changed selection list
+	 */
+	m_materials = new QComboBox();
+
+	m_freezeState = new QCheckBox("Freeze");
+	connect(m_freezeState, SIGNAL(stateChanged(int)), this, SLOT(freezeStateChanged(int)));
+
+	m_mass = new QDoubleSpinBox();
+	m_mass->setDecimals(3);
+	m_mass->setRange(0, 1000);
+	m_mass->setSingleStep(1);
+	connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(massChanged(double)));
+
 	setMaximumWidth(250);
 	layout = new QVBoxLayout();
 
-	layout->addWidget(m_lbObjects);
+	layout->addWidget(new QLabel("Object:"));
 	layout->addWidget(m_objects);
-	layout->addWidget(m_lbMaterials);
+	layout->addWidget(new QLabel("Material:"));
 	layout->addWidget(m_materials);
+	layout->addWidget(new QLabel("Freeze State:"));
+	layout->addWidget(m_freezeState);
+	layout->addWidget(new QLabel("Mass:"));
+	layout->addWidget(m_mass);
 
 	// mouse interaction buttons
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -125,6 +138,18 @@ void ToolBox::addObject(QAction* action)
 void ToolBox::materialSelected(int index)
 {
 	sim::Simulation::instance().setNewObjectMaterial(m_materials->itemText(index).toStdString());
+}
+
+void ToolBox::freezeStateChanged(int state)
+{
+	std::cout << state << std::endl;
+	sim::Simulation::instance().setNewObjectFreezeState((state == Qt::Checked) ? true: false);
+}
+
+void ToolBox::massChanged(double mass)
+{
+	std::cout << mass << std::endl;
+	sim::Simulation::instance().setNewObjectMass((float)mass);
 }
 
 }

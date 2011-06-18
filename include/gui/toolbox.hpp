@@ -7,14 +7,14 @@
 #ifndef TOOLBOX_HPP_
 #define TOOLBOX_HPP_
 
-#include <QtGui/QWidget>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QComboBox>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
 #include <QtGui/QButtonGroup>
-#include <QtGui/QMenu>
+#include <QtGui/QCheckBox>
+#include <QtGui/QComboBox>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QPushButton>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QWidget>
 #include <gui/qutils.hpp>
 #include <simulation/simulation.hpp>
 
@@ -45,9 +45,8 @@ private:
 
 	QComboBox* m_materials;
 	QPushButton* m_objects;
-	QLabel* m_lbMaterials;
-	QLabel* m_lbObjects;
-	QMenu* m_objectMenu;
+	QCheckBox* m_freezeState;
+	QDoubleSpinBox* m_mass;
 
 	/**
 	 * ToolBox::m_mouseinteraction is used for single selections of the toggle buttons
@@ -91,6 +90,8 @@ private slots:
 	void onInteractionPressed(int button);
 	void addObject(QAction*);
 	void materialSelected(int index);
+	void freezeStateChanged(int state);
+	void massChanged(double mass);
 
 signals:
 	/**
