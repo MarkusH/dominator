@@ -21,9 +21,9 @@ ToolBox::ToolBox(QWidget *parent)
 	m_selectedInteraction = sim::Simulation::INT_NONE;
 
 	QMenu* menu = new QMenu("Domino");
-	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL));
-	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE));
-	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE));
+	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL, true));
+	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE, true));
+	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE, true));
 	m_objectMenu->addMenu(menu);
 
 	menu = new QMenu("Primitives");
@@ -131,8 +131,11 @@ void ToolBox::onInteractionPressed(int button)
 
 void ToolBox::addObject(QAction* action)
 {
-	sim::Simulation::instance().setNewObjectType(((QObjectAction*) action)->getType());
-	m_objects->setText(action->text());
+	QObjectAction* a = (QObjectAction*) action;
+	sim::Simulation::instance().setNewObjectType(a->getType());
+	m_objects->setText(a->text());
+	m_mass->setValue(a->getMass());
+	m_freezeState->setCheckState((a->getFreezeState()) ? Qt::Checked : Qt::Unchecked);
 }
 
 void ToolBox::materialSelected(int index)
