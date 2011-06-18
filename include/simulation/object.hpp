@@ -102,8 +102,9 @@ public:
 	 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
 	 *
 	 * @param scale The new size of the object
+	 * @param add   If True, adds the values of scale to the current size
 	 */
-	virtual bool scale(const Vec3f& scale) { };
+	virtual bool scale(const Vec3f& scale, bool add = false) { };
 
 	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.
@@ -204,7 +205,7 @@ public:
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
 
-	virtual bool scale(const Vec3f& scale);
+	virtual bool scale(const Vec3f& scale, bool add = false);
 
 	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 

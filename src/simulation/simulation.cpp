@@ -717,7 +717,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			// We have to keep a reference of the object in order for it
 			// to remain in memeory
 			Object temp = m_selectedObject;
-			m_selectedObject->scale(Vec3f(2.0f, 2.0f, 2.0f));
+			m_selectedObject->scale(Vec3f(2.0f, 2.0f, 2.0f), true);
 
 			// Remove and add the object because the vertex count may
 			// have changed

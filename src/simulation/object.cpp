@@ -513,7 +513,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	return RigidBody();
 }
 
-bool __RigidBody::scale(const Vec3f& scale)
+bool __RigidBody::scale(const Vec3f& scale, bool add)
 {
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	/*
@@ -539,26 +539,56 @@ bool __RigidBody::scale(const Vec3f& scale)
 	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
 	NewtonCollision* scaled = NULL;
 
+	float x = scale.x;
+	float y = scale.y;
+	float z = scale.z;
+
 	NewtonCollisionInfoRecord info;
 	NewtonCollisionGetInfo(collision, &info);
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
-		scaled = NewtonCreateBox(world, scale.x, scale.y, scale.z, info.m_collisionUserID, NULL);
+		if (add) {
+			x += info.m_box.m_x;
+			y += info.m_box.m_y;
+			z += info.m_box.m_z;
+		}
+		scaled = NewtonCreateBox(world, x, y, z, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_SPHERE:
-		scaled = NewtonCreateSphere(world, scale.x, scale.y, scale.z, info.m_collisionUserID, NULL);
+		if (add) {
+			x += info.m_sphere.m_r0;
+			y += info.m_sphere.m_r1;
+			z += info.m_sphere.m_r2;
+		}
+		scaled = NewtonCreateSphere(world, x, y, z, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CYLINDER:
-		scaled = NewtonCreateCylinder(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		if (add) {
+			x += info.m_cylinder.m_r0;
+			y += info.m_cylinder.m_height;
+		}
+		scaled = NewtonCreateCylinder(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CONE:
-		scaled = NewtonCreateCone(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		if (add) {
+			x += info.m_cone.m_r;
+			y += info.m_cone.m_height;
+		}
+		scaled = NewtonCreateCone(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CAPSULE:
-		scaled = NewtonCreateCapsule(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		if (add) {
+			x += info.m_capsule.m_r0;
+			y += info.m_capsule.m_height;
+		}
+		scaled = NewtonCreateCapsule(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CHAMFERCYLINDER:
-		scaled = NewtonCreateChamferCylinder(world, scale.x, scale.y, info.m_collisionUserID, NULL);
+		if (add) {
+			x += info.m_chamferCylinder.m_r;
+			y += info.m_chamferCylinder.m_height;
+		}
+		scaled = NewtonCreateChamferCylinder(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	default:
 		return false;
