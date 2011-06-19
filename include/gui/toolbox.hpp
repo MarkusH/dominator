@@ -40,6 +40,7 @@ public:
 	 */
 	void addWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = 0);
 	void loadMaterials(QString filename);
+	void updateMaterials(QString filename = "");
 
 public slots:
 	/**

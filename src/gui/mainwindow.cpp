@@ -44,6 +44,9 @@ MainWindow::MainWindow(QApplication* app)
 	m_renderWidget = new RenderWidget(this);
 	m_renderWidget->setMinimumWidth(400);
 	m_renderWidget->show();
+	app->processEvents();
+
+	m_toolBox->updateMaterials();
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);

@@ -251,6 +251,20 @@ void ToolBox::loadMaterials(QString filename)
 	connect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
 }
 
+void ToolBox::updateMaterials(QString filename)
+{
+	if (filename != "") {
+		sim::MaterialMgr::instance().load(filename.toStdString().c_str());
+		std::set<std::string> materials;
+		sim::MaterialMgr::instance().getMaterials(materials);
+		m_materials->clear();
+		for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
+			m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
+		}
+	}
+	materialSelected(0);
+}
+
 void ToolBox::addWidget(QWidget* widget, int stretch, Qt::Alignment alignment)
 {
 	layout->addWidget(widget, stretch, alignment);
@@ -264,8 +278,7 @@ void ToolBox::onInteractionPressed(int button)
 		m_mouseinteraction->checkedButton()->setChecked(false);
 		m_mouseinteraction->setExclusive(true);
 		m_selectedInteraction = sim::Simulation::INT_NONE;
-		emit
-		interactionSelected(m_selectedInteraction);
+		emit interactionSelected(m_selectedInteraction);
 		return;
 	}
 	m_selectedInteraction = (sim::Simulation::InteractionType) m_mouseinteraction->checkedId();
@@ -279,6 +292,7 @@ void ToolBox::addObject(QAction* action)
 	m_objects->setText(a->text());
 	m_mass->setValue(a->getMass());
 	m_freezeState->setCheckState((a->getFreezeState()) ? Qt::Checked : Qt::Unchecked);
+
 }
 
 void ToolBox::materialSelected(int index)
@@ -391,10 +405,6 @@ void ToolBox::updateData(sim::Object object)
 
 	const m3d::Mat4f* matrix = &object->getMatrix();
 	if (matrix) {
-		m_width->setValue(matrix->getX().len());
-		m_height->setValue(matrix->getY().len());
-		m_depth->setValue(matrix->getZ().len());
-
 		m_locationX->setValue(matrix->_41);
 		m_locationY->setValue(matrix->_42);
 		m_locationZ->setValue(matrix->_43);
@@ -407,6 +417,9 @@ void ToolBox::updateData(sim::Object object)
 	if (object->getType() != sim::__Object::NONE) {
 		int position = layout->indexOf(m_mass) + 1;
 
+		m_width->setValue(object->getSize().x);
+		m_height->setValue(object->getSize().y);
+		m_depth->setValue(object->getSize().z);
 
 		m_materials->setCurrentIndex(m_materials->findText(QString::fromStdString(object->getMaterial()), Qt::MatchExactly | Qt::MatchCaseSensitive));
 		m_freezeState->setChecked(object->getFreezeState());
