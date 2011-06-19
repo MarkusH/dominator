@@ -68,10 +68,6 @@ MainWindow::MainWindow(QApplication* app)
 
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
 
-	connect(m_toolBox, SIGNAL(sizeChanged(char, float)), m_renderWidget, SLOT(renderSize(char, float)));
-	connect(m_toolBox, SIGNAL(locationChanged(char, float)), m_renderWidget, SLOT(renderLocation(char, float)));
-	connect(m_toolBox, SIGNAL(rotationChanged(float, float, float)), m_renderWidget, SLOT(renderRotation(float, float, float)));
-
 	showMaximized();
 	splash.finish(this);
 }

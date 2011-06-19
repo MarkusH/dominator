@@ -195,21 +195,6 @@ signals:
 	 * ToolBox::onInteractionPressed(int)
 	 */
 	void interactionSelected(sim::Simulation::InteractionType);
-	/**
-	 * Invoked by ToolBox::signalSize(double) and connected to
-	 * RenderWidget::renderSize(char, float)
-	 */
-	void sizeChanged(char, float);
-	/**
-	 * Invoked by ToolBox::signalLocation(double) and connected to
-	 * RenderWidget::renderLocation(char, float)
-	 */
-	void locationChanged(char, float);
-	/**
-	 * Invoked by ToolBox::signalRotation(double) and connected to
-	 * RenderWidget::renderRotation(float, float, float)
-	 */
-	void rotationChanged(float, float, float);
 };
 
 }

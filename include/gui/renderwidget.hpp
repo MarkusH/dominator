@@ -34,37 +34,6 @@ public:
 	 */
 	RenderWidget(QWidget* parent = 0);
 
-public slots:
-	/**
-	 * The slot function RenderWidget::renderSize will set the size of the
-	 * currently selected object regarding to the parameters <i>axis</i>
-	 * and <i>size</i>
-	 *
-	 * @param axis A character - <i>x</i>, <i>y</i> or <i>z</i>
-	 * @param size The new size of the object regarding to the given <i>axis</i>
-	 */
-	void renderSize(char axis, float size);
-	/**
-	 * The slot function RenderWidget::renderLocation will set the position
-	 * of the currently selected object regarding to the parameters <i>axis</i>
-	 * and <i>position</i>
-	 *
-	 * @param axis A character - <i>x</i>, <i>y</i> or <i>z</i>
-	 * @param position Set the <i>axis</i>-position of the object to the given
-	 * 		  value
-	 */
-	void renderLocation(char axis, float position);
-	/**
-	 * The slot function RenderWidget::renderRotation will set the size of the
-	 * currently selected object regarding to the parameters <i>x</i>, <i>y</i>
-	 * and <i>z</i>
-	 *
-	 * @param x	Rotate the object around the x axis with the given degrees
-	 * @param y	Rotate the object around the y axis with the given degrees
-	 * @param z	Rotate the object around the z axis with the given degrees
-	 */
-	void renderRotation(float x, float y, float z);
-
 protected:
 	/**
 	 * Within the RenderWidget::initializeGL function we initialize some

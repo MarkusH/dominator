@@ -283,18 +283,25 @@ void ToolBox::addObject(QAction* action)
 
 void ToolBox::materialSelected(int index)
 {
+	if (!doUpdate)
+		return;
+
 	sim::Simulation::instance().setNewObjectMaterial(m_materials->itemText(index).toStdString());
 }
 
 void ToolBox::freezeStateChanged(int state)
 {
-	std::cout << state << std::endl;
+	if (!doUpdate)
+		return;
+
 	sim::Simulation::instance().setNewObjectFreezeState((state == Qt::Checked) ? true : false);
 }
 
 void ToolBox::massChanged(double mass)
 {
-	std::cout << mass << std::endl;
+	if (!doUpdate)
+		return;
+
 	sim::Simulation::instance().setNewObjectMass((float) mass);
 }
 
@@ -302,12 +309,16 @@ void ToolBox::updateSize(double value)
 {
 	if (!doUpdate)
 		return;
-	if (QObject::sender() == m_width) {
-		emit sizeChanged('x', (float) value);
-	} else if (QObject::sender() == m_height) {
-		emit sizeChanged('y', (float) value);
-	} else if (QObject::sender() == m_depth) {
-		emit sizeChanged('z', (float) value);
+	if (sim::Simulation::instance().getSelectedObject()) {
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+		m3d::Vec3f scale;
+		if (obj->getType() == sim::__Object::BOX || obj->getType() == sim::__Object::SPHERE) {
+			scale = m3d::Vec3f(m_width->value(), m_height->value(), m_depth->value());
+		} else if (obj->getType() == sim::__Object::CYLINDER || obj->getType() == sim::__Object::CONE
+				|| obj->getType() == sim::__Object::CAPSULE || obj->getType() == sim::__Object::CHAMFER_CYLINDER) {
+			scale = m3d::Vec3f(m_width->value(), m_height->value(), 0);
+		}
+		obj->scale(scale);
 	}
 }
 
@@ -315,12 +326,17 @@ void ToolBox::updateLocation(double value)
 {
 	if (!doUpdate)
 		return;
-	if (QObject::sender() == m_locationX) {
-		emit locationChanged('x', (float) value);
-	} else if (QObject::sender() == m_locationY) {
-		emit locationChanged('y', (float) value);
-	} else if (QObject::sender() == m_locationZ) {
-		emit locationChanged('z', (float) value);
+
+	if (sim::Simulation::instance().getSelectedObject()) {
+		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
+		if (QObject::sender() == m_locationX) {
+			matrix._41= (float) value;
+		} else if (QObject::sender() == m_locationY) {
+			matrix._42 = (float) value;
+		} else if (QObject::sender() == m_locationZ) {
+			matrix._43 = (float) value;
+		}
+		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
 	}
 }
 
@@ -328,18 +344,26 @@ void ToolBox::updateRotation(double value)
 {
 	if (!doUpdate)
 		return;
-	if (QObject::sender() == m_rotationX) {
-		emit rotationChanged(m_rotationX->value(), m_rotationY->value(), m_rotationZ->value());
-	} else if (QObject::sender() == m_rotationY) {
-		emit rotationChanged(m_rotationX->value(), m_rotationY->value(), m_rotationZ->value());
-	} else if (QObject::sender() == m_rotationZ) {
-		emit rotationChanged(m_rotationX->value(), m_rotationY->value(), m_rotationZ->value());
+
+	if (sim::Simulation::instance().getSelectedObject()) {
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+
+		Mat4f matrix = Mat4f::rotZ(m_rotationZ->value() * PI / 180.0f) *
+				Mat4f::rotX(m_rotationX->value() * PI / 180.0f) *
+				Mat4f::rotY(m_rotationY->value() * PI / 180.0f) *
+				Mat4f::translate(obj->getMatrix().getW());
+
+		obj->setMatrix(matrix);
 	}
 }
 
 void ToolBox::updateData(sim::Object object)
 {
+	// set a temporary variable to prevent widgets
+	// from updating and sending their signals
 	doUpdate = false;
+
+	updateData();
 
 	const m3d::Mat4f* matrix = &object->getMatrix();
 	if (matrix) {
@@ -357,8 +381,14 @@ void ToolBox::updateData(sim::Object object)
 	}
 
 	if (object->getType() != sim::__Object::NONE) {
-		updateData();
 		int position = layout->indexOf(m_mass) + 1;
+
+		/// @todo update the material in gui::ToolBox
+		//m_materials->setCurrentIndex(m_materials->findText(QString::fromStdString(object->getMaterial()), Qt::MatchExactly | Qt::MatchCaseSensitive));
+		m_freezeState->setChecked(object->getFreezeState());
+		/// @todo update the mass in gui::ToolBox
+		// m_mass->setValue(object->getMass());
+
 		/**
 		 * BOX: x = width, y = height, z = depth
 		 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
@@ -382,8 +412,6 @@ void ToolBox::updateData(sim::Object object)
 			}
 		}
 	}
-	// we may need to set a boolean in this function that temporarily
-	// disables the handling code in the slots above.
 	doUpdate = true;
 }
 
