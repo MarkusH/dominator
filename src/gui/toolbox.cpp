@@ -286,7 +286,14 @@ void ToolBox::materialSelected(int index)
 	if (!doUpdate)
 		return;
 
-	sim::Simulation::instance().setNewObjectMaterial(m_materials->itemText(index).toStdString());
+	std::string material = m_materials->itemText(index).toStdString();
+	if (sim::Simulation::instance().getSelectedObject()) {
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+		obj->setMaterial(material);
+		sim::Simulation::instance().updateObject(obj);
+	} else {
+		sim::Simulation::instance().setNewObjectMaterial(material);
+	}
 }
 
 void ToolBox::freezeStateChanged(int state)
@@ -294,7 +301,14 @@ void ToolBox::freezeStateChanged(int state)
 	if (!doUpdate)
 		return;
 
-	sim::Simulation::instance().setNewObjectFreezeState((state == Qt::Checked) ? true : false);
+	state = (state == Qt::Checked) ? true : false;
+	if (sim::Simulation::instance().getSelectedObject()) {
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+		obj->setFreezeState(state);
+		sim::Simulation::instance().updateObject(obj);
+	} else {
+		sim::Simulation::instance().setNewObjectFreezeState(state);
+	}
 }
 
 void ToolBox::massChanged(double mass)
@@ -302,13 +316,20 @@ void ToolBox::massChanged(double mass)
 	if (!doUpdate)
 		return;
 
-	sim::Simulation::instance().setNewObjectMass((float) mass);
+	if (sim::Simulation::instance().getSelectedObject()) {
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+		//obj->setMass(mass);
+		sim::Simulation::instance().updateObject(obj);
+	} else {
+		sim::Simulation::instance().setNewObjectMass((float) mass);
+	}
 }
 
 void ToolBox::updateSize(double value)
 {
 	if (!doUpdate)
 		return;
+
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		m3d::Vec3f scale;
@@ -385,10 +406,10 @@ void ToolBox::updateData(sim::Object object)
 		int position = layout->indexOf(m_mass) + 1;
 
 		/// @todo update the material in gui::ToolBox
-		//m_materials->setCurrentIndex(m_materials->findText(QString::fromStdString(object->getMaterial()), Qt::MatchExactly | Qt::MatchCaseSensitive));
+		m_materials->setCurrentIndex(m_materials->findText(QString::fromStdString(object->getMaterial()), Qt::MatchExactly | Qt::MatchCaseSensitive));
 		m_freezeState->setChecked(object->getFreezeState());
 		/// @todo update the mass in gui::ToolBox
-		// m_mass->setValue(object->getMass());
+		m_mass->setValue(object->getMass());
 
 		/**
 		 * BOX: x = width, y = height, z = depth
