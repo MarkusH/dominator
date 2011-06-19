@@ -513,6 +513,28 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	return RigidBody();
 }
 
+Vec3f __RigidBody::getSize()
+{
+	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+	NewtonCollisionInfoRecord info;
+	NewtonCollisionGetInfo(collision, &info);
+	switch (info.m_collisionType) {
+	case SERIALIZE_ID_BOX:
+		return Vec3f(info.m_box.m_x, info.m_box.m_y, info.m_box.m_z);
+	case SERIALIZE_ID_SPHERE:
+		return Vec3f(info.m_sphere.m_r0, info.m_sphere.m_r1, info.m_sphere.m_r2);
+	case SERIALIZE_ID_CYLINDER:
+		return Vec3f(info.m_cylinder.m_r0, info.m_cylinder.m_height, 0.0f);
+	case SERIALIZE_ID_CONE:
+		return Vec3f(info.m_cone.m_r, info.m_cone.m_height, 0.0f);
+	case SERIALIZE_ID_CAPSULE:
+		return Vec3f(info.m_capsule.m_r0, info.m_capsule.m_height, 0.0f);
+	case SERIALIZE_ID_CHAMFERCYLINDER:
+		return Vec3f(info.m_chamferCylinder.m_r, info.m_chamferCylinder.m_height, 0.0f);
+	}
+	return Vec3f();
+}
+
 bool __RigidBody::scale(const Vec3f& scale, bool add)
 {
 	const NewtonWorld* world = Simulation::instance().getWorld();

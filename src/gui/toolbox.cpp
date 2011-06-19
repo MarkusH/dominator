@@ -319,6 +319,7 @@ void ToolBox::updateSize(double value)
 			scale = m3d::Vec3f(m_width->value(), m_height->value(), 0);
 		}
 		obj->scale(scale);
+		sim::Simulation::instance().updateObject(obj);
 	}
 }
 

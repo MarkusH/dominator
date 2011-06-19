@@ -86,6 +86,12 @@ public:
 	/** @return The freeze state of the body */
 	virtual int getFreezeState() { return 0; }
 
+	/** @return The mass of the object */
+	virtual float getMass() const { return 0.0f; };
+
+	/** @return The size of the object, see scale() for further info */
+	virtual Vec3f getSize() { return Vec3f(); };
+
 	/**
 	 * Get the axis-aligned bounding box of the object.
 	 *
@@ -204,6 +210,9 @@ public:
 
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
 	virtual int getFreezeState() { return m_freezeState; }
+
+	virtual float getMass() const { return Body::getMass(); };
+	virtual Vec3f getSize();
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
 
