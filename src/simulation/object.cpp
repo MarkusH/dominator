@@ -520,6 +520,19 @@ void __RigidBody::setMaterial(const std::string& material)
 	NewtonCollisionSetUserID(NewtonBodyGetCollision(m_body), materialID);
 }
 
+void __RigidBody::setMass(float mass)
+{
+	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+
+	Vec4f origin, inertia;
+	NewtonConvexCollisionCalculateInertialMatrix(collision, &inertia[0], &origin[0]);
+
+	if (mass < 0.0f)
+		mass = NewtonConvexCollisionCalculateVolume(collision) * 0.5f;
+
+	NewtonBodySetMassMatrix(m_body, mass, mass * inertia.x, mass * inertia.y, mass * inertia.z);
+}
+
 Vec3f __RigidBody::getSize()
 {
 	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
