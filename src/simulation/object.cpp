@@ -513,6 +513,13 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	return RigidBody();
 }
 
+void __RigidBody::setMaterial(const std::string& material)
+{
+	m_material = material;
+	int materialID = MaterialMgr::instance().getID(material);
+	NewtonCollisionSetUserID(NewtonBodyGetCollision(m_body), materialID);
+}
+
 Vec3f __RigidBody::getSize()
 {
 	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);

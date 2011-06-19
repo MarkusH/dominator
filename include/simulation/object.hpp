@@ -81,16 +81,20 @@ public:
 	void setID(int id) { m_id = id; }
 
 	/** @param state The new freeze state of the body */
-	virtual void setFreezeState(int state) { };
+	virtual void setFreezeState(int state) { }
 
 	/** @return The freeze state of the body */
 	virtual int getFreezeState() { return 0; }
 
 	/** @return The mass of the object */
-	virtual float getMass() const { return 0.0f; };
+	virtual float getMass() const { return 0.0f; }
 
 	/** @return The size of the object, see scale() for further info */
-	virtual Vec3f getSize() { return Vec3f(); };
+	virtual Vec3f getSize() { return Vec3f(); }
+
+	/** @param material Updates the material of the object */
+	virtual void setMaterial(const std::string& material) { }
+	virtual std::string getMaterial() { return ""; }
 
 	/**
 	 * Get the axis-aligned bounding box of the object.
@@ -213,6 +217,9 @@ public:
 
 	virtual float getMass() const { return Body::getMass(); };
 	virtual Vec3f getSize();
+
+	virtual void setMaterial(const std::string& material);
+	virtual std::string getMaterial() { return m_material; }
 
 	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
 
