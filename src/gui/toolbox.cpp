@@ -442,6 +442,7 @@ void ToolBox::updateData()
 {
 	for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsFull.rbegin(); rit != m_modifyWidgetsFull.rend(); rit++) {
 		layout->removeWidget((QWidget*) *rit);
+		((QWidget*) *rit)->setParent(0);
 	}
 }
 
