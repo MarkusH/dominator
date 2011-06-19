@@ -86,6 +86,14 @@ public:
 	/** @return The freeze state of the body */
 	virtual int getFreezeState() { return 0; }
 
+	/**
+	 * Sets the mass of the object. -1.0 sets the mass according
+	 * to the volume of the collision. 0.0 make the object static.
+	 *
+	 * @param mass The new mass of the object.
+	 */
+	virtual void setMass(float mass = -1.0f) { }
+
 	/** @return The mass of the object */
 	virtual float getMass() const { return 0.0f; }
 
@@ -215,6 +223,7 @@ public:
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
 	virtual int getFreezeState() { return m_freezeState; }
 
+	virtual void setMass(float mass = -1.0f);
 	virtual float getMass() const { return Body::getMass(); };
 	virtual Vec3f getSize();
 
