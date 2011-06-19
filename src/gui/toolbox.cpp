@@ -254,13 +254,8 @@ void ToolBox::loadMaterials(QString filename)
 void ToolBox::updateMaterials(QString filename)
 {
 	if (filename != "") {
-		sim::MaterialMgr::instance().load(filename.toStdString().c_str());
-		std::set<std::string> materials;
-		sim::MaterialMgr::instance().getMaterials(materials);
 		m_materials->clear();
-		for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
-			m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
-		}
+		loadMaterials(filename);
 	}
 	materialSelected(0);
 }
@@ -297,36 +292,38 @@ void ToolBox::addObject(QAction* action)
 
 void ToolBox::materialSelected(int index)
 {
+	std::string material = m_materials->itemText(index).toStdString();
+	sim::Simulation::instance().setNewObjectMaterial(material);
+
 	if (!doUpdate)
 		return;
 
-	std::string material = m_materials->itemText(index).toStdString();
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		obj->setMaterial(material);
 		sim::Simulation::instance().updateObject(obj);
-	} else {
-		sim::Simulation::instance().setNewObjectMaterial(material);
 	}
 }
 
 void ToolBox::freezeStateChanged(int state)
 {
+	state = (state == Qt::Checked) ? true : false;
+	sim::Simulation::instance().setNewObjectFreezeState(state);
+
 	if (!doUpdate)
 		return;
 
-	state = (state == Qt::Checked) ? true : false;
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		obj->setFreezeState(state);
 		sim::Simulation::instance().updateObject(obj);
-	} else {
-		sim::Simulation::instance().setNewObjectFreezeState(state);
 	}
 }
 
 void ToolBox::massChanged(double mass)
 {
+	sim::Simulation::instance().setNewObjectMass((float) mass);
+
 	if (!doUpdate)
 		return;
 
@@ -334,8 +331,6 @@ void ToolBox::massChanged(double mass)
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		obj->setMass(mass);
 		sim::Simulation::instance().updateObject(obj);
-	} else {
-		sim::Simulation::instance().setNewObjectMass((float) mass);
 	}
 }
 
