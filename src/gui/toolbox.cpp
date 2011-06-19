@@ -318,7 +318,7 @@ void ToolBox::massChanged(double mass)
 
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
-		//obj->setMass(mass);
+		obj->setMass(mass);
 		sim::Simulation::instance().updateObject(obj);
 	} else {
 		sim::Simulation::instance().setNewObjectMass((float) mass);
@@ -385,6 +385,8 @@ void ToolBox::updateData(sim::Object object)
 	// from updating and sending their signals
 	doUpdate = false;
 
+	// this removes all scaling, positioning and roation widgets from the layout
+	// we add them again later regarding the selected object
 	updateData();
 
 	const m3d::Mat4f* matrix = &object->getMatrix();
@@ -405,10 +407,9 @@ void ToolBox::updateData(sim::Object object)
 	if (object->getType() != sim::__Object::NONE) {
 		int position = layout->indexOf(m_mass) + 1;
 
-		/// @todo update the material in gui::ToolBox
+
 		m_materials->setCurrentIndex(m_materials->findText(QString::fromStdString(object->getMaterial()), Qt::MatchExactly | Qt::MatchCaseSensitive));
 		m_freezeState->setChecked(object->getFreezeState());
-		/// @todo update the mass in gui::ToolBox
 		m_mass->setValue(object->getMass());
 
 		/**
