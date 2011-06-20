@@ -36,29 +36,9 @@ static Vec3f rot_p1, rot_p2, rot_p3;
 static Vec3f curve_current;
 static CRSpline curve_spline;
 
-ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState)
-	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState)
+ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState, const Vec3f size)
+	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState), size(size)
 {
-	switch (type) {
-	case __Object::BOX:
-	case __Object::SPHERE:
-		size = Vec3f(1.0f, 1.0f, 1.0f);
-		size = Vec3f(1.0f, 1.0f, 1.0f);
-		break;
-	case __Object::CYLINDER:
-	case __Object::CONE:
-		size = Vec3f(1.0f, 2.0f, 1.0f);
-		break;
-	case __Object::CAPSULE:
-		size = Vec3f(1.0f, 6.0f, 1.0f);
-		break;
-	case __Object::CHAMFER_CYLINDER:
-		size = Vec3f(5.0f, 1.0f, 1.0f);
-		break;
-	default:
-		size = Vec3f(1.0f, 1.0f, 1.0f);
-		break;
-	}
 }
 
 Object ObjectInfo::create(const Mat4f& matrix) const
@@ -713,7 +693,6 @@ void Simulation::mouseMove(int x, int y)
 
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
-	Vec3f old = m_pointer;
 	m_pointer = m_camera.pointer(x, y);
 
 	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
@@ -724,7 +703,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (m_interactionTypes[button] == INT_CREATE_OBJECT && !m_enabled && down) {
-		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename, m_newObjectMass, m_newObjectFreezeState);
+		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename, m_newObjectMass, m_newObjectFreezeState, m_newObjectSize);
 		add(info);
 	}
 
@@ -920,7 +899,6 @@ void Simulation::render()
 		int md = abs(rot_mouse.x - m_mouseAdapter.getX()) + abs(rot_mouse.y -m_mouseAdapter.getY());
 		if (md > 2 && angle > 0.01f && angle < PI) {
 			Mat4f mat = Mat4f::rotAxis(axis, -angle);
-			Vec3f euler = mat.eulerAngles();
 			mat = rot_mat_start * mat;
 			mat.setW(rot_mat_start.getW());
 			m_selectedObject->setMatrix(mat);

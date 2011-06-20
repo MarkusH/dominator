@@ -64,6 +64,10 @@ public:
 		NONE
 	} Type;
 	static const char* TypeStr[];
+	static const char* name[];
+	static const float mass[];
+	static const bool freezeState[];
+	static const Vec3f size[];
 protected:
 	Type m_type;
 	int m_id;

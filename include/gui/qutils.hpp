@@ -21,21 +21,17 @@ public:
 	/**
 	 *
 	 */
-	QObjectAction(const QString &text, sim::__Object::Type type, const bool freeze = false, const float mass = -1.0f, QWidget* parent = 0);
+	QObjectAction(sim::__Object::Type type, QWidget* parent = 0);
 	sim::__Object::Type getType();
 	float getMass();
 	bool getFreezeState();
+	m3d::Vec3f getSize();
 
 private:
 	sim::__Object::Type m_type;
 	float m_mass;
 	bool m_freeze;
-
-private slots:
-	void sendObjectActionTriggered();
-
-signals:
-	void triggered(sim::__Object::Type, float, bool);
+	m3d::Vec3f m_size;
 };
 
 inline sim::__Object::Type QObjectAction::getType()
@@ -51,6 +47,11 @@ inline float QObjectAction::getMass()
 inline bool QObjectAction::getFreezeState()
 {
 	return m_freeze;
+}
+
+inline m3d::Vec3f QObjectAction::getSize()
+{
+	return m_size;
 }
 
 }

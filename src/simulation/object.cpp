@@ -22,20 +22,40 @@
 namespace sim {
 
 const char* __Object::TypeStr[] = {
-	"domino_small",
-	"domino_middle",
-	"domino_large",
-	"box",
-	"sphere",
-	"cylinder",
-	"capsule",
-	"cone",
-	"chamfercylinder",
-	"hull",
-	"assembly",
-	"compound",
+	"domino_small", "domino_middle", "domino_large",
+	"box", "sphere", "cylinder",
+	"capsule", "cone", "chamfercylinder",
+	"hull", "assembly", "compound",
 	"environment"
 };
+const char* __Object::name[] = {
+		"Domino (small)", "Domino (middle)", "Domino (large)",
+		"Box", "Sphere", "Cylinder",
+		"Capsule", "Cone", "Chamfer Cylinder",
+		"Hull", "Assembly", "Compound",
+		"Environment"
+	};
+const float __Object::mass[] = {
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f
+	};
+const bool __Object::freezeState[] = {
+		true, true, true,
+		false, false, false,
+		false, false, false,
+		false, false, false,
+		false
+	};
+const Vec3f __Object::size[] = {
+		Vec3f(), Vec3f(), Vec3f(),
+		Vec3f(1.0f, 1.0f, 1.0f), Vec3f(1.0f, 1.0f, 1.0f), Vec3f(1.0f, 2.0f, 1.0f),
+		Vec3f(1.0f, 6.0f, 1.0f), Vec3f(1.0f, 2.0f, 1.0f), Vec3f(5.0f, 1.0f, 1.0f),
+		Vec3f(), Vec3f(), Vec3f(),
+		Vec3f()
+	};
 
 __Object::__Object(Type type)
 	: m_type(type)
