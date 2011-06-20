@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="compound">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="object">
+                <xs:complexType>
+                  <xs:attribute name="id" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="type" type="xs:string" use="required" />
+                  <xs:attribute name="matrix" type="xs:string" use="required" />
+                  <xs:attribute name="width" type="xs:unsignedByte" use="optional" />
+                  <xs:attribute name="height" type="xs:decimal" use="required" />
+                  <xs:attribute name="depth" type="xs:decimal" use="optional" />
+                  <xs:attribute name="freezeState" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="damping" type="xs:string" use="required" />
+                  <xs:attribute name="material" type="xs:string" use="required" />
+                  <xs:attribute name="mass" type="xs:decimal" use="required" />
+                  <xs:attribute name="radius" type="xs:decimal" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element maxOccurs="unbounded" name="joint">
+                <xs:complexType>
+                  <xs:attribute name="type" type="xs:string" use="required" />
+                  <xs:attribute name="parentID" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="childID" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="pivot" type="xs:string" use="required" />
+                  <xs:attribute name="pinDir" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:unsignedByte" use="required" />
+            <xs:attribute name="matrix" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="environment" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
