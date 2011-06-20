@@ -7,8 +7,7 @@
 #include <iostream>
 
 #include <gui/mainwindow.hpp>
-#include <QtGui/QPixmap>
-#include <QtGui/QSplashScreen>
+#include <gui/qutils.hpp>
 #include <QtGui/QMessageBox>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QGridLayout>
@@ -24,29 +23,35 @@ MainWindow::MainWindow(QApplication* app)
 	m_modified = true;
 
 	// load the splash screen
-	QPixmap pixmap = QPixmap("data/splash.png");
-	QSplashScreen splash(pixmap);
+	SplashScreen splash(100);
 	splash.show();
 	app->processEvents();
 
 	initialize();
+	splash.updateProgress(5);
 
 	createMenu();
+	splash.updateProgress(15);
 	app->processEvents();
 
 	createStatusBar();
+	splash.updateProgress(20);
 	app->processEvents();
 
 	m_toolBox = new ToolBox();
+	splash.updateProgress(50);
 	m_toolBox->loadMaterials("data/materials.xml");
 	app->processEvents();
+	splash.updateProgress(80);
 
 	m_renderWidget = new RenderWidget(this);
 	m_renderWidget->setMinimumWidth(400);
 	m_renderWidget->show();
 	app->processEvents();
+	splash.updateProgress(85);
 
 	m_toolBox->updateMaterials();
+	splash.updateProgress(90);
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);
@@ -70,6 +75,7 @@ MainWindow::MainWindow(QApplication* app)
 	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(updateData()));
 
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
+	splash.updateProgress(100);
 
 	showMaximized();
 	splash.finish(this);

@@ -8,6 +8,8 @@
 #define QUTILSS_HPP_
 
 #include <QtGui/QAction>
+#include <QtGui/QSplashScreen>
+#include <QtGui/QProgressBar>
 #include <simulation/simulation.hpp>
 
 namespace gui {
@@ -32,6 +34,15 @@ private:
 	float m_mass;
 	bool m_freeze;
 	m3d::Vec3f m_size;
+};
+
+class SplashScreen: public QSplashScreen {
+	Q_OBJECT
+public:
+	SplashScreen(int max);
+	void updateProgress(int progrss);
+private:
+	QProgressBar* m_bar;
 };
 
 inline sim::__Object::Type QObjectAction::getType()
