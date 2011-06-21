@@ -80,13 +80,6 @@ TextureMgr::~TextureMgr()
 {
 }
 
-TextureMgr& TextureMgr::instance()
-{
-	if (!s_instance)
-		s_instance = new TextureMgr();
-	return *s_instance;
-}
-
 void TextureMgr::destroy()
 {
 	if (s_instance)

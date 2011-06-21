@@ -1,12 +1,14 @@
-/*
- * toolbox.cpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 25, 2011
+ * @file gui/toolbox.cpp
  */
 
 #include <gui/toolbox.hpp>
 #include <QtGui/QSizePolicy>
 #include <iostream>
+
+namespace gui {
 
 ToolBox::ToolBox(QWidget *parent)
 {
@@ -81,4 +83,6 @@ void ToolBox::onInteractionPressed(int button)
 	}
 	m_selectedInteraction = (sim::Simulation::InteractionType) m_mouseinteraction->checkedId();
 	emit interactionSelected(m_selectedInteraction);
+}
+
 }

@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <set>
 #include <xml/rapidxml.hpp>
 
 namespace sim {
@@ -67,7 +68,7 @@ struct MaterialPair {
 	float kineticFriction;
 	float softness;
 
-	//TODO: add sounds
+	/// @todo add sounds
 
 	/**
 	 * Constructs the default material.
@@ -119,6 +120,27 @@ public:
 	 * Destroys the instance of the MaterialMgr
 	 */
 	static void destroy();
+
+	/**
+	 * Stores all materials in the given set and returns the number
+	 * of materials stored in it. Usage:
+	 *
+	 * #include <set>
+	 * std::set<std::string> materials;
+	 * MaterialMgr::instance().getMaterials(materials);
+	 *
+	 * @param materials The set in which the materials should be stored
+	 * @return          The number of materials stored in the set
+	 */
+	int getMaterials(std::set<std::string>& materials);
+
+	/**
+	 * Applies the given material. If it is not available, disable all
+	 * material properties.
+	 *
+	 * @param material
+	 */
+	void applyMaterial(const std::string& material);
 
 	/**
 	 * Adds a material to the internal material map and returns the
@@ -231,6 +253,15 @@ public:
 			dFloat timestep,
 			int threadIndex);
 };
+
+
+inline MaterialMgr& MaterialMgr::instance()
+{
+	if (!s_instance)
+		s_instance = new MaterialMgr();
+	return *s_instance;
+}
+
 
 }
 

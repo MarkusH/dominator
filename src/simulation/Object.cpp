@@ -21,6 +21,10 @@
 
 namespace sim {
 
+/*
+ * only append strings for new Objects in TypeStr!!!
+ * prepending Object strings will break code in __RigidBody::load()
+ */
 const char* __Object::TypeStr[] = {
 	"domino_small",
 	"domino_middle",
@@ -62,29 +66,11 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 	//TODO
 	// Handle __ConvexAssembly and __ConvexHull here and call the respective
 	// __Convex..::save() method
+
 	switch (object.m_type) {
 	case DOMINO_SMALL:
 	case DOMINO_MIDDLE:
 	case DOMINO_LARGE:
-		// create and append object node
-		node = doc->allocate_node(node_element, TypeStr[object.m_type]);
-		parent->insert_node(0, node);
-
-		// create domino attributes
-		// set attribute "id" to m_id
-		pId = doc->allocate_string(util::toString(object.getID()));
-		attrI = doc->allocate_attribute("id", pId);
-		node->append_attribute(attrI);
-
-		// set attribute "matrix"
-		pMatrix = doc->allocate_string(util::toString(object.getMatrix()));
-		attrM = doc->allocate_attribute("matrix", pMatrix);
-		node->append_attribute(attrM);
-
-		// load domino data
-		__Domino::save((__Domino&) object, node, doc);
-
-		break;
 	case BOX:
 	case SPHERE:
 	case CYLINDER:
@@ -147,9 +133,6 @@ Object __Object::load(rapidxml::xml_node<>* node)
 	//TODO check if it is convex assembly or convex hull and
 	// call their load methods
 	if (std::string(node->name()) == TypeStr[COMPOUND])	return __Compound::load(node);
-	else if (std::string(node->name()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
-	else if (std::string(node->name()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
-	else if (std::string(node->name()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
 	else return __RigidBody::load(node);
 }
 
@@ -303,9 +286,9 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const
 {
 }
 
-float __RigidBody::convexCastPlacement(bool apply)
+float __RigidBody::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
 {
-	float vertical = newton::getConvexCastPlacement(m_body);
+	float vertical = newton::getConvexCastPlacement(m_body, noCollision);
 	Mat4f matrix = m_matrix;
 	matrix._42 = vertical + 0.0001f;
 	if (apply)
@@ -317,8 +300,12 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass;
+	char *pMaterial, *pMass;
+	xml_attribute<> *attrMat, *attrMass;
+
+	// dominos don't use these
+	char *pFreezeState, *pDamping;
+	xml_attribute<> *attrFS, *attrDamp;
 
 	// sphere only
 	char *pRadiusX, *pRadiusY, *pRadiusZ;
@@ -339,7 +326,6 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	//TODO save the other primitives, too: cone, cylinder, chamfercylinder, capsule
 	// use the respective SERIALIZE_IDs for that, each of the remaining primitives
 	// has radius and height attributes
-
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -354,6 +340,14 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pDepth = doc->allocate_string(util::toString(info.m_box.m_z));
 		attrD = doc->allocate_attribute("depth", pDepth);
 		node->append_attribute(attrD);
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+		// set attribute damping
+		pDamping = doc->allocate_string(util::toString(body.m_damping));
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_SPHERE:
 		// set attribute radius_x
@@ -368,6 +362,14 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pRadiusZ = doc->allocate_string(util::toString(info.m_sphere.m_r2));
 		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
 		node->append_attribute(attrZ);
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+		// set attribute damping
+		pDamping = doc->allocate_string(util::toString(body.m_damping));
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_CHAMFERCYLINDER:
 		// set attribute height
@@ -378,19 +380,17 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pRadius = doc->allocate_string(util::toString(info.m_chamferCylinder.m_r));
 		attrR = doc->allocate_attribute("radius", pRadius);
 		node->append_attribute(attrR);
+		// set attribute freezeState
+		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+		node->append_attribute(attrFS);
+		// set attribute damping
+		pDamping = doc->allocate_string(util::toString(body.m_damping));
+		attrDamp = doc->allocate_attribute("damping", pDamping);
+		node->append_attribute(attrDamp);
 		break;
 	}
 
-	// set attribute freezeState
-	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
-	attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-	node->append_attribute(attrFS);
-
-	// set attribute damping
-	pDamping = doc->allocate_string(util::toString(body.m_damping));
-	attrDamp = doc->allocate_attribute("damping", pDamping);
-	node->append_attribute(attrDamp);
-	
 	// set attribute material
 	pMaterial = doc->allocate_string(body.m_material.c_str());
 	attrMat = doc->allocate_attribute("material", pMaterial);
@@ -407,9 +407,11 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	using namespace rapidxml;
 
 	// TODO maybe defaults?
-	float w, h, d; // box
-	float x, y, z; // sphere
-	float radius;  // chamfer cylinder, cylinder, cone, capsule
+	int freezeState = 0; Vec4f damping(0.1f, 0.1f, 0.1f, 0.1f);	// all except dominos use it
+	float w, h, d;	// box
+	float x, y, z;	// sphere
+	float radius;	// chamfer cylinder, cylinder, cone, capsule
+	Type t; int i;	// domino
 
 	//attribute id is set in __Object::load()
 	xml_attribute<>* attr = node->first_attribute();
@@ -436,6 +438,15 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute depth
 		attr = attr->next_attribute();
 		d = atof(attr->value());
+
+		//attribute freezeState
+		attr = attr->next_attribute();
+		freezeState = atoi(attr->value());
+
+		//attribute damping
+		attr = attr->next_attribute();
+		Vec4f damping = Vec4f();
+		damping.assign(attr->value());
 	}/* set dimensions for box END */
 
 	/* set dimensions for sphere */
@@ -451,6 +462,15 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute z
 		attr = attr->next_attribute();
 		z = atof(attr->value());
+
+		//attribute freezeState
+		attr = attr->next_attribute();
+		freezeState = atoi(attr->value());
+
+		//attribute damping
+		attr = attr->next_attribute();
+		Vec4f damping = Vec4f();
+		damping.assign(attr->value());
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder */
@@ -462,18 +482,18 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute radius
 		attr = attr->next_attribute();
 		radius = atof(attr->value());
+
+		//attribute freezeState
+		attr = attr->next_attribute();
+		freezeState = atoi(attr->value());
+
+		//attribute damping
+		attr = attr->next_attribute();
+		Vec4f damping = Vec4f();
+		damping.assign(attr->value());
 	}/* set dimensions for chamfer cylinder END */
 
 	//TODO load the other primitives here
-
-	//attribute freezeState
-	attr = attr->next_attribute();
-	int freezeState = atoi(attr->value());
-
-	//attribute damping
-	attr = attr->next_attribute();
-	Vec4f damping = Vec4f();
-	damping.assign(attr->value());
 
 	//attribute material
 	attr = attr->next_attribute();
@@ -483,10 +503,20 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
+	// find the Type for the Domino
+	for(i = 0; i < 3; ++i) {
+		if(!strcmp(type.c_str(), TypeStr[i])) {
+			t = (Type) i;
+		}
+	}
+
 	//TODO return the other primitives here
 	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
 	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
 	if( type == TypeStr[CHAMFER_CYLINER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material, false);
+	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material, false);
+	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material, false);
 
 	// mass = get mass attribute
 	// material = get material attribute
@@ -1062,7 +1092,7 @@ void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 	}
 	case MESH_ASSEMBLY:
 	{
-		// TODO: we can combine sub-meshes with the same material
+		/// @todo we can combine sub-meshes with the same material
 		// because all sub-meshes have the same matrix. We could
 		// sort the collisions according to the shapeIDs and then
 		// combine adjacent sub-meshes

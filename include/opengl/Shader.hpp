@@ -129,6 +129,14 @@ void __Shader::setUniform1i(const char* uniform, GLint data)
 	glUniform1i(glGetUniformLocation(m_programObject, uniform), data);
 }
 
+inline
+ShaderMgr& ShaderMgr::instance()
+{
+	if (!s_instance)
+		s_instance = new ShaderMgr();
+	return *s_instance;
+}
+
 
 }
 

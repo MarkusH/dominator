@@ -43,7 +43,7 @@ public:
 	 */
 	NewtonBody* create(NewtonCollision* collision, float mass, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
-	// TODO: lets see if we need member functions to propagate the events to child classes
+	/// @todo lets see if we need member functions to propagate the events to child classes
 	//virtual void destroyBodyCallback(const NewtonBody* body);
 	//virtual void setTransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
 	//virtual void applyForceAndTorqueCallback(const NewtonBody* body, dFloat timestep, int threadIndex);
@@ -55,7 +55,7 @@ public:
 	NewtonCollision* getCollision() const;
 
 	/** @return The Matrix of this body */
-	virtual const Mat4f& getMatrix();
+	virtual const Mat4f& getMatrix() const;
 
 	/**
 	 * Sets the matrix of this body.
@@ -95,7 +95,7 @@ inline NewtonCollision* Body::getCollision() const
 	return NewtonBodyGetCollision(m_body);
 }
 
-inline const Mat4f& Body::getMatrix()
+inline const Mat4f& Body::getMatrix() const
 {
 	return m_matrix;
 }

@@ -21,12 +21,6 @@ __Joint::__Joint(Type type)
 
 void __Joint::save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc)
 {
-	//TODO: for testing only
-	// wtf is this shit, does that interfere if we want to save BallAndSocket?
-	__Hinge::save((const __Hinge&)joint, parent, doc);
-		return;
-	
-	//TODO: save BallAndSocket joints, too
 	switch (joint.type) {
 	case HINGE:
 	

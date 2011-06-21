@@ -1,16 +1,16 @@
-/*
- * dialogs.cpp
- *
- *  Created on: Jun 7, 2011
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date Jun 7, 2011
+ * @file gui/dialogs.cpp
  */
 
 #include <gui/dialogs.hpp>
 
-/**
- *
- * @param parent
- */
+namespace gui {
+
+const float GravityDialog::m_rangeLow = -100.0f;
+const float GravityDialog::m_rangeHigh = 0.0f;
+
 AboutDialog::AboutDialog(QWidget* parent) :
 	QDialog(parent)
 {
@@ -44,24 +44,27 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	setLayout(layout);
 }
 
-/**
- *
- * @param parent
- */
 GravityDialog::GravityDialog(const float gravity, QWidget* parent) :
 	QDialog(parent)
 {
-	m_layout = new QGridLayout();
+	QGridLayout* m_layout = new QGridLayout();
+	QDialogButtonBox* m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	m_gravity = new QDoubleSpinBox();
-	m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	value = gravity;
+	
+	// validate the given gravity
+	if (gravity < m_rangeLow)
+		m_value = m_rangeLow;
+	else if (gravity > m_rangeHigh)
+		m_value = m_rangeHigh;
+	else
+		m_value = gravity;
 
 	m_layout->setSizeConstraint(QLayout::SetFixedSize);
 	m_layout->setVerticalSpacing(0);
 	m_layout->setHorizontalSpacing(0);
 
-	m_gravity->setRange(-10.0f, 10.0f);
-	m_gravity->setValue(value * -0.25f);
+	m_gravity->setRange(0.0f, 25.0f);
+	m_gravity->setValue(m_value * -0.25f);
 	m_layout->addWidget(m_gravity, 0, 0);
 
 	m_layout->addWidget(m_buttons, 1, 0);
@@ -77,7 +80,8 @@ float GravityDialog::run()
 	if (exec() == QDialog::Accepted) {
 		return m_gravity->value() * -4.0f;
 	} else {
-		return value;
+		return m_value;
 	}
 }
 
+}

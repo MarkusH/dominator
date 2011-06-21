@@ -73,7 +73,7 @@ public:
 
 	const Type& getType() { return m_type; }
 
-	virtual const Mat4f& getMatrix() = 0;
+	virtual const Mat4f& getMatrix() const = 0;
 	virtual void setMatrix(const Mat4f& matrix) = 0;
 
 	int getID() const { return m_id; }
@@ -86,12 +86,20 @@ public:
 	virtual int getFreezeState() { return 0; }
 
 	/**
+	 * Get the axis-aligned bounding box of the object.
+	 *
+	 * @param min The minimum
+	 * @param max The maximum
+	 */
+	virtual void getAABB(Vec3f& min, Vec3f& max) = 0;
+
+	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.
 	 *
 	 * @param apply True, if the new position should be applied, False otherwise
 	 * @return      The new vertical position
 	 */
-	virtual float convexCastPlacement(bool apply = true) = 0;
+	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL) = 0;
 
 	/**
 	 * Checks whether this object contains the given NewtonBody.
@@ -174,13 +182,15 @@ public:
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
-	virtual const Mat4f& getMatrix() { return Body::getMatrix(); }
+	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
 	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
 	virtual int getFreezeState() { return m_freezeState; }
 
-	virtual float convexCastPlacement(bool apply = true);
+	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
+
+	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const __Object* object);

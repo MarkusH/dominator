@@ -39,7 +39,7 @@ public:
 	static Vec3<T> zAxis();
 
 	Vec3<T> normalized() const; ///< Returns the vector in a normalized form
-	void normalize(); ///< normalizes the vector
+	T normalize(); ///< normalizes the vector
 
 	T len() const; ///< returns the length of the vector
 	T lenlen() const; ///< returns the squared length of the vector
@@ -149,12 +149,14 @@ Vec3<T> Vec3<T>::normalized() const
 
 template<typename T>
 inline
-void Vec3<T>::normalize()
+T Vec3<T>::normalize()
 {
-	T tmp = 1 / sqrt(x*x + y*y + z*z);
+	T res = sqrt(x*x + y*y + z*z);
+	T tmp = 1 / res;
 	x *= tmp;
 	y *= tmp;
 	z *= tmp;
+	return res;
 }
 
 template<typename T>

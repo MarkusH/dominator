@@ -10,10 +10,21 @@
 
 #include <m3d/m3d.hpp>
 #include <Newton.h>
+#include <list>
 
 namespace newton {
 
 using namespace m3d;
+
+/**
+ * Calculates the forces resulting of the explosion at the given position
+ * with the specified strength. Only bodies in the given radius are affected.
+ *
+ * @param position The position of the explosion
+ * @param strength The strength of the explosion
+ * @param radius   The radius of the explosion
+ */
+void applyExplosion(const NewtonWorld* world, const Vec3f& position, float strength, float radius);
 
 /**
  * Shoots a ray in world from origin in direction dir and returns
@@ -48,8 +59,7 @@ float getVerticalPosition(const NewtonWorld* world, float x, float z);
  * @param body The body to use for the convex cast
  * @return     The new vertical position of the body
  */
-float getConvexCastPlacement(NewtonBody* body);
-
+float getConvexCastPlacement(NewtonBody* body, std::list<NewtonBody*>* noCollision = NULL);
 
 /**
  * Renders the specified collision shape, transformed with the given matrix.

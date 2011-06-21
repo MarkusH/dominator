@@ -20,6 +20,8 @@ using namespace m3d;
  */
 class Camera {
 public:
+	typedef enum { OUTSIDE = 0, INTERSECT, INSIDE } Visibility;
+
 	Camera();
 	virtual ~Camera();
 
@@ -37,6 +39,12 @@ public:
 
 	Mat4f m_matrix;
 	Mat4f m_inverse;
+
+	/**
+	 * The six planes of the view frustum in the following order:
+	 * left, right, bottom, top, near, far
+	 */
+	float m_frustum[6][4];
 
 	/**
 	 * Positions the camera at position,in direction view
@@ -72,14 +80,10 @@ public:
 	void rotate(float angle, Vec3f axis);
 
 	/**
-	 * Updates the strafe vector of the camera.
+	 * Updates the strafe vector of the camera. Grabs the current
+	 * matrix and calculates the inverse. It then updates the view frustum.
 	 */
 	void update();
-
-	/**
-	 * Grabs the current matrix and calculates the inverse
-	 */
-	void grabMatrix();
 
 	/**
 	 * Applies the camera matrix.
@@ -110,6 +114,29 @@ public:
 	 * @return The world-coordinates of the specified pixel
 	 */
 	Vec3f pointer(int x, int y) const;
+
+	/**
+	 * Checks whether the given axis-aligned bounding box is partially
+	 * or fully visible. If so, returns True.
+	 *
+	 * @param min The minimum of the AABB
+	 * @param max The maximum of the AABB
+	 * @return    True, if the AABB is (partially) visible, False otherwise
+	 */
+	bool checkAABB(const Vec3f& min, const Vec3f& max);
+
+	/**
+	 * Tests the visibility of the given axis-aligned bounding box.
+	 * Returns Visibility.OUTSIDE if the bounding box is completly
+	 * outside of the frustum. Returns Visibility.INTERSECT if a part
+	 * but not all of the AABB is inside the frustum. Returns
+	 * Visibility.INSIDE if all of the AABB is inside the AABB.
+	 *
+	 * @param min The minimum of the AABB
+	 * @param max The maximum of the AABB
+	 * @return    The visibility of the AABB
+	 */
+	Visibility testAABB(const Vec3f& min, const Vec3f& max);
 };
 
 }

@@ -6,6 +6,9 @@
  */
 
 #include <simulation/Material.hpp>
+#include <opengl/Texture.hpp>
+#include <opengl/Shader.hpp>
+#include <GL/glew.h>
 #include <limits.h>
 #ifdef _WIN32
 #include <boost/functional/hash.hpp>
@@ -151,19 +154,19 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 
 	mat0 = m.getID(attr->value());
 
-	attr->next_attribute();
+	attr = attr->next_attribute();
 	mat1 = m.getID(attr->value());
 
-	attr->next_attribute();
+	attr = attr->next_attribute();
 	elasticity = atof(attr->value());
 
-	attr->next_attribute();
+	attr = attr->next_attribute();
 	staticFriction = atof(attr->value());
 
-	attr->next_attribute();
+	attr = attr->next_attribute();
 	kineticFriction = atof(attr->value());
 
-	attr->next_attribute();
+	attr = attr->next_attribute();
 	softness = atof(attr->value());
 
 	if (mat0 > mat1) {
@@ -256,20 +259,51 @@ MaterialMgr::MaterialMgr(const MaterialMgr& other)
 {
 }
 
-
-MaterialMgr& MaterialMgr::instance()
-{
-	if (!s_instance)
-		s_instance = new MaterialMgr();
-	return *s_instance;
-}
-
 void MaterialMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
 }
 
+int MaterialMgr::getMaterials(std::set<std::string>& materials)
+{
+	std::map<std::string, Material>::const_iterator itr = m_materials.begin();
+	for ( ; itr != m_materials.end(); ++itr)
+		materials.insert(itr->first);
+	return m_materials.size();
+}
+
+void MaterialMgr::applyMaterial(const std::string& material) {
+	const Material* const _mat = get(material);
+	/// @todo only switch shader/texture if necessary
+	if (_mat != NULL) {
+		const Material& mat = *_mat;
+		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
+
+		if (texture) {
+			glEnable(GL_TEXTURE_2D);
+			texture->bind();
+		} else {
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, &mat.specular[0]);
+		glMaterialf(GL_FRONT, GL_SHININESS, mat.shininess);
+
+		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
+		if (shader) {
+			shader->bind();
+		} else {
+			ogl::__Shader::unbind();
+		}
+
+	} else {
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glUseProgram(0);
+	}
+}
 
 std::string MaterialMgr::add(const Material& mat)
 {
@@ -514,9 +548,8 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		// get the pair for the materials, or the default pair
 		MaterialPair& pair = getPair(mat0, mat1);
 
-		//if (mat0 > 0 && mat1 > 0 && (mat0 < 200 || mat1 < 200))
-		//	if ((fromID(mat0) && fromID(mat0)->name == "wood_matt") || (fromID(mat1) && fromID(mat1)->name == "wood_matt"))
 		//std::cout << "pair " << mat0 << ", " << mat1 << std::endl;
+		//std::cout <<pair.elasticity << std::endl;
 
 		// set the material properties for this contact
 		NewtonMaterialSetContactElasticity(material, pair.elasticity);
@@ -524,7 +557,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 0);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 1);
 
-		//TODO: get impact information and play a sound
+		/// @todo get impact information and play a sound
 	}
 
 	//std::cout << "\tmaterial end" << std::endl;

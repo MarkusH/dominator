@@ -51,6 +51,11 @@ void QtKeyAdapter::keyEvent(QKeyEvent* event)
 	}
 }
 
+MouseAdapter::MouseAdapter()
+{
+	m_down[0] = m_down[1] = m_down[2] = 0;
+}
+
 MouseAdapter::~MouseAdapter()
 {
 	m_listeners.clear();

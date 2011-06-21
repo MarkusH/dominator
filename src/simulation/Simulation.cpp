@@ -18,6 +18,8 @@
 #include <iostream>
 #include <newton/util.hpp>
 #include <simulation/Domino.hpp>
+#include <simulation/CRSpline.hpp>
+#include <opengl/oglutil.hpp>
 
 namespace sim {
 
@@ -31,6 +33,7 @@ static Vec2i rot_mouse;
 
 // INT_DOMINO_CURVE
 static Vec3f curve_current;
+static CRSpline curve_spline;
 
 void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 								util::MouseAdapter& mouseAdapter)
@@ -45,18 +48,15 @@ void Simulation::destroyInstance()
 	s_instance = NULL;
 };
 
-Simulation& Simulation::instance()
-{
-	return *s_instance;
-};
-
 Simulation::Simulation(util::KeyAdapter& keyAdapter,
 						util::MouseAdapter& mouseAdapter)
 	: m_keyAdapter(keyAdapter),
 	  m_mouseAdapter(mouseAdapter),
 	  m_nextID(0)
 {
-	m_interactionType = INT_NONE;
+	m_interactionTypes[util::LEFT] = INT_NONE;
+	m_interactionTypes[util::RIGHT] = INT_MOVE_GROUND;
+	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
 	m_world = NULL;
 	m_enabled = true;
 	m_gravity = -9.81f * 4.0f;
@@ -138,15 +138,17 @@ void Simulation::load(const std::string& fileName)
 		}
 	}
 
+	// load "environment" and create tree collision from it
 	{
 		xml_node<>* node = nodes->first_node("environment");
 		if (node) {
 			m_environment = __TreeCollision::load(node);
+			((__TreeCollision*)m_environment.get())->createOctree();
 		}
 	}
 
 	// load gravity
-	// load "environment" and create tree collision from it
+
 
 	m_clock.reset();
 }
@@ -177,11 +179,9 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 
 
-	//m_environment = __Object::createBox(Mat4f::identity(), 1000.0f, 1.0f, 1000.0f, 0.0f, "yellow");
-	//m_environment = TreeCollision(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
-	//add(m_environment);
-	//load("data/levels/level.xml");
-	//save("data/levels/test_level.xml");
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	//((__TreeCollision*)m_environment.get())->createOctree();
+
 
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
@@ -201,16 +201,17 @@ void Simulation::init()
 	// newtons cradle
 	if (0)
 	{
+		const int radius = 2.0f;
 		RigidBody boxes[5];
 		RigidBody spheres[5];
 
 		Compound c(new __Compound(Mat4f::identity()));//translate(Vec3f(0.0f, 5.0f, -10.0f))));
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), 20.0f, 0.5f, 0.5f, 0.0f, "cradle");
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
 		c->add(top);
 
 		for (int x = -2; x <= 2; ++x) {
-			boxes[x + 2] = __Object::createBox(Vec3f(x * 4.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
-			spheres[x + 2] = __Object::createSphere(Vec3f(x * 4.0f, 0.0f, 0.0f), 2.0f, 2.0f, "cradle");
+			boxes[x + 2] = __Object::createBox(Vec3f(x * radius * 2.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
+			spheres[x + 2] = __Object::createSphere(Vec3f(x * radius * 2.0f, 0.0f, 0.0f), radius, 5.0f, "cradle");
 
 			c->add(boxes[x + 2]);
 			c->add(spheres[x + 2]);
@@ -223,7 +224,7 @@ void Simulation::init()
 		}
 		add(c);
 		//Mat4f::rotY(90.0f * PI / 180.0f) *
-		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 5.0f, -10.0f)));
+		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 2.4f, 100.0f)));
 		//c->convexCastPlacement();
 	}
 
@@ -249,7 +250,7 @@ void Simulation::init()
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 10.0f)));
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 50.0f)));
 		c->convexCastPlacement();
 	}
 
@@ -403,7 +404,7 @@ void Simulation::remove(const Object& object)
 	// multiple sub-meshes with the same data and different materials
 	std::set<__Object*> deleted;
 
-	//TODO: think about what happens if a domino is inside a compound
+	/// @todo think about what happens if a domino is inside a compound
 	if (object->getType() <= __Object::DOMINO_LARGE) {
 		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin(); it != m_vertexBuffer.m_buffers.end(); ++it) {
 			if ((*it)->object == object.get()) {
@@ -486,16 +487,20 @@ void Simulation::remove(const Object& object)
 	upload(m_objects.end(), m_objects.end());
 }
 
+static bool isSharedBuffer(const ogl::SubBuffer* const buffer)
+{
+	return buffer->object == NULL;
+}
+
 void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
 {
-	// TODO in this function Windows is throwing exceptions in the second call
-	//std::cout << begin->first << " " << end->first << std::endl;
 	for (ObjectList::iterator itr = begin; itr != end; ++itr) {
-	//	std::cout << "id " << itr->first << std::endl;
 		(*itr)->genBuffers(m_vertexBuffer);
 	}
 	m_vertexBuffer.upload();
-	//TODO: sort materials
+	m_sortedBuffers.assign(m_vertexBuffer.m_buffers.begin(), m_vertexBuffer.m_buffers.end());
+	m_sortedBuffers.remove_if(isSharedBuffer);
+	m_sortedBuffers.sort();
 }
 
 Object Simulation::selectObject(int x, int y)
@@ -531,78 +536,73 @@ void Simulation::mouseMove(int x, int y)
 
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
-	} else if (m_mouseAdapter.isDown(util::RIGHT)) {
-		if (m_enabled)
-			newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+	} else if (m_mouseAdapter.isDown(util::RIGHT) && m_enabled) {
+		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+	}
 
-		// handle interaction mode if object is selected and in pause mode
-		if (m_selectedObject && !m_enabled) {
+	util::Button button = util::LEFT;
+	if (m_mouseAdapter.isDown(util::MIDDLE))
+		button = util::MIDDLE;
+	if (m_mouseAdapter.isDown(util::RIGHT))
+		button = util::RIGHT;
 
-			// get first position of the mouse (last pos) on the object using pointer
-			// get the second pos of the mouse (cur pos) in the world
-			// shoot a ray from cam pos to second pos and intersect with the plane
-			// move from pos1 to intersection point
-			//
+	// handle interaction mode if object is selected and in pause mode
+	if ((m_interactionTypes[button] == INT_ROTATE ||
+			m_interactionTypes[button] == INT_ROTATE_GROUND ||
+			m_interactionTypes[button] == INT_MOVE_GROUND ||
+			m_interactionTypes[button] == INT_MOVE_BILLBOARD) &&
+			m_selectedObject && !m_enabled) {
 
-			Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
-			Vec3f pos2 = m_camera.pointer(x, y);
+		// get first position of the mouse (last pos) on the object using pointer
+		// get the second pos of the mouse (cur pos) in the world
+		// shoot a ray from cam pos to second pos and intersect with the plane
+		// move from pos1 to intersection point
 
-			if (m_interactionType == INT_ROTATE) {
-				//rot_drag_cur = pos2;
-				rot_drag_cur = rot_mat_start.getW() + (pos2-rot_mat_start.getW()).normalized() * (rot_drag_start-rot_mat_start.getW()).len();
+		Vec3f pos1 = m_camera.pointer(m_mouseAdapter.getX(), m_mouseAdapter.getY());
+		Vec3f pos2 = m_camera.pointer(x, y);
 
-			} else if (m_interactionType == INT_MOVE_GROUND || m_interactionType == INT_MOVE_BILLBOARD) {
-				Vec3f R1, R2, S1, S2;
-				{
-					Vec4<GLint> viewport = Vec4<GLint>::viewport();
-					float _y = viewport.w - y;
-					Mat4d mvmatrix = Mat4d::modelview();
-					Mat4d projmatrix = Mat4d::projection();
+		if (m_interactionTypes[button] == INT_ROTATE) {
+			//rot_drag_cur = pos2;
+			rot_drag_cur = rot_mat_start.getW() + (pos2-rot_mat_start.getW()).normalized() * (rot_drag_start-rot_mat_start.getW()).len();
 
-					// get new ray
-					double dX, dY, dZ;
-					gluUnProject ((double) x, _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					R1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-					gluUnProject ((double) x, _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					R2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
+		} else if (m_interactionTypes[button] == INT_MOVE_GROUND ||
+				m_interactionTypes[button] == INT_MOVE_BILLBOARD ||
+				m_interactionTypes[button] == INT_ROTATE_GROUND) {
 
-					// get old ray
-					_y = viewport.w - m_mouseAdapter.getY();
-					gluUnProject ((double) m_mouseAdapter.getX(), _y, 0.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					S1 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-					gluUnProject ((double) m_mouseAdapter.getX(), _y, 1.0, mvmatrix[0], projmatrix[0], &viewport[0], &dX, &dY, &dZ);
-					S2 = Vec3f ( (float) dX, (float) dY, (float) dZ );
-				}
+			// bottom plane
+			Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
+			Vec3f p2 = pos1 + Vec3f::xAxis();
+			Vec3f p3 = pos1 + Vec3f::zAxis();
 
-				// billboard matrix
-				Vec3f look = m_camera.m_position - pos1;
-				Vec3f right = Vec3f::yAxis() % look;
-				Vec3f up = Vec3f::yAxis();
+			if (m_interactionTypes[button] == INT_ROTATE_GROUND) {
 
-				// bottom plane
-				Vec3f p1 = Vec3f(0.0f, pos1.y, 0.0f);
-				Vec3f p2 = pos1 + Vec3f::xAxis();
-				Vec3f p3 = pos1 + Vec3f::zAxis();
+			}
 
-				if (m_interactionType == INT_MOVE_BILLBOARD) {
-					// billboard plane
-					p1 = pos1;
-					p2 = pos1 + Vec3f::yAxis();
-					p3 = pos1 + m_camera.m_strafe;
-				}
+			// billboard plane
+			if (m_interactionTypes[button] == INT_MOVE_BILLBOARD) {
+				p1 = pos1;
+				p2 = pos1 + Vec3f::yAxis();
+				p3 = pos1 + m_camera.m_strafe;
+			}
 
-				pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
-				Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
+			// get new and old rays
+			Vec3f R1, R2;
+			Vec3f S1, S2;
+			ogl::getScreenRay(Vec2d(x, y), R1, R2);
+			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2);
 
-				Mat4f matrix = m_selectedObject->getMatrix();
-				matrix.setW(matrix.getW() + (pos3 - pos1));
-				m_selectedObject->setMatrix(matrix);
+			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
+			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
 
-				if (m_interactionType == INT_MOVE_GROUND)
-					m_selectedObject->convexCastPlacement();
-			} /* end MOVE_GROUND, MOVE_BILLBOARD */
-		} /* end selectedObject && !enabled */
-	} /* end button */
+			Mat4f matrix = m_selectedObject->getMatrix();
+			matrix.setW(matrix.getW() + (pos3 - pos1));
+			m_selectedObject->setMatrix(matrix);
+
+			if (m_interactionTypes[button] == INT_MOVE_GROUND) {
+				m_selectedObject->convexCastPlacement();
+			}
+		} /* end MOVE_GROUND, MOVE_BILLBOARD */
+	} /* end selectedObject && !enabled */
 
 	m_pointer = m_camera.pointer(x, y);
 }
@@ -612,61 +612,21 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	Vec3f old = m_pointer;
 	m_pointer = m_camera.pointer(x, y);
 
-	if (m_interactionType == INT_ROTATE && button == util::RIGHT && m_selectedObject && !m_enabled) {
+	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
+			&& m_selectedObject && !m_enabled) {
 		rot_drag_start = m_pointer;
 		rot_mat_start = m_selectedObject->getMatrix();
 		rot_mouse = Vec2i(x, y);
 	}
 
-	if (button == util::MIDDLE && down) {
-		Vec3f view = m_camera.viewVector();
 
-		Mat4f matrix(Vec3f::yAxis(), view, m_camera.m_position);
+	if (m_interactionTypes[button] == INT_DOMINO_CURVE && down && !m_enabled) {
+		curve_spline.knots().push_back(Vec2f(m_pointer.x, m_pointer.z));
+	}
 
-		RigidBody obj;
-		static int counter = 0;
-		switch (counter++) {
-		case 0:
-			obj = __Object::createBox(matrix, 1.0f, 1.0f, 1.0f, 5.0f, "yellow");
-			break;
-		case 1:
-			obj = __Object::createSphere(matrix, 0.2f, 5.0f, "wood_matt");
-			break;
-		case 2:
-			obj = __Object::createCapsule(matrix, 0.5f, 5.0f, 1.0f, "yellow");
-			break;
-		case 3:
-			obj = __Object::createCone(matrix, 0.5f, 1.0f, 1.0f, "yellow");
-			break;
-		case 4:
-			obj = __Object::createCylinder(matrix, 0.5f, 1.0f, 1.0f, "yellow");
-			break;
-		case 5:
-			obj = __Object::createChamferCylinder(matrix, 2.0f, 0.5f, 1.0f, "yellow");
-			break;
-		}
-		if (counter == 2)
-			counter = 0;
-
-		obj->setVelocity(view * 10.0f);
-		//obj->convexCastPlacement();
-
-		add(obj);
-
-		if (m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
-			Vec3f dir = (m_pointer - old);
-			float len = dir.len();
-			dir.normalize();
-			Mat4f matrix(Vec3f::yAxis(), dir, old);
-			for (float d = 0.0f; d <= len; d += 3.5f) {
-				matrix.setW(old + dir * d);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 1.0f, "domino");
-				add(domino);
-			}
-		}
-	} else if (button == util::RIGHT) {
-		if (m_enabled)
-			newton::mousePick(m_world, Vec2f(x, y), down);
+	if (button == util::RIGHT && m_enabled) {
+		newton::mousePick(m_world, Vec2f(x, y), down);
+		newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
 
@@ -677,9 +637,55 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		m_selectedObject = selectObject(x, y);
 		if (m_selectedObject == m_environment)
 			m_selectedObject = Object();
+	}
 
-		if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled)
-			rot_mat_start = m_selectedObject->getMatrix();
+	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
+			&& m_selectedObject && !m_enabled)
+		rot_mat_start = m_selectedObject->getMatrix();
+
+	if (m_interactionTypes[button] == INT_DOMINO_CURVE && !m_enabled) {
+		// Remove knots that are too close to each other, this improves the
+		// spline and removes unwanted knots when closing the spline
+		bool stop = false;
+		while (!stop) {
+			stop = true;
+			if (curve_spline.knots().size() > 2) {
+				Vec2f last = curve_spline.knots()[curve_spline.knots().size()-1];
+				Vec2f prev = curve_spline.knots()[curve_spline.knots().size()-2];
+				if ((last - prev).len() <= 0.5f) {
+					curve_spline.knots().pop_back();
+					stop = false;
+				}
+			}
+		}
+		curve_spline.update();
+		// spline
+		if (curve_spline.knots().size() > 2) {
+			curve_spline.update();
+			for (float t = 0.0f; t < curve_spline.table().back().len; t += 4.5f) {
+				Vec3f p = curve_spline.getPos(t);
+				Vec3f q = curve_spline.getTangent(t).normalized();
+				Mat4f matrix(Vec3f::yAxis(), q, p);
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, "domino");
+				add(domino);
+			}
+		// line
+		} else if (curve_spline.knots().size() == 2) {
+			Vec3f start = curve_spline.knots()[0].xz3(0.0f);
+			start.y = newton::getVerticalPosition(m_world, start.x, start.z);
+			Vec3f end = curve_spline.knots()[1].xz3(0.0f);
+			end.y = newton::getVerticalPosition(m_world, end.x, end.z);
+			Vec3f dir = (end - start);
+			float len = dir.normalize();
+			Mat4f matrix(Vec3f::yAxis(), dir, start);
+			for (float d = 0.0f; d <= len; d += 4.5f) {
+				matrix.setW(start + dir * d);
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, "domino");
+				add(domino);
+			}
+		}
+		curve_spline.knots().clear();
+		curve_spline.update();
 	}
 }
 
@@ -726,92 +732,76 @@ void Simulation::update()
 	}
 }
 
-void Simulation::applyMaterial(const std::string& material) {
-	const Material* const _mat = MaterialMgr::instance().get(material);
-	//TODO only switch shader/texture if necessary
-	if (_mat != NULL) {
-		const Material& mat = *_mat;
-		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
-
-		if (texture) {
-			glEnable(GL_TEXTURE_2D);
-			texture->bind();
-		} else {
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
-		glMaterialfv(GL_FRONT, GL_SPECULAR, &mat.specular[0]);
-		glMaterialf(GL_FRONT, GL_SHININESS, mat.shininess);
-
-		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
-		if (shader) {
-			shader->bind();
-		} else {
-			ogl::__Shader::unbind();
-		}
-
-	} else {
-		glDisable(GL_TEXTURE_2D);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glUseProgram(0);
-	}
-}
-
 void Simulation::render()
 {
-	m_camera.update();
 	m_camera.apply();
 
-	if (m_vertexBuffer.m_vbo && m_vertexBuffer.m_ibo) {
-		m_vertexBuffer.bind();
+	m_vertexBuffer.bind();
 
 /*
-		const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
-						 0.0f, 0.5f, 0.0f, 0.0f,
-						 0.0f, 0.0f, 0.5f, 0.0f,
-						 0.5f, 0.5f, 0.5f, 1.0f);
-		const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
-		const Mat4f lightModelview;
+	const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
+					 0.0f, 0.5f, 0.0f, 0.0f,
+					 0.0f, 0.0f, 0.5f, 0.0f,
+					 0.5f, 0.5f, 0.5f, 1.0f);
+	const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
+	const Mat4f lightModelview;
 
-		const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
+	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
 */
 
-		ogl::SubBuffers::iterator itr = m_vertexBuffer.m_buffers.begin();
-		//++itr; ++itr; ++itr;
-		for ( ; itr != m_vertexBuffer.m_buffers.end(); ++itr) {
-			const ogl::SubBuffer* buf = (*itr);
-			__Object* obj = (__Object*)buf->object;
-			if (!obj) continue;
-			applyMaterial(buf->material);
-			glPushMatrix();
-			glMultMatrixf(obj->getMatrix()[0]);
-			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
-			glPopMatrix();
+	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
+	std::string material = "";
+	if (itr != m_sortedBuffers.end()) {
+		material = (*itr)->material;
+	}
+	MaterialMgr& mmgr = MaterialMgr::instance();
+	mmgr.applyMaterial(material);
+	for ( ; itr != m_sortedBuffers.end(); ++itr) {
+		const ogl::SubBuffer* const buf = (*itr);
+		const __Object* const obj = (const __Object* const)buf->object;
+		if (material != buf->material) {
+			material = buf->material;
+			mmgr.applyMaterial(material);
 		}
+
+		glPushMatrix();
+		glMultMatrixf(obj->getMatrix()[0]);
+		glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
+		glPopMatrix();
 	}
 
-	if (m_environment)
-		m_environment->render();
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
+	if (m_environment)
+		m_environment->render();
+
 	if (m_selectedObject) {
+		Vec3f min, max;
 		ObjectList::iterator itr = m_objects.begin();
 		for ( ; itr != m_objects.end(); ++itr) {
-			if (*itr == m_selectedObject)
-				(*itr)->render();
+			if (*itr == m_selectedObject) {
+				//(*itr)->render();
+				(*itr)->getAABB(min, max);
+				if (m_camera.testAABB(min, max) == 1)
+					glColor3f(1.0f, 1.0f, 0.0f);
+				else
+					glColor3f(1.0f, 0.0, 0.0f);
+				if (m_camera.checkAABB(min, max)) {
+					//ogl::drawAABB(min, max);
+				}
+			}
 		}
 	}
 
 	glDepthMask(GL_FALSE);
 	glColor3f(1.0f, 0.0f, 1.0f);
 
-	if (m_interactionType == INT_ROTATE && m_selectedObject && !m_enabled) {
+	if (isActivated(INT_ROTATE) && m_selectedObject && !m_enabled) {
 		Vec3f origin = m_selectedObject->getMatrix().getW();
 		Vec3f axis = (rot_drag_start - origin) % (rot_drag_cur - origin);
 
@@ -834,15 +824,11 @@ void Simulation::render()
 			glVertex3fv(&(m_selectedObject->getMatrix().getW()[0]));
 			glVertex3fv(&axis.x);
 		glEnd();
-	} else if (m_interactionType == INT_DOMINO_CURVE && !m_enabled) {
-		glBegin(GL_POINTS);
-		glVertex3fv(&m_pointer[0]);
-		glVertex3fv(&rot_drag_cur[0]);
-		glEnd();
-		glBegin(GL_LINES);
-			glVertex3fv(&m_pointer[0]);
-			glVertex3fv(&curve_current[0]);
-		glEnd();
+	} else if (isActivated(INT_DOMINO_CURVE) && !m_enabled) {
+		curve_spline.update();
+		curve_spline.renderKnots();
+		curve_spline.renderSpline(0.25f);
+		curve_spline.renderPoints(5.0f);
 	}
 
 	glPointSize(5.0f);
