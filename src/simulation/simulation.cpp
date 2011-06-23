@@ -336,7 +336,7 @@ void Simulation::init()
 
 		Compound c = Compound(new __Compound());
 
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 15.0f, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "yellow");
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 15.0f, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 		lobj0 = robj0 = top;
 
@@ -365,7 +365,7 @@ void Simulation::init()
 			rlocation._42 -= (size.x - size.y);
 		}
 		// Mat4f::translate(Vec3f(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f))
-		RigidBody bottom = __Object::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "cradle");
+		RigidBody bottom = __Object::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
 		c->add(bottom);
 
 		// left attachment
@@ -383,7 +383,7 @@ void Simulation::init()
 	}
 
 	// rope
-	if (0)
+	if (1)
 	{
 		RigidBody obj0, obj1;
 		const int linksCount = 15;
@@ -412,12 +412,10 @@ void Simulation::init()
 		}
 		Vec3f pivot = location.getW();
 		pivot.y += (size.x - size.y) * 0.5f;
-		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "rope");
+		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "wood");
 		rope->add(obj1);
 		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
 		add(rope);
-		rope->setMatrix(Mat4f::translate(Vec3f(0.0f, 0.0f, 50.0f)));
-
 	}
 
 	// wagon with tires and hinges

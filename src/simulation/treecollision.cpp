@@ -239,7 +239,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	NewtonTreeCollisionEndBuild(collision, 1);
 
 	this->create(collision, 0.0f);
-	NewtonBodySetContinuousCollisionMode(m_body, 1);
+	//NewtonBodySetContinuousCollisionMode(m_body, 1);
 	NewtonReleaseCollision(world, collision);
 }
 
