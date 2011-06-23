@@ -87,7 +87,7 @@ void RenderWidget::resizeGL(int width, int height)
 	glLoadIdentity();
 	// 10 x 10 x 10 viewing volume
 	//glOrtho(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
-	gluPerspective(60.0f, (float) width / (float) height, 0.1f, 1024.0f);
+	gluPerspective(60.0f, (float) width / (float) height, 0.1f, 4096.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }

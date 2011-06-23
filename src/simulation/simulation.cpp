@@ -247,7 +247,8 @@ void Simulation::init()
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 	__Domino::genDominoBuffers(m_vertexBuffer);
-
+	m_skydome.load("clouds", "skydome", "data/models/skydome.3ds");
+	m_skydome.setRadius(2000.0f);
 
 	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//((__TreeCollision*)m_environment.get())->createOctree();
@@ -434,6 +435,7 @@ void Simulation::clear()
 	m_objects.clear();
 	m_environment = Object();
 	__Domino::freeCollisions();
+	m_skydome.clear();
 	if (m_world) {
 		std::cout << "Remaining bodies: " << NewtonWorldGetBodyCount(m_world) << std::endl;
 		NewtonDestroy(m_world);
@@ -828,7 +830,7 @@ void Simulation::update()
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
-
+	m_skydome.update(delta);
 	float step = delta * (m_keyAdapter.shift() ? 25.f : 10.0f);
 
 	if (m_keyAdapter.isDown('w')) m_camera.move(step);
@@ -882,6 +884,7 @@ void Simulation::render()
 		glPopMatrix();
 	}
 
+	m_skydome.render();
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
