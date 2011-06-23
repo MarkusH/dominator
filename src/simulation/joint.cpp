@@ -26,7 +26,6 @@ void __Joint::save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml:
 		__Hinge::save((const __Hinge&)joint, parent, doc);
 		return;
 	case BALL_AND_SOCKET:
-	case BALL_AND_SOCKET_LIMITED:
 		__BallAndSocket::save((const __BallAndSocket&)joint, parent, doc);
 		break;
 	}
@@ -162,12 +161,23 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 __BallAndSocket::__BallAndSocket(Vec3f pivot, Vec3f pinDir,
 		const Object& child, const Object& parent,
 		const dMatrix& pinAndPivot,
-		const NewtonBody* childBody, const NewtonBody* parentBody)
+		const NewtonBody* childBody, const NewtonBody* parentBody,
+		bool limited, float coneAngle, float minTwist, float maxTwist)
 	: __Joint(BALL_AND_SOCKET),
 	  pivot(pivot), pinDir(pinDir),
-	  child(child), parent(parent)
+	  child(child), parent(parent),
+	  limited(limited), coneAngle(coneAngle), minTwist(minTwist), maxTwist(maxTwist)
 {
-	m_joint = new CustomBallAndSocket(pinAndPivot, childBody, parentBody);
+	if (limited) {
+		CustomLimitBallAndSocket* tmp = new CustomLimitBallAndSocket(pinAndPivot, childBody, parentBody);
+		tmp->SetConeAngle(coneAngle);
+		tmp->SetTwistAngle(minTwist, maxTwist);
+		m_joint = tmp;
+	}
+	else {
+		m_joint = new CustomBallAndSocket(pinAndPivot, childBody, parentBody);
+	}
+
 }
 
 __BallAndSocket::~__BallAndSocket()
@@ -189,15 +199,19 @@ void __BallAndSocket::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
 void __BallAndSocket::save(const __BallAndSocket& ball, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
 {
 	//TODO this is exactly the same as with the hinge, only the type attribute varies
+	// save "limited", too
+	// save coneAngle, minTwist and maxTwist, only if limited = true
 }
 
 BallAndSocket __BallAndSocket::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
 	//TODO this is exactly the same as with the hinge, only the type attribute varies
+	// read "limited", too
+	// read coneAngle, minTwist and maxTwist, only if limited = true
 	return BallAndSocket();
 }
 
-BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
+BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited, float coneAngle, float minTwist, float maxTwist)
 {
 	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
 	__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
@@ -208,7 +222,9 @@ BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& c
 	pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
 	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
 
-	BallAndSocket result = BallAndSocket(new __BallAndSocket(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL));
+	BallAndSocket result = BallAndSocket(new __BallAndSocket(pivot, pinDir,
+			child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL,
+			limited, coneAngle, minTwist, maxTwist));
 	return result;
 }
 

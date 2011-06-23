@@ -324,6 +324,64 @@ void Simulation::init()
 		c->convexCastPlacement();
 	}
 
+	// swing
+	if (1) {
+		const int linksCount = 15;
+		Vec3f size(1.0f, 0.05f, 0.15f);
+		Mat4f llocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
+		llocation.setW(Vec3f(-2.0f, 15.0f - size.x*0.5f, 0.0f));
+		Mat4f rlocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
+		rlocation.setW(Vec3f(2.0f, 15.0f - size.x*0.5f, 0.0f));
+		RigidBody lobj0, lobj1, robj0, robj1;
+
+		Compound c = Compound(new __Compound());
+
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 15.0f, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "yellow");
+		c->add(top);
+		lobj0 = robj0 = top;
+
+		for (int i = 0; i < linksCount; i ++) {
+			//create the rigid bodies
+			lobj1 = __Object::createCylinder(llocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			c->add(lobj1);
+
+			robj1 = __Object::createCylinder(rlocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			c->add(robj1);
+
+			// left joint
+			Vec3f pivot = llocation.getW();
+			pivot.y += (size.x - size.y) * 0.5f;
+
+			c->createBallAndSocket(pivot, llocation.getY(), lobj1, lobj0);//, true, 360.0f * 3.14f / 180.0f, -45.0f * 3.14f / 180.0f, 45.0f * 3.14f / 180.0f);
+			lobj0 = lobj1;
+			llocation._42 -= (size.x - size.y);
+
+			// right joint
+			pivot = rlocation.getW();
+			pivot.y += (size.x - size.y) * 0.5f;
+
+			c->createBallAndSocket(pivot, rlocation.getY(), robj1, robj0);//, true, 360.0f * 3.14f / 180.0f, -45.0f * 3.14f / 180.0f, 45.0f * 3.14f / 180.0f);
+			robj0 = robj1;
+			rlocation._42 -= (size.x - size.y);
+		}
+		// Mat4f::translate(Vec3f(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f))
+		RigidBody bottom = __Object::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "cradle");
+		c->add(bottom);
+
+		// left attachment
+		Vec3f pivot = llocation.getW();
+		pivot.y = llocation._42+size.x*0.5f;
+		c->createBallAndSocket(pivot, llocation.getY(), bottom, lobj0, true);
+
+		// right attachment
+		pivot = rlocation.getW();
+		pivot.y = rlocation._42+size.x*0.5f;
+		c->createBallAndSocket(pivot, rlocation.getY(), bottom, robj0, true);
+
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.0f, 50.0f)));
+	}
+
 	// rope
 	if (0)
 	{
@@ -335,8 +393,6 @@ void Simulation::init()
 		Compound rope = Compound(new __Compound());
 		// create a long vertical rope with limits
 		for (int i = 0; i < linksCount; i ++) {
-			// create the a graphic character (use a visualObject as our body
-
 			//create the rigid body
 			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
 			rope->add(obj1);
@@ -360,6 +416,7 @@ void Simulation::init()
 		rope->add(obj1);
 		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
 		add(rope);
+		rope->setMatrix(Mat4f::translate(Vec3f(0.0f, 0.0f, 50.0f)));
 
 	}
 

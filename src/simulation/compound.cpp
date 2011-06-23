@@ -149,11 +149,11 @@ Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Obj
 	return result;
 }
 
-BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent)
+BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent, bool limited, float coneAngle, float minTwist, float maxTwist)
 {
 	if (child && child != parent) {
 		Vec3f pin = pinDir % m_matrix;
-		BallAndSocket ball = __BallAndSocket::create(pivot, pin, child, parent);
+		BallAndSocket ball = __BallAndSocket::create(pivot, pin, child, parent, limited, coneAngle, minTwist, maxTwist);
 		m_joints.push_back(ball);
 		return ball;
 	}

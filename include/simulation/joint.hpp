@@ -34,9 +34,12 @@ typedef std::tr1::shared_ptr<__Hinge> Hinge;
 class __BallAndSocket;
 typedef std::tr1::shared_ptr<__BallAndSocket> BallAndSocket;
 
+/**
+ * The base class for all joints. This class should not be instantiated.
+ */
 class __Joint {
 public:
-	typedef enum { HINGE, BALL_AND_SOCKET, BALL_AND_SOCKET_LIMITED } Type;
+	typedef enum { HINGE, BALL_AND_SOCKET } Type;
 
 	Type type;
 
@@ -57,6 +60,10 @@ public:
 	static Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
+/**
+ * A simple hinge at a pivot point. The given bodies can only move around
+ * the given pin axis.
+ */
 class __Hinge : public __Joint, public CustomHinge {
 protected:
 	__Hinge(Vec3f pivot, Vec3f pinDir,
@@ -77,6 +84,9 @@ public:
 	static Hinge load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
+/**
+ * A ball and socket joint at a pivot point. The cone and twist angles can be limited.
+ */
 class __BallAndSocket : public __Joint {
 protected:
 	CustomBallAndSocket* m_joint;
@@ -84,18 +94,25 @@ protected:
 	__BallAndSocket(Vec3f pivot, Vec3f pinDir,
 			const Object& child, const Object& parent,
 			const dMatrix& pinAndPivot,
-			const NewtonBody* childBody, const NewtonBody* parentBody);
+			const NewtonBody* childBody, const NewtonBody* parentBody,
+			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
 public:
 	Vec3f pivot;
 	Vec3f pinDir;
 	Object child;
 	Object parent;
+	bool limited;
+	// if limited:
+	float coneAngle;
+	float minTwist, maxTwist;
 
 	~__BallAndSocket();
 
 	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
 
-	static BallAndSocket create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
+	static BallAndSocket create(Vec3f pivot, Vec3f pinDir,
+			const Object& child, const Object& parent,
+			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
 
 	static void save(const __BallAndSocket& ball, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static BallAndSocket load(const std::list<Object>& list, rapidxml::xml_node<>* node);
