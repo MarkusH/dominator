@@ -27,12 +27,10 @@ protected:
 	float m_time;
 public:
 	Skydome();
-	Skydome(const std::string& texture, const std::string& shader, const std::string& fileName);
+	Skydome(float radius, const std::string& texture, const std::string& shader, const std::string& fileName);
 	virtual ~Skydome();
 
-	void setRadius(float radius) { m_radius = radius * 0.01f; };
-
-	void load(const std::string& texture, const std::string& shader, const std::string& fileName);
+	void load(float radius, const std::string& texture, const std::string& shader, const std::string& fileName);
 	void clear();
 
 	void update(float dt);

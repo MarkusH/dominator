@@ -9,7 +9,7 @@ void main()
 {
 	//vec4 horizon = vec4(0.9, 0.7, 0.7, 1.0);
 
-   vec4 clouds_0 = vec4(0.0, 0.0, 0.0, 0.0); //texture2D(s_texture_0, gl_TexCoord[0].xy);
+   vec4 clouds_0 = texture2D(s_texture_0, gl_TexCoord[0].xy);
    vec4 clouds_1 = texture2D(s_texture_1, gl_TexCoord[0].wz);
 	//vec4 clouds_2 = texture2D(s_texture_1, gl_TexCoord[0].xy);
 	

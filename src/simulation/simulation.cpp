@@ -247,8 +247,7 @@ void Simulation::init()
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 	__Domino::genDominoBuffers(m_vertexBuffer);
-	m_skydome.load("clouds", "skydome", "data/models/skydome.3ds");
-	m_skydome.setRadius(2000.0f);
+	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds");
 
 	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//((__TreeCollision*)m_environment.get())->createOctree();
