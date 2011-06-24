@@ -81,12 +81,12 @@ public:
 	/**
 	 * Returns the current modelview matrix of OpenGL.
 	 */
-	static Mat4<T> modelview__();
+	static Mat4<T> modelview();
 
 	/**
 	 * Returns the current projection matrix of OpenGL.
 	 */
-	static Mat4<T> projection__();
+	static Mat4<T> projection();
 #endif
 
 	Mat4<T>& operator*=(const Mat4<T>& m);
@@ -266,7 +266,7 @@ Mat4<T>::Mat4(Vec3<T> up, Vec3<T> front, Vec3<T> pos)
 #ifdef M3D_USE_OPENGL
 template<typename T>
 inline
-Mat4<T> Mat4<T>::modelview__()
+Mat4<T> Mat4<T>::modelview()
 {
 	Mat4d res;
 	glGetDoublev(GL_MODELVIEW_MATRIX, res[0]);
@@ -275,7 +275,7 @@ Mat4<T> Mat4<T>::modelview__()
 
 template<typename T>
 inline
-Mat4<T> Mat4<T>::projection__()
+Mat4<T> Mat4<T>::projection()
 {
 	Mat4d res;
 	glGetDoublev(GL_PROJECTION_MATRIX, res[0]);

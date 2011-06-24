@@ -123,7 +123,7 @@ static inline void drawFlare(Skydome::Flares flare, const Vec4f& color, const Ma
 	glTexCoord2fv(flare_uv[flare][3]); glVertex3fv(v[3]);
 }
 
-void Skydome::render(const Vec3f& cam, const Vec3f& light)
+void Skydome::render(const Camera& cam, const Vec3f& light, bool concealed)
 {
 	// skydome
 	glEnable(GL_TEXTURE_2D);
@@ -141,35 +141,17 @@ void Skydome::render(const Vec3f& cam, const Vec3f& light)
 	__Shader::unbind();
 
 	// flares
-
-	// Get some depth samples to determine the visibility
-	// of the light source
-	const int SAMPLES = 625;
-	//TODO: this is slow. remove these functions and store all this in the camera
-	// pass a pointer to them when needed
-	Vec4<GLint> viewport = Vec4<GLint>::viewport__();
-	Mat4d modelview = Mat4d::modelview__();
-	Mat4d projection = Mat4d::projection__();
-
 	Vec3d window;
-	float samples[SAMPLES];
+	bool inside = false;
+	bool visible = false;
 
-	gluProject(light.x, light.y, light.z, modelview[0], projection[0],
-			&viewport[0], &window.x, &window.y, &window.z);
+	visible = cam.testSphere(light, 50.0f);
 
-	//TODO: this is slow. maybe shoot a newton ray? we could also do these calculations only every tenth/xth frame
-	glReadPixels(window.x, window.y, sqrt(SAMPLES), sqrt(SAMPLES),
-			GL_DEPTH_COMPONENT, GL_FLOAT, &samples[0]);
-
-	bool in = false;
-	for (int i = 0; i < SAMPLES; ++i) {
-		if (samples[i] > window.z) {
-			in = true;
-			break;
-		}
+	if (visible) {
+		inside = !concealed;
 	}
 
-	if (in) {
+	if (inside) {
 		m_fadeTime += m_delta * 0.05f;
 		if (m_fadeTime > 20.0f)
 			m_fadeTime = 20.0f;
@@ -179,14 +161,22 @@ void Skydome::render(const Vec3f& cam, const Vec3f& light)
 		m_fadeTime -= m_delta * 0.05f;
 	}
 
+	if (!visible && m_fadeTime <= 0.0f)
+		return;
+
 	glCullFace(GL_FRONT);
 
-	Mat4f modelviewf(modelview);
+	Mat4d modelview(cam.m_modelview);
+	Mat4d projection(cam.m_projection);
+	gluProject(light.x, light.y, light.z, modelview[0], projection[0],
+			&cam.m_viewport[0], &window.x, &window.y, &window.z);
+
+	Mat4f modelviewf(cam.m_modelview);
 
 	Vec3f dir = modelviewf.getZ();
 	dir.z *= -1.0f;
-	Vec3f lightToCam = cam - light;
-	Vec3f intersection = (dir * lightToCam.len()) + cam;
+	Vec3f lightToCam = cam.m_position - light;
+	Vec3f intersection = (dir * lightToCam.len()) + cam.m_position;
 	Vec3f lToInt = intersection - light;
 	float length = lToInt.len() * 0.3f;
 	lToInt.normalize();
@@ -198,9 +188,9 @@ void Skydome::render(const Vec3f& cam, const Vec3f& light)
 	glBindTexture(GL_TEXTURE_2D, m_flares);
 
 	float alpha = 2.0f * m_fadeTime / 10.0f;
-	Vec2f tmp(viewport[2] * 0.5f - window[0], viewport[3] * 0.5f - (window[1] / alpha));
+	Vec2f tmp(cam.m_viewport[2] * 0.5f - window[0], cam.m_viewport[3] * 0.5f - (window[1] / alpha));
 	float len = tmp.len();
-	float Alpha = ((viewport[3] / len) / 5.0f) * alpha;
+	float Alpha = ((cam.m_viewport[3] / len) / 5.0f) * alpha;
 
 	glPushMatrix();
 	glLoadIdentity();
@@ -226,6 +216,7 @@ void Skydome::render(const Vec3f& cam, const Vec3f& light)
 		Vec3f vtemp = lToInt * 2.0f * length;
 		drawFlare(STREAK, Vec4f(0.6f, 0.6f, 0.80f, 0.25f * Alpha), modelviewf, light, 32.0f);
 		drawFlare(GLOW, Vec4f(0.80f, 0.80f, 1.00f, 0.5f * Alpha), modelviewf, light, 3.5f);
+		/*
 		drawFlare(GLOW, Vec4f(0.90f, 0.60f, 0.40f, 0.5f * Alpha), modelviewf, vtemp * 0.1000f + light, 0.60f);
 		drawFlare(HALO, Vec4f(0.80f, 0.50f, 0.60f, 0.5f * Alpha), modelviewf, vtemp * 0.1500f + light, 1.70f);
 		drawFlare(HALO, Vec4f(0.90f, 0.20f, 0.10f, 0.5f * Alpha), modelviewf, vtemp * 0.1750f + light, 0.83f);
@@ -239,6 +230,7 @@ void Skydome::render(const Vec3f& cam, const Vec3f& light)
 		drawFlare(GLOW, Vec4f(0.80f, 0.50f, 0.10f, 0.5f * Alpha), modelviewf, vtemp * 0.7825f + light, 0.60f);
 		drawFlare(HALO, Vec4f(0.50f, 0.50f, 0.70f, 0.5f * Alpha), modelviewf, vtemp * 1.0000f + light, 1.70f);
 		drawFlare(GLOW, Vec4f(0.40f, 0.10f, 0.90f, 0.5f * Alpha), modelviewf, vtemp * 0.9750f + light, 2.00f);
+		*/
 		glEnd();
 	}
 

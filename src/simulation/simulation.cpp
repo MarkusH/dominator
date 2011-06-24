@@ -633,7 +633,7 @@ void Simulation::mouseMove(int x, int y)
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT) && m_enabled) {
-		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+		newton::mousePick(m_world, m_camera, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 	}
 
 	util::Button button = util::LEFT;
@@ -680,8 +680,8 @@ void Simulation::mouseMove(int x, int y)
 			// get new and old rays
 			Vec3f R1, R2;
 			Vec3f S1, S2;
-			ogl::getScreenRay(Vec2d(x, y), R1, R2);
-			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2);
+			ogl::getScreenRay(Vec2d(x, y), R1, R2, m_camera);
+			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2, m_camera);
 
 			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
 			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
@@ -735,7 +735,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (button == util::RIGHT && m_enabled) {
-		newton::mousePick(m_world, Vec2f(x, y), down);
+		newton::mousePick(m_world, m_camera, Vec2f(x, y), down);
 		//newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
@@ -862,8 +862,6 @@ void Simulation::render()
 */
 
 	// set some light properties
-	GLfloat fullambient[4] = { 0.1, 0.1, 0.1, 1.0 };
-	GLfloat position[4] = { 30.0, 0.0, 10.0, 0.0 };
 	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
 	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
 	GLfloat specular[4] = { 0.7, 0.7, 0.7, 1.0 };
@@ -901,7 +899,7 @@ void Simulation::render()
 		m_environment->render();
 
 	glDisable(GL_LIGHTING);
-	m_skydome.render(m_camera.m_position, m_lightPos.xyz());
+	m_skydome.render(m_camera, m_lightPos.xyz(), newton::getRayCastBody(m_world, m_camera.m_position, m_lightPos.xyz() - m_camera.m_position));
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);

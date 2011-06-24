@@ -65,6 +65,8 @@ void RenderWidget::resizeGL(int width, int height)
 	gluPerspective(60.0f, (float) width / (float) height, 0.1f, 4096.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	sim::Simulation::instance().getCamera().m_viewport = Vec4<GLint>::viewport();
+	sim::Simulation::instance().getCamera().m_projection = Mat4f::projection();
 }
 
 void RenderWidget::paintGL()

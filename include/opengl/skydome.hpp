@@ -12,6 +12,7 @@
 #include <m3d/m3d.hpp>
 #include <opengl/texture.hpp>
 #include <opengl/shader.hpp>
+#include <opengl/camera.hpp>
 
 namespace ogl {
 
@@ -38,7 +39,7 @@ public:
 	void clear();
 
 	void update(float dt);
-	void render(const Vec3f& cam, const Vec3f& light);
+	void render(const Camera& cam, const Vec3f& light, bool concealed);
 };
 
 }
