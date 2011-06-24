@@ -24,11 +24,10 @@ Camera::~Camera()
 {
 }
 
-bool Camera::checkAABB(const Vec3f& min, const Vec3f& max)
+bool Camera::checkAABB(const Vec3f& min, const Vec3f& max) const
 {
 	Vec3f near;
 	float distance = 0.0f;
-	int count = 0;
 	for (int i = 0; i < 6; ++i) {
     	near.x = (m_frustum[i][0] > 0.0f) ? max.x : min.x;
 		near.y = (m_frustum[i][1] > 0.0f) ? max.y : min.y;
@@ -41,7 +40,7 @@ bool Camera::checkAABB(const Vec3f& min, const Vec3f& max)
 	return true;
 }
 
-Camera::Visibility Camera::testAABB(const Vec3f& min, const Vec3f& max)
+Camera::Visibility Camera::testAABB(const Vec3f& min, const Vec3f& max) const
 {
 	Visibility result = INSIDE;
 	float distance = 0.0f;
@@ -69,15 +68,30 @@ Camera::Visibility Camera::testAABB(const Vec3f& min, const Vec3f& max)
 	return result;
 }
 
+Camera::Visibility Camera::testSphere(const Vec3f& center, float radius) const
+{
+	float distance;
+	Visibility result = INSIDE;
+
+	for (int i = 0; i < 6; ++i) {
+		distance = m_frustum[i][0] * center.x + m_frustum[i][1] * center.y + m_frustum[i][2] * center.z + m_frustum[i][3];
+		if (distance < -radius)
+			return OUTSIDE;
+		else if (distance < radius)
+			result =  INTERSECT;
+	}
+	return result;
+}
+
 void Camera::update()
 {
 	m_strafe = (m_eye - m_position) % m_up;
 	m_strafe.normalize();
 
-	m_matrix = Mat4f::lookAt(m_position, m_eye, m_up);
-	m_inverse = m_matrix.inverse();
+	m_modelview = Mat4f::lookAt(m_position, m_eye, m_up);
+	m_inverse = m_modelview.inverse();
 
-	Mat4f mvproj = m_matrix * Mat4f::projection();
+	Mat4f mvproj = m_modelview * m_projection;
 
 	// left
 	m_frustum[0][0] = mvproj._14 + mvproj._11;
@@ -202,9 +216,10 @@ void Camera::apply()
 {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(m_position.x, m_position.y, m_position.z,
-				   m_eye.x,	     m_eye.y,      m_eye.z,
-				    m_up.x,       m_up.y,       m_up.z);
+	//gluLookAt(m_position.x, m_position.y, m_position.z,
+	//			   m_eye.x,	     m_eye.y,      m_eye.z,
+	//			    m_up.x,       m_up.y,       m_up.z);
+	glLoadMatrixf(m_modelview[0]);
 }
 
 Vec3f Camera::viewVector() const
@@ -214,25 +229,23 @@ Vec3f Camera::viewVector() const
 
 Vec3f Camera::pointer() const
 {
-	Vec4<GLint> viewport = Vec4<GLint>::viewport();
-	return pointer((viewport.z - viewport.x) / 2,
-				   (viewport.w - viewport.y) / 2);
+	return pointer((m_viewport.z - m_viewport.x) / 2,
+				   (m_viewport.w - m_viewport.y) / 2);
 }
 
 Vec3f Camera::pointer(int x, int y) const
 {
-	Mat4d modelview = Mat4d::modelview();
-	Mat4d projection = Mat4d::projection();
-	Vec4<GLint> viewport = Vec4<GLint>::viewport();
+	Mat4d modelview(m_modelview);
+	Mat4d projection(m_projection);
 	GLfloat z;
 
-	y = viewport.w - y;
+	y = m_viewport.w - y;
 
 	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
 
 	GLdouble _x, _y, _z;
 	gluUnProject(x, y, z,
-			modelview[0], projection[0], &viewport[0],
+			modelview[0], projection[0], &m_viewport[0],
 			&_x, &_y, &_z);
 
 	return Vec3f(_x, _y, _z);

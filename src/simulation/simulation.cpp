@@ -132,6 +132,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_gravity = -9.81f * 4.0f;
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
+	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
 }
 
 Simulation::~Simulation()
@@ -247,7 +248,7 @@ void Simulation::init()
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 	__Domino::genDominoBuffers(m_vertexBuffer);
-
+	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
 	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//((__TreeCollision*)m_environment.get())->createOctree();
@@ -489,6 +490,7 @@ void Simulation::clear()
 	m_objects.clear();
 	m_environment = Object();
 	__Domino::freeCollisions();
+	m_skydome.clear();
 	if (m_world) {
 		std::cout << "Remaining bodies: " << NewtonWorldGetBodyCount(m_world) << std::endl;
 		NewtonDestroy(m_world);
@@ -686,7 +688,7 @@ void Simulation::mouseMove(int x, int y)
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT) && m_enabled) {
-		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+		newton::mousePick(m_world, m_camera, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 	}
 
 	util::Button button = util::LEFT;
@@ -733,8 +735,8 @@ void Simulation::mouseMove(int x, int y)
 			// get new and old rays
 			Vec3f R1, R2;
 			Vec3f S1, S2;
-			ogl::getScreenRay(Vec2d(x, y), R1, R2);
-			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2);
+			ogl::getScreenRay(Vec2d(x, y), R1, R2, m_camera);
+			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2, m_camera);
 
 			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
 			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
@@ -788,7 +790,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (button == util::RIGHT && m_enabled) {
-		newton::mousePick(m_world, Vec2f(x, y), down);
+		newton::mousePick(m_world, m_camera, Vec2f(x, y), down);
 		//newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
@@ -883,7 +885,7 @@ void Simulation::update()
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
-
+	m_skydome.update(delta);
 	float step = delta * (m_keyAdapter.shift() ? 25.f : 10.0f);
 
 	if (m_keyAdapter.isDown('w')) m_camera.move(step);
@@ -914,6 +916,17 @@ void Simulation::render()
 	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
 */
 
+	// set some light properties
+	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
+	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
+	GLfloat specular[4] = { 0.7, 0.7, 0.7, 1.0 };
+
+	glLightfv(GL_LIGHT0, GL_POSITION, &m_lightPos[0]);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
 	if (itr != m_sortedBuffers.end()) {
@@ -937,13 +950,17 @@ void Simulation::render()
 		glPopMatrix();
 	}
 
+	if (m_environment)
+		m_environment->render();
+
+	glDisable(GL_LIGHTING);
+	m_skydome.render(m_camera, m_lightPos.xyz(), newton::getRayCastBody(m_world, m_camera.m_position, m_lightPos.xyz() - m_camera.m_position));
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
-	if (m_environment)
-		m_environment->render();
+
 
 	if (m_selectedObject) {
 		Vec3f min, max;
