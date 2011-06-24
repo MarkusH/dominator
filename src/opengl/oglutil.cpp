@@ -54,9 +54,9 @@ void drawAABB(const Vec3f& min, const Vec3f& max)
 
 Vec3f screenToWorld(const Vec3d& screen)
 {
-	Vec4<GLint> view = Vec4<GLint>::viewport();
-	Mat4d mv = Mat4d::modelview();
-	Mat4d proj = Mat4d::projection();
+	Vec4<GLint> view = Vec4<GLint>::viewport__();
+	Mat4d mv = Mat4d::modelview__();
+	Mat4d proj = Mat4d::projection__();
 
 	double x, y, z;
 	y = view.w - screen.y;
@@ -67,9 +67,9 @@ Vec3f screenToWorld(const Vec3d& screen)
 
 Vec3f screenToWorld(const Vec2d& screen)
 {
-	Vec4<GLint> view = Vec4<GLint>::viewport();
-	Mat4d mv = Mat4d::modelview();
-	Mat4d proj = Mat4d::projection();
+	Vec4<GLint> view = Vec4<GLint>::viewport__();
+	Mat4d mv = Mat4d::modelview__();
+	Mat4d proj = Mat4d::projection__();
 
 	double x, y, z;
 	float screenZ;
@@ -84,10 +84,10 @@ Vec3f screenToWorld(const Vec2d& screen)
 
 Vec3f getScreenRay(const Vec2d& screen, Vec3f& near, Vec3f& far)
 {
-	Vec4<GLint> viewport = Vec4<GLint>::viewport();
+	Vec4<GLint> viewport = Vec4<GLint>::viewport__();
 	float _y = viewport.w - screen.y;
-	Mat4d mvmatrix = Mat4d::modelview();
-	Mat4d projmatrix = Mat4d::projection();
+	Mat4d mvmatrix = Mat4d::modelview__();
+	Mat4d projmatrix = Mat4d::projection__();
 
 	// shoot a ray to the near and far plane
 	double dX, dY, dZ;

@@ -119,6 +119,7 @@ protected:
 	 * The skydome of the simulation.
 	 */
 	ogl::Skydome m_skydome;
+	Vec4f m_lightPos;
 
 	/**
 	 * Uploads the vertex data of all objects between begin

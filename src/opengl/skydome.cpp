@@ -14,30 +14,45 @@
 
 namespace ogl {
 
+/* Texture layout:
+ * ------------------------
+ * | big glow  |   glow   |
+ * ------------------------
+ * |   halo    |  streak  |
+ * ------------------------
+ */
+static const float flare_uv[4][4][2] = {
+		{{ 0.0f, 0.0f }, { 0.0f, 0.5f }, { 0.5f, 0.5f }, { 0.5f, 0.0f }}, //< big glow
+		{{ 0.5f, 0.0f }, { 0.5f, 0.5f }, { 1.0f, 0.5f }, { 1.0f, 0.0f }}, //< glow
+		{{ 0.0f, 0.5f }, { 0.0f, 1.0f }, { 0.5f, 1.0f }, { 0.5f, 0.5f }}, //< halo
+		{{ 0.5f, 0.5f }, { 0.5f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.5f }}  //< streak
+};
+
 Skydome::Skydome()
 	: m_list(0),
 	  m_radius(1000.0f * 0.01f)
 {
-	m_color = Vec4f(0.9f, 0.7f, 0.7f, 1.0f);
+	m_horizon = Vec4f(0.9f, 0.7f, 0.7f, 1.0f);
 }
 
-Skydome::Skydome(float radius, const std::string& texture, const std::string& shader, const std::string& fileName)
+Skydome::Skydome(float radius, const std::string& clouds, const std::string& shader, const std::string& fileName, const std::string& flares)
 	: m_list(0),
 	  m_radius(1000.0f * 0.01f)
 {
-	load(radius, texture, shader, fileName);
+	load(radius, clouds, shader, fileName, flares);
 }
 
 Skydome::~Skydome() {
 	clear();
 }
 
-void Skydome::load(float radius, const std::string& texture, const std::string& shader, const std::string& fileName)
+void Skydome::load(float radius, const std::string& clouds, const std::string& shader, const std::string& fileName, const std::string& flares)
 {
 	clear();
 	m_shader = ShaderMgr::instance().get(shader);
-	m_texture = TextureMgr::instance().get(texture);
+	m_clouds = TextureMgr::instance().get(clouds)->m_textureID;
 	m_radius = radius * 0.01f;
+	m_flares = TextureMgr::instance().get(flares)->m_textureID;
 
 	Lib3dsFile* model = lib3ds_file_load(fileName.c_str());
 	if(!model)
@@ -81,45 +96,176 @@ void Skydome::clear()
 		glDeleteLists(m_list, 1);
 	m_list = 0;
 	m_shader = Shader();
-	m_texture = Texture();
+	m_clouds = 0;
 	m_time = 0.0f;
 }
 
 void Skydome::update(float dt)
 {
 	m_time += dt * 0.01f;
+	m_delta = dt * 100.0f;
 }
 
-void Skydome::render()
+static inline void drawFlare(Skydome::Flares flare, const Vec4f& color, const Mat4f& mat, const Vec3f& position, float scale)
 {
+	scale *= 5.0f;
+	Vec3f pos = position * mat;
+	float v[4][3] = {
+			{ pos[0] - scale, pos[1] - scale, pos[2] },
+			{ pos[0] - scale, pos[1] + scale, pos[2] },
+			{ pos[0] + scale, pos[1] + scale, pos[2] },
+			{ pos[0] + scale, pos[1] - scale, pos[2] }
+	};
+	glColor4fv(&color[0]);
+	glTexCoord2fv(flare_uv[flare][0]); glVertex3fv(v[0]);
+	glTexCoord2fv(flare_uv[flare][1]); glVertex3fv(v[1]);
+	glTexCoord2fv(flare_uv[flare][2]); glVertex3fv(v[2]);
+	glTexCoord2fv(flare_uv[flare][3]); glVertex3fv(v[3]);
+}
+
+void Skydome::render(const Vec3f& cam, const Vec3f& light)
+{
+	// skydome
 	glEnable(GL_TEXTURE_2D);
-
-	m_texture->bind();
-
-	/*
-	m_shader->bind();
-	m_shader->setUniform1f("time", m_time);
-	m_shader->setUniform1f("invHeight", 1.0f / 50.0f);
-	m_shader->setUniform1f("invRadius", 2.0f / (10.0f * m_radius));
-	m_shader->setUniform4fv("color", &m_color[0]);
-	m_shader->setUniform1i("s_texture_0", 0);
-	m_shader->setUniform1i("s_texture_1", 0);
-	*/
+	glBindTexture(GL_TEXTURE_2D, m_clouds);
 
 	m_shader->bind();
 	m_shader->setUniform1f("time", m_time);
 	m_shader->setUniform1f("invHeight", 16.0f * m_radius / 50.0f);
 	m_shader->setUniform1f("invRadius", 2.0f / (10.0f * m_radius * m_radius));
-	m_shader->setUniform4fv("color", &m_color[0]);
+	m_shader->setUniform4fv("color", &m_horizon[0]);
 
-	//glPushMatrix();
 	glDepthMask(GL_FALSE);
-	//glScalef(m_radius, m_radius, m_radius);
-	//glTranslatef(0.0f, -16.0f, 0.0f);
 	glCallList(m_list);
 	glDepthMask(GL_TRUE);
-	//glPopMatrix();
 	__Shader::unbind();
+
+	// flares
+
+	// Get some depth samples to determine the visibility
+	// of the light source
+	const int SAMPLES = 625;
+	//TODO: this is slow. remove these functions and store all this in the camera
+	// pass a pointer to them when needed
+	Vec4<GLint> viewport = Vec4<GLint>::viewport__();
+	Mat4d modelview = Mat4d::modelview__();
+	Mat4d projection = Mat4d::projection__();
+
+	Vec3d window;
+	float samples[SAMPLES];
+
+	gluProject(light.x, light.y, light.z, modelview[0], projection[0],
+			&viewport[0], &window.x, &window.y, &window.z);
+
+	//TODO: this is slow. maybe shoot a newton ray? we could also do these calculations only every tenth/xth frame
+	glReadPixels(window.x, window.y, sqrt(SAMPLES), sqrt(SAMPLES),
+			GL_DEPTH_COMPONENT, GL_FLOAT, &samples[0]);
+
+	bool in = false;
+	for (int i = 0; i < SAMPLES; ++i) {
+		if (samples[i] > window.z) {
+			in = true;
+			break;
+		}
+	}
+
+	if (in) {
+		m_fadeTime += m_delta * 0.05f;
+		if (m_fadeTime > 20.0f)
+			m_fadeTime = 20.0f;
+	} else if (m_fadeTime > 0) {
+		if (m_fadeTime > 4.5f)
+			m_fadeTime = 4.5f;
+		m_fadeTime -= m_delta * 0.05f;
+	}
+
+	glCullFace(GL_FRONT);
+
+	Mat4f modelviewf(modelview);
+
+	Vec3f dir = modelviewf.getZ();
+	dir.z *= -1.0f;
+	Vec3f lightToCam = cam - light;
+	Vec3f intersection = (dir * lightToCam.len()) + cam;
+	Vec3f lToInt = intersection - light;
+	float length = lToInt.len() * 0.3f;
+	lToInt.normalize();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, m_flares);
+
+	float alpha = 2.0f * m_fadeTime / 10.0f;
+	Vec2f tmp(viewport[2] * 0.5f - window[0], viewport[3] * 0.5f - (window[1] / alpha));
+	float len = tmp.len();
+	float Alpha = ((viewport[3] / len) / 5.0f) * alpha;
+
+	glPushMatrix();
+	glLoadIdentity();
+
+	if (m_fadeTime > 0.0f) {
+		Vec4f ctemp(0.6f, 0.6f, 0.8f, 20.0f * Alpha);
+		glBegin(GL_QUADS);
+		drawFlare(BIG_GLOW, ctemp, modelviewf, light, 32.0f);
+		drawFlare(BIG_GLOW, ctemp, modelviewf, light, 32.0f);
+		drawFlare(BIG_GLOW, ctemp, modelviewf, light, 32.0f);
+		drawFlare(BIG_GLOW, ctemp, modelviewf, light, 32.0f);
+
+		drawFlare(STREAK, ctemp, modelviewf, light, 32.0f);
+		glEnd();
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBegin(GL_QUADS);
+		drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 50.0f * Alpha), modelviewf, light, 32.0f);
+		glEnd();
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glBegin(GL_QUADS);
+		Vec3f vtemp = lToInt * 2.0f * length;
+		drawFlare(STREAK, Vec4f(0.6f, 0.6f, 0.80f, 0.25f * Alpha), modelviewf, light, 32.0f);
+		drawFlare(GLOW, Vec4f(0.80f, 0.80f, 1.00f, 0.5f * Alpha), modelviewf, light, 3.5f);
+		drawFlare(GLOW, Vec4f(0.90f, 0.60f, 0.40f, 0.5f * Alpha), modelviewf, vtemp * 0.1000f + light, 0.60f);
+		drawFlare(HALO, Vec4f(0.80f, 0.50f, 0.60f, 0.5f * Alpha), modelviewf, vtemp * 0.1500f + light, 1.70f);
+		drawFlare(HALO, Vec4f(0.90f, 0.20f, 0.10f, 0.5f * Alpha), modelviewf, vtemp * 0.1750f + light, 0.83f);
+		drawFlare(HALO, Vec4f(0.70f, 0.70f, 0.40f, 0.5f * Alpha), modelviewf, vtemp * 0.2850f + light, 1.60f);
+		drawFlare(GLOW, Vec4f(0.90f, 0.90f, 0.20f, 0.5f * Alpha), modelviewf, vtemp * 0.2755f + light, 0.80f);
+		drawFlare(GLOW, Vec4f(0.93f, 0.82f, 0.73f, 0.5f * Alpha), modelviewf, vtemp * 0.4775f + light, 1.00f);
+		drawFlare(HALO, Vec4f(0.70f, 0.60f, 0.50f, 0.5f * Alpha), modelviewf, vtemp * 0.4900f + light, 1.40f);
+		drawFlare(GLOW, Vec4f(0.70f, 0.80f, 0.30f, 0.5f * Alpha), modelviewf, vtemp * 0.6500f + light, 1.80f);
+		drawFlare(GLOW, Vec4f(0.40f, 0.30f, 0.20f, 0.5f * Alpha), modelviewf, vtemp * 0.6300f + light, 1.40f);
+		drawFlare(HALO, Vec4f(0.70f, 0.50f, 0.50f, 0.5f * Alpha), modelviewf, vtemp * 0.8000f + light, 1.40f);
+		drawFlare(GLOW, Vec4f(0.80f, 0.50f, 0.10f, 0.5f * Alpha), modelviewf, vtemp * 0.7825f + light, 0.60f);
+		drawFlare(HALO, Vec4f(0.50f, 0.50f, 0.70f, 0.5f * Alpha), modelviewf, vtemp * 1.0000f + light, 1.70f);
+		drawFlare(GLOW, Vec4f(0.40f, 0.10f, 0.90f, 0.5f * Alpha), modelviewf, vtemp * 0.9750f + light, 2.00f);
+		glEnd();
+	}
+
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBegin(GL_QUADS);
+
+	if (m_fadeTime > 1.0f)
+		drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 1.0f / m_fadeTime), modelviewf, light, 32.0f);
+
+	if (m_fadeTime < 1.0f) {
+		drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 1.0f), modelviewf, light, 24.0f);
+		drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 1.0f), modelviewf, light, 16.0f);
+		if (m_fadeTime < 0.5f) {
+			drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 10.0f), modelviewf, light, 16.0f);
+			drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 1.0f), modelviewf, light, 12.0f);
+			drawFlare(BIG_GLOW, Vec4f(1.0f, 1.0f, 0.0f, 1.0f), modelviewf, light, 8.0f);
+		}
+	}
+	glEnd();
+	glPopMatrix();
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+	glCullFace(GL_BACK);
 }
 
 }

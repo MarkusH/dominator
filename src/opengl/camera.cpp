@@ -28,7 +28,6 @@ bool Camera::checkAABB(const Vec3f& min, const Vec3f& max)
 {
 	Vec3f near;
 	float distance = 0.0f;
-	int count = 0;
 	for (int i = 0; i < 6; ++i) {
     	near.x = (m_frustum[i][0] > 0.0f) ? max.x : min.x;
 		near.y = (m_frustum[i][1] > 0.0f) ? max.y : min.y;
@@ -77,7 +76,7 @@ void Camera::update()
 	m_matrix = Mat4f::lookAt(m_position, m_eye, m_up);
 	m_inverse = m_matrix.inverse();
 
-	Mat4f mvproj = m_matrix * Mat4f::projection();
+	Mat4f mvproj = m_matrix * Mat4f::projection__();
 
 	// left
 	m_frustum[0][0] = mvproj._14 + mvproj._11;
@@ -202,9 +201,10 @@ void Camera::apply()
 {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(m_position.x, m_position.y, m_position.z,
-				   m_eye.x,	     m_eye.y,      m_eye.z,
-				    m_up.x,       m_up.y,       m_up.z);
+	//gluLookAt(m_position.x, m_position.y, m_position.z,
+	//			   m_eye.x,	     m_eye.y,      m_eye.z,
+	//			    m_up.x,       m_up.y,       m_up.z);
+	glLoadMatrixf(m_matrix[0]);
 }
 
 Vec3f Camera::viewVector() const
@@ -214,16 +214,16 @@ Vec3f Camera::viewVector() const
 
 Vec3f Camera::pointer() const
 {
-	Vec4<GLint> viewport = Vec4<GLint>::viewport();
+	Vec4<GLint> viewport = Vec4<GLint>::viewport__();
 	return pointer((viewport.z - viewport.x) / 2,
 				   (viewport.w - viewport.y) / 2);
 }
 
 Vec3f Camera::pointer(int x, int y) const
 {
-	Mat4d modelview = Mat4d::modelview();
-	Mat4d projection = Mat4d::projection();
-	Vec4<GLint> viewport = Vec4<GLint>::viewport();
+	Mat4d modelview = Mat4d::modelview__();
+	Mat4d projection = Mat4d::projection__();
+	Vec4<GLint> viewport = Vec4<GLint>::viewport__();
 	GLfloat z;
 
 	y = viewport.w - y;

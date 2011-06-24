@@ -132,6 +132,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_gravity = -9.81f * 4.0f;
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
+	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
 }
 
 Simulation::~Simulation()
@@ -247,7 +248,7 @@ void Simulation::init()
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 	__Domino::genDominoBuffers(m_vertexBuffer);
-	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds");
+	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
 	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
 	//((__TreeCollision*)m_environment.get())->createOctree();
@@ -860,6 +861,19 @@ void Simulation::render()
 	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
 */
 
+	// set some light properties
+	GLfloat fullambient[4] = { 0.1, 0.1, 0.1, 1.0 };
+	GLfloat position[4] = { 30.0, 0.0, 10.0, 0.0 };
+	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
+	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
+	GLfloat specular[4] = { 0.7, 0.7, 0.7, 1.0 };
+
+	glLightfv(GL_LIGHT0, GL_POSITION, &m_lightPos[0]);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
 	if (itr != m_sortedBuffers.end()) {
@@ -883,14 +897,17 @@ void Simulation::render()
 		glPopMatrix();
 	}
 
-	m_skydome.render();
+	if (m_environment)
+		m_environment->render();
+
+	glDisable(GL_LIGHTING);
+	m_skydome.render(m_camera.m_position, m_lightPos.xyz());
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
-	if (m_environment)
-		m_environment->render();
+
 
 	if (m_selectedObject) {
 		Vec3f min, max;

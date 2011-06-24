@@ -19,22 +19,26 @@ using namespace m3d;
 
 class Skydome {
 protected:
+	GLuint m_flares;
 	GLuint m_list;
 	Shader m_shader;
-	Texture m_texture;
+	GLuint m_clouds;
 	float m_radius;
-	Vec4f m_color;
-	float m_time;
+	Vec4f m_horizon;
+	float m_time, m_delta;
+	float m_fadeTime;
 public:
+	typedef enum { BIG_GLOW = 0, GLOW, HALO, STREAK } Flares;
+
 	Skydome();
-	Skydome(float radius, const std::string& texture, const std::string& shader, const std::string& fileName);
+	Skydome(float radius, const std::string& clouds, const std::string& shader, const std::string& fileName, const std::string& flares);
 	virtual ~Skydome();
 
-	void load(float radius, const std::string& texture, const std::string& shader, const std::string& fileName);
+	void load(float radius, const std::string& clouds, const std::string& shader, const std::string& fileName, const std::string& flares);
 	void clear();
 
 	void update(float dt);
-	void render();
+	void render(const Vec3f& cam, const Vec3f& light);
 };
 
 }
