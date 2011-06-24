@@ -829,7 +829,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
 				Mat4f matrix(Vec3f::yAxis(), q, p);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, "domino");
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, m_newObjectMaterial);
 				add(domino);
 			}
 		// line
@@ -843,7 +843,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			Mat4f matrix(Vec3f::yAxis(), dir, start);
 			for (float d = 0.0f; d <= len; d += 4.5f) {
 				matrix.setW(start + dir * d);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, "domino");
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, m_newObjectMaterial);
 				add(domino);
 			}
 		}
