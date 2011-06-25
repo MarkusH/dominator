@@ -282,17 +282,29 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 
 	// declarations
 	xml_node<>* node;
+	char *pModel;
+	xml_attribute<> *attrMo;
 
 	node = doc->allocate_node(node_element, "environment");
 	parent->insert_node(0, node);
 
-	//TODO: save matrix and fileName
+
+	// set attribute "model" to  the correct file name
+	pModel = doc->allocate_string(object.m_fileName.c_str());
+	attrMo = doc->allocate_attribute("model", pModel);
+	node->append_attribute(attrMo);
+
 }
 
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 {
-	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/ramps.3ds"));
-	//TODO load matrix and filename and return "real" environment
+	using namespace rapidxml;
+
+	//attribute model
+	xml_attribute<>* attr = node->first_attribute();
+	std::string model = attr->value();
+
+	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), model));
 	return result;
 }
 

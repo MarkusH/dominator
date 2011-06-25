@@ -214,7 +214,7 @@ void Simulation::load(const std::string& fileName)
 		xml_node<>* node = nodes->first_node("environment");
 		if (node) {
 			m_environment = __TreeCollision::load(node);
-			((__TreeCollision*)m_environment.get())->createOctree();
+			//((__TreeCollision*)m_environment.get())->createOctree();
 		}
 	}
 
@@ -250,7 +250,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
 	//add(m_environment);
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
@@ -327,7 +327,7 @@ void Simulation::init()
 	}
 
 	// swing
-	if (1) {
+	if (0) {
 		const int linksCount = 15;
 		Vec3f size(1.0f, 0.05f, 0.15f);
 		Mat4f llocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
@@ -385,7 +385,7 @@ void Simulation::init()
 	}
 
 	// rope
-	if (1)
+	if (0)
 	{
 		RigidBody obj0, obj1;
 		const int linksCount = 15;
