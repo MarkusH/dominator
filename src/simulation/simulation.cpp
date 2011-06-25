@@ -250,7 +250,8 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
+	//add(m_environment);
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
 

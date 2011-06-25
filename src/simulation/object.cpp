@@ -652,10 +652,10 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 	case SPHERE:
 		NewtonMeshApplySphericalMapping(collisionMesh, 0);
 		break;
-	case CYLINDER:
-	case CHAMFER_CYLINDER:
-		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
-		//break;
+	//case CYLINDER:
+	//case CHAMFER_CYLINDER:
+	//	NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
+	//	break;
 	case BOX:
 	default:
 		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);

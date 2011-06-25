@@ -164,7 +164,7 @@ void __Domino::genDominoBuffers(ogl::VertexBuffer& vbo)
 Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material, int freezeState)
 {
 	const NewtonWorld* world = Simulation::instance().getWorld();
-	const float VERTICAL_DELTA = 0.0001f;
+	const float VERTICAL_DELTA = 0.01f;
 	const int materialID = MaterialMgr::instance().getID(material);
 
 	type = std::min(type, DOMINO_LARGE);
