@@ -198,6 +198,61 @@ void __BallAndSocket::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
 
 void __BallAndSocket::save(const __BallAndSocket& ball, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
 {
+	using namespace rapidxml;
+
+	xml_node<>* node = doc->allocate_node(node_element, "joint");
+	sibling->append_node(node);
+
+	// type attribute
+	char* pType = doc->allocate_string("ballandsocket");
+	xml_attribute<>* attrT = doc->allocate_attribute("type", pType);
+	node->append_attribute(attrT);
+
+	// parentID attribute
+	int parentID = ball.parent ? ball.parent->getID() : -1;
+	char* pParentID = doc->allocate_string(util::toString(parentID));
+	xml_attribute<>* attrP = doc->allocate_attribute("parentID", pParentID);
+	node->append_attribute(attrP);
+
+	// childID attribute
+	int childID = ball.child->getID();
+	char* pChildID = doc->allocate_string(util::toString(childID));
+	xml_attribute<>* attrC = doc->allocate_attribute("childID", pChildID);
+	node->append_attribute(attrC);
+
+	// pivot attribute
+	char* pPivot = doc->allocate_string(ball.pivot.str().c_str());
+	xml_attribute<>* attrPi = doc->allocate_attribute("pivot", pPivot);
+	node->append_attribute(attrPi);
+
+	// pinDir attribute
+	char* pPinDir = doc->allocate_string(ball.pinDir.str().c_str());
+	xml_attribute<>* attrPD = doc->allocate_attribute("pinDir", pPinDir);
+	node->append_attribute(attrPD);
+
+	// limited attribute
+	char* pLimited = doc->allocate_string(util::toString(ball.limited));
+	xml_attribute<>* attrLi = doc->allocate_attribute("limited", pLimited);
+	node->append_attribute(attrLi);
+
+	if (ball.limited) {
+		// coneAngle attribute
+		char* pConeAngle = doc->allocate_string(util::toString(ball.coneAngle));
+		xml_attribute<>* attrCo = doc->allocate_attribute("coneangle", pConeAngle);
+		node->append_attribute(attrCo);
+
+		// minTwist attribute
+		char* pMinTwist = doc->allocate_string(util::toString(ball.minTwist));
+		xml_attribute<>* attrMi = doc->allocate_attribute("mintwist", pMinTwist);
+		node->append_attribute(attrMi);
+
+		// maxTwist attribute
+		char* pMaxTwist = doc->allocate_string(util::toString(ball.maxTwist));
+		xml_attribute<>* attrMa = doc->allocate_attribute("maxtwist", pMaxTwist);
+		node->append_attribute(attrMa);
+	}
+
+
 	//TODO this is exactly the same as with the hinge, only the type attribute varies
 	// save "limited", too
 	// save coneAngle, minTwist and maxTwist, only if limited = true
@@ -205,10 +260,62 @@ void __BallAndSocket::save(const __BallAndSocket& ball, rapidxml::xml_node<>* si
 
 BallAndSocket __BallAndSocket::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 {
+	using namespace rapidxml;
+
+	Vec3f pivot, pinDir;
+	int parentID = -1, childID = -1;
+
+	//type attribute
+	xml_attribute<>* attr = node->first_attribute();
+
+	//parentID attribute
+	attr = attr->next_attribute();
+	parentID = atoi(attr->value());
+
+	//childID attribute
+	attr = attr->next_attribute();
+	childID = atoi(attr->value());
+
+	//pivot attribute
+	attr = attr->next_attribute();
+	pivot.assign(attr->value());
+
+	//pinDir attribute
+	attr = attr->next_attribute();
+	pinDir.assign(attr->value());
+
+
+	// Get the objects with the required IDs out of the object list
+	Object parent, child;
+	for (std::list<Object>::const_iterator itr = list.begin(); itr != list.end(); ++itr) {
+		if ((*itr)->getID() == parentID)
+			parent = *itr;
+		if ((*itr)->getID() == childID)
+			child = *itr;
+	}
+
+	// limited attribute
+	attr = attr->next_attribute();
+	bool limited = atoi(attr->value());
+	float coneAngle = 0.0f, minTwist = 0.0f, maxTwist = 0.0f;
+
+	if (limited) {
+		attr = attr->next_attribute();
+		coneAngle = atof(attr->value());
+
+		attr = attr->next_attribute();
+		minTwist = atof(attr->value());
+
+		attr = attr->next_attribute();
+		maxTwist = atof(attr->value());
+	}
+
+
+	BallAndSocket ball = __BallAndSocket::create(pivot, pinDir, child, parent, limited, coneAngle, minTwist, maxTwist);
+	return ball;
 	//TODO this is exactly the same as with the hinge, only the type attribute varies
 	// read "limited", too
 	// read coneAngle, minTwist and maxTwist, only if limited = true
-	return BallAndSocket();
 }
 
 BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited, float coneAngle, float minTwist, float maxTwist)

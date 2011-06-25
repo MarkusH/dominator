@@ -298,20 +298,17 @@ __RigidBody::__RigidBody(Type type, NewtonBody* body, const std::string& materia
 	: __Object(type), Body(body), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
-	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 __RigidBody::__RigidBody(Type type, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
 	: __Object(type), Body(matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 {
-	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 __RigidBody::__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material, int freezeState, const Vec4f& damping)
 	: __Object(type), Body(body, matrix), m_material(material), m_freezeState(freezeState), m_damping(damping)
 
 {
-	m_scale = Vec3f(1.0f, 1.0f, 1.0f);
 }
 
 float __RigidBody::convexCastPlacement(bool apply, std::list<NewtonBody*>* noCollision)
@@ -365,14 +362,6 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pDepth = doc->allocate_string(util::toString(info.m_box.m_z));
 		attrD = doc->allocate_attribute("depth", pDepth);
 		node->append_attribute(attrD);
-		// set attribute freezeState
-		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
-		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-		node->append_attribute(attrFS);
-		// set attribute damping
-		pDamping = doc->allocate_string(util::toString(body.m_damping));
-		attrDamp = doc->allocate_attribute("damping", pDamping);
-		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_SPHERE:
 		// set attribute radius_x
@@ -387,14 +376,6 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pRadiusZ = doc->allocate_string(util::toString(info.m_sphere.m_r2));
 		attrZ = doc->allocate_attribute("radius_z", pRadiusZ);
 		node->append_attribute(attrZ);
-		// set attribute freezeState
-		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
-		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-		node->append_attribute(attrFS);
-		// set attribute damping
-		pDamping = doc->allocate_string(util::toString(body.m_damping));
-		attrDamp = doc->allocate_attribute("damping", pDamping);
-		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_CHAMFERCYLINDER:
 		// set attribute height
@@ -405,14 +386,6 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		pRadius = doc->allocate_string(util::toString(info.m_chamferCylinder.m_r));
 		attrR = doc->allocate_attribute("radius", pRadius);
 		node->append_attribute(attrR);
-		// set attribute freezeState
-		pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
-		attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-		node->append_attribute(attrFS);
-		// set attribute damping
-		pDamping = doc->allocate_string(util::toString(body.m_damping));
-		attrDamp = doc->allocate_attribute("damping", pDamping);
-		node->append_attribute(attrDamp);
 		break;
 	case SERIALIZE_ID_CYLINDER:
 		// set attribute height
@@ -445,6 +418,16 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		node->append_attribute(attrR);
 		break;
 	}
+
+	// set attribute freezeState
+	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
+	attrFS = doc->allocate_attribute("freezeState", pFreezeState);
+	node->append_attribute(attrFS);
+
+	// set attribute damping
+	pDamping = doc->allocate_string(util::toString(body.m_damping));
+	attrDamp = doc->allocate_attribute("damping", pDamping);
+	node->append_attribute(attrDamp);
 
 	// set attribute material
 	pMaterial = doc->allocate_string(body.m_material.c_str());
@@ -493,14 +476,6 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		attr = attr->next_attribute();
 		d = atof(attr->value());
 
-		//attribute freezeState
-		attr = attr->next_attribute();
-		freezeState = atoi(attr->value());
-
-		//attribute damping
-		attr = attr->next_attribute();
-		Vec4f damping = Vec4f();
-		damping.assign(attr->value());
 	}/* set dimensions for box END */
 
 	/* set dimensions for sphere */
@@ -516,15 +491,6 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute z
 		attr = attr->next_attribute();
 		z = atof(attr->value());
-
-		//attribute freezeState
-		attr = attr->next_attribute();
-		freezeState = atoi(attr->value());
-
-		//attribute damping
-		attr = attr->next_attribute();
-		Vec4f damping = Vec4f();
-		damping.assign(attr->value());
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder, cylinder, cone, capsule */
@@ -537,16 +503,17 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		//attribute radius
 		attr = attr->next_attribute();
 		radius = atof(attr->value());
-
-		//attribute freezeState
-		attr = attr->next_attribute();
-		freezeState = atoi(attr->value());
-
-		//attribute damping
-		attr = attr->next_attribute();
-		Vec4f damping = Vec4f();
-		damping.assign(attr->value());
 	}/* set dimensions for chamfer cylinder, cylinder, cone, capsule END */
+
+
+	//attribute freezeState
+	attr = attr->next_attribute();
+	freezeState = atoi(attr->value());
+
+	//attribute damping
+	attr = attr->next_attribute();
+	damping = Vec4f();
+	damping.assign(attr->value());
 
 	//attribute material
 	attr = attr->next_attribute();

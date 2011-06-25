@@ -393,6 +393,9 @@ void Simulation::init()
 		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
 		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
 		Compound rope = Compound(new __Compound());
+		obj0 = __Object::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
+		rope->add(obj0);
+
 		// create a long vertical rope with limits
 		for (int i = 0; i < linksCount; i ++) {
 			//create the rigid body
@@ -416,7 +419,7 @@ void Simulation::init()
 		pivot.y += (size.x - size.y) * 0.5f;
 		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "wood");
 		rope->add(obj1);
-		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
+		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0, true);
 		add(rope);
 	}
 
