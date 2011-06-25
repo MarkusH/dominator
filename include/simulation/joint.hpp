@@ -14,6 +14,7 @@
 #include <NewtonCustomJoint.h>
 #include <CustomHinge.h>
 #include <CustomBallAndSocket.h>
+#include <CustomSlider.h>
 #ifdef _WIN32
 #include <boost/tr1/memory.hpp>
 #else
@@ -31,6 +32,8 @@ class __Joint;
 typedef std::tr1::shared_ptr<__Joint> Joint;
 class __Hinge;
 typedef std::tr1::shared_ptr<__Hinge> Hinge;
+class __Slider;
+typedef std::tr1::shared_ptr<__Slider> Slider;
 class __BallAndSocket;
 typedef std::tr1::shared_ptr<__BallAndSocket> BallAndSocket;
 
@@ -39,7 +42,7 @@ typedef std::tr1::shared_ptr<__BallAndSocket> BallAndSocket;
  */
 class __Joint {
 public:
-	typedef enum { HINGE, BALL_AND_SOCKET } Type;
+	typedef enum { HINGE, SLIDER, BALL_AND_SOCKET } Type;
 
 	Type type;
 
@@ -82,6 +85,34 @@ public:
 
 	static void save(const __Hinge& hinge, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static Hinge load(const std::list<Object>& list, rapidxml::xml_node<>* node);
+};
+
+/**
+ * A joint where the two bodies can only move relative to each other
+ * along a given axis.
+ */
+class __Slider : public __Joint, public CustomSlider {
+protected:
+	__Slider(Vec3f pivot, Vec3f pinDir,
+			const Object& child, const Object& parent,
+			const dMatrix& pinAndPivot,
+			const NewtonBody* childBody, const NewtonBody* parentBody,
+			bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
+public:
+	Vec3f pivot;
+	Vec3f pinDir;
+	Object child;
+	Object parent;
+	bool limited;
+	float minDist;
+	float maxDist;
+
+	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
+
+	static Slider create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
+
+	static void save(const __Slider& slider, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static Slider load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
 /**

@@ -104,6 +104,10 @@ void Skydome::update(float dt)
 {
 	m_time += dt * 0.01f;
 	m_delta = dt * 100.0f;
+
+	m_horizon.x = 0.4f + fabs(sin(m_time));
+	m_horizon.y = 0.4f + fabs(sin(m_time));
+	//std::cout << m_horizon << std::endl;
 }
 
 static inline void drawFlare(Skydome::Flares flare, const Vec4f& color, const Mat4f& mat, const Vec3f& position, float scale)

@@ -303,11 +303,11 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if(0)
 	{
-		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", true));
+		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", true));
 		add(convex);
 		convex->convexCastPlacement();
 
-		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", __ConvexAssembly::ORIGINAL));
+		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", __ConvexAssembly::ORIGINAL));
 		add(convex);
 		convex->convexCastPlacement();
 	}
@@ -316,29 +316,30 @@ void Simulation::init()
 	if (0)
 	{
 		Compound c = Compound(new __Compound());
-		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
-		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow");
+		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
+		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
 		c->add(obj0);
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 50.0f)));
-		c->convexCastPlacement();
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.50f + 0.70f, 50.0f)));
+		//c->convexCastPlacement();
 	}
 
 	// swing
 	if (0) {
 		const int linksCount = 15;
+		const float vertical = 20.0f;
 		Vec3f size(1.0f, 0.05f, 0.15f);
 		Mat4f llocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
-		llocation.setW(Vec3f(-2.0f, 15.0f - size.x*0.5f, 0.0f));
+		llocation.setW(Vec3f(-2.0f, vertical - size.x*0.5f, 0.0f));
 		Mat4f rlocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
-		rlocation.setW(Vec3f(2.0f, 15.0f - size.x*0.5f, 0.0f));
+		rlocation.setW(Vec3f(2.0f, vertical - size.x*0.5f, 0.0f));
 		RigidBody lobj0, lobj1, robj0, robj1;
 
 		Compound c = Compound(new __Compound());
 
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 15.0f, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 		lobj0 = robj0 = top;
 
@@ -382,6 +383,39 @@ void Simulation::init()
 
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.0f, 50.0f)));
+	}
+
+	// rope way
+	if (0) {
+		const float anchorRadius = 0.05f;
+		const float ropeHeight = 0.25f;
+		const float ropeLength = 20.0f;
+		const float anchorRopeLength = 5.0f;
+		Compound c = Compound(new __Compound());
+
+		// rope
+		RigidBody rope = __Object::createBox(Mat4f::identity(), ropeLength, ropeHeight, 0.25f, 0.0f, "metal");
+		c->add(rope);
+
+		// anchor
+		RigidBody anchor = __Object::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
+		c->add(anchor);
+		c->createSlider(Vec3f(0.0f, -ropeHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, rope, true, -ropeLength*0.5f, ropeLength*0.5f);
+
+		// anchor rope
+		RigidBody anchorRope = __Object::createCylinder(
+				Mat4f::rotZ(3.14f*0.5f) * Mat4f::translate(Vec3f(0.0f, -anchorRopeLength*0.5f - ropeHeight*0.5f - 0.1f, 0.0f)),
+				anchorRadius * 2.0f, anchorRopeLength, 0.1f, "rope");
+		c->add(anchorRope);
+
+		c->createBallAndSocket(anchor->getMatrix().getW(), Vec3f::zAxis(), anchorRope, anchor);
+
+		RigidBody load = __Object::createSphere(anchorRope->getMatrix().getW() - Vec3f(0.0f, anchorRopeLength*0.5f, 0.0f), 1.0f, 1.0f, "cradle");
+		c->add(load);
+		c->createBallAndSocket(load->getMatrix().getW(), Vec3f::zAxis(), load, anchorRope);
+
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+		add(c);
 	}
 
 	// rope

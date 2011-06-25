@@ -149,6 +149,20 @@ Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Obj
 	return result;
 }
 
+
+Slider __Compound::createSlider(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent,
+		bool limited, float minDist, float maxDist)
+{
+	if (child && child != parent) {
+		Vec3f pin = pinDir % m_matrix;
+		Slider slider = __Slider::create(pivot, pin, child, parent, limited, minDist, maxDist);
+		m_joints.push_back(slider);
+		return slider;
+	}
+	Slider result;
+	return result;
+}
+
 BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent, bool limited, float coneAngle, float minTwist, float maxTwist)
 {
 	if (child && child != parent) {
