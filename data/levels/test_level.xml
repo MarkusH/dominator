@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level>
-	<compound id="0" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -8.35301, 11.4275, -10, 1">
-		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -8.35301, 15.9275, -10, 1" width="20" height="0.5" depth="0.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0"/>
-		<object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -16.353, 13.4275, -10, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="2" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -16.353, 11.4275, -10, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="3" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -12.353, 13.4275, -10, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="4" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -12.353, 11.4275, -10, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="5" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -8.35301, 13.4275, -10, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="6" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -8.35301, 11.4275, -10, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="7" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -4.35301, 13.4275, -10, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="8" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -4.35301, 11.4275, -10, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<object id="9" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -0.353008, 13.4275, -10, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
-		<object id="10" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -0.353008, 11.4275, -10, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="2"/>
-		<joint type="hinge" parentID="2" childID="1" pivot="-16.353, 11.4275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="1" childID="0" pivot="-16.353, 15.8275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="4" childID="3" pivot="-12.353, 11.4275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="3" childID="0" pivot="-12.353, 15.8275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="6" childID="5" pivot="-8.35301, 11.4275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="5" childID="0" pivot="-8.35301, 15.8275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="8" childID="7" pivot="-4.35301, 11.4275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="7" childID="0" pivot="-4.35301, 15.8275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="10" childID="9" pivot="-0.353008, 11.4275, -10" pinDir="0, 0, 1"/>
-		<joint type="hinge" parentID="9" childID="0" pivot="-0.353008, 15.8275, -10" pinDir="0, 0, 1"/>
-	</compound>
+	<object id="0" type="box" matrix="-0.0487048, 0, -0.998813, 0; 0, 1, 0, 0; 0.998813, -0, -0.0487048, 0; -67.1843, 1.80478, -25.1228, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="0.5"/>
+	<object id="1" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -67.1935, 1.80478, -23.5753, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="barrel" mass="0.5"/>
+	<object id="2" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -67.7682, 1.80479, -21.875, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="crate" mass="0.5"/>
+	<object id="3" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -68.9755, 1.80479, -21.9347, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="metal" mass="0.5"/>
+	<object id="4" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -69.0784, 1.8048, -23.543, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="planks" mass="0.5"/>
+	<object id="5" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -68.7248, 1.8048, -24.839, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="plankso" mass="0.5"/>
+	<object id="6" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -66.9782, 1.80479, -27.0031, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="sand" mass="0.5"/>
+	<object id="7" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -68.2837, 1.80479, -27.1476, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="stone" mass="0.5"/>
+	<object id="8" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -67.3493, 2.80489, -27.1015, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.5"/>
+	<object id="11" type="box" matrix="-0.676994, 0, -0.735988, 0; 0, 1, 0, 0; 0.735988, -0, -0.676994, 0; -67.4481, 2.80487, -24.9207, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.5"/>
+	<object id="13" type="box" matrix="-0.676994, 0, -0.735988, 0; 0, 1, 0, 0; 0.735988, -0, -0.676994, 0; -67.0745, 2.80487, -23.2461, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.5"/>
+	<object id="15" type="box" matrix="-0.676994, 0, -0.735988, 0; 0, 1, 0, 0; 0.735988, -0, -0.676994, 0; -67.51, 2.905, -21.6101, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.5"/>
+	<object id="16" type="box" matrix="-0.676994, 0, -0.735988, 0; 0, 1, 0, 0; 0.735988, -0, -0.676994, 0; -69.2882, 2.80489, -23.4121, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="1.5"/>
+	<object id="17" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -68.8763, 2.80489, -24.9656, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="1.5"/>
+	<object id="18" type="box" matrix="0.0820684, -0, -0.996627, 0; 0, 1, 0, 0; 0.996627, -0, 0.0820684, 0; -68.4829, 2.80488, -27.1299, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="1.5"/>
+	<object id="19" type="box" matrix="-0.676994, 0, -0.735988, 0; 0, 1, 0, 0; 0.735988, -0, -0.676994, 0; -68.9825, 2.80489, -21.8564, 1" width="1" height="1" depth="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="1.5"/>
+	<object id="20" type="capsule" matrix="0.776775, -0, 0.629778, 0; 0, 1, 0, 0; -0.629778, -0, 0.776775, 0; -55.4643, 2.3048, -15.0634, 1" height="6" radius="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
+	<object id="21" type="chamfercylinder" matrix="0.776775, -0, 0.629778, 0; 0, 1, 0, 0; -0.629778, -0, 0.776775, 0; -55.1038, 6.30479, -20.9493, 1" height="1" radius="5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
+	<object id="22" type="cone" matrix="0.776775, -0, 0.629778, 0; 0, 1, 0, 0; -0.629778, -0, 0.776775, 0; -60.2545, 2.30478, -27.25, 1" height="2" radius="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
+	<object id="23" type="sphere" matrix="0.776771, -0, 0.629783, 0; 0, 1, 0, 0; -0.629783, -0, 0.776771, 0; -62.3336, 2.30078, -32.2735, 1" radius_x="1" radius_y="1" radius_z="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
+	<environment model="data/models/mattest.3ds"/>
 </level>
 

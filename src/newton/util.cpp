@@ -271,14 +271,14 @@ static void PhysicsApplyPickForce (const NewtonBody* body, float timestep, int t
 }
 
 
-bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down)
+bool mousePick(const NewtonWorld* world, const ogl::Camera& cam, const Vec2f& mouse, bool down)
 {
 	dMatrix matrix;
 
 	if (down) {
 		if (!down0) {
-			Vec3f _p0(ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 0.0f)));
-			Vec3f _p1(ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 1.0f)));
+			Vec3f _p0(ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 0.0f), cam));
+			Vec3f _p1(ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 1.0f), cam));
 			p0 = dVector(_p0.x, _p0.y, _p0.z, 0.0f);
 			p1 = dVector(_p1.x, _p1.y, _p1.z, 0.0f);
 
@@ -312,8 +312,8 @@ bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down)
 			// init pick mode
 			dMatrix matrix;
 			NewtonBodyGetMatrix(pickedBody, &matrix[0][0]);
-			Vec3f _p0 (ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 0.0f)));
-			Vec3f _p1 (ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 1.0f)));
+			Vec3f _p0 (ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 0.0f), cam));
+			Vec3f _p1 (ogl::screenToWorld(Vec3d(mouse.x, mouse.y, 1.0f), cam));
 			p0 = dVector(_p0.x, _p0.y, _p0.z, 0.0f);
 			p1 = dVector(_p1.x, _p1.y, _p1.z, 0.0f);
 			dVector p2 (matrix.TransformVector (attachmentPoint));
