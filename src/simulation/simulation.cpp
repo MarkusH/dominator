@@ -517,6 +517,56 @@ void Simulation::init()
 		 */
 	}
 
+	// bridge
+	if (0) {
+		const int linksCount = 20;
+		Vec3f boxSize(3.0f, 1.0f, 3.0f);
+		Vec3f linkSize(1.4f, 0.1f, 0.5f);
+		boxSize *= 5.0f;
+		linkSize *= 5.0f;
+
+		Mat4f location = Mat4f::identity();
+
+		Compound c = Compound(new __Compound());
+
+		RigidBody link0 = __Object::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		c->add(link0);
+		RigidBody link1;
+
+		location._43 += boxSize.z * 0.5f + linkSize.z * 0.5f;
+		location._42 += boxSize.y * 0.5f - linkSize.y * 0.5f;;
+
+		for (int i = 0; i < linksCount; ++i) {
+
+			link1 = __Object::createBox(location, linkSize.x, linkSize.y, linkSize.z, 0.25f, "plankso", 0, Vec4f(0.5f, 0.5f, 0.5f, 0.5f));
+			c->add(link1);
+
+			Vec3f pivot(location.getW());
+			pivot.y += linkSize.y * 0.5f;
+			pivot.z -= linkSize.z * 0.5f;
+
+			c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
+
+			link0 = link1;
+			location._43 += linkSize.z;
+		}
+
+		Vec3f pivot(location.getW());
+		pivot.y += linkSize.y * 0.5f;
+		pivot.z -= linkSize.z * 0.5f;
+
+		location._43 += boxSize.z * 0.5f - linkSize.z * 0.5f;
+		location._42 += linkSize.y * 0.5f - boxSize.y * 0.5f;
+
+		link1 = __Object::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		c->add(link1);
+
+		c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
+
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+	}
+
 	//save("data/levels/test_level.xml");
 	setEnabled(false);
 }
