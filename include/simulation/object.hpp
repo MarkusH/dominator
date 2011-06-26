@@ -18,6 +18,7 @@
 #include <opengl/vertexbuffer.hpp>
 #include <lib3ds/file.h>
 #include <xml/rapidxml.hpp>
+#include <opengl/mesh.hpp>
 
 namespace sim {
 
@@ -210,6 +211,8 @@ protected:
 
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
+
+	ogl::Mesh m_visual;
 public:
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
@@ -257,6 +260,7 @@ protected:
 	NewtonMesh* m_mesh;
 	std::vector<float> m_data;
 	std::string m_fileName;
+	ogl::Mesh m_visual;
 public:
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));

@@ -250,7 +250,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
 	//add(m_environment);
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
@@ -301,7 +301,7 @@ void Simulation::init()
 	}
 
 	// assemlby vs hull comparison
-	if(0)
+	if(1)
 	{
 		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", true));
 		add(convex);
@@ -458,7 +458,7 @@ void Simulation::init()
 	}
 
 	// wagon with tires and hinges
-	if (0)
+	if (1)
 	{
 		// hinge pinDir is z Axis
 

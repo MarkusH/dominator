@@ -245,6 +245,8 @@ RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, flo
 	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
 
+	result->m_visual = ogl::__Mesh::load3ds("data/models/tire.3ds", result.get(), Vec3f(height, radius*2.0f, radius*2.0f));
+
 	return result;
 }
 
@@ -643,6 +645,7 @@ bool __RigidBody::scale(const Vec3f& scale, bool add)
 			x += info.m_chamferCylinder.m_r;
 			y += info.m_chamferCylinder.m_height;
 		}
+		m_visual->m_scale = Vec3f(y, x*2.0f, x*2.0f);
 		scaled = NewtonCreateChamferCylinder(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	default:
@@ -667,6 +670,10 @@ bool __RigidBody::scale(const Vec3f& scale, bool add)
 
 void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 {
+	if (m_type == CHAMFER_CYLINDER) {
+		m_visual->genBuffers(vbo);
+		return;
+	}
 	// get the offset in floats and vertices
 	const unsigned vertexSize = vbo.floatSize();
 	const unsigned byteSize = vbo.byteSize();
