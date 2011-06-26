@@ -250,7 +250,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
 	//add(m_environment);
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
@@ -324,6 +324,23 @@ void Simulation::init()
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.50f + 0.70f, 50.0f)));
 		//c->convexCastPlacement();
+	}
+
+	// hinge door
+	if (1) {
+		const float vertical = 20.0f;
+		const float doorHeight = 3.0f;
+		Compound c = Compound(new __Compound());
+
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		c->add(top);
+
+		RigidBody door = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f)), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
+		c->add(door);
+
+		c->createHinge(Vec3f(0.0f, vertical - 0.25f, 0.0f), Vec3f::xAxis(), door, top, true, -75.0f * 3.14f / 180.0f, 75.0f * 3.14f / 180.0f);
+
+		add(c);
 	}
 
 	// swing

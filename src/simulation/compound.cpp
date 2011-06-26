@@ -38,7 +38,6 @@ __Compound::~__Compound()
 
 void __Compound::getAABB(Vec3f& min, Vec3f& max)
 {
-
 	if (m_nodes.size() > 0) {
 		m_nodes.front()->getAABB(min, max);
 		std::list<Object>::iterator itr = m_nodes.begin();
@@ -50,7 +49,7 @@ void __Compound::getAABB(Vec3f& min, Vec3f& max)
 			min.z = min(min.z, _min.z);
 			max.x = max(max.x, _max.x);
 			max.y = max(max.y, _max.y);
-			max.z = max(max.z, _max.x);
+			max.z = max(max.z, _max.z);
 		}
 	} else {
 		min = max = Vec3f();
@@ -137,11 +136,11 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	return result;
 }
 
-Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent)
+Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent, bool limited, float minAngle, float maxAngle)
 {
 	if (child && child != parent) {
 		Vec3f pin = pinDir % m_matrix;
-		Hinge hinge = __Hinge::create(pivot, pin, child, parent);
+		Hinge hinge = __Hinge::create(pivot, pin, child, parent, limited, minAngle, maxAngle);
 		m_joints.push_back(hinge);
 		return hinge;
 	}

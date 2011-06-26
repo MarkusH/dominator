@@ -72,16 +72,20 @@ protected:
 	__Hinge(Vec3f pivot, Vec3f pinDir,
 			const Object& child, const Object& parent,
 			const dMatrix& pinAndPivot,
-			const NewtonBody* childBody, const NewtonBody* parentBody);
+			const NewtonBody* childBody, const NewtonBody* parentBody,
+			bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
 public:
 	Vec3f pivot;
 	Vec3f pinDir;
 	Object child;
 	Object parent;
+	bool limited;
+	float minAngle;
+	float maxAngle;
 
 	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
 
-	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
+	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
 
 	static void save(const __Hinge& hinge, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static Hinge load(const std::list<Object>& list, rapidxml::xml_node<>* node);

@@ -3,7 +3,7 @@
 	<compound id="0" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 10.0243, 1.79613, 50.0009, 1">
 		<object id="0" type="box" matrix="0.707107, 0.707107, 0, 0; -0.707107, 0.707107, 0, 0; 0, 0, 1, 0; 10.0243, 1.29613, 50.0009, 1" width="2" height="2" depth="4" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="plankso" mass="0"/>
 		<object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 10.0243, 2.74613, 50.0009, 1" width="10" height="0.05" depth="3" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="planks" mass="2.5"/>
-		<joint type="hinge" parentID="1" childID="0" pivot="10.0243, 2.74613, 50.0009" pinDir="0, 0, 1"/>
+		<joint type="hinge" parentID="1" childID="0" pivot="10.0243, 2.74613, 50.0009" pinDir="0, 0, 1" limited="0"/>
 	</compound>
 	<compound id="1" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 0, 1">
 		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 0, 1" width="20" height="0.25" depth="0.25" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="metal" mass="0"/>
