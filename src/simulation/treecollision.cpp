@@ -210,7 +210,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 
 	unsigned finishedFaces = 0;
 
-	NewtonCollision* collision = NewtonCreateTreeCollision(world, defaultMaterial);
+	NewtonCollision* collision = NewtonCreateTreeCollision(world, 0);
 	NewtonTreeCollisionBeginBuild(collision);
 
 	//TODO sort the meshes and then only appy and begin() if it is another material
@@ -245,6 +245,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 				m_indices.push_back(m_indices.size());
 			}
 			faceMaterial = face->material && face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
+			//std::cout << faceMaterial << std::endl;
 			faceMaterials[finishedFaces] = faceMaterial;
 			NewtonTreeCollisionAddFace(collision, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
 			finishedFaces++;
