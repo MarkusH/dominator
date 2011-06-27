@@ -348,6 +348,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
 
+	if(body.m_type != DOMINO_SMALL || body.m_type != DOMINO_MIDDLE || body.m_type != DOMINO_LARGE) {
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -428,6 +429,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	pDamping = doc->allocate_string(util::toString(body.m_damping));
 	attrDamp = doc->allocate_attribute("damping", pDamping);
 	node->append_attribute(attrDamp);
+	}
 
 	// set attribute material
 	pMaterial = doc->allocate_string(body.m_material.c_str());
@@ -450,7 +452,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float radius;	// chamfer cylinder, cylinder, cone, capsule
 	Type t; int i;	// domino
 
-	//attribute id is set in __Object::load()
+	//attribute id is set in Simulation::load()
 	xml_attribute<>* attr = node->first_attribute();
 	
 	//attribute type
@@ -463,7 +465,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	matrix.assign(attr->value());
 
 	/* set dimensions for box */
-	if ( type == TypeStr[BOX] ) {
+	if ( type == TypeStr[BOX]) {
 		//attribute width
 		attr = attr->next_attribute();
 		w = atof(attr->value());
@@ -928,6 +930,8 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	float mass = atof(attr->value());
 
 	return ConvexHull(new __ConvexHull(matrix, mass, material, model, original, freezeState, damping));
+	}
+	return ConvexHull(new __ConvexHull(matrix, mass, material, filename, originalGeometry, freezeState, damping));
 }
 
 __ConvexHull::~__ConvexHull()
@@ -1252,6 +1256,7 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	float mass = atof(attr->value());
 
 	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, model, (RenderingType)rendering, freezeState, damping));
+	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, filename, renderingType, freezeState, damping));
 }
 
 __ConvexAssembly::~__ConvexAssembly()
