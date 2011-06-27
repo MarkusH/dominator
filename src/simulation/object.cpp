@@ -348,7 +348,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
 
-	if(body.m_type != DOMINO_SMALL || body.m_type != DOMINO_MIDDLE || body.m_type != DOMINO_LARGE) {
+	if(body.m_type != DOMINO_SMALL && body.m_type != DOMINO_MIDDLE && body.m_type != DOMINO_LARGE) {
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -419,6 +419,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		node->append_attribute(attrR);
 		break;
 	}
+	}
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -429,7 +430,6 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	pDamping = doc->allocate_string(util::toString(body.m_damping));
 	attrDamp = doc->allocate_attribute("damping", pDamping);
 	node->append_attribute(attrDamp);
-	}
 
 	// set attribute material
 	pMaterial = doc->allocate_string(body.m_material.c_str());

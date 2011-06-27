@@ -70,6 +70,7 @@
   <object id="32" type="convex_assembly" matrix="" freezeState="" damping="" material="" mass="" filename="" renderingType=""/>
   <object id="33" type="convex_hull" matrix="" freezeState="" damping="" material="" mass="" filename="" originalGeometry=""/>
   -->
-  <environment/>
+  <environment filename="data/models/ramps.3ds" octree="0" />
+  <!-- filename  std::string octree bool -->
 </level>
 
