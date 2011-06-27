@@ -12,28 +12,28 @@
 		<object id="8" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -1.74846e-07, 2.4, 96, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="5"/>
 		<object id="9" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -3.49691e-07, 4.4, 92, 1" width="0.05" height="5" depth="0.15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="0.05"/>
 		<object id="10" type="sphere" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -3.49691e-07, 2.4, 92, 1" radius_x="2" radius_y="2" radius_z="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="cradle" mass="5"/>
-		<joint type="hinge" parentID="2" childID="1" pivot="3.49691e-07, 2.4, 108" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="1" childID="0" pivot="3.49691e-07, 6.8, 108" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="4" childID="3" pivot="1.74846e-07, 2.4, 104" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="3" childID="0" pivot="1.74846e-07, 6.8, 104" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="6" childID="5" pivot="0, 2.4, 100" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="5" childID="0" pivot="0, 6.8, 100" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="8" childID="7" pivot="-1.74846e-07, 2.4, 96" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="7" childID="0" pivot="-1.74846e-07, 6.8, 96" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="10" childID="9" pivot="-3.49691e-07, 2.4, 92" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="9" childID="0" pivot="-3.49691e-07, 6.8, 92" pinDir="1, 0, -4.37114e-08"/>
+		<joint type="hinge" parentID="2" childID="1" pivot="3.49691e-07, 2.4, 108" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="1" childID="0" pivot="3.49691e-07, 6.8, 108" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="4" childID="3" pivot="1.74846e-07, 2.4, 104" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="3" childID="0" pivot="1.74846e-07, 6.8, 104" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="6" childID="5" pivot="0, 2.4, 100" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="5" childID="0" pivot="0, 6.8, 100" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="8" childID="7" pivot="-1.74846e-07, 2.4, 96" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="7" childID="0" pivot="-1.74846e-07, 6.8, 96" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="10" childID="9" pivot="-3.49691e-07, 2.4, 92" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="9" childID="0" pivot="-3.49691e-07, 6.8, 92" pinDir="1, 0, -4.37114e-08" limited="0"/>
 	</compound>
 	<compound id="1" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; 0, 42.9159, -25, 1">
-		<object id="0" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -7.10543e-15, 42.9159, -25, 1" width="5" height="0.5" depth="2.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="5"/>
-		<object id="1" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; -1.375, 42.9159, -22.75, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="0.1"/>
-		<object id="2" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; -1.375, 42.9159, -27.25, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="0.1"/>
-		<object id="3" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; 1.375, 42.9159, -22.75, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="0.1"/>
-		<object id="4" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; 1.375, 42.9159, -27.25, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="yellow" mass="0.1"/>
-		<joint type="hinge" parentID="1" childID="0" pivot="-1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="2" childID="0" pivot="-1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="3" childID="0" pivot="1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08"/>
-		<joint type="hinge" parentID="4" childID="0" pivot="1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08"/>
+		<object id="0" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -7.10543e-15, 42.9159, -25, 1" width="5" height="0.5" depth="2.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="planks" mass="5"/>
+		<object id="1" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; -1.375, 42.9159, -22.75, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.1"/>
+		<object id="2" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; -1.375, 42.9159, -27.25, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.1"/>
+		<object id="3" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; 1.375, 42.9159, -22.75, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.1"/>
+		<object id="4" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; 1.375, 42.9159, -27.25, 1" height="0.2" radius="0.75" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.1"/>
+		<joint type="hinge" parentID="1" childID="0" pivot="-1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="2" childID="0" pivot="-1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="3" childID="0" pivot="1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08" limited="0"/>
+		<joint type="hinge" parentID="4" childID="0" pivot="1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08" limited="0"/>
 	</compound>
-	<environment/>
+	<environment model="data/models/ramps.3ds"/>
 </level>
 

@@ -20,8 +20,7 @@
 #include <gui/renderwidget.hpp>
 #include <gui/dialogs.hpp>
 #include <gui/toolbox.hpp>
-#include <gui/modifybox.hpp>
-#include <simulation/Simulation.hpp>
+#include <simulation/simulation.hpp>
 
 namespace gui {
 
@@ -194,12 +193,6 @@ private:
 	 * sim::Simulation::InteractionType.
 	 */
 	ToolBox* m_toolBox;
-
-	/**
-	 * MainWindow::m_modifyBox is a ModifyBox. This widget can be used for
-	 * explicit an exact resizing, positioning and rotation of a single object
-	 */
-	ModifyBox* m_modifyBox;
 
 	/**
 	 * Splitter between the left side (ToolBox, ModifyBox) and the RenderWidget

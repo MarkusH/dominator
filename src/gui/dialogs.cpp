@@ -84,4 +84,25 @@ float GravityDialog::run()
 	}
 }
 
+MessageDialog::MessageDialog(QString title, QString message, MessageType type) :
+	QMessageBox()
+{
+	QMessageBox msgBox;
+	msgBox.setText(title);
+	msgBox.setInformativeText(message);
+	switch (type) {
+	case INFO:
+		msgBox.setIcon(QMessageBox::Information);
+		break;
+	case WARNING:
+		msgBox.setIcon(QMessageBox::Warning);
+		break;
+	case ERROR:
+		msgBox.setIcon(QMessageBox::Critical);
+		break;
+	}
+	msgBox.setStandardButtons(QMessageBox::Ok);
+	msgBox.exec();
+}
+
 }

@@ -11,11 +11,12 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QString>
-#include <opengl/Shader.hpp>
+#include <opengl/shader.hpp>
 #include <m3d/m3d.hpp>
-#include <util/Clock.hpp>
-#include <util/InputAdapters.hpp>
+#include <util/clock.hpp>
+#include <util/inputadapters.hpp>
 #include <QtGui/QWheelEvent>
+#include <simulation/object.hpp>
 
 namespace gui {
 
@@ -32,37 +33,6 @@ public:
 	 * @param parent	the parent widget
 	 */
 	RenderWidget(QWidget* parent = 0);
-
-public slots:
-	/**
-	 * The slot function RenderWidget::renderSize will set the size of the
-	 * currently selected object regarding to the parameters <i>axis</i>
-	 * and <i>size</i>
-	 *
-	 * @param axis A character - <i>x</i>, <i>y</i> or <i>z</i>
-	 * @param size The new size of the object regarding to the given <i>axis</i>
-	 */
-	void renderSize(char axis, float size);
-	/**
-	 * The slot function RenderWidget::renderLocation will set the position
-	 * of the currently selected object regarding to the parameters <i>axis</i>
-	 * and <i>position</i>
-	 *
-	 * @param axis A character - <i>x</i>, <i>y</i> or <i>z</i>
-	 * @param position Set the <i>axis</i>-position of the object to the given
-	 * 		  value
-	 */
-	void renderLocation(char axis, float position);
-	/**
-	 * The slot function RenderWidget::renderRotation will set the size of the
-	 * currently selected object regarding to the parameters <i>x</i>, <i>y</i>
-	 * and <i>z</i>
-	 *
-	 * @param x	Rotate the object around the x axis with the given degrees
-	 * @param y	Rotate the object around the y axis with the given degrees
-	 * @param z	Rotate the object around the z axis with the given degrees
-	 */
-	void renderRotation(float x, float y, float z);
 
 protected:
 	/**
@@ -178,15 +148,8 @@ signals:
 	 * objectSelected(m3d::Mat4f) is emitted each time the user has selected
 	 * an object. The signal is connected to ModifyBox::updateData(m3d::Mat4f)
 	 */
-	void objectSelected(const m3d::Mat4f*);
-	/**
-	 * objectSelected(bool) is emitted each time the user has selected
-	 * an object. The signal is connected to ModifyBox::updateData(bool)
-	 *
-	 * @param if the parameter is true, the user selects an object if it is
-	 * false, the user unselects an object
-	 */
-	void objectSelected(bool);
+	void objectSelected(sim::Object);
+	void objectSelected();
 };
 
 }
