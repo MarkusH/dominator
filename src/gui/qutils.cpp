@@ -33,10 +33,8 @@ SplashScreen::SplashScreen(int max) :
 
 void SplashScreen::updateProgress(int progress)
 {
-	std::cout << progress << std::endl;
 	m_bar->setValue(progress);
 	m_bar->repaint(10, 10, width() - 20, 20);
-	//sleep(5);
 }
 
 }

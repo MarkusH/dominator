@@ -273,8 +273,7 @@ void ToolBox::onInteractionPressed(int button)
 		m_mouseinteraction->checkedButton()->setChecked(false);
 		m_mouseinteraction->setExclusive(true);
 		m_selectedInteraction = sim::Simulation::INT_NONE;
-		emit
-		interactionSelected(m_selectedInteraction);
+		emit interactionSelected(m_selectedInteraction);
 		return;
 	}
 	m_selectedInteraction = (sim::Simulation::InteractionType) m_mouseinteraction->checkedId();
@@ -291,6 +290,8 @@ void ToolBox::addObject(QAction *action)
 	m_width->setValue(a->getSize().x);
 	m_height->setValue(a->getSize().y);
 	m_depth->setValue(a->getSize().z);
+	m_selectedInteraction = sim::Simulation::INT_CREATE_OBJECT;
+	emit interactionSelected(m_selectedInteraction);
 
 	updateData();
 
