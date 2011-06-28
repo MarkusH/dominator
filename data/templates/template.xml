@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <!-- id attribute in compound is moot -->
+  <compound id="-1" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; 0, 42.9159, -25, 1">
+    <object id="0" type="box" matrix="-4.37114e-08, 0, -1, 0; 0, 1, 0, 0; 1, 0, -4.37114e-08, 0; -7.10543e-15, 42.9159, -25, 1" width="5" height="0.5" depth="2.5" freezeState="134923048" damping="0, 0, 0, 0" material="yellow" mass="5"/>
+    <object id="1" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; -1.375, 42.9159, -22.75, 1" height="0.2" radius="0.75" freezeState="134923048" damping="0, 0, 0, 0" material="yellow" mass="0.1"/>
+    <object id="2" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; -1.375, 42.9159, -27.25, 1" height="0.2" radius="0.75" freezeState="134923048" damping="0, 0, 0, 0" material="yellow" mass="0.1"/>
+    <object id="3" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; 1.375, 42.9159, -22.75, 1" height="0.2" radius="0.75" freezeState="134923048" damping="0, 0, 0, 0" material="yellow" mass="0.1"/>
+    <object id="4" type="chamfercylinder" matrix="-1, 0, 8.74228e-08, 0; 0, 1, 0, 0; -8.74228e-08, 0, -1, 0; 1.375, 42.9159, -27.25, 1" height="0.2" radius="0.75" freezeState="134923048" damping="0, 0, 0, 0" material="yellow" mass="0.1"/>
+    <joint type="hinge" parentID="1" childID="0" pivot="-1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08" limited="0"/>
+    <joint type="hinge" parentID="2" childID="0" pivot="-1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08" limited="0"/>
+    <joint type="hinge" parentID="3" childID="0" pivot="1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08" limited="0"/>
+    <joint type="hinge" parentID="4" childID="0" pivot="1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08" limited="0"/>
+  </compound>
+</template>
