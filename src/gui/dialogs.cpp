@@ -94,10 +94,10 @@ MessageDialog::MessageDialog(QString title, QString message, MessageType type) :
 	case INFO:
 		msgBox.setIcon(QMessageBox::Information);
 		break;
-	case WARNING:
+	case QWARNING:
 		msgBox.setIcon(QMessageBox::Warning);
 		break;
-	case ERROR:
+	case QERROR:
 		msgBox.setIcon(QMessageBox::Critical);
 		break;
 	}

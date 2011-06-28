@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="materials">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="material">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required" />
+            <xs:attribute name="texture" type="xs:string" use="required" />
+            <xs:attribute name="shader" type="xs:string" use="required" />
+            <xs:attribute name="ambient" type="xs:string" use="required" />
+            <xs:attribute name="diffuse" type="xs:string" use="required" />
+            <xs:attribute name="specular" type="xs:string" use="required" />
+            <xs:attribute name="shininess" type="xs:unsignedByte" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="unbounded" name="pair">
+          <xs:complexType>
+            <xs:attribute name="mat0" type="xs:string" use="required" />
+            <xs:attribute name="mat1" type="xs:string" use="required" />
+            <xs:attribute name="elasticity" type="xs:decimal" use="required" />
+            <xs:attribute name="staticFriction" type="xs:decimal" use="required" />
+            <xs:attribute name="kineticFriction" type="xs:decimal" use="required" />
+            <xs:attribute name="softness" type="xs:decimal" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

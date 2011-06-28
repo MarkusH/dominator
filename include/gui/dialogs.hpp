@@ -84,8 +84,8 @@ Q_OBJECT
 public:
 	typedef enum {
 		INFO = 0, /**< displays an "i". */
-		WARNING, /**< displays an "!" */
-		ERROR   /**< displays an "x" */
+		QWARNING, /**< displays an "!" */
+		QERROR   /**< displays an "x" */
 	} MessageType;
 	MessageDialog(QString title, QString message, MessageType type = INFO);
 };

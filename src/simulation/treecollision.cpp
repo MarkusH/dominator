@@ -257,7 +257,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	NewtonTreeCollisionEndBuild(collision, 1);
 
 	m_mesh = NewtonMeshCreate(world);
-	NewtonMeshBuildFromVertexListIndexList(m_mesh, numFaces, faceIndexCount, faceMaterials,
+	NewtonMeshBuildFromVertexListIndexList(m_mesh, numFaces, (const int*)faceIndexCount, (const int*)faceMaterials,
 			m_vertices[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
 			m_normals[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
 			m_uvs[0], sizeof(Lib3dsTexel), (const int*)&m_indices[0],
