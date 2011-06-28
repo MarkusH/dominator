@@ -233,7 +233,7 @@ void ToolBox::create_m_buttonbox()
 
 	m_rotate = new QPushButton("Rotate");
 	m_rotate->setCheckable(true);
-	m_mouseinteraction->addButton(m_rotate, (int) sim::Simulation::INT_ROTATE);
+	m_mouseinteraction->addButton(m_rotate, (int) sim::Simulation::INT_ROTATE_GROUND);
 	buttonLayout->addWidget(m_rotate);
 
 	m_mouseinteraction->setParent(this);
