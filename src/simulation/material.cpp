@@ -24,6 +24,8 @@
 
 namespace sim {
 
+using namespace m3d;
+
 MaterialMgr* MaterialMgr::s_instance = NULL;
 
 Material::Material(const std::string& name)
@@ -557,6 +559,27 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 0);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 1);
 
+		/*
+		bool conv = false;
+		Material* mat = fromID(mat0);
+		if (mat && mat->name == "sand")
+			conv = true;
+
+		mat = fromID(mat1);
+		if (mat && mat->name == "sand")
+			conv = true;
+
+		if (conv) {
+			//std::cout << "conv" << std::endl;
+			Vec3f convDir(1.0f, 0.0f, 0.0f);
+			float convSpeed = 10.0f;
+			NewtonBodySetFreezeState(body0, 0); NewtonBodySetFreezeState(body1, 0);
+			NewtonMaterialContactRotateTangentDirections(material, &convDir[0]);
+			float speed = NewtonMaterialGetContactTangentSpeed(material, 0);
+			NewtonMaterialSetContactElasticity(material, 0);
+		    NewtonMaterialSetContactTangentAcceleration(material, (convSpeed - speed) / timestep, 0);
+		}
+	*/
 		/// @todo get impact information and play a sound
 	}
 

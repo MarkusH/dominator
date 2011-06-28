@@ -9,9 +9,11 @@
 #define OGL_UTIL_HPP_
 
 #include <m3d/m3d.hpp>
-using namespace m3d;
+#include <opengl/camera.hpp>
 
 namespace ogl {
+
+using namespace m3d;
 
 /**
  * Draws the given axis-aligned bounding box
@@ -28,7 +30,7 @@ void drawAABB(const Vec3f& min, const Vec3f& max);
  * @param screen The screen coordinates
  * @return       The world coordinates
  */
-Vec3f screenToWorld(const Vec3d& screen);
+Vec3f screenToWorld(const Vec3d& screen, const Camera& cam);
 
 /**
  * Returns the world coordinates of the given position on the
@@ -37,7 +39,7 @@ Vec3f screenToWorld(const Vec3d& screen);
  * @param screen The screen coordinates
  * @return       The world coordinates
  */
-Vec3f screenToWorld(const Vec2d& screen);
+Vec3f screenToWorld(const Vec2d& screen, const Camera& cam);
 
 /**
  * Shoots a ray at from the screen position to the near and far plane.
@@ -49,7 +51,7 @@ Vec3f screenToWorld(const Vec2d& screen);
  * @param far    The intersection on the far plane
  * @return       The direction vector between near and far
  */
-Vec3f getScreenRay(const Vec2d& screen, Vec3f& near, Vec3f& far);
+Vec3f getScreenRay(const Vec2d& screen, Vec3f& near, Vec3f& far, const Camera& cam);
 
 }
 

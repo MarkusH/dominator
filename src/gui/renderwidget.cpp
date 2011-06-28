@@ -41,27 +41,6 @@ void RenderWidget::initializeGL()
 	ogl::ShaderMgr::instance().load("data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
 
-	// set some material properties
-	const float mat_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	const float mat_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const float mat_specular[] = { 0.5, 0.5, 0.5, 1.0 };
-	const float mat_shininess = 20.0f;
-
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat_diffuse[0]);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, &mat_ambient[0]);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, &mat_specular[0]);
-	glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
-	glEnable(GL_COLOR_MATERIAL);
-
-	// set some light properties
-	GLfloat ambient[4] = { 0.2, 0.2, 0.2, 1.0 };
-	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
-	GLfloat specular[4] = { 0.5, 0.5, 0.5, 1.0 };
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0f);
@@ -80,30 +59,22 @@ void RenderWidget::initializeGL()
 
 void RenderWidget::resizeGL(int width, int height)
 {
-	// Reset the viewport
 	glViewport(0, 0, width, height);
-	// Reset the projection and modelview matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	// 10 x 10 x 10 viewing volume
-	//glOrtho(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
-	gluPerspective(60.0f, (float) width / (float) height, 0.1f, 1024.0f);
+	gluPerspective(60.0f, (float) width / (float) height, 0.1f, 4096.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	sim::Simulation::instance().getCamera().m_viewport = Vec4<GLint>::viewport();
+	sim::Simulation::instance().getCamera().m_projection = Mat4f::projection();
 }
 
 void RenderWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 
 	sim::Simulation::instance().update();
 	sim::Simulation::instance().render();
-
-	// set the position of the light
-	static m3d::Vec4f lightPos(0.0f, 10.0f, 15.0f, 0.0f);
-	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
 
 	static int frames = 0;
 	frames++;

@@ -63,8 +63,13 @@ public:
 
 	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 
-	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
-	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
+	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent,
+			bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
+	Slider createSlider(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent,
+			bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
+	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir,
+			const Object& child, const Object& parent,
+			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
 
 	virtual bool contains(const NewtonBody* const body);
 	virtual bool contains(const __Object* object);

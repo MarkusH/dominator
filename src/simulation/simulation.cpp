@@ -112,6 +112,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_gravity = -9.81f * 4.0f;
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
+	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
 }
 
 Simulation::~Simulation()
@@ -193,7 +194,7 @@ void Simulation::load(const std::string& fileName)
 		xml_node<>* node = nodes->first_node("environment");
 		if (node) {
 			m_environment = __TreeCollision::load(node);
-			((__TreeCollision*)m_environment.get())->createOctree();
+			//((__TreeCollision*)m_environment.get())->createOctree();
 		}
 	}
 
@@ -227,9 +228,10 @@ void Simulation::init()
 	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 	__Domino::genDominoBuffers(m_vertexBuffer);
+	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/ramps.3ds"));
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
+	//add(m_environment);
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
 
@@ -281,11 +283,11 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if(0)
 	{
-		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", true));
+		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", true));
 		add(convex);
 		convex->convexCastPlacement();
 
-		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "yellow", "data/models/mesh.3ds", __ConvexAssembly::ORIGINAL));
+		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", __ConvexAssembly::ORIGINAL));
 		add(convex);
 		convex->convexCastPlacement();
 	}
@@ -294,14 +296,123 @@ void Simulation::init()
 	if (0)
 	{
 		Compound c = Compound(new __Compound());
-		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "yellow");
-		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "yellow");
+		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
+		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
 		c->add(obj0);
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.75f, 50.0f)));
-		c->convexCastPlacement();
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.50f + 0.70f, 50.0f)));
+		//c->convexCastPlacement();
+	}
+
+	// hinge door
+	if (0) {
+		const float vertical = 20.0f;
+		const float doorHeight = 3.0f;
+		Compound c = Compound(new __Compound());
+
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		c->add(top);
+
+		RigidBody door = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f)), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
+		c->add(door);
+
+		c->createHinge(Vec3f(0.0f, vertical - 0.25f, 0.0f), Vec3f::xAxis(), door, top, true, -75.0f * 3.14f / 180.0f, 75.0f * 3.14f / 180.0f);
+
+		add(c);
+	}
+
+	// swing
+	if (0) {
+		const int linksCount = 15;
+		const float vertical = 20.0f;
+		Vec3f size(1.0f, 0.05f, 0.15f);
+		Mat4f llocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
+		llocation.setW(Vec3f(-2.0f, vertical - size.x*0.5f, 0.0f));
+		Mat4f rlocation = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
+		rlocation.setW(Vec3f(2.0f, vertical - size.x*0.5f, 0.0f));
+		RigidBody lobj0, lobj1, robj0, robj1;
+
+		Compound c = Compound(new __Compound());
+
+		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		c->add(top);
+		lobj0 = robj0 = top;
+
+		for (int i = 0; i < linksCount; i ++) {
+			//create the rigid bodies
+			lobj1 = __Object::createCylinder(llocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			c->add(lobj1);
+
+			robj1 = __Object::createCylinder(rlocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			c->add(robj1);
+
+			// left joint
+			Vec3f pivot = llocation.getW();
+			pivot.y += (size.x - size.y) * 0.5f;
+
+			c->createBallAndSocket(pivot, llocation.getY(), lobj1, lobj0);//, true, 360.0f * 3.14f / 180.0f, -45.0f * 3.14f / 180.0f, 45.0f * 3.14f / 180.0f);
+			lobj0 = lobj1;
+			llocation._42 -= (size.x - size.y);
+
+			// right joint
+			pivot = rlocation.getW();
+			pivot.y += (size.x - size.y) * 0.5f;
+
+			c->createBallAndSocket(pivot, rlocation.getY(), robj1, robj0);//, true, 360.0f * 3.14f / 180.0f, -45.0f * 3.14f / 180.0f, 45.0f * 3.14f / 180.0f);
+			robj0 = robj1;
+			rlocation._42 -= (size.x - size.y);
+		}
+		// Mat4f::translate(Vec3f(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f))
+		RigidBody bottom = __Object::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
+		c->add(bottom);
+
+		// left attachment
+		Vec3f pivot = llocation.getW();
+		pivot.y = llocation._42+size.x*0.5f;
+		c->createBallAndSocket(pivot, llocation.getY(), bottom, lobj0, true);
+
+		// right attachment
+		pivot = rlocation.getW();
+		pivot.y = rlocation._42+size.x*0.5f;
+		c->createBallAndSocket(pivot, rlocation.getY(), bottom, robj0, true);
+
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.0f, 50.0f)));
+	}
+
+	// rope way
+	if (0) {
+		const float anchorRadius = 0.05f;
+		const float ropeHeight = 0.25f;
+		const float ropeLength = 20.0f;
+		const float anchorRopeLength = 5.0f;
+		Compound c = Compound(new __Compound());
+
+		// rope
+		RigidBody rope = __Object::createBox(Mat4f::identity(), ropeLength, ropeHeight, 0.25f, 0.0f, "metal");
+		c->add(rope);
+
+		// anchor
+		RigidBody anchor = __Object::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
+		c->add(anchor);
+		c->createSlider(Vec3f(0.0f, -ropeHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, rope, true, -ropeLength*0.5f, ropeLength*0.5f);
+
+		// anchor rope
+		RigidBody anchorRope = __Object::createCylinder(
+				Mat4f::rotZ(3.14f*0.5f) * Mat4f::translate(Vec3f(0.0f, -anchorRopeLength*0.5f - ropeHeight*0.5f - 0.1f, 0.0f)),
+				anchorRadius * 2.0f, anchorRopeLength, 0.1f, "rope");
+		c->add(anchorRope);
+
+		c->createBallAndSocket(anchor->getMatrix().getW(), Vec3f::zAxis(), anchorRope, anchor);
+
+		RigidBody load = __Object::createSphere(anchorRope->getMatrix().getW() - Vec3f(0.0f, anchorRopeLength*0.5f, 0.0f), 1.0f, 1.0f, "cradle");
+		c->add(load);
+		c->createBallAndSocket(load->getMatrix().getW(), Vec3f::zAxis(), load, anchorRope);
+
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+		add(c);
 	}
 
 	// rope
@@ -313,10 +424,11 @@ void Simulation::init()
 		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
 		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
 		Compound rope = Compound(new __Compound());
+		obj0 = __Object::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
+		rope->add(obj0);
+
 		// create a long vertical rope with limits
 		for (int i = 0; i < linksCount; i ++) {
-			// create the a graphic character (use a visualObject as our body
-
 			//create the rigid body
 			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
 			rope->add(obj1);
@@ -336,11 +448,10 @@ void Simulation::init()
 		}
 		Vec3f pivot = location.getW();
 		pivot.y += (size.x - size.y) * 0.5f;
-		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "rope");
+		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "wood");
 		rope->add(obj1);
-		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0);
+		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0, true);
 		add(rope);
-
 	}
 
 	// wagon with tires and hinges
@@ -403,6 +514,56 @@ void Simulation::init()
 		 */
 	}
 
+	// bridge
+	if (0) {
+		const int linksCount = 20;
+		Vec3f boxSize(3.0f, 1.0f, 3.0f);
+		Vec3f linkSize(1.4f, 0.1f, 0.5f);
+		boxSize *= 5.0f;
+		linkSize *= 5.0f;
+
+		Mat4f location = Mat4f::identity();
+
+		Compound c = Compound(new __Compound());
+
+		RigidBody link0 = __Object::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		c->add(link0);
+		RigidBody link1;
+
+		location._43 += boxSize.z * 0.5f + linkSize.z * 0.5f;
+		location._42 += boxSize.y * 0.5f - linkSize.y * 0.5f;;
+
+		for (int i = 0; i < linksCount; ++i) {
+
+			link1 = __Object::createBox(location, linkSize.x, linkSize.y, linkSize.z, 0.25f, "plankso", 0, Vec4f(0.5f, 0.5f, 0.5f, 0.5f));
+			c->add(link1);
+
+			Vec3f pivot(location.getW());
+			pivot.y += linkSize.y * 0.5f;
+			pivot.z -= linkSize.z * 0.5f;
+
+			c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
+
+			link0 = link1;
+			location._43 += linkSize.z;
+		}
+
+		Vec3f pivot(location.getW());
+		pivot.y += linkSize.y * 0.5f;
+		pivot.z -= linkSize.z * 0.5f;
+
+		location._43 += boxSize.z * 0.5f - linkSize.z * 0.5f;
+		location._42 += linkSize.y * 0.5f - boxSize.y * 0.5f;
+
+		link1 = __Object::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		c->add(link1);
+
+		c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
+
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+	}
+
 	//save("data/levels/test_level.xml");
 	setEnabled(false);
 }
@@ -414,6 +575,7 @@ void Simulation::clear()
 	m_objects.clear();
 	m_environment = Object();
 	__Domino::freeCollisions();
+	m_skydome.clear();
 	if (m_world) {
 		std::cout << "Remaining bodies: " << NewtonWorldGetBodyCount(m_world) << std::endl;
 		NewtonDestroy(m_world);
@@ -611,7 +773,7 @@ void Simulation::mouseMove(int x, int y)
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT) && m_enabled) {
-		newton::mousePick(m_world, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+		newton::mousePick(m_world, m_camera, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 	}
 
 	util::Button button = util::LEFT;
@@ -658,8 +820,8 @@ void Simulation::mouseMove(int x, int y)
 			// get new and old rays
 			Vec3f R1, R2;
 			Vec3f S1, S2;
-			ogl::getScreenRay(Vec2d(x, y), R1, R2);
-			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2);
+			ogl::getScreenRay(Vec2d(x, y), R1, R2, m_camera);
+			ogl::getScreenRay(Vec2d(m_mouseAdapter.getX(), m_mouseAdapter.getY()), S1, S2, m_camera);
 
 			pos1 = rayPlaneIntersect(S1, S2, p1, p2, p3);
 			Vec3f pos3 = rayPlaneIntersect(R1, R2, p1, p2, p3);
@@ -712,7 +874,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (button == util::RIGHT && m_enabled) {
-		newton::mousePick(m_world, Vec2f(x, y), down);
+		newton::mousePick(m_world, m_camera, Vec2f(x, y), down);
 		//newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
@@ -753,7 +915,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
 				Mat4f matrix(Vec3f::yAxis(), q, p);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, "domino");
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, m_newObjectMaterial);
 				add(domino);
 			}
 		// line
@@ -767,7 +929,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			Mat4f matrix(Vec3f::yAxis(), dir, start);
 			for (float d = 0.0f; d <= len; d += 4.5f) {
 				matrix.setW(start + dir * d);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, "domino");
+				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, m_newObjectMaterial);
 				add(domino);
 			}
 		}
@@ -807,7 +969,7 @@ void Simulation::update()
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
-
+	m_skydome.update(delta);
 	float step = delta * (m_keyAdapter.shift() ? 25.f : 10.0f);
 
 	if (m_keyAdapter.isDown('w')) m_camera.move(step);
@@ -838,6 +1000,17 @@ void Simulation::render()
 	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
 */
 
+	// set some light properties
+	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
+	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
+	GLfloat specular[4] = { 0.7, 0.7, 0.7, 1.0 };
+
+	glLightfv(GL_LIGHT0, GL_POSITION, &m_lightPos[0]);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
 	if (itr != m_sortedBuffers.end()) {
@@ -861,13 +1034,17 @@ void Simulation::render()
 		glPopMatrix();
 	}
 
+	if (m_environment)
+		m_environment->render();
+
+	glDisable(GL_LIGHTING);
+	m_skydome.render(m_camera, m_lightPos.xyz(), newton::getRayCastBody(m_world, m_camera.m_position, m_lightPos.xyz() - m_camera.m_position));
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 0.0, 0.0f);
 
-	if (m_environment)
-		m_environment->render();
+
 
 	if (m_selectedObject) {
 		Vec3f min, max;

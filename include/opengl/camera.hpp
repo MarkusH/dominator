@@ -37,8 +37,10 @@ public:
 	/** A vector perpendicular to the viewVector() and the up vector */
 	Vec3f m_strafe;
 
-	Mat4f m_matrix;
+	Mat4f m_modelview;
+	Mat4f m_projection;
 	Mat4f m_inverse;
+	Vec4<GLint> m_viewport;
 
 	/**
 	 * The six planes of the view frustum in the following order:
@@ -123,7 +125,7 @@ public:
 	 * @param max The maximum of the AABB
 	 * @return    True, if the AABB is (partially) visible, False otherwise
 	 */
-	bool checkAABB(const Vec3f& min, const Vec3f& max);
+	bool checkAABB(const Vec3f& min, const Vec3f& max) const;
 
 	/**
 	 * Tests the visibility of the given axis-aligned bounding box.
@@ -136,7 +138,15 @@ public:
 	 * @param max The maximum of the AABB
 	 * @return    The visibility of the AABB
 	 */
-	Visibility testAABB(const Vec3f& min, const Vec3f& max);
+	Visibility testAABB(const Vec3f& min, const Vec3f& max) const;
+
+	/**
+	 *
+	 * @param center
+	 * @param radius
+	 * @return
+	 */
+	Visibility testSphere(const Vec3f& center, float radius) const;
 };
 
 }

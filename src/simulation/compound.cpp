@@ -38,7 +38,6 @@ __Compound::~__Compound()
 
 void __Compound::getAABB(Vec3f& min, Vec3f& max)
 {
-
 	if (m_nodes.size() > 0) {
 		m_nodes.front()->getAABB(min, max);
 		std::list<Object>::iterator itr = m_nodes.begin();
@@ -50,7 +49,7 @@ void __Compound::getAABB(Vec3f& min, Vec3f& max)
 			min.z = min(min.z, _min.z);
 			max.x = max(max.x, _max.x);
 			max.y = max(max.y, _max.y);
-			max.z = max(max.z, _max.x);
+			max.z = max(max.z, _max.z);
 		}
 	} else {
 		min = max = Vec3f();
@@ -97,7 +96,7 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	Compound result = Compound(new __Compound());
 	// load m_matrix
 
-	// type attribute
+	// id attribute
 	xml_attribute<>* attr = nodes->first_attribute();
 
 	// matrix attribute
@@ -137,11 +136,11 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	return result;
 }
 
-Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent)
+Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent, bool limited, float minAngle, float maxAngle)
 {
 	if (child && child != parent) {
 		Vec3f pin = pinDir % m_matrix;
-		Hinge hinge = __Hinge::create(pivot, pin, child, parent);
+		Hinge hinge = __Hinge::create(pivot, pin, child, parent, limited, minAngle, maxAngle);
 		m_joints.push_back(hinge);
 		return hinge;
 	}
@@ -149,11 +148,25 @@ Hinge __Compound::createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Obj
 	return result;
 }
 
-BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent)
+
+Slider __Compound::createSlider(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent,
+		bool limited, float minDist, float maxDist)
 {
 	if (child && child != parent) {
 		Vec3f pin = pinDir % m_matrix;
-		BallAndSocket ball = __BallAndSocket::create(pivot, pin, child, parent);
+		Slider slider = __Slider::create(pivot, pin, child, parent, limited, minDist, maxDist);
+		m_joints.push_back(slider);
+		return slider;
+	}
+	Slider result;
+	return result;
+}
+
+BallAndSocket __Compound::createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent, bool limited, float coneAngle, float minTwist, float maxTwist)
+{
+	if (child && child != parent) {
+		Vec3f pin = pinDir % m_matrix;
+		BallAndSocket ball = __BallAndSocket::create(pivot, pin, child, parent, limited, coneAngle, minTwist, maxTwist);
 		m_joints.push_back(ball);
 		return ball;
 	}

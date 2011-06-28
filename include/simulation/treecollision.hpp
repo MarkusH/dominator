@@ -41,7 +41,7 @@ protected:
 	// T2F_N3F_V3F
 	std::vector<float> m_data;
 	std::vector<uint32_t> m_indices;
-
+NewtonMesh* m_mesh;
 	int m_vertexCount;
 	Lib3dsVector* m_vertices;
 	Lib3dsVector* m_normals;

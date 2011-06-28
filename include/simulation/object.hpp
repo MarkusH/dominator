@@ -214,8 +214,6 @@ protected:
 
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
-
-	Vec3f m_scale;
 public:
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));

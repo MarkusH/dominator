@@ -50,7 +50,7 @@ GravityDialog::GravityDialog(const float gravity, QWidget* parent) :
 	QGridLayout* m_layout = new QGridLayout();
 	QDialogButtonBox* m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	m_gravity = new QDoubleSpinBox();
-
+	
 	// validate the given gravity
 	if (gravity < m_rangeLow)
 		m_value = m_rangeLow;

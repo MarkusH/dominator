@@ -199,13 +199,21 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	m_normals = new Lib3dsVector[numFaces * 3];
 	m_uvs = new Lib3dsTexel[numFaces * 3];
 
+	int32_t* faceIndexCount = new int32_t[numFaces];
+	for (int i = 0; i < numFaces; ++i)
+		faceIndexCount[i] = 3;
+
+	int32_t* faceMaterials = new int32_t[numFaces];
+
 	m_data.reserve(3 * numFaces * 3);
 	m_indices.reserve(3 * numFaces);
 
 	unsigned finishedFaces = 0;
 
-	NewtonCollision* collision = NewtonCreateTreeCollision(world, defaultMaterial);
+	NewtonCollision* collision = NewtonCreateTreeCollision(world, 0);
 	NewtonTreeCollisionBeginBuild(collision);
+
+	//TODO sort the meshes and then only appy and begin() if it is another material
 
 	m_list = glGenLists(1);
 	glNewList(m_list, GL_COMPILE);
@@ -214,21 +222,31 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 		//data.resize(data.size() + (mesh->points * (3 + 3 + 2)));
 		int faceMaterial = defaultMaterial;
 		lib3ds_mesh_calculate_normals(mesh, &m_normals[finishedFaces*3]);
-		MaterialMgr::instance().applyMaterial("yellow");
+		if (mesh->faces) {
+			faceMaterial = mesh->faceL[0].material && mesh->faceL[0].material[0] ? MaterialMgr::instance().getID(mesh->faceL[0].material) : defaultMaterial;
+			Material* mat = MaterialMgr::instance().fromID(faceMaterial);
+			MaterialMgr::instance().applyMaterial(mat ? mat->name : "yellow");
+		}
 		glBegin(GL_TRIANGLES);
 		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
 			Lib3dsFace* face = &mesh->faceL[cur_face];
 			for(unsigned int i = 0;i < 3; i++) {
 				memcpy(&m_vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				//memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
+				if (mesh->texelL) {
+					memcpy(&m_uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
+					glTexCoord2fv(m_uvs[finishedFaces*3 + i]);
+				}
 				glNormal3fv(m_normals[finishedFaces*3 + i]);
 				glVertex3fv(m_vertices[finishedFaces*3 + i]);
+
 				m_data.push_back(mesh->pointL[face->points[i]].pos[0]);
 				m_data.push_back(mesh->pointL[face->points[i]].pos[1]);
 				m_data.push_back(mesh->pointL[face->points[i]].pos[2]);
 				m_indices.push_back(m_indices.size());
 			}
 			faceMaterial = face->material && face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
+			//std::cout << faceMaterial << std::endl;
+			faceMaterials[finishedFaces] = faceMaterial;
 			NewtonTreeCollisionAddFace(collision, 3, m_vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
 			finishedFaces++;
 		}
@@ -237,6 +255,13 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	glEndList();
 	lib3ds_file_free(file);
 	NewtonTreeCollisionEndBuild(collision, 1);
+
+	m_mesh = NewtonMeshCreate(world);
+	NewtonMeshBuildFromVertexListIndexList(m_mesh, numFaces, faceIndexCount, faceMaterials,
+			m_vertices[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
+			m_normals[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
+			m_uvs[0], sizeof(Lib3dsTexel), (const int*)&m_indices[0],
+			m_uvs[0], sizeof(Lib3dsTexel), (const int*)&m_indices[0]);
 
 	this->create(collision, 0.0f);
 	//NewtonBodySetContinuousCollisionMode(m_body, 1);
@@ -258,17 +283,29 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 
 	// declarations
 	xml_node<>* node;
+	char *pModel;
+	xml_attribute<> *attrMo;
 
 	node = doc->allocate_node(node_element, "environment");
 	parent->insert_node(0, node);
 
-	//TODO: save matrix and fileName
+
+	// set attribute "model" to  the correct file name
+	pModel = doc->allocate_string(object.m_fileName.c_str());
+	attrMo = doc->allocate_attribute("model", pModel);
+	node->append_attribute(attrMo);
+
 }
 
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 {
-	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), "data/models/ramps.3ds"));
-	//TODO load matrix and filename and return "real" environment
+	using namespace rapidxml;
+
+	//attribute model
+	xml_attribute<>* attr = node->first_attribute();
+	std::string model = attr->value();
+
+	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), model));
 	return result;
 }
 
@@ -305,27 +342,12 @@ void __TreeCollision::genBuffers(ogl::VertexBuffer& vbo)
 	const unsigned floatOffset = vbo.m_data.size();
 	const unsigned vertexOffset = floatOffset / vertexSize;
 
-	NewtonCollision* collision = NewtonBodyGetCollision(m_body);
+	//NewtonCollision* collision = NewtonBodyGetCollision(m_body);
 
 	// create a mesh from the collision
-	NewtonMesh* collisionMesh = NewtonMeshCreateFromCollision(collision);
+	NewtonMesh* collisionMesh = m_mesh;//NewtonMeshCreateFromCollision(collision);
 
-	switch (m_type) {
-	case SPHERE:
-		NewtonMeshApplySphericalMapping(collisionMesh, 0);
-		break;
-	case CYLINDER:
-	case CHAMFER_CYLINDER:
-		//NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
-		//break;
-	case BOX:
-	default:
-		NewtonMeshApplyBoxMapping(collisionMesh, 0, 0, 0);
-		break;
-	}
-
-	//NewtonMeshCalculateVertexNormals(collisionMesh, 60.0f * 3.1416f/180.0f);
-
+	NewtonMeshCalculateVertexNormals(collisionMesh, 45.0f * 3.1416f/180.0f);
 
 	// allocate the vertex data
 	int vertexCount = NewtonMeshGetPointCount(collisionMesh);
@@ -339,22 +361,18 @@ void __TreeCollision::genBuffers(ogl::VertexBuffer& vbo)
 			byteSize, &vbo.m_data[floatOffset],
 			byteSize, &vbo.m_data[floatOffset]);
 
-	//std::cout << "____" << std::endl;
-	//std::cout << vertexCount << std::endl;
-
-
 	// iterate over the submeshes and store the indices
 	void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
 	for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
 			handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
 
-		//int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
+		int material = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
 		//std::cout << "material " << material << std::endl;
 		//std::cout << "mesh " << material << std::endl;
 
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-		subBuffer->material = "yellow";
+		subBuffer->material = MaterialMgr::instance().fromID(material)->name;
 		subBuffer->object = this;
 
 		subBuffer->dataCount = vertexCount;

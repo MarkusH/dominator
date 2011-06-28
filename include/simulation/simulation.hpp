@@ -12,6 +12,7 @@
 #include <util/clock.hpp>
 #include <opengl/camera.hpp>
 #include <opengl/vertexbuffer.hpp>
+#include <opengl/skydome.hpp>
 #include <simulation/object.hpp>
 #include <map>
 #include <Newton.h>
@@ -114,6 +115,12 @@ protected:
 	 * the sub-buffers of the VBO directly because the order is important.
 	 */
 	ogl::SubBuffers m_sortedBuffers;
+
+	/**
+	 * The skydome of the simulation.
+	 */
+	ogl::Skydome m_skydome;
+	Vec4f m_lightPos;
 
 	/**
 	 * Uploads the vertex data of all objects between begin

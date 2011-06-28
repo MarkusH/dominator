@@ -9,6 +9,7 @@
 #define NEWTON_UTIL_HPP_
 
 #include <m3d/m3d.hpp>
+#include <opengl/camera.hpp>
 #include <Newton.h>
 #include <list>
 
@@ -78,7 +79,7 @@ void showCollisionShape(const NewtonCollision* shape, const Mat4f& matrix);
  * @param down  True, if the button is down, False otherwise
  * @return      True, if in pick-mode, False otherwise
  */
-bool mousePick(const NewtonWorld* world, const Vec2f& mouse, bool down);
+bool mousePick(const NewtonWorld* world, const ogl::Camera& cam, const Vec2f& mouse, bool down);
 
 
 
