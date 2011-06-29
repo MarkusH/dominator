@@ -5,22 +5,36 @@
  */
 
 #include <gui/qutils.hpp>
-#include <stdio.h>
+#include <QtGui/QPixmap>
+#include <iostream>
 
 namespace gui {
 
-QObjectAction::QObjectAction(const QString &text, sim::__Object::Type type, const bool freeze, const float mass, QWidget* parent) :
-	QAction(text, parent)
+QObjectAction::QObjectAction(sim::__Object::Type type, QWidget* parent) :
+	QAction(parent)
 {
+	setText(QString::fromStdString(sim::__Object::TypeName[type]));
 	m_type = type;
-	m_mass = mass;
-	m_freeze = freeze;
-	connect(this, SIGNAL(triggered()), this, SLOT(sendObjectActionTriggered()));
+	m_mass = sim::__Object::TypeMass[type];
+	m_freeze = sim::__Object::TypeFreezeState[type];
+	m_size = sim::__Object::TypeSize[type];
 }
 
-void QObjectAction::sendObjectActionTriggered()
+SplashScreen::SplashScreen(int max) :
+		QSplashScreen()
 {
-	emit triggered(m_type, m_mass, m_freeze);
+	QPixmap pixmap = QPixmap("data/splash.png");
+	setPixmap(pixmap);
+	m_bar = new QProgressBar(this);
+	m_bar->setGeometry(10, 10, width() - 20, 20);
+	m_bar->setMaximum(max);
+	m_bar->setValue(0);
+}
+
+void SplashScreen::updateProgress(int progress)
+{
+	m_bar->setValue(progress);
+	m_bar->repaint(10, 10, width() - 20, 20);
 }
 
 }
