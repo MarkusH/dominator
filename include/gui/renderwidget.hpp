@@ -109,7 +109,7 @@ protected:
 	 */
 	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
-private:
+public:
 	/**
 	 * RenderWidget::m_timer is used to update and repaint the display. The
 	 * timeout() signal is connected to <a href="http://doc.qt.nokia.com/4.7/qglwidget.html#updateGL">

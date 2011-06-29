@@ -69,9 +69,12 @@ void MouseAdapter::addListener(MouseListener* listener)
 
 void MouseAdapter::removeListener(MouseListener* listener)
 {
+	m_listeners.remove(listener);
+	/*
 	for (std::list<MouseListener*>::iterator itr = m_listeners.begin(); itr != m_listeners.end(); ++itr)
 		if (*itr == listener)
 			m_listeners.erase(itr);
+			*/
 }
 
 bool MouseAdapter::isDown(Button button)

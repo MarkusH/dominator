@@ -689,6 +689,7 @@ void Simulation::clear()
 		NewtonDestroy(m_world);
 		std::cout << "Remaining memory: " << NewtonGetMemoryUsed() << std::endl;
 	}
+	m_world = NULL;
 }
 
 int Simulation::add(const Object& object)

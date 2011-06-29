@@ -24,13 +24,15 @@ RenderWidget::RenderWidget(QWidget* parent) :
 	QGLWidget(parent)
 {
 	setFocusPolicy(Qt::WheelFocus);
+	//updateGL();
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
-	m_timer->start();
+	//m_timer->start();
 }
 
 void RenderWidget::initializeGL()
 {
+	std::cout << "initGL" << std::endl;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		std::cerr << "could not initialize GLEW" << std::endl;

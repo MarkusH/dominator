@@ -50,8 +50,7 @@ MainWindow::MainWindow(QApplication* app)
 	app->processEvents();
 	splash.updateProgress(85);
 
-	m_toolBox->updateMaterials();
-	splash.updateProgress(90);
+
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);
@@ -78,6 +77,12 @@ MainWindow::MainWindow(QApplication* app)
 	splash.updateProgress(100);
 
 	showMaximized();
+	m_renderWidget->updateGL();
+	m_renderWidget->m_timer->start();
+	m_toolBox->updateMaterials();
+	splash.updateProgress(90);
+
+
 	splash.finish(this);
 }
 
