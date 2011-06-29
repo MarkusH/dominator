@@ -678,6 +678,7 @@ void Simulation::init()
 
 void Simulation::clear()
 {
+	m_selectedObject = Object();
 	m_sortedBuffers.clear();
 	m_vertexBuffer.flush();
 	m_objects.clear();
@@ -712,7 +713,8 @@ int Simulation::add(const ObjectInfo& info)
 {
 	Mat4f matrix(Vec3f::yAxis(), m_camera.viewVector(), m_pointer);
 	int result = add(info.create(matrix));
-	m_objects.back()->convexCastPlacement();
+	if (result > -1)
+		m_objects.back()->convexCastPlacement();
 	return result;
 }
 
