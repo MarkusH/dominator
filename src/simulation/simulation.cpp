@@ -718,6 +718,8 @@ void Simulation::clear()
 
 int Simulation::add(const Object& object)
 {
+	if (!object.get())
+		return -1;
 	return add(object, m_nextID++);
 }
 
