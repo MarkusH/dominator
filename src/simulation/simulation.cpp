@@ -39,6 +39,9 @@ static CRSpline curve_spline;
 ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState)
 	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState)
 {
+	// use this to test the template
+	//this->type = __Object::COMPOUND;
+	//this->fileName = "data/templates/template.xml";
 	switch (type) {
 	case __Object::BOX:
 	case __Object::SPHERE:
@@ -91,8 +94,30 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::COMPOUND:
 	case __Object::CONVEX_ASSEMBLY:
 	case __Object::CONVEX_HULL:
-		// TODO: create xml document of this->fileName
-		// result = __Object.load(node)
+		{
+			using namespace rapidxml;
+
+			file<char> f(fileName.c_str());
+
+			char* m = f.data();
+
+			// TODO add exception handling
+			xml_document<> doc;
+			doc.parse<0>(m);
+
+			// this is important so we don't parse the template tag but the object or compound tag
+			xml_node<>* nodes = doc.first_node();
+
+			// only the first tag is loaded the rest will be ignored
+			xml_node<>* node = nodes->first_node();
+			std::string type(node->name());
+
+			if (type == "object" || type == "compound") {
+				result = __Object::load(node);
+				result->setMatrix(matrix);
+				return result;
+			}
+		}
 		break;
 	default:
 		break;
@@ -1117,6 +1142,9 @@ void Simulation::render()
 		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
 		glPopMatrix();
 	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	if (m_environment)
 		m_environment->render();

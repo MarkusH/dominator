@@ -47,7 +47,7 @@
 	<object id="27" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.903348, 3.01006, 156.457, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
 	<object id="28" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.977973, 3.01006, 160.956, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
 	<object id="29" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 1.0526, 3.01006, 165.455, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<environment model="data/models/ramps.3ds"/>
+	<environment filename="data/models/ramps.3ds" octree="0"/>
 <!--
 	<object id="32" type="convex_assembly" matrix="" freezeState="" damping="" material="" mass="" filename="" renderingType=""/>
 	<object id="33" type="convex_hull" matrix="" freezeState="" damping="" material="" mass="" filename="" originalGeometry=""/>

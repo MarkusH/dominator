@@ -101,6 +101,6 @@
 		<joint type="ballandsocket" parentID="14" childID="15" pivot="0, 5.10469, 0" pinDir="-1, 3.13916e-07, 0" limited="0"/>
 		<joint type="ballandsocket" parentID="15" childID="16" pivot="0, 4.15469, 0" pinDir="-1, 3.13916e-07, 0" limited="1" coneangle="0" mintwist="0" maxtwist="0"/>
 	</compound>
-	<environment model="data/models/mattest.3ds"/>
+	<environment filename="data/models/mattest.3ds" octree="0"/>
 </level>
 

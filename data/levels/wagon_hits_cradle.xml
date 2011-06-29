@@ -34,6 +34,6 @@
 		<joint type="hinge" parentID="3" childID="0" pivot="1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-08" limited="0"/>
 		<joint type="hinge" parentID="4" childID="0" pivot="1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-08" limited="0"/>
 	</compound>
-	<environment model="data/models/ramps.3ds"/>
+	<environment filename="data/models/ramps.3ds" octree="0"/>
 </level>
 
