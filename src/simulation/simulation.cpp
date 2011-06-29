@@ -672,6 +672,30 @@ void Simulation::init()
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
 	}
 
+	// slider
+	if (0) {
+		const float axisHeight = 0.25f;
+		const float axisLength = 20.0f;
+		float anchorRadius = 1.0f;
+		Compound c = Compound(new __Compound());
+
+		// axis
+		RigidBody axis = __Object::createBox(Mat4f::identity(), axisLength, axisHeight, 0.25f, 0.0f, "metal", 1);
+		c->add(axis);
+
+		// anchor
+		RigidBody anchor = __Object::createSphere(Mat4f::translate(Vec3f(axisLength*0.5f, 0.0f, 0.0f)), anchorRadius, anchorRadius, anchorRadius, 1.0f, "wood", 1);
+		c->add(anchor);
+
+		c->createSlider(Vec3f(0.0f, -axisHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, axis, true, -axisLength - anchorRadius * 0.5f, 0);
+		add(c);
+
+		c->setMatrix(Mat4f::rotZ(3.14 * 0.525f));
+		c->convexCastPlacement();
+		c->setMatrix(Mat4f::translate(Vec3f(0.0f, 2.0f, 0.0f)) * c->getMatrix());
+		anchor->setFreezeState(1);
+	}
+
 	//save("data/levels/test_level.xml");
 	setEnabled(false);
 }
