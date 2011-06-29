@@ -257,7 +257,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	NewtonTreeCollisionEndBuild(collision, 1);
 
 	m_mesh = NewtonMeshCreate(world);
-	NewtonMeshBuildFromVertexListIndexList(m_mesh, numFaces, faceIndexCount, faceMaterials,
+	NewtonMeshBuildFromVertexListIndexList(m_mesh, numFaces, (const int*)faceIndexCount, (const int*)faceMaterials,
 			m_vertices[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
 			m_normals[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
 			m_uvs[0], sizeof(Lib3dsTexel), (const int*)&m_indices[0],
@@ -283,8 +283,8 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 
 	// declarations
 	xml_node<>* node;
-	char *pModel;
-	xml_attribute<> *attrMo;
+	char *pModel, *pOctree;
+	xml_attribute<> *attrMo, *attrOct;
 
 	node = doc->allocate_node(node_element, "environment");
 	parent->insert_node(0, node);
@@ -295,6 +295,12 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 	attrMo = doc->allocate_attribute("model", pModel);
 	node->append_attribute(attrMo);
 
+	// set attribute "octree"
+	bool octree = true; // TODO read octree
+	if(octree) pOctree = doc->allocate_string("1");
+	else pOctree = doc->allocate_string("0");
+	attrOct = doc->allocate_attribute("octree", pOctree);
+	node->append_attribute(attrOct);
 }
 
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
@@ -304,6 +310,13 @@ TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 	//attribute model
 	xml_attribute<>* attr = node->first_attribute();
 	std::string model = attr->value();
+
+	//attribute octree
+	attr = attr->next_attribute();
+	bool octree = true;
+	if(std::string(attr->value()) == "0") octree = false;
+	else octree = true;
+	// TODO use octree
 
 	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), model));
 	return result;

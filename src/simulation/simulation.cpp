@@ -39,6 +39,9 @@ static CRSpline curve_spline;
 ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState)
 	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState)
 {
+	// use this to test the template
+	//this->type = __Object::COMPOUND;
+	//this->fileName = "data/templates/template.xml";
 	switch (type) {
 	case __Object::BOX:
 	case __Object::SPHERE:
@@ -91,8 +94,30 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::COMPOUND:
 	case __Object::CONVEX_ASSEMBLY:
 	case __Object::CONVEX_HULL:
-		// TODO: create xml document of this->fileName
-		// result = __Object.load(node)
+		{
+			using namespace rapidxml;
+
+			file<char> f(fileName.c_str());
+
+			char* m = f.data();
+
+			// TODO add exception handling
+			xml_document<> doc;
+			doc.parse<0>(m);
+
+			// this is important so we don't parse the template tag but the object or compound tag
+			xml_node<>* nodes = doc.first_node();
+
+			// only the first tag is loaded the rest will be ignored
+			xml_node<>* node = nodes->first_node();
+			std::string type(node->name());
+
+			if (type == "object" || type == "compound") {
+				result = __Object::load(node);
+				result->setMatrix(matrix);
+				return result;
+			}
+		}
 		break;
 	default:
 		break;
@@ -140,6 +165,68 @@ Simulation::~Simulation()
 	clear();
 	m_mouseAdapter.removeListener(this);
 }
+
+// TODO I didn't find the todo just paste this code where it belongs
+/* template load/save */
+/*
+void Simulation::saveTemplate(const std::string& fileName, __Object& object)
+{
+	using namespace rapidxml;
+	// create document
+	xml_document<> doc;
+
+	// create XML declaration
+	xml_node<>* declaration = doc.allocate_node(node_declaration);
+	doc.append_node(declaration);
+	declaration->append_attribute(doc.allocate_attribute("version", "1.0"));
+    declaration->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+
+
+	// create root element "template"
+	xml_node<>* t = doc.allocate_node(node_element, "template");
+	doc.append_node(t);
+	
+	__Object::save(object, t, &doc);
+
+	std::string s;
+	print(std::back_inserter(s), doc, 0);
+
+	// save document
+	std::ofstream myfile;
+	myfile.open (fileName.c_str());
+	myfile << s;
+	myfile.close();
+
+	// frees all memory allocated to the nodes
+	doc.clear();
+
+}
+
+void Simulation::loadTemplate(const std::string& fileName)
+{
+	using namespace rapidxml;
+
+	file<char> f(fileName.c_str());
+
+	char* m = f.data();
+	
+	// TODO add exception handling
+	xml_document<> doc;
+	doc.parse<0>(m);
+
+	// this is important so we don't parse the template tag but the object or compound tag
+	xml_node<>* nodes = doc.first_node();
+
+	// only the first tag is loaded the rest will be ignored
+	xml_node<>* node = nodes->first_node();
+	std::string type(node->name());
+
+	if (type == "object" || type == "compound") {
+			Object object = __Object::load(node);
+			add(object);
+		}
+}*/ /* template load/save END */
+
 
 void Simulation::save(const std::string& fileName)
 {
@@ -193,6 +280,7 @@ void Simulation::load(const std::string& fileName)
 
 	char* m = f.data();
 	
+	// TODO add exception handling
 	xml_document<> doc;
 	doc.parse<0>(m);
 
@@ -1054,6 +1142,9 @@ void Simulation::render()
 		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
 		glPopMatrix();
 	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	if (m_environment)
 		m_environment->render();

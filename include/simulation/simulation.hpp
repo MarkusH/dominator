@@ -263,7 +263,8 @@ public:
 
 	void save(const std::string& fileName);
 	void load(const std::string& fileName);
-
+	//void saveTemplate(const std::string& fileName, __Object& object);
+	//void loadTemplate(const std::string& fileName);
 
 	virtual void mouseMove(int x, int y);
 	virtual void mouseButton(util::Button button, bool down, int x, int y);

@@ -348,6 +348,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
 
+	if(body.m_type != DOMINO_SMALL && body.m_type != DOMINO_MIDDLE && body.m_type != DOMINO_LARGE) {
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -418,6 +419,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		node->append_attribute(attrR);
 		break;
 	}
+	}
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -450,7 +452,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float radius;	// chamfer cylinder, cylinder, cone, capsule
 	Type t; int i;	// domino
 
-	//attribute id is set in __Object::load()
+	//attribute id is set in Simulation::load()
 	xml_attribute<>* attr = node->first_attribute();
 	
 	//attribute type
@@ -463,7 +465,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	matrix.assign(attr->value());
 
 	/* set dimensions for box */
-	if ( type == TypeStr[BOX] ) {
+	if ( type == TypeStr[BOX]) {
 		//attribute width
 		attr = attr->next_attribute();
 		w = atof(attr->value());
@@ -850,18 +852,8 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pModel, *pOriginal;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrMo, *attrOr;
-
-	// set attribute "model" to  the correct file name
-	pModel = doc->allocate_string(body.m_fileName.c_str());
-	attrMo = doc->allocate_attribute("model", pModel);
-	node->append_attribute(attrMo);
-
-	// set attribute rendering type
-	pOriginal = doc->allocate_string(util::toString(body.m_originalGeometry));
-	attrOr = doc->allocate_attribute("original", pOriginal);
-	node->append_attribute(attrOr);
+	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName, *pOriginal;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName, *attrOr;
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -882,6 +874,17 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 	pMass = doc->allocate_string(util::toString(body.getMass()));
 	attrMass = doc->allocate_attribute("mass", pMass);
 	node->append_attribute(attrMass);
+
+	// set attribute filename to the correct file name
+	pFileName = doc->allocate_string(body.m_fileName.c_str());
+	attrFileName = doc->allocate_attribute("filename", pFileName);
+	node->append_attribute(attrFileName);
+
+	// set attribute rendering type
+	pOriginal = doc->allocate_string(util::toString(body.m_originalGeometry));
+	attrOr = doc->allocate_attribute("original", pOriginal);
+	node->append_attribute(attrOr);
+
 }
 
 ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
@@ -900,16 +903,6 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
-
-	//attribute model
-	attr = attr->next_attribute();
-	std::string model = attr->value();
-
-	//attribute original
-	attr = attr->next_attribute();
-	int original = atoi(attr->value());
-
-
 	//attribute freezeState
 	attr = attr->next_attribute();
 	int freezeState = atoi(attr->value());
@@ -927,7 +920,15 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
-	return ConvexHull(new __ConvexHull(matrix, mass, material, model, original, freezeState, damping));
+	//attribute filename
+	attr = attr->next_attribute();
+	std::string filename = attr->value();
+
+	//attribute original
+	attr = attr->next_attribute();
+	int original = atoi(attr->value());
+
+	return ConvexHull(new __ConvexHull(matrix, mass, material, filename, original, freezeState, damping));
 }
 
 __ConvexHull::~__ConvexHull()
@@ -1174,18 +1175,8 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pModel, *pRendering;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrMo, *attrRe;
-
-	// set attribute "model" to  the correct file name
-	pModel = doc->allocate_string(body.m_fileName.c_str());
-	attrMo = doc->allocate_attribute("model", pModel);
-	node->append_attribute(attrMo);
-
-	// set attribute rendering type
-	pRendering = doc->allocate_string(util::toString(body.m_renderingType));
-	attrRe = doc->allocate_attribute("rendering", pRendering);
-	node->append_attribute(attrRe);
+	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName, *pRendering;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName, *attrRe;
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -1206,6 +1197,16 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 	pMass = doc->allocate_string(util::toString(body.getMass()));
 	attrMass = doc->allocate_attribute("mass", pMass);
 	node->append_attribute(attrMass);
+
+	// set attribute filename to the correct file name
+	pFileName = doc->allocate_string(body.m_fileName.c_str());
+	attrFileName = doc->allocate_attribute("filename", pFileName);
+	node->append_attribute(attrFileName);
+
+	// set attribute rendering type
+	pRendering = doc->allocate_string(util::toString(body.m_renderingType));
+	attrRe = doc->allocate_attribute("rendering", pRendering);
+	node->append_attribute(attrRe);
 }
 
 ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
@@ -1224,16 +1225,6 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
-
-	//attribute model
-	attr = attr->next_attribute();
-	std::string model = attr->value();
-
-	//attribute rendering type
-	attr = attr->next_attribute();
-	int rendering = atoi(attr->value());
-
-
 	//attribute freezeState
 	attr = attr->next_attribute();
 	int freezeState = atoi(attr->value());
@@ -1251,7 +1242,15 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
-	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, model, (RenderingType)rendering, freezeState, damping));
+	//attribute filename
+	attr = attr->next_attribute();
+	std::string filename = attr->value();
+
+	//attribute rendering type
+	attr = attr->next_attribute();
+	int rendering = atoi(attr->value());
+
+	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, filename, (RenderingType)rendering, freezeState, damping));
 }
 
 __ConvexAssembly::~__ConvexAssembly()
