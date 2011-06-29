@@ -275,41 +275,49 @@ void Simulation::load(const std::string& fileName)
 {
 	init();
 	using namespace rapidxml;
-
+	
 	file<char> f(fileName.c_str());
 
 	char* m = f.data();
-	
-	// TODO add exception handling
-	xml_document<> doc;
-	doc.parse<0>(m);
 
-	// this is important so we don't parse the level tag but the object and compound tags
-	xml_node<>* nodes = doc.first_node();
+	try {
 
-	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-		std::string type(node->name());
-		if (type == "object" || type == "compound") {
-			Object object = __Object::load(node);
-			// load m_id from "id"
-			object->setID(atoi(node->first_attribute()->value()));
-			add(object, object->getID());
+		xml_document<> doc;
+		doc.parse<0>(m);
+
+		// this is important so we don't parse the level tag but the object and compound tags
+		xml_node<>* nodes = doc.first_node();
+
+		for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
+			std::string type(node->name());
+			if (type == "object" || type == "compound") {
+				Object object = __Object::load(node);
+				// load m_id from "id"
+				object->setID(atoi(node->first_attribute()->value()));
+				add(object, object->getID());
+			}
 		}
-	}
 
-	// load "environment" and create tree collision from it
-	{
-		xml_node<>* node = nodes->first_node("environment");
-		if (node) {
-			m_environment = __TreeCollision::load(node);
-			//((__TreeCollision*)m_environment.get())->createOctree();
+		// load "environment" and create tree collision from it
+		{
+			xml_node<>* node = nodes->first_node("environment");
+			if (node) {
+				m_environment = __TreeCollision::load(node);
+				//((__TreeCollision*)m_environment.get())->createOctree();
+			}
 		}
+
+		// load gravity
+
+		m_clock.reset();
+
+	} catch( parse_error& e ) {
+		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
+		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+	} catch(...) {
+		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
+		// TODO tell user in the GUI that an unknown error occurred
 	}
-
-	// load gravity
-
-
-	m_clock.reset();
 }
 
 void Simulation::init()

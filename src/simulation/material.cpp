@@ -405,14 +405,14 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 }
 
 
-bool MaterialMgr::load(const char* fileName)
+bool MaterialMgr::load(const char* fileName)// TODO breaks if file doesn't exist
 {
 	using namespace rapidxml;
 
+	file<char> f(fileName);
+	char* m = f.data();
+
 	try {
-		file<char> f(fileName);
-		char* m = f.data();
-	
 		// string containing valid xml for test purposes
 		// char m[] = "<?xml version=\"1.0\" ?><materials><material name=\"wood_shiny\" texture=\"wood_shiny\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.6, 0.6, 0.6, 1\" shininess=\"50\" /><material name=\"wood_matt\" texture=\"wood_matt\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.1, 0.1, 0.1, 1\" shininess=\"20\" /><pair mat0=\"wood_shiny\" mat1=\"wood_shiny\" elasticity=\"0.100000\" staticFriction=\"0.450000\" kineticFriction=\"0.310000\" softness=\"0.050000\" /><pair mat0=\"wood_matt\" mat1=\"wood_matt\" elasticity=\"0.15000\" staticFriction=\"0.55000\" kineticFriction=\"0.45000\" softness=\"0.080000\" /></materials>";
 
@@ -449,8 +449,13 @@ bool MaterialMgr::load(const char* fileName)
 
 		return true;
 	}
-	// catch all exceptions
-	catch (...) {
+	catch ( parse_error& e ) {
+		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
+		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		return false;
+	} catch (...) {
+		std::cout<<"Caught unknown exception in MaterialMgr::load"<<std::endl;
+		// TODO tell user in the GUI that an unknown error occurred
 		return false;
 	}
 }
