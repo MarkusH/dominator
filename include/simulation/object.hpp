@@ -262,10 +262,14 @@ protected:
 	NewtonMesh* m_mesh;
 	std::vector<float> m_data;
 	std::string m_fileName;
-public:
+
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+public:
 	virtual ~__ConvexHull();
+
+	static ConvexHull createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
@@ -291,9 +295,14 @@ protected:
 	std::vector<uint32_t> m_indices;
 	ogl::SubBuffers m_buffers;
 	std::string m_fileName;
+
+	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 public:
-	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	virtual ~__ConvexAssembly();
+
+	static ConvexAssembly createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 

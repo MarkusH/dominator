@@ -391,13 +391,13 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if(0)
 	{
-		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", true));
-		add(convex);
-		convex->convexCastPlacement();
+		ConvexHull hull = __ConvexHull::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", true);
+		add(hull);
+		hull->convexCastPlacement();
 
-		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", __ConvexAssembly::ORIGINAL));
-		add(convex);
-		convex->convexCastPlacement();
+		ConvexAssembly assembly = __ConvexAssembly::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", __ConvexAssembly::ORIGINAL);
+		add(assembly);
+		assembly->convexCastPlacement();
 	}
 
 	// simple seesaw with hinge

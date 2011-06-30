@@ -782,6 +782,12 @@ void __RigidBody::render()
 	newton::showCollisionShape(getCollision(), m_matrix);
 }
 
+ConvexHull __ConvexHull::createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, bool originalGeometry, int freezeState, const Vec4f& damping)
+{
+	ConvexHull result(new __ConvexHull(matrix, mass, material, fileName, originalGeometry, freezeState, damping));
+	return result;
+}
+
 __ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, bool originalGeometry, int freezeState, const Vec4f& damping)
 	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_originalGeometry(originalGeometry), m_mesh(NULL), m_fileName(fileName)
 {
@@ -1058,6 +1064,13 @@ struct MeshEntry {
 		return first.materialID < second.materialID;
 	}
 };
+
+ConvexAssembly __ConvexAssembly::createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+		RenderingType renderingType, int freezeState, const Vec4f& damping)
+{
+	ConvexAssembly result(new __ConvexAssembly(matrix, mass, material, fileName, renderingType, freezeState, damping));
+	return result;
+}
 
 __ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType, int freezeState, const Vec4f& damping)
 	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_renderingType(renderingType), m_mesh(NULL), m_fileName(fileName)
