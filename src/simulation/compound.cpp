@@ -36,6 +36,12 @@ __Compound::~__Compound()
 	//m_joints.clear();
 }
 
+Compound __Compound::createCompound(const Mat4f& matrix)
+{
+	Compound result(new __Compound());
+	return result;
+}
+
 void __Compound::getAABB(Vec3f& min, Vec3f& max)
 {
 	if (m_nodes.size() > 0) {

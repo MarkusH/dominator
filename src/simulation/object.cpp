@@ -183,7 +183,7 @@ Object __Object::load(rapidxml::xml_node<>* node)
 
 
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::SPHERE, matrix, material, freezeState, damping));
 
@@ -198,22 +198,22 @@ RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radi
 	return result;
 }
 
-RigidBody __Object::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
 {
-	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	return createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
 {
-	return __Object::createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	return createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
 {
 	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material, freezeState, damping));
 
@@ -228,12 +228,12 @@ RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, fl
 	return result;
 }
 
-RigidBody __Object::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
+RigidBody __RigidBody::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
 {
 	return createBox(Mat4f::translate(position), w, h, d, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CYLINDER, matrix, material, freezeState, damping));
 
@@ -248,12 +248,12 @@ RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float heig
 	return result;
 }
 
-RigidBody __Object::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINDER, matrix, material, freezeState, damping));
 
@@ -268,12 +268,12 @@ RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, flo
 	return result;
 }
 
-RigidBody __Object::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CAPSULE, matrix, material, freezeState, damping));
 
@@ -288,12 +288,12 @@ RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float heigh
 	return result;
 }
 
-RigidBody __Object::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCapsule(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CONE, matrix, material, freezeState, damping));
 
@@ -308,7 +308,7 @@ RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, 
 	return result;
 }
 
-RigidBody __Object::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCone(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
@@ -552,12 +552,12 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		}
 	}
 
-	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
-	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
-	if( type == TypeStr[CHAMFER_CYLINDER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CYLINDER] ) return __Object::createCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CONE] ) return __Object::createCone(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CAPSULE] ) return __Object::createCapsule(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[BOX] ) return __RigidBody::createBox(matrix, w, h, d, mass, material, freezeState, damping);
+	if( type == TypeStr[SPHERE] ) return __RigidBody::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
+	if( type == TypeStr[CHAMFER_CYLINDER] ) return __RigidBody::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CYLINDER] ) return __RigidBody::createCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CONE] ) return __RigidBody::createCone(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CAPSULE] ) return __RigidBody::createCapsule(matrix, radius, h, mass, material, freezeState, damping);
 	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material, false);
