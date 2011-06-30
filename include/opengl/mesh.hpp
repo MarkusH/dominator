@@ -12,11 +12,7 @@
 #include <vector>
 #include <string>
 #include <opengl/vertexbuffer.hpp>
-#ifdef _WIN32
 #include <boost/tr1/memory.hpp>
-#else
-#include <tr1/memory>
-#endif
 
 namespace ogl {
 
