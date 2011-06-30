@@ -73,6 +73,9 @@ protected:
 	util::KeyAdapter& m_keyAdapter;
 	util::MouseAdapter& m_mouseAdapter;
 
+	// error adapter
+	//util::ErrorAdapter& m_errorAdapter;
+
 	/** The interaction types for the buttons: util::LEFT util::RIGHT util::MIDDLE */
 	InteractionType m_interactionTypes[3];
 

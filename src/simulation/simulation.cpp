@@ -274,6 +274,12 @@ void Simulation::save(const std::string& fileName)
 
 void Simulation::load(const std::string& fileName)
 {
+	/* information for error messages */
+	std::string function = "Simulation::load";
+	std::vector<std::string> args;
+	args.push_back(fileName);
+	/* END information for error messages */
+
 	init();
 
 	using namespace rapidxml;
@@ -283,8 +289,15 @@ void Simulation::load(const std::string& fileName)
 
 	try {
 		f = new file<char>(fileName.c_str());
-	} catch (...) {
+	} catch ( std::runtime_error& e ) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
+		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
+		if(f) delete f;
+		return;
+	} catch (...) {
+		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
+		//m_errorAdapter.displayError(function, args);
 		if(f) delete f;
 		return;
 	}
@@ -323,9 +336,11 @@ void Simulation::load(const std::string& fileName)
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
 	} catch(...) {
 		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
+		//m_errorAdapter.displayError(function, args);
 	}
 	delete f;
 }

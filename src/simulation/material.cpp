@@ -403,17 +403,30 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 }
 
 
-bool MaterialMgr::load(const char* fileName)/// @todo crashes if file doesn't exist
+bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doesn't exist
 {
+	/* information for error messages */
+	std::string function = "MaterialMgr::load";
+	std::vector<std::string> args;
+	args.push_back(fileName);
+	/* END information for error messages */
+
 	using namespace rapidxml;
 
 	char* m;
 	file<char>* f = 0;
 
 	try {
-		f = new file<char>(fileName);
-	} catch (...) {
+		f = new file<char>(fileName.c_str());
+	} catch ( std::runtime_error& e ) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
+		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
+		if(f) delete f;
+		return false;
+	} catch (...) {
+		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
+		//m_errorAdapter.displayError(function, args);
 		if(f) delete f;
 		return false;
 	}
@@ -450,21 +463,22 @@ bool MaterialMgr::load(const char* fileName)/// @todo crashes if file doesn't ex
 			delete f;
 			return false;
 		}
-	}
-	catch ( parse_error& e ) {
+	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
 		delete f;
 		return false;
-	} catch (...) {
-		std::cout<<"Caught unknown exception in MaterialMgr::load"<<std::endl;
+	} catch(...) {
+		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
+		//m_errorAdapter.displayError(function, args);
 		delete f;
 		return false;
 	}
 }
 
-bool MaterialMgr::save(const char* fileName)
+bool MaterialMgr::save(const std::string& fileName)
 {
 	using namespace rapidxml;
 	// create document
@@ -498,7 +512,7 @@ bool MaterialMgr::save(const char* fileName)
 
 	// save document
 	std::ofstream myfile;
-	myfile.open (fileName);
+	myfile.open (fileName.c_str());
 	myfile << s;
 	myfile.close();
 
