@@ -7,9 +7,11 @@
 
 #include <opengl/texture.hpp>
 #include "stb_image.hpp"
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <iostream>
+
 
 namespace ogl {
 
