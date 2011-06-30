@@ -347,7 +347,7 @@ void Simulation::init()
 
 	NewtonSetSolverModel(m_world, 1);
 	NewtonSetFrictionModel(m_world, 1);
-	NewtonSetThreadsCount(m_world, getThreadCount());
+	NewtonSetThreadsCount(m_world, util::getThreadCount());
 	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 0);
 
 	int id = NewtonMaterialGetDefaultGroupID(m_world);
