@@ -278,13 +278,13 @@ void Simulation::load(const std::string& fileName)
 	using namespace rapidxml;
 
 	char* m;
-	file<char>* f;
+	file<char>* f = 0;
 
 	try {
 		f = new file<char>(fileName.c_str());
 	} catch (...) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
-		delete f;
+		if(f) delete f;
 		return;
 	}
 	
