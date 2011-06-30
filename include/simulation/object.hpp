@@ -18,6 +18,7 @@
 #include <opengl/vertexbuffer.hpp>
 #include <lib3ds/file.h>
 #include <xml/rapidxml.hpp>
+#include <opengl/mesh.hpp>
 
 namespace sim {
 
@@ -72,8 +73,8 @@ protected:
 	Type m_type;
 	int m_id;
 
-public:
 	__Object(Type type);
+public:
 	virtual ~__Object();
 
 	const Type& getType() { return m_type; }
@@ -183,21 +184,6 @@ public:
 	 */
 	static Object load(rapidxml::xml_node<>* node);
 
-	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
-	static RigidBody createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material = "");
-	static RigidBody createSphere(const Vec3f& position, float radius, float mass, const std::string& material);
-	static RigidBody createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material = "");
-	static RigidBody createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-	static RigidBody createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-	static RigidBody createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-	static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-
 	friend class __RigidBody;
 };
 
@@ -214,11 +200,11 @@ protected:
 
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
-public:
+
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-
+public:
 	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
@@ -248,55 +234,80 @@ public:
 	static void save(const __RigidBody& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static RigidBody load(rapidxml::xml_node<>* node);
 
+	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Vec3f& position, float radius, float mass, const std::string& material);
+	static RigidBody createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+
+
 	friend class __Object;
 };
 
 /**
- * A simple convex body with a single material. Generates a
- * convex hull of a 3ds file.
+ * A simple convex body with a single material. Generates a convex hull of
+ * a 3ds file. The visual representation is the one defined in the model.
  */
 class __ConvexHull : public __RigidBody {
 protected:
-	bool m_originalGeometry;
-	NewtonMesh* m_mesh;
-	std::vector<float> m_data;
 	std::string m_fileName;
-public:
+	ogl::Mesh m_visual;
+
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
-			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+public:
 	virtual ~__ConvexHull();
+
+	/**
+	 * Creates a new convex hull from the given model file.
+	 *
+	 * @param matrix      The matrix of the object
+	 * @param mass        The mass of the object, where 0 = static and -1 = according to volume
+	 * @param material    The material name of the object
+	 * @param fileName    The model file
+	 * @param freezeState The initial freeze state of the body, default = false
+	 * @param damping     The initial damping vector of the body: x, y, z = angular, w = linear. default = 0.1 each
+	 * @return            The new convex hull
+	 */
+	static ConvexHull createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
-	static void save(const __ConvexHull& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static void save(const __ConvexHull& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static ConvexHull load(rapidxml::xml_node<>* node);
 };
 
 /**
- * A NewtonCompound is generated for each submesh of a 3ds file.
+ * A rigid body created from a model file. Each sub-mesh of the given model
+ * is represented by a convex hull. By adding multiple meshes to the model,
+ * this object can have a complex shape.
  */
 class __ConvexAssembly : public __RigidBody  {
-public:
-	/**
-	 * 1) a single mesh of the faces --> no smooth normals
-	 * 2) a mesh for each convex hull --> convex submeshes
-	 * 3) original 3ds data
-	 */
-	typedef enum { ORIGINAL = 0, MESH_EXACT, MESH_ASSEMBLY } RenderingType;
 protected:
-	RenderingType m_renderingType;
-	NewtonMesh* m_mesh;
-	std::vector<float> m_data;
-	std::vector<uint32_t> m_indices;
-	ogl::SubBuffers m_buffers;
 	std::string m_fileName;
+	ogl::Mesh m_visual;
+
+	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 public:
-	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	virtual ~__ConvexAssembly();
+
+	static ConvexAssembly createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
-	static void save(const __ConvexAssembly& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static void save(const __ConvexAssembly& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static ConvexAssembly load(rapidxml::xml_node<>* node);
 };
 
