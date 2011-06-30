@@ -20,6 +20,7 @@
 #include <simulation/domino.hpp>
 #include <simulation/crspline.hpp>
 #include <opengl/oglutil.hpp>
+#include <util/threadcounter.hpp>
 
 namespace sim {
 
@@ -346,7 +347,7 @@ void Simulation::init()
 
 	NewtonSetSolverModel(m_world, 1);
 	NewtonSetFrictionModel(m_world, 1);
-	NewtonSetThreadsCount(m_world, 2);
+	NewtonSetThreadsCount(m_world, getThreadCount());
 	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 0);
 
 	int id = NewtonMaterialGetDefaultGroupID(m_world);
