@@ -689,12 +689,37 @@ void Simulation::init()
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
 	}
 
+	// slider
+	if (0) {
+		const float axisHeight = 0.25f;
+		const float axisLength = 20.0f;
+		float anchorRadius = 1.0f;
+		Compound c = Compound(new __Compound());
+
+		// axis
+		RigidBody axis = __Object::createBox(Mat4f::identity(), axisLength, axisHeight, 0.25f, 0.0f, "metal", 1);
+		c->add(axis);
+
+		// anchor
+		RigidBody anchor = __Object::createSphere(Mat4f::translate(Vec3f(axisLength*0.5f, 0.0f, 0.0f)), anchorRadius, anchorRadius, anchorRadius, 1.0f, "wood", 1);
+		c->add(anchor);
+
+		c->createSlider(Vec3f(0.0f, -axisHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, axis, true, -axisLength - anchorRadius * 0.5f, 0);
+		add(c);
+
+		c->setMatrix(Mat4f::rotZ(3.14 * 0.525f));
+		c->convexCastPlacement();
+		c->setMatrix(Mat4f::translate(Vec3f(0.0f, 2.0f, 0.0f)) * c->getMatrix());
+		anchor->setFreezeState(1);
+	}
+
 	//save("data/levels/test_level.xml");
 	setEnabled(false);
 }
 
 void Simulation::clear()
 {
+	m_selectedObject = Object();
 	m_sortedBuffers.clear();
 	m_vertexBuffer.flush();
 	m_objects.clear();
@@ -711,6 +736,8 @@ void Simulation::clear()
 
 int Simulation::add(const Object& object)
 {
+	if (!object.get())
+		return -1;
 	return add(object, m_nextID++);
 }
 
@@ -730,7 +757,8 @@ int Simulation::add(const ObjectInfo& info)
 {
 	Mat4f matrix(Vec3f::yAxis(), m_camera.viewVector(), m_pointer);
 	int result = add(info.create(matrix));
-	m_objects.back()->convexCastPlacement();
+	if (result > -1)
+		m_objects.back()->convexCastPlacement();
 	return result;
 }
 

@@ -65,6 +65,7 @@ float __Compound::convexCastPlacement(bool apply, std::list<NewtonBody*>* noColl
 	float maximum = -1000.0f;
 	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
 		float current = (*itr)->convexCastPlacement(false, &temp);
+		current += (m_matrix._42 - (*itr)->getMatrix()._42);
 		if (current > maximum) maximum = current;
 	}
 	Mat4f matrix = m_matrix;
