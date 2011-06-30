@@ -308,12 +308,12 @@ TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 	using namespace rapidxml;
 
 	//attribute model
-	xml_attribute<>* attr = node->first_attribute();
+	xml_attribute<>* attr = node->first_attribute("filename");
 	std::string model = attr->value();
 
 	//attribute octree
-	attr = attr->next_attribute();
-	bool octree = true;
+	attr = attr->next_attribute("octree");
+	bool octree;
 	if(std::string(attr->value()) == "0") octree = false;
 	else octree = true;
 	// TODO use octree

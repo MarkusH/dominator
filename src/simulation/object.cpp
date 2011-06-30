@@ -473,29 +473,29 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	Type t; int i;	// domino
 
 	//attribute id is set in Simulation::load()
-	xml_attribute<>* attr = node->first_attribute();
+	//xml_attribute<>* attr = 
 	
 	//attribute type
-	attr = attr->next_attribute();
+	xml_attribute<>* attr = node->first_attribute("type");
 	std::string type = attr->value();
 
 	//attribute matrix
-	attr = attr->next_attribute();
+	attr = node->first_attribute("matrix");
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
 	/* set dimensions for box */
 	if ( type == TypeStr[BOX]) {
 		//attribute width
-		attr = attr->next_attribute();
+		attr = node->first_attribute("width");
 		w = atof(attr->value());
 
 		//attribute height
-		attr = attr->next_attribute();
+		attr = node->first_attribute("height");
 		h = atof(attr->value());
 
 		//attribute depth
-		attr = attr->next_attribute();
+		attr = node->first_attribute("depth");
 		d = atof(attr->value());
 
 	}/* set dimensions for box END */
@@ -503,15 +503,15 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	/* set dimensions for sphere */
 	if ( type == TypeStr[SPHERE] ) {
 		//attribute x
-		attr = attr->next_attribute();
+		attr = node->first_attribute("radius_x");
 		x = atof(attr->value());
 
 		//attribute y
-		attr = attr->next_attribute();
+		attr = node->first_attribute("radius_y");
 		y = atof(attr->value());
 
 		//attribute z
-		attr = attr->next_attribute();
+		attr = node->first_attribute("radius_z");
 		z = atof(attr->value());
 	}/* set dimensions for sphere END */
 
@@ -519,30 +519,30 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if ( type == TypeStr[CHAMFER_CYLINDER] || type == TypeStr[CYLINDER] ||
 			type == TypeStr[CONE] || type == TypeStr[CAPSULE]) {
 		//attribute height
-		attr = attr->next_attribute();
+		attr = node->first_attribute("height");
 		h = atof(attr->value());
 
 		//attribute radius
-		attr = attr->next_attribute();
+		attr = node->first_attribute("radius");
 		radius = atof(attr->value());
 	}/* set dimensions for chamfer cylinder, cylinder, cone, capsule END */
 
 
 	//attribute freezeState
-	attr = attr->next_attribute();
+	attr = node->first_attribute("freezeState");
 	freezeState = atoi(attr->value());
 
 	//attribute damping
-	attr = attr->next_attribute();
+	attr = node->first_attribute("damping");
 	damping = Vec4f();
 	damping.assign(attr->value());
 
 	//attribute material
-	attr = attr->next_attribute();
+	attr = node->first_attribute("material");
 	std::string material = attr->value();
 
 	//attribute mass
-	attr = attr->next_attribute();
+	attr = node->first_attribute("mass");
 	float mass = atof(attr->value());
 
 	// find the Type for the Domino
@@ -910,42 +910,40 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
-
-	//attribute id is set in __Object::load()
-	xml_attribute<>* attr = node->first_attribute();
+	
 
 	//attribute type
-	attr = attr->next_attribute();
+	xml_attribute<>* attr = node->first_attribute("attribute");
 	std::string type = attr->value();
 
 	//attribute matrix
-	attr = attr->next_attribute();
+	attr = node->first_attribute("matrix");
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
 	//attribute freezeState
-	attr = attr->next_attribute();
+	attr = node->first_attribute("freezeState");
 	int freezeState = atoi(attr->value());
 
 	//attribute damping
-	attr = attr->next_attribute();
+	attr = node->first_attribute("damping");
 	Vec4f damping = Vec4f();
 	damping.assign(attr->value());
 
 	//attribute material
-	attr = attr->next_attribute();
+	attr = node->first_attribute("material");
 	std::string material = attr->value();
 
 	//attribute mass
-	attr = attr->next_attribute();
+	attr = node->first_attribute("mass");
 	float mass = atof(attr->value());
 
 	//attribute filename
-	attr = attr->next_attribute();
+	attr = node->first_attribute("filename");
 	std::string filename = attr->value();
 
 	//attribute original
-	attr = attr->next_attribute();
+	attr = node->first_attribute("original");
 	int original = atoi(attr->value());
 
 	return ConvexHull(new __ConvexHull(matrix, mass, material, filename, original, freezeState, damping));
@@ -1233,41 +1231,38 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
 
-	//attribute id is set in __Object::load()
-	xml_attribute<>* attr = node->first_attribute();
-
 	//attribute type
-	attr = attr->next_attribute();
+	xml_attribute<>* attr = node->first_attribute("type");
 	std::string type = attr->value();
 
 	//attribute matrix
-	attr = attr->next_attribute();
+	attr = node->first_attribute("matrix");
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
 	//attribute freezeState
-	attr = attr->next_attribute();
+	attr = node->first_attribute("freezeState");
 	int freezeState = atoi(attr->value());
 
 	//attribute damping
-	attr = attr->next_attribute();
+	attr = node->first_attribute("damping");
 	Vec4f damping = Vec4f();
 	damping.assign(attr->value());
 
 	//attribute material
-	attr = attr->next_attribute();
+	attr = node->first_attribute("material");
 	std::string material = attr->value();
 
 	//attribute mass
-	attr = attr->next_attribute();
+	attr = node->first_attribute("mass");
 	float mass = atof(attr->value());
 
 	//attribute filename
-	attr = attr->next_attribute();
+	attr = node->first_attribute("filename");
 	std::string filename = attr->value();
 
 	//attribute rendering type
-	attr = attr->next_attribute();
+	attr = node->first_attribute("type");
 	int rendering = atoi(attr->value());
 
 	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, filename, (RenderingType)rendering, freezeState, damping));

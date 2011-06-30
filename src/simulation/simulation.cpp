@@ -293,19 +293,17 @@ void Simulation::load(const std::string& fileName)
 			if (type == "object" || type == "compound") {
 				Object object = __Object::load(node);
 				// load m_id from "id"
-				object->setID(atoi(node->first_attribute()->value()));
+				object->setID(atoi(node->first_attribute("id")->value()));
 				add(object, object->getID());
 			}
 		}
 
 		// load "environment" and create tree collision from it
-		{
 			xml_node<>* node = nodes->first_node("environment");
 			if (node) {
 				m_environment = __TreeCollision::load(node);
 				//((__TreeCollision*)m_environment.get())->createOctree();
 			}
-		}
 
 		// load gravity
 

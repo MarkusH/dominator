@@ -49,26 +49,25 @@ void Material::load(rapidxml::xml_node<>* const node)
 {
 	using namespace rapidxml;
 
-	xml_attribute<> *attr = node->first_attribute();
-	
+	xml_attribute<>* attr = node->first_attribute("name");
 	name = attr->value();
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("texture");
 	texture = attr->value();
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("shader");
 	shader = attr->value();
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("ambient");
 	ambient.assign(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("diffuse");
 	diffuse.assign(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("specular");
 	specular.assign(attr->value());
 	
-	attr = attr->next_attribute();
+	attr = node->first_attribute("shininess");
 	shininess = atof(attr->value());
 
 }
@@ -152,23 +151,22 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 	using namespace rapidxml;
 	MaterialMgr& m = MaterialMgr::instance();
 	
-	xml_attribute<> *attr = node->first_attribute();
-
+	xml_attribute<> *attr = node->first_attribute("mat0");
 	mat0 = m.getID(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("mat1");
 	mat1 = m.getID(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("elasticity");
 	elasticity = atof(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("staticFriction");
 	staticFriction = atof(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("kineticFriction");
 	kineticFriction = atof(attr->value());
 
-	attr = attr->next_attribute();
+	attr = node->first_attribute("softness");
 	softness = atof(attr->value());
 
 	if (mat0 > mat1) {

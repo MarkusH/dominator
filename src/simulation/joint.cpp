@@ -147,19 +147,19 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	xml_attribute<>* attr = node->first_attribute();
 
 	//parentID attribute
-	attr = attr->next_attribute();
+	attr = attr->next_attribute("parentID");
 	parentID = atoi(attr->value());
 
 	//childID attribute
-	attr = attr->next_attribute();
+	attr = attr->next_attribute("childID");
 	childID = atoi(attr->value());
 
 	//pivot attribute
-	attr = attr->next_attribute();
+	attr = attr->next_attribute("pivot");
 	pivot.assign(attr->value());
 
 	//pinDir attribute
-	attr = attr->next_attribute();
+	attr = attr->next_attribute("pinDir");
 	pinDir.assign(attr->value());
 
 	// Get the objects with the required IDs out of the object list
@@ -172,15 +172,15 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	}
 
 	// limited attribute
-	attr = attr->next_attribute();
+	attr = attr->next_attribute("limited");
 	bool limited = atoi(attr->value());
 	float minAngle = 0.0f, maxAngle = 0.0f;
 
 	if (limited) {
-		attr = attr->next_attribute();
+		attr = attr->next_attribute("minangle");
 		minAngle = atof(attr->value());
 
-		attr = attr->next_attribute();
+		attr = attr->next_attribute("maxangle");
 		maxAngle = atof(attr->value());
 	}
 

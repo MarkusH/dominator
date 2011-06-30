@@ -94,13 +94,12 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	using namespace rapidxml;
 
 	Compound result = Compound(new __Compound());
-	// load m_matrix
 
 	// id attribute
-	xml_attribute<>* attr = nodes->first_attribute();
+	//xml_attribute<>* attr = nodes->first_attribute();
 
 	// matrix attribute
-	attr = attr->next_attribute();
+	xml_attribute<>* attr = nodes->first_attribute("matrix");
 
 	// Cache the matrix because the subsequent add() method would
 	// multiply the matrix of the nodes with the matrix of the
