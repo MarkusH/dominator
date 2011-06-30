@@ -328,7 +328,7 @@ void Simulation::load(const std::string& fileName)
 			if (node) {
 				m_environment = __TreeCollision::load(node);
 				//((__TreeCollision*)m_environment.get())->createOctree();
-			}
+			} else throw parse_error("No environment node found", m);
 
 			m_clock.reset();
 

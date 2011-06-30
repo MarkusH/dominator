@@ -472,31 +472,50 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float radius;	// chamfer cylinder, cylinder, cone, capsule
 	Type t; int i;	// domino
 
+	std::string type;
+	Mat4f matrix;
+	float mass;
+	std::string material;
+
 	//attribute id is set in Simulation::load()
 	//xml_attribute<>* attr = 
 	
 	//attribute type
 	xml_attribute<>* attr = node->first_attribute("type");
-	std::string type = attr->value();
+	if(attr) {
+	type = attr->value();
+	} else throw parse_error("No \"type\" attribute in object tag found", node->value());
 
 	//attribute matrix
 	attr = node->first_attribute("matrix");
-	Mat4f matrix = Mat4f();
+	if(attr) {
+	matrix = Mat4f();
 	matrix.assign(attr->value());
+	} else throw parse_error("No \"matrix\" attribute in object tag found", node->value());
+
 
 	/* set dimensions for box */
 	if ( type == TypeStr[BOX]) {
 		//attribute width
 		attr = node->first_attribute("width");
+		if(attr) {
 		w = atof(attr->value());
+		} else throw parse_error("No \"width\" attribute in object tag found", node->value());
+
 
 		//attribute height
 		attr = node->first_attribute("height");
+		if(attr) {
 		h = atof(attr->value());
+		} else throw parse_error("No \"height\" attribute in object tag found", node->value());
+
 
 		//attribute depth
 		attr = node->first_attribute("depth");
+		if(attr) {
 		d = atof(attr->value());
+		} else throw parse_error("No \"depth\" attribute in object tag found", node->value());
+
 
 	}/* set dimensions for box END */
 
@@ -504,15 +523,24 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if ( type == TypeStr[SPHERE] ) {
 		//attribute x
 		attr = node->first_attribute("radius_x");
+		if(attr) {
 		x = atof(attr->value());
+		} else throw parse_error("No \"radius_x\" attribute in object tag found", node->value());
+
 
 		//attribute y
 		attr = node->first_attribute("radius_y");
+		if(attr) {
 		y = atof(attr->value());
+		} else throw parse_error("No \"radius_y\" attribute in object tag found", node->value());
+
 
 		//attribute z
 		attr = node->first_attribute("radius_z");
+		if(attr) {
 		z = atof(attr->value());
+		} else throw parse_error("No \"radius_z\" attribute in object tag found", node->value());
+
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder, cylinder, cone, capsule */
@@ -520,30 +548,48 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 			type == TypeStr[CONE] || type == TypeStr[CAPSULE]) {
 		//attribute height
 		attr = node->first_attribute("height");
+		if(attr) {
 		h = atof(attr->value());
+		} else throw parse_error("No \"height\" attribute in object tag found", node->value());
+
 
 		//attribute radius
 		attr = node->first_attribute("radius");
+		if(attr) {
 		radius = atof(attr->value());
+		} else throw parse_error("No \"radius\" attribute in object tag found", node->value());
+
 	}/* set dimensions for chamfer cylinder, cylinder, cone, capsule END */
 
 
 	//attribute freezeState
 	attr = node->first_attribute("freezeState");
+	if(attr) {
 	freezeState = atoi(attr->value());
+	} else throw parse_error("No \"freezeState\" attribute in object tag found", node->value());
+
 
 	//attribute damping
 	attr = node->first_attribute("damping");
+	if(attr) {
 	damping = Vec4f();
 	damping.assign(attr->value());
+	} else throw parse_error("No \"damping\" attribute in object tag found", node->value());
+
 
 	//attribute material
 	attr = node->first_attribute("material");
-	std::string material = attr->value();
+	if(attr) {
+	material = attr->value();
+	} else throw parse_error("No \"material\" attribute in object tag found", node->value());
+
 
 	//attribute mass
 	attr = node->first_attribute("mass");
-	float mass = atof(attr->value());
+	if(attr) {
+	mass = atof(attr->value());
+	} else throw parse_error("No \"mass\" attribute in object tag found", node->value());
+
 
 	// find the Type for the Domino
 	for(i = 0; i < 3; ++i) {

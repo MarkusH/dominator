@@ -113,8 +113,11 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	// compound. This would not be correct because the matrix of
 	// the nodes is already in global space
 	Mat4f matrix;
+	if(attr) {
 	matrix.assign(attr->value());
 	result->m_matrix = Mat4f::identity();
+	} else throw parse_error("No \"matrix\" attribute in compound tag found", nodes->value());
+
 	
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 		std::string type = node->name();
