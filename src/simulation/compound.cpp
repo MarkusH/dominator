@@ -36,6 +36,12 @@ __Compound::~__Compound()
 	//m_joints.clear();
 }
 
+Compound __Compound::createCompound(const Mat4f& matrix)
+{
+	Compound result(new __Compound());
+	return result;
+}
+
 void __Compound::getAABB(Vec3f& min, Vec3f& max)
 {
 	if (m_nodes.size() > 0) {
@@ -65,6 +71,7 @@ float __Compound::convexCastPlacement(bool apply, std::list<NewtonBody*>* noColl
 	float maximum = -1000.0f;
 	for (std::list<Object>::iterator itr = m_nodes.begin(); itr != m_nodes.end(); ++itr) {
 		float current = (*itr)->convexCastPlacement(false, &temp);
+		current += (m_matrix._42 - (*itr)->getMatrix()._42);
 		if (current > maximum) maximum = current;
 	}
 	Mat4f matrix = m_matrix;
