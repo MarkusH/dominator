@@ -36,27 +36,30 @@ static Vec3f rot_p1, rot_p2, rot_p3;
 static Vec3f curve_current;
 static CRSpline curve_spline;
 
-ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState)
-	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState)
+ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState, const Vec3f& size)
+	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState), size(size)
 {
+	// use this to test the template
+	//this->type = __Object::COMPOUND;
+	//this->fileName = "data/templates/template.xml";
 	switch (type) {
 	case __Object::BOX:
 	case __Object::SPHERE:
-		size = Vec3f(1.0f, 1.0f, 1.0f);
-		size = Vec3f(1.0f, 1.0f, 1.0f);
+		this->size = Vec3f(1.0f, 1.0f, 1.0f);
+		this->size = Vec3f(1.0f, 1.0f, 1.0f);
 		break;
 	case __Object::CYLINDER:
 	case __Object::CONE:
-		size = Vec3f(1.0f, 2.0f, 1.0f);
+		this->size = Vec3f(1.0f, 2.0f, 1.0f);
 		break;
 	case __Object::CAPSULE:
-		size = Vec3f(1.0f, 6.0f, 1.0f);
+		this->size = Vec3f(1.0f, 6.0f, 1.0f);
 		break;
 	case __Object::CHAMFER_CYLINDER:
-		size = Vec3f(5.0f, 1.0f, 1.0f);
+		this->size = Vec3f(5.0f, 1.0f, 1.0f);
 		break;
 	default:
-		size = Vec3f(1.0f, 1.0f, 1.0f);
+		this->size = Vec3f(1.0f, 1.0f, 1.0f);
 		break;
 	}
 }
@@ -71,28 +74,50 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 		result = __Domino::createDomino(type, matrix, mass, material, freezeState);
 		break;
 	case __Object::BOX:
-		result = __Object::createBox(matrix, size.x, size.y, size.z, mass, material, freezeState);
+		result = __RigidBody::createBox(matrix, size.x, size.y, size.z, mass, material, freezeState);
 		break;
 	case __Object::SPHERE:
-		result = __Object::createSphere(matrix, size.x, size.y, size.z, mass, material, freezeState);
+		result = __RigidBody::createSphere(matrix, size.x, size.y, size.z, mass, material, freezeState);
 		break;
 	case __Object::CYLINDER:
-		result = __Object::createCylinder(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CAPSULE:
-		result = __Object::createCapsule(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createCapsule(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CONE:
-		result = __Object::createCone(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createCone(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CHAMFER_CYLINDER:
-		result = __Object::createChamferCylinder(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createChamferCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::COMPOUND:
 	case __Object::CONVEX_ASSEMBLY:
 	case __Object::CONVEX_HULL:
-		// TODO: create xml document of this->fileName
-		// result = __Object.load(node)
+		{
+			using namespace rapidxml;
+
+			file<char> f(fileName.c_str());
+
+			char* m = f.data();
+
+			// TODO add exception handling
+			xml_document<> doc;
+			doc.parse<0>(m);
+
+			// this is important so we don't parse the template tag but the object or compound tag
+			xml_node<>* nodes = doc.first_node();
+
+			// only the first tag is loaded the rest will be ignored
+			xml_node<>* node = nodes->first_node();
+			std::string type(node->name());
+
+			if (type == "object" || type == "compound") {
+				result = __Object::load(node);
+				result->setMatrix(matrix);
+				return result;
+			}
+		}
 		break;
 	default:
 		break;
@@ -140,6 +165,68 @@ Simulation::~Simulation()
 	clear();
 	m_mouseAdapter.removeListener(this);
 }
+
+// TODO I didn't find the todo just paste this code where it belongs
+/* template load/save */
+/*
+void Simulation::saveTemplate(const std::string& fileName, __Object& object)
+{
+	using namespace rapidxml;
+	// create document
+	xml_document<> doc;
+
+	// create XML declaration
+	xml_node<>* declaration = doc.allocate_node(node_declaration);
+	doc.append_node(declaration);
+	declaration->append_attribute(doc.allocate_attribute("version", "1.0"));
+    declaration->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
+
+
+	// create root element "template"
+	xml_node<>* t = doc.allocate_node(node_element, "template");
+	doc.append_node(t);
+	
+	__Object::save(object, t, &doc);
+
+	std::string s;
+	print(std::back_inserter(s), doc, 0);
+
+	// save document
+	std::ofstream myfile;
+	myfile.open (fileName.c_str());
+	myfile << s;
+	myfile.close();
+
+	// frees all memory allocated to the nodes
+	doc.clear();
+
+}
+
+void Simulation::loadTemplate(const std::string& fileName)
+{
+	using namespace rapidxml;
+
+	file<char> f(fileName.c_str());
+
+	char* m = f.data();
+	
+	// TODO add exception handling
+	xml_document<> doc;
+	doc.parse<0>(m);
+
+	// this is important so we don't parse the template tag but the object or compound tag
+	xml_node<>* nodes = doc.first_node();
+
+	// only the first tag is loaded the rest will be ignored
+	xml_node<>* node = nodes->first_node();
+	std::string type(node->name());
+
+	if (type == "object" || type == "compound") {
+			Object object = __Object::load(node);
+			add(object);
+		}
+}*/ /* template load/save END */
+
 
 void Simulation::save(const std::string& fileName)
 {
@@ -193,6 +280,7 @@ void Simulation::load(const std::string& fileName)
 
 	char* m = f.data();
 	
+	// TODO add exception handling
 	xml_document<> doc;
 	doc.parse<0>(m);
 
@@ -257,7 +345,7 @@ void Simulation::init()
 
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
-	Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
+	Object obj = __RigidBody::createSphere(matrix, 2.0f, 1.0f, "yellow");
 	add(obj);
 
 	matrix =
@@ -266,7 +354,7 @@ void Simulation::init()
 			Mat4f::rotY(25.0f * PI / 180.0f) *
 			Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
 
-	obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
+	obj = __RigidBody::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 	add(obj);
 */
 
@@ -277,13 +365,13 @@ void Simulation::init()
 		RigidBody boxes[5];
 		RigidBody spheres[5];
 
-		Compound c(new __Compound(Mat4f::identity()));//translate(Vec3f(0.0f, 5.0f, -10.0f))));
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
+		Compound c = __Compound::createCompound();//translate(Vec3f(0.0f, 5.0f, -10.0f))));
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
 		c->add(top);
 
 		for (int x = -2; x <= 2; ++x) {
-			boxes[x + 2] = __Object::createBox(Vec3f(x * radius * 2.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
-			spheres[x + 2] = __Object::createSphere(Vec3f(x * radius * 2.0f, 0.0f, 0.0f), radius, 5.0f, "cradle");
+			boxes[x + 2] = __RigidBody::createBox(Vec3f(x * radius * 2.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
+			spheres[x + 2] = __RigidBody::createSphere(Vec3f(x * radius * 2.0f, 0.0f, 0.0f), radius, 5.0f, "cradle");
 
 			c->add(boxes[x + 2]);
 			c->add(spheres[x + 2]);
@@ -315,15 +403,32 @@ void Simulation::init()
 	// simple seesaw with hinge
 	if (0)
 	{
-		Compound c = Compound(new __Compound());
-		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
-		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
+		Compound c = __Compound::createCompound();
+		Object obj0 = __RigidBody::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
+		Object obj1 = __RigidBody::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
 		c->add(obj0);
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.50f + 0.70f, 50.0f)));
 		//c->convexCastPlacement();
+	}
+
+	// hinge door
+	if (0) {
+		const float vertical = 20.0f;
+		const float doorHeight = 3.0f;
+		Compound c = __Compound::createCompound();
+
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		c->add(top);
+
+		RigidBody door = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f)), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
+		c->add(door);
+
+		c->createHinge(Vec3f(0.0f, vertical - 0.25f, 0.0f), Vec3f::xAxis(), door, top, true, -75.0f * 3.14f / 180.0f, 75.0f * 3.14f / 180.0f);
+
+		add(c);
 	}
 
 	// swing
@@ -337,18 +442,18 @@ void Simulation::init()
 		rlocation.setW(Vec3f(2.0f, vertical - size.x*0.5f, 0.0f));
 		RigidBody lobj0, lobj1, robj0, robj1;
 
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 		lobj0 = robj0 = top;
 
 		for (int i = 0; i < linksCount; i ++) {
 			//create the rigid bodies
-			lobj1 = __Object::createCylinder(llocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			lobj1 = __RigidBody::createCylinder(llocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
 			c->add(lobj1);
 
-			robj1 = __Object::createCylinder(rlocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			robj1 = __RigidBody::createCylinder(rlocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
 			c->add(robj1);
 
 			// left joint
@@ -368,7 +473,7 @@ void Simulation::init()
 			rlocation._42 -= (size.x - size.y);
 		}
 		// Mat4f::translate(Vec3f(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f))
-		RigidBody bottom = __Object::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
+		RigidBody bottom = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
 		c->add(bottom);
 
 		// left attachment
@@ -391,26 +496,26 @@ void Simulation::init()
 		const float ropeHeight = 0.25f;
 		const float ropeLength = 20.0f;
 		const float anchorRopeLength = 5.0f;
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
 		// rope
-		RigidBody rope = __Object::createBox(Mat4f::identity(), ropeLength, ropeHeight, 0.25f, 0.0f, "metal");
+		RigidBody rope = __RigidBody::createBox(Mat4f::identity(), ropeLength, ropeHeight, 0.25f, 0.0f, "metal");
 		c->add(rope);
 
 		// anchor
-		RigidBody anchor = __Object::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
+		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
 		c->add(anchor);
 		c->createSlider(Vec3f(0.0f, -ropeHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, rope, true, -ropeLength*0.5f, ropeLength*0.5f);
 
 		// anchor rope
-		RigidBody anchorRope = __Object::createCylinder(
+		RigidBody anchorRope = __RigidBody::createCylinder(
 				Mat4f::rotZ(3.14f*0.5f) * Mat4f::translate(Vec3f(0.0f, -anchorRopeLength*0.5f - ropeHeight*0.5f - 0.1f, 0.0f)),
 				anchorRadius * 2.0f, anchorRopeLength, 0.1f, "rope");
 		c->add(anchorRope);
 
 		c->createBallAndSocket(anchor->getMatrix().getW(), Vec3f::zAxis(), anchorRope, anchor);
 
-		RigidBody load = __Object::createSphere(anchorRope->getMatrix().getW() - Vec3f(0.0f, anchorRopeLength*0.5f, 0.0f), 1.0f, 1.0f, "cradle");
+		RigidBody load = __RigidBody::createSphere(anchorRope->getMatrix().getW() - Vec3f(0.0f, anchorRopeLength*0.5f, 0.0f), 1.0f, 1.0f, "cradle");
 		c->add(load);
 		c->createBallAndSocket(load->getMatrix().getW(), Vec3f::zAxis(), load, anchorRope);
 
@@ -426,21 +531,15 @@ void Simulation::init()
 		Vec3f size(1.0f, 0.05f, 0.15f);
 		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
 		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
-		Compound rope = Compound(new __Compound());
-		obj0 = __Object::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
+		Compound rope = __Compound::createCompound();
+		obj0 = __RigidBody::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
 		rope->add(obj0);
 
 		// create a long vertical rope with limits
 		for (int i = 0; i < linksCount; i ++) {
 			//create the rigid body
-			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
+			obj1 = __RigidBody::createCylinder(location, size.y, size.x, 2.0f, "rope", 0, Vec4f(0.1f, 0.1f, 0.1f, 0.0f));
 			rope->add(obj1);
-			float dampValue = 0.0f;
-			NewtonBodySetLinearDamping(obj1->m_body, dampValue);
-
-			dampValue = 0.1f;
-			Vec3f angularDamp(dampValue, dampValue, dampValue);
-			NewtonBodySetAngularDamping (obj1->m_body, &angularDamp[0]);
 
 			Vec3f pivot = location.getW();
 			pivot.y += (size.x - size.y) * 0.5f;
@@ -451,7 +550,7 @@ void Simulation::init()
 		}
 		Vec3f pivot = location.getW();
 		pivot.y += (size.x - size.y) * 0.5f;
-		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "wood");
+		obj1 = __RigidBody::createSphere(location, 0.5f, 5.0f, "wood");
 		rope->add(obj1);
 		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0, true);
 		add(rope);
@@ -470,24 +569,24 @@ void Simulation::init()
 
 		// tire size, z = mass
 		Vec3f tires(0.75f, 0.2f, 0.1f);
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
-		Object chassis = __Object::createBox(Mat4f::identity(), size.x, size.y, size.z, 5.0f, "yellow");
+		Object chassis = __RigidBody::createBox(Mat4f::identity(), size.x, size.y, size.z, 5.0f, "yellow");
 		c->add(chassis);
 
-		Object fl = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(fl);
 
 		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fr = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(fr);
 
 		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object bl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(bl);
 
 		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object br = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(br);
 
 		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
@@ -498,23 +597,97 @@ void Simulation::init()
 
 		/*
 		Compound c = Compound(new __Compound());
-		Object chassis = __Object::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
+		Object chassis = __RigidBody::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
 		c->add(chassis);
-		Object fl = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object fl = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(fl);
 		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object fr = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(fr);
 		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object bl = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(bl);
 		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object br = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(br);
 		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 5.0f, 0.0f)));
 		 */
+	}
+
+	// bridge
+	if (0) {
+		const int linksCount = 20;
+		Vec3f boxSize(3.0f, 1.0f, 3.0f);
+		Vec3f linkSize(1.4f, 0.1f, 0.5f);
+		boxSize *= 5.0f;
+		linkSize *= 5.0f;
+
+		Mat4f location = Mat4f::identity();
+
+		Compound c = __Compound::createCompound();
+
+		RigidBody link0 = __RigidBody::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		c->add(link0);
+		RigidBody link1;
+
+		location._43 += boxSize.z * 0.5f + linkSize.z * 0.5f;
+		location._42 += boxSize.y * 0.5f - linkSize.y * 0.5f;;
+
+		for (int i = 0; i < linksCount; ++i) {
+
+			link1 = __RigidBody::createBox(location, linkSize.x, linkSize.y, linkSize.z, 0.25f, "plankso", 0, Vec4f(0.5f, 0.5f, 0.5f, 0.5f));
+			c->add(link1);
+
+			Vec3f pivot(location.getW());
+			pivot.y += linkSize.y * 0.5f;
+			pivot.z -= linkSize.z * 0.5f;
+
+			c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
+
+			link0 = link1;
+			location._43 += linkSize.z;
+		}
+
+		Vec3f pivot(location.getW());
+		pivot.y += linkSize.y * 0.5f;
+		pivot.z -= linkSize.z * 0.5f;
+
+		location._43 += boxSize.z * 0.5f - linkSize.z * 0.5f;
+		location._42 += linkSize.y * 0.5f - boxSize.y * 0.5f;
+
+		link1 = __RigidBody::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		c->add(link1);
+
+		c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
+
+		add(c);
+		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+	}
+
+	// slider
+	if (0) {
+		const float axisHeight = 0.25f;
+		const float axisLength = 20.0f;
+		float anchorRadius = 1.0f;
+		Compound c = __Compound::createCompound();
+
+		// axis
+		RigidBody axis = __RigidBody::createBox(Mat4f::identity(), axisLength, axisHeight, 0.25f, 0.0f, "metal", 1);
+		c->add(axis);
+
+		// anchor
+		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(Vec3f(axisLength*0.5f, 0.0f, 0.0f)), anchorRadius, anchorRadius, anchorRadius, 1.0f, "wood", 1);
+		c->add(anchor);
+
+		c->createSlider(Vec3f(0.0f, -axisHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, axis, true, -axisLength - anchorRadius * 0.5f, 0);
+		add(c);
+
+		c->setMatrix(Mat4f::rotZ(3.14 * 0.525f));
+		c->convexCastPlacement();
+		c->setMatrix(Mat4f::translate(Vec3f(0.0f, 2.0f, 0.0f)) * c->getMatrix());
+		anchor->setFreezeState(1);
 	}
 
 	//save("data/levels/test_level.xml");
@@ -523,6 +696,7 @@ void Simulation::init()
 
 void Simulation::clear()
 {
+	m_selectedObject = Object();
 	m_sortedBuffers.clear();
 	m_vertexBuffer.flush();
 	m_objects.clear();
@@ -538,6 +712,8 @@ void Simulation::clear()
 
 int Simulation::add(const Object& object)
 {
+	if (!object.get())
+		return -1;
 	return add(object, m_nextID++);
 }
 
@@ -557,7 +733,8 @@ int Simulation::add(const ObjectInfo& info)
 {
 	Mat4f matrix(Vec3f::yAxis(), m_camera.viewVector(), m_pointer);
 	int result = add(info.create(matrix));
-	m_objects.back()->convexCastPlacement();
+	if (result > -1)
+		m_objects.back()->convexCastPlacement();
 	return result;
 }
 
@@ -808,7 +985,6 @@ void Simulation::mouseMove(int x, int y)
 
 void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 {
-	Vec3f old = m_pointer;
 	m_pointer = m_camera.pointer(x, y);
 
 	if ((m_interactionTypes[button] == INT_ROTATE || m_interactionTypes[button] == INT_ROTATE_GROUND)
@@ -819,7 +995,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (m_interactionTypes[button] == INT_CREATE_OBJECT && !m_enabled && down) {
-		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename, m_newObjectMass, m_newObjectFreezeState);
+		ObjectInfo info(m_newObjectType, m_newObjectMaterial, m_newObjectFilename, m_newObjectMass, m_newObjectFreezeState, m_newObjectSize);
 		add(info);
 	}
 
@@ -988,6 +1164,9 @@ void Simulation::render()
 		glPopMatrix();
 	}
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	if (m_environment)
 		m_environment->render();
 
@@ -1030,7 +1209,6 @@ void Simulation::render()
 		int md = abs(rot_mouse.x - m_mouseAdapter.getX()) + abs(rot_mouse.y -m_mouseAdapter.getY());
 		if (md > 2 && angle > 0.01f && angle < PI) {
 			Mat4f mat = Mat4f::rotAxis(axis, -angle);
-			Vec3f euler = mat.eulerAngles();
 			mat = rot_mat_start * mat;
 			mat.setW(rot_mat_start.getW());
 			m_selectedObject->setMatrix(mat);

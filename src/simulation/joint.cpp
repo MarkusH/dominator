@@ -48,12 +48,15 @@ Joint __Joint::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 __Hinge::__Hinge(Vec3f pivot, Vec3f pinDir,
 		const Object& child, const Object& parent,
 		const dMatrix& pinAndPivot,
-		const NewtonBody* childBody, const NewtonBody* parentBody)
+		const NewtonBody* childBody, const NewtonBody* parentBody,
+		bool limited, float minAngle, float maxAngle)
 	: __Joint(HINGE), CustomHinge(pinAndPivot, childBody, parentBody),
 	  pivot(pivot), pinDir(pinDir),
-	  child(child), parent(parent)
+	  child(child), parent(parent),
+	  limited(limited), minAngle(minAngle), maxAngle(maxAngle)
 {
-
+	this->EnableLimits(limited);
+	this->SetLimis(minAngle, maxAngle);
 }
 
 void __Hinge::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
@@ -66,7 +69,7 @@ void __Hinge::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
 	pivot *= inverse * matrix;
 }
 
-Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
+Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited, float minAngle, float maxAngle)
 {
 	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
 	__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
@@ -77,7 +80,7 @@ Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Obje
 	pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
 	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
 
-	Hinge result = Hinge(new __Hinge(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL));
+	Hinge result = Hinge(new __Hinge(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL, limited, minAngle, maxAngle));
 	return result;
 }
 
@@ -114,6 +117,23 @@ void __Hinge::save(const __Hinge& hinge, rapidxml::xml_node<>* sibling, rapidxml
 	char* pPinDir = doc->allocate_string(hinge.pinDir.str().c_str()); // hinge.pinDir doesn't contain the value at load
 	xml_attribute<>* attrPD = doc->allocate_attribute("pinDir", pPinDir);
 	node->append_attribute(attrPD);
+
+	// limited attribute
+	char* pLimited = doc->allocate_string(util::toString(hinge.limited));
+	xml_attribute<>* attrLi = doc->allocate_attribute("limited", pLimited);
+	node->append_attribute(attrLi);
+
+	if (hinge.limited) {
+		// minDist attribute
+		char* pMinAngle = doc->allocate_string(util::toString(hinge.minAngle));
+		xml_attribute<>* attrMi = doc->allocate_attribute("minangle", pMinAngle);
+		node->append_attribute(attrMi);
+
+		// maxDist attribute
+		char* pMaxAngle = doc->allocate_string(util::toString(hinge.maxAngle));
+		xml_attribute<>* attrMa = doc->allocate_attribute("maxangle", pMaxAngle);
+		node->append_attribute(attrMa);
+	}
 }
 
 Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
@@ -151,8 +171,21 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 			child = *itr;
 	}
 
+	// limited attribute
+	attr = attr->next_attribute();
+	bool limited = atoi(attr->value());
+	float minAngle = 0.0f, maxAngle = 0.0f;
 
-	Hinge hinge = __Hinge::create(pivot, pinDir, child, parent);
+	if (limited) {
+		attr = attr->next_attribute();
+		minAngle = atof(attr->value());
+
+		attr = attr->next_attribute();
+		maxAngle = atof(attr->value());
+	}
+
+
+	Hinge hinge = __Hinge::create(pivot, pinDir, child, parent, limited, minAngle, maxAngle);
 	return hinge;
 }
 
@@ -167,10 +200,8 @@ __Slider::__Slider(Vec3f pivot, Vec3f pinDir,
 	  child(child), parent(parent),
 	  limited(limited), minDist(minDist), maxDist(maxDist)
 {
-	if (limited) {
-		this->EnableLimits(true);
-		this->SetLimis(minDist, maxDist);
-	}
+	this->EnableLimits(limited);
+	this->SetLimis(minDist, maxDist);
 }
 
 void __Slider::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)

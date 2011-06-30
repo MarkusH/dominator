@@ -54,19 +54,19 @@ void ToolBox::create_m_objects()
 	// Create the menu for dominos
 	QMenu* m_objectMenu = new QMenu();
 	QMenu* menu = new QMenu("Domino");
-	menu->addAction(new QObjectAction("Small", sim::__Object::DOMINO_SMALL, true));
-	menu->addAction(new QObjectAction("Middle", sim::__Object::DOMINO_MIDDLE, true));
-	menu->addAction(new QObjectAction("Large", sim::__Object::DOMINO_LARGE, true));
+	menu->addAction(new QObjectAction(sim::__Object::DOMINO_SMALL));
+	menu->addAction(new QObjectAction(sim::__Object::DOMINO_MIDDLE));
+	menu->addAction(new QObjectAction(sim::__Object::DOMINO_LARGE));
 	m_objectMenu->addMenu(menu);
 
 	// create the menu for primitive objects
 	menu = new QMenu("Primitives");
-	menu->addAction(new QObjectAction("Box", sim::__Object::BOX));
-	menu->addAction(new QObjectAction("Capsule", sim::__Object::CAPSULE));
-	menu->addAction(new QObjectAction("Chamfer Cylinder", sim::__Object::CHAMFER_CYLINDER));
-	menu->addAction(new QObjectAction("Cone", sim::__Object::CONE));
-	menu->addAction(new QObjectAction("Cylinder", sim::__Object::CYLINDER));
-	menu->addAction(new QObjectAction("Sphere", sim::__Object::SPHERE));
+	menu->addAction(new QObjectAction(sim::__Object::BOX));
+	menu->addAction(new QObjectAction(sim::__Object::CAPSULE));
+	menu->addAction(new QObjectAction(sim::__Object::CHAMFER_CYLINDER));
+	menu->addAction(new QObjectAction(sim::__Object::CONE));
+	menu->addAction(new QObjectAction(sim::__Object::CYLINDER));
+	menu->addAction(new QObjectAction(sim::__Object::SPHERE));
 	m_objectMenu->addMenu(menu);
 
 	// create the menu for templates
@@ -233,7 +233,7 @@ void ToolBox::create_m_buttonbox()
 
 	m_rotate = new QPushButton("Rotate");
 	m_rotate->setCheckable(true);
-	m_mouseinteraction->addButton(m_rotate, (int) sim::Simulation::INT_ROTATE);
+	m_mouseinteraction->addButton(m_rotate, (int) sim::Simulation::INT_ROTATE_GROUND);
 	buttonLayout->addWidget(m_rotate);
 
 	m_mouseinteraction->setParent(this);
@@ -280,14 +280,42 @@ void ToolBox::onInteractionPressed(int button)
 	emit interactionSelected(m_selectedInteraction);
 }
 
-void ToolBox::addObject(QAction* action)
+void ToolBox::addObject(QAction *action)
 {
 	QObjectAction* a = (QObjectAction*) action;
 	sim::Simulation::instance().setNewObjectType(a->getType());
 	m_objects->setText(a->text());
 	m_mass->setValue(a->getMass());
 	m_freezeState->setCheckState((a->getFreezeState()) ? Qt::Checked : Qt::Unchecked);
+	m_width->setValue(a->getSize().x);
+	m_height->setValue(a->getSize().y);
+	m_depth->setValue(a->getSize().z);
+	m_selectedInteraction = sim::Simulation::INT_CREATE_OBJECT;
+	emit interactionSelected(m_selectedInteraction);
 
+	updateData();
+
+	int position = layout->indexOf(m_mass) + 1;
+	// todo
+	switch (a->getType()) {
+	case sim::__Object::BOX:
+	case sim::__Object::SPHERE:
+		layout->insertWidget(position, m_depth);
+		layout->insertWidget(position, m_height);
+		layout->insertWidget(position, m_width);
+		layout->insertWidget(position, m_labelSize);
+		break;
+	case sim::__Object::CYLINDER:
+	case sim::__Object::CONE:
+	case sim::__Object::CAPSULE:
+	case sim::__Object::CHAMFER_CYLINDER:
+		layout->insertWidget(position, m_height);
+		layout->insertWidget(position, m_width);
+		layout->insertWidget(position, m_labelSize);
+		break;
+	default:
+		break;
+	}
 }
 
 void ToolBox::materialSelected(int index)
@@ -336,6 +364,8 @@ void ToolBox::massChanged(double mass)
 
 void ToolBox::updateSize(double value)
 {
+	sim::Simulation::instance().setNewObjectSize(m3d::Vec3f(m_width->value(), m_height->value(), m_depth->value()));
+
 	if (!doUpdate)
 		return;
 
@@ -344,8 +374,8 @@ void ToolBox::updateSize(double value)
 		m3d::Vec3f scale;
 		if (obj->getType() == sim::__Object::BOX || obj->getType() == sim::__Object::SPHERE) {
 			scale = m3d::Vec3f(m_width->value(), m_height->value(), m_depth->value());
-		} else if (obj->getType() == sim::__Object::CYLINDER || obj->getType() == sim::__Object::CONE
-				|| obj->getType() == sim::__Object::CAPSULE || obj->getType() == sim::__Object::CHAMFER_CYLINDER) {
+		} else if (obj->getType() == sim::__Object::CYLINDER || obj->getType() == sim::__Object::CONE || obj->getType() == sim::__Object::CAPSULE
+				|| obj->getType() == sim::__Object::CHAMFER_CYLINDER) {
 			scale = m3d::Vec3f(m_width->value(), m_height->value(), 0);
 		}
 		obj->scale(scale);
@@ -361,7 +391,7 @@ void ToolBox::updateLocation(double value)
 	if (sim::Simulation::instance().getSelectedObject()) {
 		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
 		if (QObject::sender() == m_locationX) {
-			matrix._41= (float) value;
+			matrix._41 = (float) value;
 		} else if (QObject::sender() == m_locationY) {
 			matrix._42 = (float) value;
 		} else if (QObject::sender() == m_locationZ) {
@@ -379,10 +409,8 @@ void ToolBox::updateRotation(double value)
 	if (sim::Simulation::instance().getSelectedObject()) {
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 
-		Mat4f matrix = Mat4f::rotZ(m_rotationZ->value() * PI / 180.0f) *
-				Mat4f::rotX(m_rotationX->value() * PI / 180.0f) *
-				Mat4f::rotY(m_rotationY->value() * PI / 180.0f) *
-				Mat4f::translate(obj->getMatrix().getW());
+		Mat4f matrix = Mat4f::rotZ(m_rotationZ->value() * PI / 180.0f) * Mat4f::rotX(m_rotationX->value() * PI / 180.0f) * Mat4f::rotY(
+				m_rotationY->value() * PI / 180.0f) * Mat4f::translate(obj->getMatrix().getW());
 
 		obj->setMatrix(matrix);
 	}
@@ -425,8 +453,8 @@ void ToolBox::updateData(sim::Object object)
 		 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
 		 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
 		 */
-		if (object->getType() == sim::__Object::DOMINO_SMALL || object->getType() == sim::__Object::DOMINO_MIDDLE
-				|| object->getType() == sim::__Object::DOMINO_LARGE) {
+		if (object->getType() == sim::__Object::DOMINO_SMALL || object->getType() == sim::__Object::DOMINO_MIDDLE || object->getType()
+				== sim::__Object::DOMINO_LARGE) {
 			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsDominos.rbegin(); rit != m_modifyWidgetsDominos.rend(); rit++) {
 				layout->insertWidget(position, (QWidget*) *rit);
 			}
@@ -436,8 +464,8 @@ void ToolBox::updateData(sim::Object object)
 				layout->insertWidget(position, (QWidget*) *rit);
 			}
 
-		} else if (object->getType() == sim::__Object::CYLINDER || object->getType() == sim::__Object::CONE
-				|| object->getType() == sim::__Object::CAPSULE || object->getType() == sim::__Object::CHAMFER_CYLINDER) {
+		} else if (object->getType() == sim::__Object::CYLINDER || object->getType() == sim::__Object::CONE || object->getType() == sim::__Object::CAPSULE
+				|| object->getType() == sim::__Object::CHAMFER_CYLINDER) {
 			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgets .rbegin(); rit != m_modifyWidgets.rend(); rit++) {
 				layout->insertWidget(position, (QWidget*) *rit);
 			}

@@ -42,10 +42,11 @@ protected:
 	Mat4f m_matrix;
 	std::list<Object> m_nodes;
 	std::list<Joint> m_joints;
-public:
+
 	__Compound();
 	__Compound(const Mat4f& matrix);
 	__Compound(const Vec3f& position);
+public:
 	virtual ~__Compound();
 
 	void add(Object object);
@@ -63,7 +64,8 @@ public:
 
 	virtual float convexCastPlacement(bool apply = true, std::list<NewtonBody*>* noCollision = NULL);
 
-	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent);
+	Hinge createHinge(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent,
+			bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
 	Slider createSlider(const Vec3f& pivot, const Vec3f& pinDir, const Object& child, const Object& parent,
 			bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
 	BallAndSocket createBallAndSocket(const Vec3f& pivot, const Vec3f& pinDir,
@@ -74,6 +76,8 @@ public:
 	virtual bool contains(const __Object* object);
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 	virtual void render();
+
+	static Compound createCompound(const Mat4f& matrix = Mat4f::identity());
 
 	static void save(__Compound& compound, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc);
 	static Compound load(rapidxml::xml_node<>* node);

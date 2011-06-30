@@ -65,12 +65,16 @@ public:
 		NONE
 	} Type;
 	static const char* TypeStr[];
+	static const char* TypeName[];
+	static const float TypeMass[];
+	static const bool TypeFreezeState[];
+	static const Vec3f TypeSize[];
 protected:
 	Type m_type;
 	int m_id;
 
-public:
 	__Object(Type type);
+public:
 	virtual ~__Object();
 
 	const Type& getType() { return m_type; }
@@ -180,21 +184,6 @@ public:
 	 */
 	static Object load(rapidxml::xml_node<>* node);
 
-	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
-	static RigidBody createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material = "");
-	static RigidBody createSphere(const Vec3f& position, float radius, float mass, const std::string& material);
-	static RigidBody createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material = "");
-	static RigidBody createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-	static RigidBody createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-	static RigidBody createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-	static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-
 	friend class __RigidBody;
 };
 
@@ -211,11 +200,11 @@ protected:
 
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
-public:
+
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-
+public:
 	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
 	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
 
@@ -245,6 +234,22 @@ public:
 	static void save(const __RigidBody& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static RigidBody load(rapidxml::xml_node<>* node);
 
+	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material = "");
+	static RigidBody createSphere(const Vec3f& position, float radius, float mass, const std::string& material);
+	static RigidBody createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material = "");
+	static RigidBody createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+	static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
+
+
 	friend class __Object;
 };
 
@@ -262,7 +267,7 @@ protected:
 public:
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	~__ConvexHull();
+	virtual ~__ConvexHull();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
@@ -290,7 +295,7 @@ protected:
 	std::string m_fileName;
 public:
 	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-	~__ConvexAssembly();
+	virtual ~__ConvexAssembly();
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 

@@ -138,6 +138,8 @@ void Skydome::render(const Camera& cam, const Vec3f& light, bool concealed)
 	m_shader->setUniform1f("invHeight", 16.0f * m_radius / 50.0f);
 	m_shader->setUniform1f("invRadius", 2.0f / (10.0f * m_radius * m_radius));
 	m_shader->setUniform4fv("color", &m_horizon[0]);
+	m_shader->setUniform1i("s_texture_0", 0);
+	m_shader->setUniform1i("s_texture_1", 0);
 
 	glDepthMask(GL_FALSE);
 	glCallList(m_list);

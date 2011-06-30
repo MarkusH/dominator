@@ -163,7 +163,7 @@ private slots:
 	 * as described at the buttons.
 	 */
 	void onInteractionPressed(int button);
-	void addObject(QAction*);
+	void addObject(QAction *action);
 	void materialSelected(int index);
 	void freezeStateChanged(int state);
 	void massChanged(double mass);

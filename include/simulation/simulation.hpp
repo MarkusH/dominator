@@ -45,7 +45,7 @@ struct ObjectInfo {
 	Vec3f size;
 
 	ObjectInfo(__Object::Type type, const std::string& material = "", const std::string& fileName = "",
-			const float mass = -1.0f, const int freezeState = false);
+			const float mass = -1.0f, const int freezeState = false, const Vec3f& size = Vec3f(1.0f, 1.0f, 1.0f));
 	Object create(const Mat4f& matrix) const;
 };
 
@@ -91,6 +91,7 @@ protected:
 	std::string m_newObjectFilename;
 	float m_newObjectMass;
 	int m_newObjectFreezeState;
+	Vec3f m_newObjectSize;
 
 	int m_nextID;
 	ObjectList m_objects;
@@ -183,6 +184,7 @@ public:
 	void setNewObjectFilename(const std::string& filename);
 	void setNewObjectMass(const float mass);
 	void setNewObjectFreezeState(const int freezeState);
+	void setNewObjectSize(const Vec3f size);
 
 	/** @return The handle to the NewtonWorld */
 	NewtonWorld* getWorld() const;
@@ -263,7 +265,8 @@ public:
 
 	void save(const std::string& fileName);
 	void load(const std::string& fileName);
-
+	//void saveTemplate(const std::string& fileName, __Object& object);
+	//void loadTemplate(const std::string& fileName);
 
 	virtual void mouseMove(int x, int y);
 	virtual void mouseButton(util::Button button, bool down, int x, int y);
@@ -332,6 +335,11 @@ inline void Simulation::setNewObjectMass(const float mass)
 inline void Simulation::setNewObjectFreezeState(const int freezeState)
 {
 	m_newObjectFreezeState = freezeState;
+}
+
+inline void Simulation::setNewObjectSize(const Vec3f size)
+{
+	m_newObjectSize = size;
 }
 
 inline ogl::Camera& Simulation::getCamera()

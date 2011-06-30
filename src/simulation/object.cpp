@@ -26,20 +26,40 @@ namespace sim {
  * prepending Object strings will break code in __RigidBody::load()
  */
 const char* __Object::TypeStr[] = {
-	"domino_small",
-	"domino_middle",
-	"domino_large",
-	"box",
-	"sphere",
-	"cylinder",
-	"capsule",
-	"cone",
-	"chamfercylinder",
-	"hull",
-	"assembly",
-	"compound",
+	"domino_small", "domino_middle", "domino_large",
+	"box", "sphere", "cylinder",
+	"capsule", "cone", "chamfercylinder",
+	"hull", "assembly", "compound",
 	"environment"
 };
+const char* __Object::TypeName[] = {
+		"Domino (small)", "Domino (middle)", "Domino (large)",
+		"Box", "Sphere", "Cylinder",
+		"Capsule", "Cone", "Chamfer Cylinder",
+		"Hull", "Assembly", "Compound",
+		"Environment"
+	};
+const float __Object::TypeMass[] = {
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f
+	};
+const bool __Object::TypeFreezeState[] = {
+		true, true, true,
+		false, false, false,
+		false, false, false,
+		false, false, false,
+		false
+	};
+const Vec3f __Object::TypeSize[] = {
+		Vec3f(), Vec3f(), Vec3f(),
+		Vec3f(1.0f, 1.0f, 1.0f), Vec3f(1.0f, 1.0f, 1.0f), Vec3f(1.0f, 2.0f, 1.0f),
+		Vec3f(1.0f, 6.0f, 1.0f), Vec3f(1.0f, 2.0f, 1.0f), Vec3f(5.0f, 1.0f, 1.0f),
+		Vec3f(), Vec3f(), Vec3f(),
+		Vec3f()
+	};
 
 __Object::__Object(Type type)
 	: m_type(type)
@@ -163,7 +183,7 @@ Object __Object::load(rapidxml::xml_node<>* node)
 
 
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::SPHERE, matrix, material, freezeState, damping));
 
@@ -178,22 +198,22 @@ RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radi
 	return result;
 }
 
-RigidBody __Object::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
 {
-	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	return createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
 {
-	return __Object::createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	return createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
 {
 	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material, freezeState, damping));
 
@@ -208,12 +228,12 @@ RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, fl
 	return result;
 }
 
-RigidBody __Object::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
+RigidBody __RigidBody::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
 {
 	return createBox(Mat4f::translate(position), w, h, d, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CYLINDER, matrix, material, freezeState, damping));
 
@@ -228,12 +248,12 @@ RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float heig
 	return result;
 }
 
-RigidBody __Object::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINDER, matrix, material, freezeState, damping));
 
@@ -248,12 +268,12 @@ RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, flo
 	return result;
 }
 
-RigidBody __Object::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CAPSULE, matrix, material, freezeState, damping));
 
@@ -268,12 +288,12 @@ RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float heigh
 	return result;
 }
 
-RigidBody __Object::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCapsule(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CONE, matrix, material, freezeState, damping));
 
@@ -288,7 +308,7 @@ RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, 
 	return result;
 }
 
-RigidBody __Object::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCone(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
@@ -348,6 +368,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 	NewtonCollision* collision = NewtonBodyGetCollision(body.m_body);
 	NewtonCollisionGetInfo(collision, &info);
 
+	if(body.m_type != DOMINO_SMALL && body.m_type != DOMINO_MIDDLE && body.m_type != DOMINO_LARGE) {
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
 		// set attribute width
@@ -418,6 +439,7 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 		node->append_attribute(attrR);
 		break;
 	}
+	}
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -450,7 +472,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float radius;	// chamfer cylinder, cylinder, cone, capsule
 	Type t; int i;	// domino
 
-	//attribute id is set in __Object::load()
+	//attribute id is set in Simulation::load()
 	xml_attribute<>* attr = node->first_attribute();
 	
 	//attribute type
@@ -463,7 +485,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	matrix.assign(attr->value());
 
 	/* set dimensions for box */
-	if ( type == TypeStr[BOX] ) {
+	if ( type == TypeStr[BOX]) {
 		//attribute width
 		attr = attr->next_attribute();
 		w = atof(attr->value());
@@ -530,12 +552,12 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		}
 	}
 
-	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
-	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
-	if( type == TypeStr[CHAMFER_CYLINDER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CYLINDER] ) return __Object::createCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CONE] ) return __Object::createCone(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CAPSULE] ) return __Object::createCapsule(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[BOX] ) return __RigidBody::createBox(matrix, w, h, d, mass, material, freezeState, damping);
+	if( type == TypeStr[SPHERE] ) return __RigidBody::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
+	if( type == TypeStr[CHAMFER_CYLINDER] ) return __RigidBody::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CYLINDER] ) return __RigidBody::createCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CONE] ) return __RigidBody::createCone(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CAPSULE] ) return __RigidBody::createCapsule(matrix, radius, h, mass, material, freezeState, damping);
 	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material, false);
@@ -857,18 +879,8 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pModel, *pOriginal;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrMo, *attrOr;
-
-	// set attribute "model" to  the correct file name
-	pModel = doc->allocate_string(body.m_fileName.c_str());
-	attrMo = doc->allocate_attribute("model", pModel);
-	node->append_attribute(attrMo);
-
-	// set attribute rendering type
-	pOriginal = doc->allocate_string(util::toString(body.m_originalGeometry));
-	attrOr = doc->allocate_attribute("original", pOriginal);
-	node->append_attribute(attrOr);
+	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName, *pOriginal;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName, *attrOr;
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -889,6 +901,17 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 	pMass = doc->allocate_string(util::toString(body.getMass()));
 	attrMass = doc->allocate_attribute("mass", pMass);
 	node->append_attribute(attrMass);
+
+	// set attribute filename to the correct file name
+	pFileName = doc->allocate_string(body.m_fileName.c_str());
+	attrFileName = doc->allocate_attribute("filename", pFileName);
+	node->append_attribute(attrFileName);
+
+	// set attribute rendering type
+	pOriginal = doc->allocate_string(util::toString(body.m_originalGeometry));
+	attrOr = doc->allocate_attribute("original", pOriginal);
+	node->append_attribute(attrOr);
+
 }
 
 ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
@@ -907,16 +930,6 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
-
-	//attribute model
-	attr = attr->next_attribute();
-	std::string model = attr->value();
-
-	//attribute original
-	attr = attr->next_attribute();
-	int original = atoi(attr->value());
-
-
 	//attribute freezeState
 	attr = attr->next_attribute();
 	int freezeState = atoi(attr->value());
@@ -934,7 +947,15 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
-	return ConvexHull(new __ConvexHull(matrix, mass, material, model, original, freezeState, damping));
+	//attribute filename
+	attr = attr->next_attribute();
+	std::string filename = attr->value();
+
+	//attribute original
+	attr = attr->next_attribute();
+	int original = atoi(attr->value());
+
+	return ConvexHull(new __ConvexHull(matrix, mass, material, filename, original, freezeState, damping));
 }
 
 __ConvexHull::~__ConvexHull()
@@ -1181,18 +1202,8 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pModel, *pRendering;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrMo, *attrRe;
-
-	// set attribute "model" to  the correct file name
-	pModel = doc->allocate_string(body.m_fileName.c_str());
-	attrMo = doc->allocate_attribute("model", pModel);
-	node->append_attribute(attrMo);
-
-	// set attribute rendering type
-	pRendering = doc->allocate_string(util::toString(body.m_renderingType));
-	attrRe = doc->allocate_attribute("rendering", pRendering);
-	node->append_attribute(attrRe);
+	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName, *pRendering;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName, *attrRe;
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -1213,6 +1224,16 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 	pMass = doc->allocate_string(util::toString(body.getMass()));
 	attrMass = doc->allocate_attribute("mass", pMass);
 	node->append_attribute(attrMass);
+
+	// set attribute filename to the correct file name
+	pFileName = doc->allocate_string(body.m_fileName.c_str());
+	attrFileName = doc->allocate_attribute("filename", pFileName);
+	node->append_attribute(attrFileName);
+
+	// set attribute rendering type
+	pRendering = doc->allocate_string(util::toString(body.m_renderingType));
+	attrRe = doc->allocate_attribute("rendering", pRendering);
+	node->append_attribute(attrRe);
 }
 
 ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
@@ -1231,16 +1252,6 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
-
-	//attribute model
-	attr = attr->next_attribute();
-	std::string model = attr->value();
-
-	//attribute rendering type
-	attr = attr->next_attribute();
-	int rendering = atoi(attr->value());
-
-
 	//attribute freezeState
 	attr = attr->next_attribute();
 	int freezeState = atoi(attr->value());
@@ -1258,7 +1269,15 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	attr = attr->next_attribute();
 	float mass = atof(attr->value());
 
-	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, model, (RenderingType)rendering, freezeState, damping));
+	//attribute filename
+	attr = attr->next_attribute();
+	std::string filename = attr->value();
+
+	//attribute rendering type
+	attr = attr->next_attribute();
+	int rendering = atoi(attr->value());
+
+	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, filename, (RenderingType)rendering, freezeState, damping));
 }
 
 __ConvexAssembly::~__ConvexAssembly()
