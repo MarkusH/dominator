@@ -321,10 +321,10 @@ void Simulation::load(const std::string& fileName)
 		} else throw parse_error("No valid root node found", m);
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
-		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
 	} catch(...) {
 		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
-		// TODO tell user in the GUI that an unknown error occurred
+		/// @todo tell user in the GUI that an unknown error occurred
 	}
 	delete f;
 }

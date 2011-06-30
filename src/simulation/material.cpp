@@ -403,7 +403,7 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 }
 
 
-bool MaterialMgr::load(const char* fileName)// TODO crashes if file doesn't exist
+bool MaterialMgr::load(const char* fileName)/// @todo crashes if file doesn't exist
 {
 	using namespace rapidxml;
 
@@ -453,12 +453,12 @@ bool MaterialMgr::load(const char* fileName)// TODO crashes if file doesn't exis
 	}
 	catch ( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
-		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
 		delete f;
 		return false;
 	} catch (...) {
 		std::cout<<"Caught unknown exception in MaterialMgr::load"<<std::endl;
-		// TODO tell user in the GUI that an unknown error occurred
+		/// @todo tell user in the GUI that an unknown error occurred
 		delete f;
 		return false;
 	}

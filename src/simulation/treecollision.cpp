@@ -316,7 +316,7 @@ TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 	bool octree;
 	if(std::string(attr->value()) == "0") octree = false;
 	else octree = true;
-	// TODO use octree
+	/// @todo use octree
 
 	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), model));
 	return result;
