@@ -15,11 +15,7 @@
 #include <CustomHinge.h>
 #include <CustomBallAndSocket.h>
 #include <CustomSlider.h>
-#ifdef _WIN32
 #include <boost/tr1/memory.hpp>
-#else
-#include <tr1/memory>
-#endif
 #include <list>
 
 namespace sim {

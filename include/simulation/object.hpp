@@ -8,11 +8,8 @@
 #ifndef OBJECT_HPP_
 #define OBJECT_HPP_
 
-#ifdef _WIN32
+
 #include <boost/tr1/memory.hpp>
-#else
-#include <tr1/memory>
-#endif
 #include <string>
 #include <simulation/body.hpp>
 #include <opengl/vertexbuffer.hpp>

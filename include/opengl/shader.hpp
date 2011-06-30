@@ -9,12 +9,7 @@
 #define SHADER_HPP_
 
 #include <GL/glew.h>
-#ifdef _WIN32
 #include <boost/tr1/memory.hpp>
-#else
-#include <tr1/memory>
-#endif
-
 #include <iostream>
 #include <map>
 

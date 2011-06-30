@@ -10,11 +10,7 @@
 #include <opengl/shader.hpp>
 #include <GL/glew.h>
 #include <limits.h>
-#ifdef _WIN32
 #include <boost/functional/hash.hpp>
-#else
-#include <tr1/functional_hash.h>
-#endif
 #include <Newton.h>
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
@@ -345,7 +341,8 @@ int MaterialMgr::getID(const std::string& name) const
 {
 	if (name.size() == 0)
 		return 0;
-	std::tr1::hash<std::string> string_hash;
+
+	boost::hash<std::string> string_hash;
 	return string_hash(name) % INT_MAX;
 }
 
@@ -367,7 +364,7 @@ Material* MaterialMgr::fromID(unsigned int id)
 
 	std::map<std::string, Material>::iterator it;
 	for (it = m_materials.begin(); it != m_materials.end(); ++it) {
-		std::tr1::hash<std::string> string_hash;
+		boost::hash<std::string> string_hash;
 		if (string_hash(it->first) % INT_MAX == id)
 			return &(it->second);
 	}

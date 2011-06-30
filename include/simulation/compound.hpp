@@ -10,11 +10,7 @@
 
 #include <m3d/m3d.hpp>
 #include <simulation/object.hpp>
-#ifdef _WIN32
 #include <boost/tr1/memory.hpp>
-#else
-#include <tr1/memory>
-#endif
 #include <list>
 #include <simulation/joint.hpp>
 
