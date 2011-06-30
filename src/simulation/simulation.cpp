@@ -274,13 +274,23 @@ void Simulation::save(const std::string& fileName)
 void Simulation::load(const std::string& fileName)
 {
 	init();
-	using namespace rapidxml;
-	
-	file<char> f(fileName.c_str());
 
-	char* m = f.data();
+	using namespace rapidxml;
+
+	char* m;
+	file<char>* f;
 
 	try {
+		f = new file<char>(fileName.c_str());
+	} catch (...) {
+		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
+		delete f;
+		return;
+	}
+	
+	try {
+
+		m = f->data();
 
 		xml_document<> doc;
 		doc.parse<0>(m);
@@ -288,7 +298,6 @@ void Simulation::load(const std::string& fileName)
 		// this is important so we don't parse the level tag but the object and compound tags
 		xml_node<>* nodes = doc.first_node("level");
 
-		// first_node returns 0 if node is not found
 		if (nodes) {
 			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 				std::string type(node->name());
@@ -307,10 +316,9 @@ void Simulation::load(const std::string& fileName)
 				//((__TreeCollision*)m_environment.get())->createOctree();
 			}
 
-			// load gravity
-
 			m_clock.reset();
-		} // TODO exception handling in else
+
+		} else throw parse_error("No valid root node found", m);
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
@@ -318,6 +326,7 @@ void Simulation::load(const std::string& fileName)
 		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		// TODO tell user in the GUI that an unknown error occurred
 	}
+	delete f;
 }
 
 void Simulation::init()

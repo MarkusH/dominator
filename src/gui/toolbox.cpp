@@ -242,6 +242,7 @@ void ToolBox::create_m_buttonbox()
 
 void ToolBox::loadMaterials(QString filename)
 {
+	// TODO handle if load returns false
 	sim::MaterialMgr::instance().load(filename.toStdString().c_str());
 	std::set<std::string> materials;
 	sim::MaterialMgr::instance().getMaterials(materials);

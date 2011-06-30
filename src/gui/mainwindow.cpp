@@ -40,7 +40,7 @@ MainWindow::MainWindow(QApplication* app)
 
 	m_toolBox = new ToolBox();
 	splash.updateProgress(50);
-	//m_toolBox->loadMaterials("data/levels/exception_test.xml");
+	//m_toolBox->loadMaterials("data/levels/test.xml");
 	m_toolBox->loadMaterials("data/materials.xml");
 	app->processEvents();
 	splash.updateProgress(80);

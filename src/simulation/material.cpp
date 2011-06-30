@@ -403,17 +403,27 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 }
 
 
-bool MaterialMgr::load(const char* fileName)// TODO breaks if file doesn't exist
+bool MaterialMgr::load(const char* fileName)// TODO crashes if file doesn't exist
 {
 	using namespace rapidxml;
 
-	file<char> f(fileName);
-	char* m = f.data();
+	char* m;
+	file<char>* f;
+
+	try {
+		f = new file<char>(fileName);
+	} catch (...) {
+		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
+		delete f;
+		return false;
+	}
 
 	try {
 		// string containing valid xml for test purposes
 		// char m[] = "<?xml version=\"1.0\" ?><materials><material name=\"wood_shiny\" texture=\"wood_shiny\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.6, 0.6, 0.6, 1\" shininess=\"50\" /><material name=\"wood_matt\" texture=\"wood_matt\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.1, 0.1, 0.1, 1\" shininess=\"20\" /><pair mat0=\"wood_shiny\" mat1=\"wood_shiny\" elasticity=\"0.100000\" staticFriction=\"0.450000\" kineticFriction=\"0.310000\" softness=\"0.050000\" /><pair mat0=\"wood_matt\" mat1=\"wood_matt\" elasticity=\"0.15000\" staticFriction=\"0.55000\" kineticFriction=\"0.45000\" softness=\"0.080000\" /></materials>";
-
+		
+		m = f->data();
+		
 		xml_document<> materials;
 		materials.parse<0>(m);
 
@@ -433,28 +443,23 @@ bool MaterialMgr::load(const char* fileName)// TODO breaks if file doesn't exist
 					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
 				}
 			}
-	
 
-		// foreach material tag
-			// Material mat("none");
-			// mat.load(elem);
-			// add(mat);
-
-		// foreach pair tag
-			// MaterialPair pair;
-			// pair.load(elem);
-			// m_pairs[std::make_pair(pair.mat0, pair.mat1)] = pair;
-
+			delete f;
 			return true;
-		} else return false;
+		} else {
+			delete f;
+			return false;
+		}
 	}
 	catch ( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		delete f;
 		return false;
 	} catch (...) {
 		std::cout<<"Caught unknown exception in MaterialMgr::load"<<std::endl;
 		// TODO tell user in the GUI that an unknown error occurred
+		delete f;
 		return false;
 	}
 }
