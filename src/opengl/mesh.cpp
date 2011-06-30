@@ -12,13 +12,15 @@
 
 namespace ogl {
 
-__Mesh::~__Mesh()
-{
-
-}
 
 __Mesh::__Mesh()
 {
+	m_format = GL_T2F_N3F_V3F;
+}
+
+__Mesh::~__Mesh()
+{
+
 }
 
 void __Mesh::genBuffers(ogl::VertexBuffer& vbo)
@@ -33,11 +35,6 @@ void __Mesh::genBuffers(ogl::VertexBuffer& vbo)
 	vbo.m_data.resize(floatOffset + m_data.size());
 
 	memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
-	for (int i = 0; i < m_data.size() / vertexSize; ++i) {
-		vbo.m_data[floatOffset + i * vertexSize + 5] *= m_scale.x;
-		vbo.m_data[floatOffset + i * vertexSize + 6] *= m_scale.y;
-		vbo.m_data[floatOffset + i * vertexSize + 7] *= m_scale.z;
-	}
 
 	for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr) {
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
@@ -68,14 +65,13 @@ struct MeshEntry {
 	}
 };
 
-Mesh __Mesh::load3ds(const std::string& fileName, void* object, const Vec3f& scale)
+Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffers* originalMeshes)
 {
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
 	if (!file)
 		return Mesh();
 
 	Mesh result = Mesh(new __Mesh());
-	result->m_scale = scale;
 
 	int numFaces = 0;
 
@@ -103,6 +99,7 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* object, const Vec3f& sca
 
 	unsigned finishedFaces = 0;
 	unsigned buffer_vOffset = 0;
+	unsigned model_vOffset = 0;
 
 	for (std::list<MeshEntry>::iterator itr = sortedMeshes.begin(); itr != sortedMeshes.end(); ++itr) {
 		Lib3dsMesh* mesh = itr->mesh;
@@ -122,19 +119,37 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* object, const Vec3f& sca
 			finishedFaces++;
 		}
 
+		// create original sub-meshes, if requested
+		if (originalMeshes) {
+			ogl::SubBuffer* buffer = new ogl::SubBuffer();
+			buffer->object = userData;
+			buffer->material = faceMaterial;
+
+			buffer->dataCount = finishedFaces*3 - model_vOffset;
+			buffer->dataOffset = model_vOffset;
+
+			buffer->indexCount = buffer->dataCount;
+			buffer->indexOffset = buffer->dataOffset;
+
+			model_vOffset = finishedFaces*3;
+			originalMeshes->push_back(buffer);
+		}
+
+		// Only create it if the next mesh has another material, or this is the last mesh
+		// otherwise combine it with the next mesh.
 		std::list<MeshEntry>::iterator next = itr;
 		++next;
-		// only create it if the next mesh has another material, or this is the last mesh
-		// otherwise combine it with the next mesh
 		if (next == sortedMeshes.end() || next->materialID != faceMaterial) {
 			ogl::SubBuffer* buffer = new ogl::SubBuffer();
-			buffer->object = object;
+			buffer->object = userData;
 			buffer->material = faceMaterial;
 
 			buffer->dataCount = finishedFaces*3 - buffer_vOffset;
 			buffer->dataOffset = buffer_vOffset;
+
 			buffer->indexCount = buffer->dataCount;
 			buffer->indexOffset = buffer->dataOffset;
+
 			buffer_vOffset = finishedFaces*3;
 			result->m_buffers.push_back(buffer);
 		}

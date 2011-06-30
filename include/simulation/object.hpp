@@ -254,52 +254,60 @@ public:
 };
 
 /**
- * A simple convex body with a single material. Generates a
- * convex hull of a 3ds file.
+ * A simple convex body with a single material. Generates a convex hull of
+ * a 3ds file. The visual representation is the one defined in the model.
  */
 class __ConvexHull : public __RigidBody {
 protected:
-	bool m_originalGeometry;
-	NewtonMesh* m_mesh;
-	std::vector<float> m_data;
 	std::string m_fileName;
 	ogl::Mesh m_visual;
-public:
+
 	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
-			bool originalGeometry = true, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+public:
 	virtual ~__ConvexHull();
+
+	/**
+	 * Creates a new convex hull from the given model file.
+	 *
+	 * @param matrix      The matrix of the object
+	 * @param mass        The mass of the object, where 0 = static and -1 = according to volume
+	 * @param material    The material name of the object
+	 * @param fileName    The model file
+	 * @param freezeState The initial freeze state of the body, default = false
+	 * @param damping     The initial damping vector of the body: x, y, z = angular, w = linear. default = 0.1 each
+	 * @return            The new convex hull
+	 */
+	static ConvexHull createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
-	static void save(const __ConvexHull& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static void save(const __ConvexHull& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static ConvexHull load(rapidxml::xml_node<>* node);
 };
 
 /**
- * A NewtonCompound is generated for each submesh of a 3ds file.
+ * A rigid body created from a model file. Each sub-mesh of the given model
+ * is represented by a convex hull. By adding multiple meshes to the model,
+ * this object can have a complex shape.
  */
 class __ConvexAssembly : public __RigidBody  {
-public:
-	/**
-	 * 1) a single mesh of the faces --> no smooth normals
-	 * 2) a mesh for each convex hull --> convex submeshes
-	 * 3) original 3ds data
-	 */
-	typedef enum { ORIGINAL = 0, MESH_EXACT, MESH_ASSEMBLY } RenderingType;
 protected:
-	RenderingType m_renderingType;
-	NewtonMesh* m_mesh;
-	std::vector<float> m_data;
-	std::vector<uint32_t> m_indices;
-	ogl::SubBuffers m_buffers;
 	std::string m_fileName;
+	ogl::Mesh m_visual;
+
+	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 public:
-	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType = MESH_ASSEMBLY, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	virtual ~__ConvexAssembly();
+
+	static ConvexAssembly createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
-	static void save(const __ConvexAssembly& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static void save(const __ConvexAssembly& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
 	static ConvexAssembly load(rapidxml::xml_node<>* node);
 };
 
