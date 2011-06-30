@@ -418,21 +418,21 @@ bool MaterialMgr::load(const char* fileName)// TODO breaks if file doesn't exist
 		materials.parse<0>(m);
 
 		// this is important so we don't parse the materials tag but the material and pair tags
-		xml_node<>* nodes = materials.first_node();
-
-		for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-			std::string name = node->name();
-			if(name == "material") {
-				Material mat("none");
-				mat.load(node);
-				add(mat);
+		xml_node<>* nodes = materials.first_node("materials");
+		if( nodes ) { 
+			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
+				std::string name = node->name();
+				if(name == "material") {
+					Material mat("none");
+					mat.load(node);
+					add(mat);
+				}
+				if(name == "pair") {
+					MaterialPair p;
+					p.load(node);
+					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
+				}
 			}
-			if(name == "pair") {
-				MaterialPair p;
-				p.load(node);
-				m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
-			}
-		}
 	
 
 		// foreach material tag
@@ -445,7 +445,8 @@ bool MaterialMgr::load(const char* fileName)// TODO breaks if file doesn't exist
 			// pair.load(elem);
 			// m_pairs[std::make_pair(pair.mat0, pair.mat1)] = pair;
 
-		return true;
+			return true;
+		} else return false;
 	}
 	catch ( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;

@@ -286,29 +286,31 @@ void Simulation::load(const std::string& fileName)
 		doc.parse<0>(m);
 
 		// this is important so we don't parse the level tag but the object and compound tags
-		xml_node<>* nodes = doc.first_node();
+		xml_node<>* nodes = doc.first_node("level");
 
-		for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-			std::string type(node->name());
-			if (type == "object" || type == "compound") {
-				Object object = __Object::load(node);
-				// load m_id from "id"
-				object->setID(atoi(node->first_attribute("id")->value()));
-				add(object, object->getID());
+		// first_node returns 0 if node is not found
+		if (nodes) {
+			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
+				std::string type(node->name());
+				if (type == "object" || type == "compound") {
+					Object object = __Object::load(node);
+					// load m_id from "id"
+					object->setID(atoi(node->first_attribute("id")->value()));
+					add(object, object->getID());
+				}
 			}
-		}
 
-		// load "environment" and create tree collision from it
+			// load "environment" and create tree collision from it
 			xml_node<>* node = nodes->first_node("environment");
 			if (node) {
 				m_environment = __TreeCollision::load(node);
 				//((__TreeCollision*)m_environment.get())->createOctree();
 			}
 
-		// load gravity
+			// load gravity
 
-		m_clock.reset();
-
+			m_clock.reset();
+		} // TODO exception handling in else
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		// TODO tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
