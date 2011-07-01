@@ -109,7 +109,7 @@ protected:
 	 * All other dominos reference this data in order to save memory on the
 	 * GPU.
 	 */
-	ogl::VertexBuffer m_vertexBuffer;
+	ogl::VertexBuffer m_vbo;
 
 	/**
 	 * A list of sorted sub-buffers from the vertex buffer. We cannot sort

@@ -812,7 +812,6 @@ Convex __Convex::createHull(const Mat4f& matrix, float mass, const std::string& 
 	// load the visual
 	ogl::Mesh visual = ogl::__Mesh::load3ds(fileName, result.get());
 
-	//TODO: move this from here
 	int materialID = MaterialMgr::instance().getID(material);
 
 	// create a hull from the visual
@@ -835,13 +834,11 @@ Convex __Convex::createAssembly(const Mat4f& matrix, float mass, const std::stri
 	ogl::SubBuffers buffers;
 	ogl::Mesh visual = ogl::__Mesh::load3ds(fileName, result.get(), &buffers);
 
-	//TODO: move this from here
 	int defaultMaterial = MaterialMgr::instance().getID(material);
 
 	// for each sub-mesh, create a convex hull
 	std::vector<NewtonCollision*> collisions;
 	BOOST_FOREACH(ogl::SubBuffer* buf, buffers) {
-		//TODO: move this from here
 		int meshMaterial = MaterialMgr::instance().getID(buf->material);
 		const float* data = visual->firstVertex() + buf->dataOffset * visual->floatSize();
 		collisions.push_back(NewtonCreateConvexHull(newton::world, buf->dataCount, data, visual->byteSize(), 0.002f, meshMaterial, NULL));

@@ -368,7 +368,7 @@ void Simulation::init()
 	int id = NewtonMaterialGetDefaultGroupID(newton::world);
 	NewtonMaterialSetCollisionCallback(newton::world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
-	__Domino::genDominoBuffers(m_vertexBuffer);
+	__Domino::genDominoBuffers(m_vbo);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
 	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/mattest.3ds"));
@@ -406,9 +406,9 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if (0)
 	{
-		Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
-		add(hull);
-		hull->convexCastPlacement();
+		//Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
+		//add(hull);
+		//hull->convexCastPlacement();
 
 		Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
 		add(assembly);
@@ -684,16 +684,13 @@ void Simulation::init()
 		c->setMatrix(Mat4f::translate(0.0f, 2.0f, 0.0f) * c->getMatrix());
 		anchor->setFreezeState(1);
 	}
-
-	//save("data/levels/test_level.xml");
-	setEnabled(false);
 }
 
 void Simulation::clear()
 {
 	m_selectedObject = Object();
 	m_sortedBuffers.clear();
-	m_vertexBuffer.flush();
+	m_vbo.flush();
 	m_objects.clear();
 	m_environment = Object();
 	__Domino::freeCollisions();
@@ -754,70 +751,77 @@ void Simulation::remove(const Object& object)
 	// multiple sub-meshes with the same data and different materials
 	std::set<__Object*> deleted;
 
-	/// @todo think about what happens if a domino is inside a compound
 	if (object->getType() <= __Object::DOMINO_LARGE) {
-		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin(); it != m_vertexBuffer.m_buffers.end(); ++it) {
+		for (ogl::SubBuffers::iterator it = m_vbo.m_buffers.begin(); it != m_vbo.m_buffers.end(); ++it) {
 			if ((*it)->userData == object.get()) {
 				delete (*it);
-				m_vertexBuffer.m_buffers.erase(it);
+				m_vbo.m_buffers.erase(it);
 				break;
 			}
 		}
 	} else {
 		// iterate over all sub-buffers and check if it has to be deleted
-		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin();
-				it != m_vertexBuffer.m_buffers.end(); ) {
+		for (ogl::SubBuffers::iterator it = m_vbo.m_buffers.begin(); it != m_vbo.m_buffers.end(); ) {
 
-			__Object* curObj = (__Object*)(*it)->userData;
+			// do nothing if it is a shared buffer
+			ogl::SubBuffer* curBuf = *it;
+			__Object* curObj = (__Object*)curBuf->userData;
 			if (curObj == NULL) {
 				++it;
 				continue;
 			}
 
 			// Check if a domino is inside a compound (it cannot be a single domino,
-			// because we checked that prior to the for-loop
+			// because we checked that prior to the for-loop).
+			// If so, do not adjust anything, because domino data is stored globally
 			if (curObj->getType() <= __Object::DOMINO_LARGE) {
 				if (object->contains(curObj)) {
-					// delete sub-mesh
-					delete (*it);
-					it = m_vertexBuffer.m_buffers.erase(it);
+					delete curBuf;
+					it = m_vbo.m_buffers.erase(it);
 				}
-				// do not adjust anything, because domino data is stored globally
 				++it;
 			} else {
 
 				// adjust the offsets according to the previously deleted buffers
-				(*it)->indexOffset -= indexOffset;
-				(*it)->dataOffset -= dataOffset;
+				curBuf->indexOffset -= indexOffset;
+				curBuf->dataOffset -= dataOffset;
 
 				// delete the data associated with the object
 				if (object->contains(curObj)) {
-					const unsigned co = (*it)->indexOffset;
-					const unsigned cc = (*it)->indexCount;
+					const unsigned co = curBuf->indexOffset;
+					const unsigned cc = curBuf->indexCount;
 					indexOffset += cc;
 
-					// delete vertices
+					//TODO: With primitives that may be valid (if applyMapping is called with
+					// different materials). However for other types of meshes this will leave
+					// some data in the VBO, because each sub-mesh has its own data.
+					// 1) Ensure that primitives only have a single sub-mesh and remove this check
+					// 2) Ensure that sub-buffers for all objects have dataOffset and count for the entire object
+					// 3) Delete depended on object type? --> rather not
+
+					// delete vertices only if a sub-buffer of this objects
+					// has not already been deleted
 					if (deleted.find(curObj) == deleted.end()) {
-						const unsigned vo = (*it)->dataOffset * m_vertexBuffer.floatSize();
-						const unsigned vc = (*it)->dataCount * m_vertexBuffer.floatSize();
-						dataOffset += (*it)->dataCount;
-						m_vertexBuffer.m_data.erase(m_vertexBuffer.m_data.begin() + vo,
-								m_vertexBuffer.m_data.begin() + vo + vc);
+						const unsigned vo = curBuf->dataOffset * m_vbo.floatSize();
+						const unsigned vc = curBuf->dataCount * m_vbo.floatSize();
+						dataOffset += curBuf->dataCount;
+						m_vbo.m_data.erase(m_vbo.m_data.begin() + vo,
+								m_vbo.m_data.begin() + vo + vc);
 						deleted.insert(curObj);
 					}
 
 					// delete indices
-					m_vertexBuffer.m_indices.erase(m_vertexBuffer.m_indices.begin() + co,
-							m_vertexBuffer.m_indices.begin() + co + cc);
+					m_vbo.m_indices.erase(m_vbo.m_indices.begin() + co,
+							m_vbo.m_indices.begin() + co + cc);
 
 					// delete sub-mesh
-					delete (*it);
-					it = m_vertexBuffer.m_buffers.erase(it);
+					delete curBuf;
+					it = m_vbo.m_buffers.erase(it);
 				} else {
 					// adjust the indices of the object, because vertices were deleted
 					if (dataOffset > 0) {
-						for (unsigned i = 0; i < (*it)->indexCount; ++i)
-							m_vertexBuffer.m_indices[i + (*it)->indexOffset] -= dataOffset;
+						for (unsigned i = 0; i < curBuf->indexCount; ++i)
+							m_vbo.m_indices[i + curBuf->indexOffset] -= dataOffset;
 					}
 					++it;
 				} /* end check if object has to be deleted */
@@ -844,11 +848,11 @@ static bool isSharedBuffer(const ogl::SubBuffer* const buffer)
 
 void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
 {
-	for (ObjectList::iterator itr = begin; itr != end; ++itr) {
-		(*itr)->genBuffers(m_vertexBuffer);
-	}
-	m_vertexBuffer.upload();
-	m_sortedBuffers.assign(m_vertexBuffer.m_buffers.begin(), m_vertexBuffer.m_buffers.end());
+	for (ObjectList::iterator itr = begin; itr != end; ++itr)
+		(*itr)->genBuffers(m_vbo);
+
+	m_vbo.upload();
+	m_sortedBuffers.assign(m_vbo.m_buffers.begin(), m_vbo.m_buffers.end());
 	m_sortedBuffers.remove_if(isSharedBuffer);
 	m_sortedBuffers.sort();
 }
@@ -1115,7 +1119,7 @@ void Simulation::render()
 {
 	m_camera.apply();
 
-	m_vertexBuffer.bind();
+	m_vbo.bind();
 
 /*
 	const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
