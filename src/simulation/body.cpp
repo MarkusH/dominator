@@ -6,7 +6,7 @@
  */
 
 #include <simulation/body.hpp>
-#include <simulation/simulation.hpp>
+#include <newton/util.hpp>
 
 namespace sim {
 
@@ -48,7 +48,7 @@ NewtonBody* Body::create(NewtonCollision* collision, float mass, int freezeState
 	Vec4f minBox, maxBox;
 	Vec4f origin, inertia;
 
-	m_body = NewtonCreateBody(Simulation::instance().getWorld(), collision, this->m_matrix[0]);
+	m_body = NewtonCreateBody(newton::world, collision, this->m_matrix[0]);
 
 	NewtonBodySetUserData(m_body, this);
 	NewtonBodySetMatrix(m_body, this->m_matrix[0]);
@@ -95,7 +95,7 @@ void Body::__applyForceAndTorqueCallback(const NewtonBody* body, dFloat timestep
 	dFloat mass;
 
 	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
-	Vec4f gravityForce(0.0f, mass * Simulation::instance().getGravity(), 0.0f, 1.0f);
+	Vec4f gravityForce(0.0f, mass * newton::gravity, 0.0f, 1.0f);
 	NewtonBodySetForce(body, &gravityForce[0]);
 	//std::cout << "\tforce end " << threadIndex << " " << body << std::endl;
 }

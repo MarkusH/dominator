@@ -132,6 +132,7 @@ public:
 
 	static Mat4<T> identity();
 	static Mat4<T> translate(const Vec3<T>& translation);
+	static Mat4<T> translate(const T& x, const T& y, const T& z);
 	static Mat4<T> scale(const Vec3<T>& scale);
 	static Mat4<T> rotX(const T& angle);
 	static Mat4<T> rotY(const T& angle);
@@ -639,6 +640,16 @@ Mat4<T> Mat4<T>::translate(const Vec3<T>& t)
 				   0, 1, 0, 0,
 				   0, 0, 1, 0,
 				   t.x, t.y, t.z, 1);
+}
+
+template<typename T>
+inline
+Mat4<T> Mat4<T>::translate(const T& x, const T& y, const T& z)
+{
+	return Mat4<T>(1, 0, 0, 0,
+				   0, 1, 0, 0,
+				   0, 0, 1, 0,
+				   x, y, z, 1);
 }
 
 template<typename T>

@@ -8,7 +8,6 @@
 #include <simulation/object.hpp>
 #include <simulation/compound.hpp>
 #include <simulation/material.hpp>
-#include <simulation/simulation.hpp>
 #include <simulation/domino.hpp>
 #include <newton/util.hpp>
 #include <iostream>
@@ -184,13 +183,12 @@ RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius_x, float r
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::SPHERE, matrix, material, freezeState, damping));
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateSphere(world, radius_x, radius_y, radius_z, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateSphere(newton::world, radius_x, radius_y, radius_z, materialID, identity[0]);
 
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }
@@ -214,13 +212,12 @@ RigidBody __RigidBody::createBox(const Mat4f& matrix, float w, float h, float d,
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material, freezeState, damping));
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateBox(world, w, h, d, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateBox(newton::world, w, h, d, materialID, identity[0]);
 
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }
@@ -234,13 +231,12 @@ RigidBody __RigidBody::createCylinder(const Mat4f& matrix, float radius, float h
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CYLINDER, matrix, material, freezeState, damping));
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateCylinder(world, radius, height, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateCylinder(newton::world, radius, height, materialID, identity[0]);
 
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }
@@ -254,13 +250,12 @@ RigidBody __RigidBody::createChamferCylinder(const Mat4f& matrix, float radius, 
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINDER, matrix, material, freezeState, damping));
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateChamferCylinder(world, radius, height, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateChamferCylinder(newton::world, radius, height, materialID, identity[0]);
 
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }
@@ -274,13 +269,12 @@ RigidBody __RigidBody::createCapsule(const Mat4f& matrix, float radius, float he
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CAPSULE, matrix, material, freezeState, damping));
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateCapsule(world, radius, height, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateCapsule(newton::world, radius, height, materialID, identity[0]);
 
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }
@@ -294,13 +288,12 @@ RigidBody __RigidBody::createCone(const Mat4f& matrix, float radius, float heigh
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CONE, matrix, material, freezeState, damping));
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateCone(world, radius, height, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateCone(newton::world, radius, height, materialID, identity[0]);
 
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }
@@ -654,7 +647,6 @@ Vec3f __RigidBody::getSize()
 
 bool __RigidBody::scale(const Vec3f& scale, bool add)
 {
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	if (m_type <= DOMINO_LARGE)
 		return false;
 
@@ -670,22 +662,22 @@ bool __RigidBody::scale(const Vec3f& scale, bool add)
 	NewtonCollisionGetInfo(collision, &info);
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
-		scaled = NewtonCreateBox(world, x, y, z, info.m_collisionUserID, NULL);
+		scaled = NewtonCreateBox(newton::world, x, y, z, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_SPHERE:
-		scaled = NewtonCreateSphere(world, x, y, z, info.m_collisionUserID, NULL);
+		scaled = NewtonCreateSphere(newton::world, x, y, z, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CYLINDER:
-		scaled = NewtonCreateCylinder(world, x, y, info.m_collisionUserID, NULL);
+		scaled = NewtonCreateCylinder(newton::world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CONE:
-		scaled = NewtonCreateCone(world, x, y, info.m_collisionUserID, NULL);
+		scaled = NewtonCreateCone(newton::world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CAPSULE:
-		scaled = NewtonCreateCapsule(world, x, y, info.m_collisionUserID, NULL);
+		scaled = NewtonCreateCapsule(newton::world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CHAMFERCYLINDER:
-		scaled = NewtonCreateChamferCylinder(world, x, y, info.m_collisionUserID, NULL);
+		scaled = NewtonCreateChamferCylinder(newton::world, x, y, info.m_collisionUserID, NULL);
 		break;
 	default:
 		return false;
@@ -703,7 +695,7 @@ bool __RigidBody::scale(const Vec3f& scale, bool add)
 
 	NewtonBodySetCentreOfMass(m_body, &origin[0]);
 
-	NewtonReleaseCollision(world, scaled);
+	NewtonReleaseCollision(newton::world, scaled);
 	return true;
 }
 
@@ -821,14 +813,13 @@ Convex __Convex::createHull(const Mat4f& matrix, float mass, const std::string& 
 	ogl::Mesh visual = ogl::__Mesh::load3ds(fileName, result.get());
 
 	//TODO: move this from here
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 
 	// create a hull from the visual
-	NewtonCollision* collision = NewtonCreateConvexHull(world, visual->vertexCount(),
+	NewtonCollision* collision = NewtonCreateConvexHull(newton::world, visual->vertexCount(),
 			visual->firstVertex(), visual->byteSize(), 0.002f, materialID, NULL);
 	result->create(collision, mass, freezeState, damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	result->m_visual = visual;
 
@@ -840,32 +831,30 @@ Convex __Convex::createAssembly(const Mat4f& matrix, float mass, const std::stri
 {
 	Convex result(new __Convex(CONVEX_ASSEMBLY, matrix, mass, material, fileName, freezeState, damping));
 
-	// load the visual
+	// load the visual entity and preserve the original sub-meshes
 	ogl::SubBuffers buffers;
 	ogl::Mesh visual = ogl::__Mesh::load3ds(fileName, result.get(), &buffers);
 
 	//TODO: move this from here
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int defaultMaterial = MaterialMgr::instance().getID(material);
 
-	std::vector<NewtonCollision*> collisions;
-
 	// for each sub-mesh, create a convex hull
+	std::vector<NewtonCollision*> collisions;
 	BOOST_FOREACH(ogl::SubBuffer* buf, buffers) {
 		//TODO: move this from here
 		int meshMaterial = MaterialMgr::instance().getID(buf->material);
 		const float* data = visual->firstVertex() + buf->dataOffset * visual->floatSize();
-		collisions.push_back(NewtonCreateConvexHull(world, buf->dataCount, data, visual->byteSize(), 0.002f, meshMaterial, NULL));
+		collisions.push_back(NewtonCreateConvexHull(newton::world, buf->dataCount, data, visual->byteSize(), 0.002f, meshMaterial, NULL));
 		delete buf;
 	}
 
 	// create a compound from all hulls
-	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
+	NewtonCollision* collision = NewtonCreateCompoundCollision(newton::world, collisions.size(), &collisions[0], defaultMaterial);
 	result->create(collision, mass, freezeState, damping);
 
-	NewtonReleaseCollision(world, collision);
-	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
-		NewtonReleaseCollision(world, *itr);
+	NewtonReleaseCollision(newton::world, collision);
+	BOOST_FOREACH(NewtonCollision* hull, collisions)
+		NewtonReleaseCollision(newton::world, hull);
 
 	result->m_visual = visual;
 

@@ -16,6 +16,8 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+#include <newton/util.hpp>
+
 namespace gui {
 
 MainWindow::MainWindow(QApplication* app)
@@ -265,8 +267,8 @@ void MainWindow::onSimulationControlsPressed()
 
 void MainWindow::onGravityPressed()
 {
-	GravityDialog* dialog = new GravityDialog(sim::Simulation::instance().getGravity(), this);
-	sim::Simulation::instance().setGravity(dialog->run());
+	GravityDialog* dialog = new GravityDialog(newton::gravity, this);
+	newton::gravity = dialog->run();
 }
 
 /**

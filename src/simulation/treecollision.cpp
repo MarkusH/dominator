@@ -9,13 +9,13 @@
 #include <simulation/object.hpp>
 #include <simulation/compound.hpp>
 #include <simulation/material.hpp>
-#include <simulation/simulation.hpp>
 #include <newton/util.hpp>
 #include <iostream>
 #include <lib3ds/file.h>
 #include <lib3ds/mesh.h>
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
+#include <simulation/simulation.hpp>
 
 #define OCTREE_NODE_SIZE 60000
 
@@ -90,6 +90,7 @@ int __TreeCollision::Node::drawWireFrame(bool test) {
 	max += Vec3f(size, size, size);
 	ogl::Camera::Visibility v = ogl::Camera::INSIDE;
 	if (test) {
+		//TODO remove the dependency to sim
 		v = Simulation::instance().getCamera().testAABB(min, max);
 		if (v == ogl::Camera::OUTSIDE)
 			return 0;
@@ -140,6 +141,7 @@ int __TreeCollision::Node::draw(bool test) {
 	max += Vec3f(size, size, size);
 	ogl::Camera::Visibility v = ogl::Camera::INSIDE;
 	if (test) {
+		//TODO remove the dependency to sim
 		v = Simulation::instance().getCamera().testAABB(min, max);
 		if (v == ogl::Camera::OUTSIDE)
 			return 0;
@@ -186,7 +188,6 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	if (!file)
 		return;
 
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	int defaultMaterial = MaterialMgr::instance().getID("yellow");
 	int numFaces = 0;
 
@@ -210,7 +211,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 
 	unsigned finishedFaces = 0;
 
-	NewtonCollision* collision = NewtonCreateTreeCollision(world, 0);
+	NewtonCollision* collision = NewtonCreateTreeCollision(newton::world, 0);
 	NewtonTreeCollisionBeginBuild(collision);
 
 	//TODO sort the meshes and then only appy and begin() if it is another material
@@ -256,7 +257,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	lib3ds_file_free(file);
 	NewtonTreeCollisionEndBuild(collision, 1);
 
-	m_mesh = NewtonMeshCreate(world);
+	m_mesh = NewtonMeshCreate(newton::world);
 	NewtonMeshBuildFromVertexListIndexList(m_mesh, numFaces, (const int*)faceIndexCount, (const int*)faceMaterials,
 			m_vertices[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
 			m_normals[0], sizeof(Lib3dsVector), (const int*)&m_indices[0],
@@ -265,7 +266,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 
 	this->create(collision, 0.0f);
 	//NewtonBodySetContinuousCollisionMode(m_body, 1);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 }
 
 __TreeCollision::~__TreeCollision()

@@ -7,7 +7,6 @@
 
 #include <simulation/domino.hpp>
 #include <newton/util.hpp>
-#include <simulation/simulation.hpp>
 #include <simulation/material.hpp>
 
 namespace sim {
@@ -29,21 +28,19 @@ __Domino::~__Domino()
 #ifndef CONVEX_DOMINO
 NewtonCollision*  __Domino::getCollision(Type type, int materialID)
 {
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	Mat4f identity = Mat4f::identity();
 	Vec3f size = s_domino_size[type];
 	if (!s_domino_collision[type]) {
-		s_domino_collision[type] = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
+		s_domino_collision[type] = NewtonCreateBox(newton::world, size.x, size.y, size.z, materialID, identity[0]);
 	}
 	return s_domino_collision[type];
 }
 
 void __Domino::freeCollisions()
 {
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	for (int i = 0; i <= __Domino::DOMINO_LARGE; ++i) {
 		if (s_domino_collision[i]) {
-			NewtonReleaseCollision(world, s_domino_collision[i]);
+			NewtonReleaseCollision(newton::world, s_domino_collision[i]);
 			s_domino_collision[i] = NULL;
 		}
 	}
@@ -137,7 +134,6 @@ void __Domino::genDominoBuffers(ogl::VertexBuffer& vbo)
 
 Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const std::string& material, bool doPlacement)
 {
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	const float VERTICAL_DELTA = 0.01f;
 	const int materialID = MaterialMgr::instance().getID(material);
 
@@ -154,13 +150,13 @@ Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const 
 		// generate points
 		Vec3f p[4][2];
 		p[0][0] = p[0][1] = p0 + Vec3f(sz.x, 0.0f, sz.z) * mat;
-		p[0][0].y = newton::getVerticalPosition(world, p[0][0].x, p[0][0].z) + VERTICAL_DELTA;
+		p[0][0].y = newton::getVerticalPosition(p[0][0].x, p[0][0].z) + VERTICAL_DELTA;
 		p[1][0] = p[1][1] = p0 + Vec3f(-sz.x, 0.0f, sz.z) * mat;
-		p[1][0].y = newton::getVerticalPosition(world, p[1][0].x, p[1][0].z) + VERTICAL_DELTA;
+		p[1][0].y = newton::getVerticalPosition(p[1][0].x, p[1][0].z) + VERTICAL_DELTA;
 		p[2][0] = p[2][1] = p0 + Vec3f(-sz.x, 0.0f, -sz.z) * mat;
-		p[2][0].y = newton::getVerticalPosition(world, p[2][0].x, p[2][0].z) + VERTICAL_DELTA;
+		p[2][0].y = newton::getVerticalPosition(p[2][0].x, p[2][0].z) + VERTICAL_DELTA;
 		p[3][0] = p[3][1] = p0 + Vec3f(sz.x, 0.0f, -sz.z) * mat;
-		p[3][0].y = newton::getVerticalPosition(world, p[3][0].x, p[3][0].z) + VERTICAL_DELTA;
+		p[3][0].y = newton::getVerticalPosition(p[3][0].x, p[3][0].z) + VERTICAL_DELTA;
 
 		mat = matrix;
 		Vec3f pos = mat.getW();
@@ -171,11 +167,11 @@ Domino __Domino::createDomino(Type type, const Mat4f& matrix, float mass, const 
 	Mat4f identity = Mat4f::identity();
 
 	// getCollision(type, materialID);
-	NewtonCollision* collision = NewtonCreateBox(world, size.x, size.y, size.z, materialID, identity[0]);
+	NewtonCollision* collision = NewtonCreateBox(newton::world, size.x, size.y, size.z, materialID, identity[0]);
 
 	Domino result = Domino(new __Domino(type, mat, material));
 	result->create(collision, mass, result->m_freezeState, result->m_damping);
-	NewtonReleaseCollision(world, collision);
+	NewtonReleaseCollision(newton::world, collision);
 
 	return result;
 }

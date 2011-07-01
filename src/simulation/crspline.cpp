@@ -8,7 +8,6 @@
 #include <simulation/crspline.hpp>
 #include <GL/glew.h>
 #include <newton/util.hpp>
-#include <simulation/simulation.hpp>
 
 namespace sim {
 
@@ -65,13 +64,12 @@ float CRSpline::getT(float length)
 
 Vec3f CRSpline::getPos(float length)
 {
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	if (length == m_table.front().len)
 		return m_table.front().pos.xz3(
-				newton::getVerticalPosition(world, m_table.front().pos.x, m_table.front().pos.y));
+				newton::getVerticalPosition(m_table.front().pos.x, m_table.front().pos.y));
 	else if (length == m_table.back().len)
 		return m_table.back().pos.xz3(
-				newton::getVerticalPosition(world, m_table.front().pos.x, m_table.back().pos.y));
+				newton::getVerticalPosition(m_table.front().pos.x, m_table.back().pos.y));
 
 	unsigned lower = binarySearch(length);
 
@@ -80,7 +78,7 @@ Vec3f CRSpline::getPos(float length)
 			m_table[lower].len, m_table[lower + 1].len, m_table[lower].pos.y,
 			m_table[lower + 1].pos.y));
 
-	return pos.xz3(newton::getVerticalPosition(world, pos.x, pos.y));
+	return pos.xz3(newton::getVerticalPosition(pos.x, pos.y));
 }
 
 Vec3f CRSpline::getTangent(float length)
@@ -192,12 +190,11 @@ CRSpline::HelpList::iterator CRSpline::divideSegment(HelpList &helpPoints, HelpL
 
 void CRSpline::renderKnots(bool link, const Vec3f& color)
 {
-	const NewtonWorld* world = Simulation::instance().getWorld();
 	Vec3f p;
 	glColor3fv(&color.x);
 	glBegin(GL_POINTS);
 	for (unsigned i = 0; i < m_knots.size(); ++i) {
-		p = m_knots[i].xz3(newton::getVerticalPosition(world, m_knots[i].x, m_knots[i].y));
+		p = m_knots[i].xz3(newton::getVerticalPosition(m_knots[i].x, m_knots[i].y));
 		glVertex3fv(&p.x);
 	}
 	glEnd();
@@ -205,7 +202,7 @@ void CRSpline::renderKnots(bool link, const Vec3f& color)
 	if (link) {
 		glBegin(GL_LINE_STRIP);
 		for (unsigned i = 0; i < m_knots.size(); ++i) {
-			p = m_knots[i].xz3(newton::getVerticalPosition(world, m_knots[i].x, m_knots[i].y));
+			p = m_knots[i].xz3(newton::getVerticalPosition(m_knots[i].x, m_knots[i].y));
 			glVertex3fv(&p.x);
 		}
 		glEnd();
@@ -216,7 +213,6 @@ void CRSpline::renderSpline(float accuracy, const Vec3f& color)
 {
 	if (m_knots.size() >= 3)  {
 		glColor3fv(&color.x);
-		const NewtonWorld* world = Simulation::instance().getWorld();
 	    glBegin(GL_LINES);
 	    Vec2f p;
 	    Vec3f q;
@@ -225,10 +221,10 @@ void CRSpline::renderSpline(float accuracy, const Vec3f& color)
 	    for (unsigned i = 0; i < size; ++i) {
 			for (float t = 0.0f; t < 1.0f; t += 0.01f) {
 				p = interpolate(at(i-1), at(i+0), at(i+1), at(i+2), t);
-				q = p.xz3(newton::getVerticalPosition(world, p.x, p.y));
+				q = p.xz3(newton::getVerticalPosition(p.x, p.y));
 				glVertex3fv(&q.x);
 				p = interpolate(at(i-1), at(i+0), at(i+1), at(i+2), t + 0.01f);
-				q = p.xz3(newton::getVerticalPosition(world, p.x, p.y));
+				q = p.xz3(newton::getVerticalPosition(p.x, p.y));
 				glVertex3fv(&q.x);
 			}
 	    }

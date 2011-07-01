@@ -153,9 +153,9 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_interactionTypes[util::LEFT] = INT_NONE;
 	m_interactionTypes[util::RIGHT] = INT_CREATE_OBJECT;
 	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
-	m_world = NULL;
+	newton::world = NULL;
 	m_enabled = true;
-	m_gravity = -9.81f * 4.0f;
+	newton::gravity = -9.81f * 4.0f;
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
 	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
@@ -350,46 +350,28 @@ void Simulation::init()
 	clear();
 	m_camera.positionCamera(Vec3f(0.0f, 10.0f, 0.0f), -Vec3f::zAxis(), Vec3f::yAxis());
 
-	m_world = NewtonCreate();
-	NewtonWorldSetUserData(m_world, this);
+	newton::world = NewtonCreate();
+	NewtonWorldSetUserData(newton::world, this);
 
-	NewtonSetPlatformArchitecture(m_world, 3);
+	NewtonSetPlatformArchitecture(newton::world, 3);
 
 	// set a fixed world size
 	Vec3f minSize(-2000.0f, -2000.0f, -2000.0f);
 	Vec3f maxSize(2000.0f, 2000.0f, 2000.0f);
-	NewtonSetWorldSize(m_world, &minSize[0], &maxSize[0]);
+	NewtonSetWorldSize(newton::world, &minSize[0], &maxSize[0]);
 
-	NewtonSetSolverModel(m_world, 1);
-	NewtonSetFrictionModel(m_world, 1);
-	NewtonSetThreadsCount(m_world, util::getThreadCount());
-	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 0);
+	NewtonSetSolverModel(newton::world, 1);
+	NewtonSetFrictionModel(newton::world, 1);
+	NewtonSetThreadsCount(newton::world, util::getThreadCount());
+	NewtonSetMultiThreadSolverOnSingleIsland(newton::world, 0);
 
-	int id = NewtonMaterialGetDefaultGroupID(m_world);
-	NewtonMaterialSetCollisionCallback(m_world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
+	int id = NewtonMaterialGetDefaultGroupID(newton::world);
+	NewtonMaterialSetCollisionCallback(newton::world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
 	__Domino::genDominoBuffers(m_vertexBuffer);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
-	//add(m_environment);
-	//((__TreeCollision*)m_environment.get())->createOctree();
-
-
-/*
-	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
-	Object obj = __RigidBody::createSphere(matrix, 2.0f, 1.0f, "yellow");
-	add(obj);
-
-	matrix =
-			Mat4f::rotZ(15.0f * PI / 180.0f) *
-			Mat4f::rotX(-90.0f * PI / 180.0f) *
-			Mat4f::rotY(25.0f * PI / 180.0f) *
-			Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
-
-	obj = __RigidBody::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
-	add(obj);
-*/
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/mattest.3ds"));
 
 	// newtons cradle
 	if (0)
@@ -398,8 +380,8 @@ void Simulation::init()
 		RigidBody boxes[5];
 		RigidBody spheres[5];
 
-		Compound c = __Compound::createCompound();//translate(Vec3f(0.0f, 5.0f, -10.0f))));
-		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
+		Compound c = __Compound::createCompound();
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(0.0f, 4.5f, 0.0f), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
 		c->add(top);
 
 		for (int x = -2; x <= 2; ++x) {
@@ -417,18 +399,18 @@ void Simulation::init()
 		}
 		add(c);
 		//Mat4f::rotY(90.0f * PI / 180.0f) *
-		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, 2.4f, 100.0f)));
+		c->setMatrix(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(0.0f, 2.4f, 100.0f));
 		//c->convexCastPlacement();
 	}
 
 	// assemlby vs hull comparison
-	if (1)
+	if (0)
 	{
-		Convex hull = __Convex::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
 		add(hull);
 		hull->convexCastPlacement();
 
-		Convex assembly = __Convex::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
 		add(assembly);
 		assembly->convexCastPlacement();
 	}
@@ -437,13 +419,13 @@ void Simulation::init()
 	if (0)
 	{
 		Compound c = __Compound::createCompound();
-		Object obj0 = __RigidBody::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
+		Object obj0 = __RigidBody::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(0.0f, -0.5f, 0.0f), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
 		Object obj1 = __RigidBody::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
 		c->add(obj0);
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.50f + 0.70f, 50.0f)));
+		c->setMatrix(c->getMatrix() * Mat4f::translate(10.0f, 0.50f + 0.70f, 50.0f));
 		//c->convexCastPlacement();
 	}
 
@@ -453,10 +435,10 @@ void Simulation::init()
 		const float doorHeight = 3.0f;
 		Compound c = __Compound::createCompound();
 
-		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(0.0f, vertical, 0.0f), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 
-		RigidBody door = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f)), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
+		RigidBody door = __RigidBody::createBox(Mat4f::translate(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
 		c->add(door);
 
 		c->createHinge(Vec3f(0.0f, vertical - 0.25f, 0.0f), Vec3f::xAxis(), door, top, true, -75.0f * 3.14f / 180.0f, 75.0f * 3.14f / 180.0f);
@@ -477,7 +459,7 @@ void Simulation::init()
 
 		Compound c = __Compound::createCompound();
 
-		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(0.0f, vertical, 0.0f), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 		lobj0 = robj0 = top;
 
@@ -505,8 +487,8 @@ void Simulation::init()
 			robj0 = robj1;
 			rlocation._42 -= (size.x - size.y);
 		}
-		// Mat4f::translate(Vec3f(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f))
-		RigidBody bottom = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
+		// Mat4f::translate(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f)
+		RigidBody bottom = __RigidBody::createBox(Mat4f::translate(0.0f, llocation._42+size.x*0.5f, 0.0f), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
 		c->add(bottom);
 
 		// left attachment
@@ -520,7 +502,7 @@ void Simulation::init()
 		c->createBallAndSocket(pivot, rlocation.getY(), bottom, robj0, true);
 
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(10.0f, 0.0f, 50.0f)));
+		c->setMatrix(c->getMatrix() * Mat4f::translate(10.0f, 0.0f, 50.0f));
 	}
 
 	// rope way
@@ -536,13 +518,13 @@ void Simulation::init()
 		c->add(rope);
 
 		// anchor
-		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
+		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f), anchorRadius, 1.0f, "wood");
 		c->add(anchor);
 		c->createSlider(Vec3f(0.0f, -ropeHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, rope, true, -ropeLength*0.5f, ropeLength*0.5f);
 
 		// anchor rope
 		RigidBody anchorRope = __RigidBody::createCylinder(
-				Mat4f::rotZ(3.14f*0.5f) * Mat4f::translate(Vec3f(0.0f, -anchorRopeLength*0.5f - ropeHeight*0.5f - 0.1f, 0.0f)),
+				Mat4f::rotZ(3.14f*0.5f) * Mat4f::translate(0.0f, -anchorRopeLength*0.5f - ropeHeight*0.5f - 0.1f, 0.0f),
 				anchorRadius * 2.0f, anchorRopeLength, 0.1f, "rope");
 		c->add(anchorRope);
 
@@ -552,7 +534,7 @@ void Simulation::init()
 		c->add(load);
 		c->createBallAndSocket(load->getMatrix().getW(), Vec3f::zAxis(), load, anchorRope);
 
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+		c->setMatrix(c->getMatrix() * Mat4f::translate(0.0f, 10.0f, 0.0f));
 		add(c);
 	}
 
@@ -563,9 +545,9 @@ void Simulation::init()
 		const int linksCount = 15;
 		Vec3f size(1.0f, 0.05f, 0.15f);
 		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
-		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
+		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(location._41, location._43) + 2.0f;
 		Compound rope = __Compound::createCompound();
-		obj0 = __RigidBody::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
+		obj0 = __RigidBody::createBox(location * Mat4f::translate(0.0f, size.x * 0.5f, 0.0f), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
 		rope->add(obj0);
 
 		// create a long vertical rope with limits
@@ -607,46 +589,26 @@ void Simulation::init()
 		Object chassis = __RigidBody::createBox(Mat4f::identity(), size.x, size.y, size.z, 5.0f, "yellow");
 		c->add(chassis);
 
-		Object fl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f), tires.x, tires.y, tires.z, "yellow");
 		c->add(fl);
 
 		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fr = __RigidBody::createChamferCylinder(rot * Mat4f::translate(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f), tires.x, tires.y, tires.z, "yellow");
 		c->add(fr);
 
 		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object bl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f), tires.x, tires.y, tires.z, "yellow");
 		c->add(bl);
 
 		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object br = __RigidBody::createChamferCylinder(rot * Mat4f::translate(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f), tires.x, tires.y, tires.z, "yellow");
 		c->add(br);
 
 		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
 		add(c);
 
-		c->setMatrix(Mat4f::rotY(PI*0.5f) * Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)));
+		c->setMatrix(Mat4f::rotY(PI*0.5f) * Mat4f::translate(0.0f, 0.0f, -25.0f));
 		c->convexCastPlacement();
-
-		/*
-		Compound c = Compound(new __Compound());
-		Object chassis = __RigidBody::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
-		c->add(chassis);
-		Object fl = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
-		c->add(fl);
-		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
-		c->add(fr);
-		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
-		c->add(bl);
-		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
-		c->add(br);
-		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
-		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 5.0f, 0.0f)));
-		 */
 	}
 
 	// bridge
@@ -696,7 +658,7 @@ void Simulation::init()
 		c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
 
 		add(c);
-		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
+		c->setMatrix(c->getMatrix() * Mat4f::translate(0.0f, 10.0f, 0.0f));
 	}
 
 	// slider
@@ -711,7 +673,7 @@ void Simulation::init()
 		c->add(axis);
 
 		// anchor
-		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(Vec3f(axisLength*0.5f, 0.0f, 0.0f)), anchorRadius, anchorRadius, anchorRadius, 1.0f, "wood", 1);
+		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(axisLength*0.5f, 0.0f, 0.0f), anchorRadius, anchorRadius, anchorRadius, 1.0f, "wood", 1);
 		c->add(anchor);
 
 		c->createSlider(Vec3f(0.0f, -axisHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, axis, true, -axisLength - anchorRadius * 0.5f, 0);
@@ -719,7 +681,7 @@ void Simulation::init()
 
 		c->setMatrix(Mat4f::rotZ(3.14 * 0.525f));
 		c->convexCastPlacement();
-		c->setMatrix(Mat4f::translate(Vec3f(0.0f, 2.0f, 0.0f)) * c->getMatrix());
+		c->setMatrix(Mat4f::translate(0.0f, 2.0f, 0.0f) * c->getMatrix());
 		anchor->setFreezeState(1);
 	}
 
@@ -736,12 +698,12 @@ void Simulation::clear()
 	m_environment = Object();
 	__Domino::freeCollisions();
 	m_skydome.clear();
-	if (m_world) {
-		std::cout << "Remaining bodies: " << NewtonWorldGetBodyCount(m_world) << std::endl;
-		NewtonDestroy(m_world);
+	if (newton::world) {
+		std::cout << "Remaining bodies: " << NewtonWorldGetBodyCount(newton::world) << std::endl;
+		NewtonDestroy(newton::world);
 		std::cout << "Remaining memory: " << NewtonGetMemoryUsed() << std::endl;
 	}
-	m_world = NULL;
+	newton::world = NULL;
 }
 
 int Simulation::add(const Object& object)
@@ -914,7 +876,7 @@ Object Simulation::selectObject(int x, int y)
 
 	// Cast a ray from the camera position in the direction of the
 	// selected world position
-	NewtonBody* body = newton::getRayCastBody(m_world, origin, world - origin);
+	NewtonBody* body = newton::getRayCastBody(origin, world - origin);
 
 	// find the matching body
 	ObjectList::iterator itr = m_objects.begin();
@@ -937,7 +899,7 @@ void Simulation::mouseMove(int x, int y)
 		m_camera.rotate(angleX, Vec3f::yAxis());
 		m_camera.rotate(angleY, m_camera.m_strafe);
 	} else if (m_mouseAdapter.isDown(util::RIGHT) && m_enabled) {
-		newton::mousePick(m_world, m_camera, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
+		newton::mousePick(m_camera, Vec2f(x, y), m_mouseAdapter.isDown(util::RIGHT));
 	}
 
 	util::Button button = util::LEFT;
@@ -1038,7 +1000,7 @@ void Simulation::mouseButton(util::Button button, bool down, int x, int y)
 	}
 
 	if (button == util::RIGHT && m_enabled) {
-		newton::mousePick(m_world, m_camera, Vec2f(x, y), down);
+		newton::mousePick(m_camera, Vec2f(x, y), down);
 		//newton::applyExplosion(m_world, m_pointer, 30.0f, 20.0f);
 	}
 }
@@ -1086,9 +1048,9 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		// line
 		} else if (curve_spline.knots().size() == 2) {
 			Vec3f start = curve_spline.knots()[0].xz3(0.0f);
-			start.y = newton::getVerticalPosition(m_world, start.x, start.z);
+			start.y = newton::getVerticalPosition(start.x, start.z);
 			Vec3f end = curve_spline.knots()[1].xz3(0.0f);
-			end.y = newton::getVerticalPosition(m_world, end.x, end.z);
+			end.y = newton::getVerticalPosition(end.x, end.z);
 			Vec3f dir = (end - start);
 			float len = dir.normalize();
 			//Mat4f matrix(Vec3f::yAxis(), dir, start);
@@ -1131,7 +1093,7 @@ void Simulation::update()
 		timeSlice += delta * 1000.0f;
 
 		while (timeSlice > 12.0f) {
-			NewtonUpdate(m_world, (12.0f / 1000.0f) * 20.0f);
+			NewtonUpdate(newton::world, (12.0f / 1000.0f) * 20.0f);
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
@@ -1207,7 +1169,7 @@ void Simulation::render()
 		m_environment->render();
 
 	glDisable(GL_LIGHTING);
-	m_skydome.render(m_camera, m_lightPos.xyz(), newton::getRayCastBody(m_world, m_camera.m_position, m_lightPos.xyz() - m_camera.m_position));
+	m_skydome.render(m_camera, m_lightPos.xyz(), newton::getRayCastBody(m_camera.m_position, m_lightPos.xyz() - m_camera.m_position));
 
 	glUseProgram(0);
 	glDisable(GL_TEXTURE_2D);

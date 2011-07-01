@@ -17,6 +17,9 @@ namespace newton {
 
 using namespace m3d;
 
+extern NewtonWorld* world;
+extern float gravity;
+
 /**
  * Calculates the forces resulting of the explosion at the given position
  * with the specified strength. Only bodies in the given radius are affected.
@@ -25,18 +28,17 @@ using namespace m3d;
  * @param strength The strength of the explosion
  * @param radius   The radius of the explosion
  */
-void applyExplosion(const NewtonWorld* world, const Vec3f& position, float strength, float radius);
+void applyExplosion(const Vec3f& position, float strength, float radius);
 
 /**
  * Shoots a ray in world from origin in direction dir and returns
  * the first body that was hit. Returns NULL if no body was hit.
  *
- * @param world  The world to cast the ray in
  * @param origin The ray origin
  * @param dir    The ray direction
  * @return The first body hit with the ray, or NULL
  */
-NewtonBody* getRayCastBody(const NewtonWorld* world, const Vec3f& origin, const Vec3f& dir);
+NewtonBody* getRayCastBody(const Vec3f& origin, const Vec3f& dir);
 
 
 /**
@@ -44,12 +46,11 @@ NewtonBody* getRayCastBody(const NewtonWorld* world, const Vec3f& origin, const 
  * of the plane. This function takes into consideration all collision
  * shapes and bodies of the given world.
  *
- * @param world The world to get the position from
  * @param x     The x position in the plane
  * @param z     The z position in the plane
  * @return      The y position in the world at this position
  */
-float getVerticalPosition(const NewtonWorld* world, float x, float z);
+float getVerticalPosition(float x, float z);
 
 /**
  * Does a convex cast of the body and returns the vertical position of
@@ -74,12 +75,11 @@ void showCollisionShape(const NewtonCollision* shape, const Mat4f& matrix);
  * Picks the object under the mouse coordinates and drags it the the world
  * position at the cursor.
  *
- * @param world The NewtonWorld
  * @param mouse The mouse coordinates
  * @param down  True, if the button is down, False otherwise
  * @return      True, if in pick-mode, False otherwise
  */
-bool mousePick(const NewtonWorld* world, const ogl::Camera& cam, const Vec2f& mouse, bool down);
+bool mousePick(const ogl::Camera& cam, const Vec2f& mouse, bool down);
 
 
 

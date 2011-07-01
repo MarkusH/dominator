@@ -14,8 +14,11 @@
 
 namespace newton {
 
+NewtonWorld* world = NULL;
+float gravity = 0.0f;
+
+
 struct ExplosionData {
-	const NewtonWorld* world;
 	Vec3f position;
 	float strength;
 	float radius;
@@ -29,7 +32,7 @@ void explosionCallback(const NewtonBody* body, void* userData)
 	const NewtonCollision* collision = NewtonBodyGetCollision(body);
 	Vec3f contact, normal;
 
-	if (NewtonCollisionPointDistance(data->world, &data->position[0], collision, matrix[0], &contact[0], &normal[0], 0)) {
+	if (NewtonCollisionPointDistance(world, &data->position[0], collision, matrix[0], &contact[0], &normal[0], 0)) {
 		float distance = (contact - data->position).lenlen();
 		if (distance <= data->radius) {
 			Vec3f impulse = normal * (-data->strength * (1.0f - distance / data->radius));
@@ -38,7 +41,7 @@ void explosionCallback(const NewtonBody* body, void* userData)
 	}
 }
 
-void applyExplosion(const NewtonWorld* world, const Vec3f& position, float strength, float radius)
+void applyExplosion(const Vec3f& position, float strength, float radius)
 {
 	// an axis-aligned bounding box of the sphere around position with radius
 	Vec3f min = position - Vec3f(radius, radius, radius);
@@ -48,7 +51,6 @@ void applyExplosion(const NewtonWorld* world, const Vec3f& position, float stren
 	data.position = position;
 	data.strength = strength;
 	data.radius = radius * radius;
-	data.world = world;
 
 	NewtonWorldForEachBodyInAABBDo(world, &min[0], &max[0], explosionCallback, &data);
 }
@@ -68,7 +70,7 @@ static float getRayCastBodyCallback(const NewtonBody* body, const float* normal,
 	return data->param;
 }
 
-NewtonBody* getRayCastBody(const NewtonWorld* world, const Vec3f& origin, const Vec3f& dir)
+NewtonBody* getRayCastBody(const Vec3f& origin, const Vec3f& dir)
 {
 	RayCastBodyData data;
 	data.param = 1.2f;
@@ -88,7 +90,7 @@ static float getVerticalPositionCallback(const NewtonBody* body, const float* no
 	return paramPtr[0];
 }
 
-float getVerticalPosition(const NewtonWorld* world, float x, float z)
+float getVerticalPosition(float x, float z)
 {
 	float parameter;
 
@@ -127,7 +129,6 @@ float getConvexCastPlacement(NewtonBody* body, std::list<NewtonBody*>* noCollisi
 	Vec3f p(matrix.getW());
 	p.y -= 400.0f;
 
-	NewtonWorld* world = NewtonBodyGetWorld(body);
 	NewtonCollision* collision = NewtonBodyGetCollision(body);
 
 	float param = 0.0f;
@@ -215,7 +216,7 @@ static float mousePickRayCastFilter(const NewtonBody* body, const float* normal,
 
 
 
-static void PhysicsApplyPickForce (const NewtonBody* body, float timestep, int threadIndex)
+static void PhysicsApplyPickForce(const NewtonBody* body, float timestep, int threadIndex)
 {
 	float mass, Ixx, Iyy, Izz;
 	dVector com, veloc, omega;
@@ -271,7 +272,7 @@ static void PhysicsApplyPickForce (const NewtonBody* body, float timestep, int t
 }
 
 
-bool mousePick(const NewtonWorld* world, const ogl::Camera& cam, const Vec2f& mouse, bool down)
+bool mousePick(const ogl::Camera& cam, const Vec2f& mouse, bool down)
 {
 	dMatrix matrix;
 

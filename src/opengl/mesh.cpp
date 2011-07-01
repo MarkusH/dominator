@@ -120,8 +120,8 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffer
 			originalMeshes->push_back(buffer);
 		}
 
-		// Only create it if the next mesh has another material, or this is the last mesh
-		// otherwise combine it with the next mesh.
+		// Only create it if the next mesh has another material, or this is the last mesh.
+		// Otherwise combine it with the next mesh.
 		std::list<Lib3dsMesh*>::const_iterator next = itr; ++next;
 		if (next == meshes.end() || ((*next)->faces ? (*next)->faceL[0].material : "") != faceMaterial) {
 			ogl::SubBuffer* buffer = new ogl::SubBuffer();

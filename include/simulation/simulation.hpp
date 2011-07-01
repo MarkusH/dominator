@@ -86,8 +86,6 @@ protected:
 	/** The world position of the mouse pointer */
 	Vec3f m_pointer;
 
-	NewtonWorld* m_world;
-	float m_gravity;
 	bool m_enabled;
 	__Object::Type m_newObjectType;
 	std::string m_newObjectMaterial;
@@ -189,12 +187,6 @@ public:
 	void setNewObjectFreezeState(const int freezeState);
 	void setNewObjectSize(const Vec3f size);
 
-	/** @return The handle to the NewtonWorld */
-	NewtonWorld* getWorld() const;
-
-	/** @return Returns the current gravity */
-	float getGravity() const;
-
 	/** @param gravity The new gravity*/
 	void setGravity(float gravity);
 
@@ -287,22 +279,6 @@ public:
 inline Simulation& Simulation::instance()
 {
 	return *s_instance;
-}
-
-
-inline NewtonWorld* Simulation::getWorld() const
-{
-	return m_world;
-}
-
-inline float Simulation::getGravity() const
-{
-	return m_gravity;
-}
-
-inline void Simulation::setGravity(float gravity)
-{
-	m_gravity = gravity;
 }
 
 inline void Simulation::setEnabled(bool enabled)
