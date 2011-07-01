@@ -9,44 +9,34 @@
 #include <string.h>
 #include <lib3ds/file.h>
 #include <lib3ds/mesh.h>
+#include <boost/foreach.hpp>
 
 namespace ogl {
 
-
-__Mesh::__Mesh()
-{
-	m_format = GL_T2F_N3F_V3F;
-}
-
-__Mesh::~__Mesh()
-{
-
-}
 
 void __Mesh::genBuffers(ogl::VertexBuffer& vbo)
 {
 	// get the offset in floats and vertices
 	const unsigned vertexSize = vbo.floatSize();
-	//const unsigned byteSize = vbo.byteSize();
 	const unsigned floatOffset = vbo.m_data.size();
 	const unsigned vertexOffset = floatOffset / vertexSize;
 
+	// reserve enough data to prevent re-allocation of memory and then copy it
 	vbo.m_data.reserve(floatOffset + m_data.size());
 	vbo.m_data.resize(floatOffset + m_data.size());
+	std::copy(m_data.begin(), m_data.end(), vbo.m_data.begin() + floatOffset);
 
-	memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
+	BOOST_FOREACH(const ogl::SubBuffer* old, m_buffers) {
+		ogl::SubBuffer* buffer = new ogl::SubBuffer();
+		buffer->material = old->material;
+		buffer->userData = old->userData;
 
-	for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr) {
-		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-		subBuffer->material = (*itr)->material;
-		subBuffer->object = (*itr)->object;
+		buffer->dataCount = old->dataCount;
+		buffer->dataOffset = old->dataOffset + vertexOffset;
+		buffer->indexCount = old->indexCount;
+		buffer->indexOffset = old->indexOffset + vbo.m_indices.size();
 
-		subBuffer->dataCount = (*itr)->dataCount;
-		subBuffer->dataOffset = (*itr)->dataOffset + vertexOffset;
-		subBuffer->indexCount = (*itr)->indexCount;
-		subBuffer->indexOffset = (*itr)->indexOffset + vbo.m_indices.size();
-
-		vbo.m_buffers.push_back(subBuffer);
+		vbo.m_buffers.push_back(buffer);
 	}
 
 	// copy the indices to the global list and add the offset
@@ -55,13 +45,12 @@ void __Mesh::genBuffers(ogl::VertexBuffer& vbo)
 		vbo.m_indices.push_back(vertexOffset + m_indices[i]);
 }
 
-struct MeshEntry {
-	Lib3dsMesh* mesh;
-	std::string materialID;
-	MeshEntry() { }
-	MeshEntry(Lib3dsMesh* mesh, const char* material) : mesh(mesh), materialID(material) { }
-	static bool compare(const MeshEntry& first, const MeshEntry& second) {
-		return first.materialID < second.materialID;
+// functor to sort meshes by their material
+struct MeshSorter {
+	bool operator()(Lib3dsMesh* first, Lib3dsMesh* second) {
+		std::string f = first->faces ? first->faceL[0].material : "";
+		std::string s = second->faces ? second->faceL[0].material : "";
+		return f < s;
 	}
 };
 
@@ -75,24 +64,17 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffer
 
 	int numFaces = 0;
 
-	// count the faces
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next)
+	// count the faces and sort the meshes by material in order to combine buffers
+	std::list<Lib3dsMesh*> meshes;
+	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
 		numFaces += mesh->faces;
+		meshes.push_back(mesh);
+	}
+	meshes.sort(MeshSorter());
 
 	int vertexCount = numFaces*3;
 
-	// sort meshes by the material, this way we can combine several meshes
-	// to a single buffer
-	std::list<MeshEntry> sortedMeshes;
-	{
-		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-			if (mesh->faces > 0) {
-				sortedMeshes.push_back(MeshEntry(mesh, mesh->faceL[0].material));
-			}
-		}
-		sortedMeshes.sort(MeshEntry::compare);
-	}
-
+	// allocate data
 	Lib3dsVector* vertices = new Lib3dsVector[vertexCount];
 	Lib3dsVector* normals = new Lib3dsVector[vertexCount];
 	Lib3dsTexel* uvs = new Lib3dsTexel[vertexCount];
@@ -101,16 +83,19 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffer
 	unsigned buffer_vOffset = 0;
 	unsigned model_vOffset = 0;
 
-	for (std::list<MeshEntry>::iterator itr = sortedMeshes.begin(); itr != sortedMeshes.end(); ++itr) {
-		Lib3dsMesh* mesh = itr->mesh;
-		std::string faceMaterial = itr->materialID;
+	// for each sub-mesh, load the geometry
+	for (std::list<Lib3dsMesh*>::const_iterator itr = meshes.begin(); itr != meshes.end(); ++itr) {
+		Lib3dsMesh* mesh = *itr;
+		std::string faceMaterial = mesh->faces ? mesh->faceL[0].material : "";
 
 		lib3ds_mesh_calculate_normals(mesh, &normals[finishedFaces*3]);
 
-		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
-			Lib3dsFace* face = &mesh->faceL[cur_face];
+		// for each face, copy the data
+		for (unsigned faceIndex = 0; faceIndex < mesh->faces; faceIndex++) {
+			Lib3dsFace* face = &mesh->faceL[faceIndex];
 
-			for(unsigned int i = 0; i < 3; i++) {
+			// for each vertex, copy the data
+			for (unsigned int i = 0; i < 3; i++) {
 				memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
 				if (mesh->texelL)
 					memcpy(&uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
@@ -122,7 +107,7 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffer
 		// create original sub-meshes, if requested
 		if (originalMeshes) {
 			ogl::SubBuffer* buffer = new ogl::SubBuffer();
-			buffer->object = userData;
+			buffer->userData = userData;
 			buffer->material = faceMaterial;
 
 			buffer->dataCount = finishedFaces*3 - model_vOffset;
@@ -137,11 +122,10 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffer
 
 		// Only create it if the next mesh has another material, or this is the last mesh
 		// otherwise combine it with the next mesh.
-		std::list<MeshEntry>::iterator next = itr;
-		++next;
-		if (next == sortedMeshes.end() || next->materialID != faceMaterial) {
+		std::list<Lib3dsMesh*>::const_iterator next = itr; ++next;
+		if (next == meshes.end() || ((*next)->faces ? (*next)->faceL[0].material : "") != faceMaterial) {
 			ogl::SubBuffer* buffer = new ogl::SubBuffer();
-			buffer->object = userData;
+			buffer->userData = userData;
 			buffer->material = faceMaterial;
 
 			buffer->dataCount = finishedFaces*3 - buffer_vOffset;
@@ -165,6 +149,7 @@ Mesh __Mesh::load3ds(const std::string& fileName, void* userData, ogl::SubBuffer
 		memcpy(&result->m_data[i * (3+3+2) + 5], vertices[i], 3 * sizeof(float));
 	}
 
+	// store indices
 	result->m_indices.reserve(vertexCount);
 	for (int i = 0; i < vertexCount; ++i)
 		result->m_indices.push_back(i);

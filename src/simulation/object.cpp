@@ -714,7 +714,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
 		subBuffer->material = m_material;
-		subBuffer->object = this;
+		subBuffer->userData = this;
 
 		subBuffer->dataCount = vertexCount;
 		subBuffer->dataOffset = vertexOffset;

@@ -34,7 +34,7 @@ struct SubBuffer {
 	std::string material;
 
 	// the object that generated this sub mesh
-	void* object;
+	void* userData;
 
 	// the offset and size in the global index buffer
 	uint32_t indexOffset;
@@ -48,7 +48,7 @@ struct SubBuffer {
 		material = "";
 		indexOffset = indexCount = 0;
 		dataOffset = dataCount = 0;
-		object = NULL;
+		userData = NULL;
 	}
 
 	static bool compare(const SubBuffer* const first, const SubBuffer* const second) {
