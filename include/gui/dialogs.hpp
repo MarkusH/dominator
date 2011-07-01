@@ -83,11 +83,11 @@ class MessageDialog: public QMessageBox {
 Q_OBJECT
 public:
 	typedef enum {
-		INFO = 0, /**< displays an "i". */
+		QINFO = 0, /**< displays an "i". */
 		QWARNING, /**< displays an "!" */
 		QERROR   /**< displays an "x" */
 	} MessageType;
-	MessageDialog(QString title, QString message, MessageType type = INFO);
+	MessageDialog(QString title, QString message, MessageType type = QINFO);
 };
 
 }

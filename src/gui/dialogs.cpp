@@ -91,7 +91,7 @@ MessageDialog::MessageDialog(QString title, QString message, MessageType type) :
 	msgBox.setText(title);
 	msgBox.setInformativeText(message);
 	switch (type) {
-	case INFO:
+	case QINFO:
 		msgBox.setIcon(QMessageBox::Information);
 		break;
 	case QWARNING:

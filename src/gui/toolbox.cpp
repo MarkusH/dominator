@@ -5,6 +5,7 @@
  */
 
 #include <gui/toolbox.hpp>
+#include <gui/dialogs.hpp>
 #include <QtGui/QMenu>
 #include <QtGui/QSizePolicy>
 #include <simulation/material.hpp>
@@ -242,14 +243,16 @@ void ToolBox::create_m_buttonbox()
 
 void ToolBox::loadMaterials(QString filename)
 {
-	/// @todo handle if load returns false
-	sim::MaterialMgr::instance().load(filename.toStdString());
-	std::set<std::string> materials;
-	sim::MaterialMgr::instance().getMaterials(materials);
-	for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
-		m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
+	if (sim::MaterialMgr::instance().load(filename.toStdString())) {
+		std::set<std::string> materials;
+		sim::MaterialMgr::instance().getMaterials(materials);
+		for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
+			m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
+		}
+		connect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
+	} else {
+		MessageDialog("Error", "Sorry, something went wrong while loading the materials.", MessageDialog::QERROR);
 	}
-	connect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
 }
 
 void ToolBox::updateMaterials(QString filename)
