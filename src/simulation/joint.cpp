@@ -153,28 +153,28 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	xml_attribute<>* attr = node->first_attribute("parentID");
 	if(attr) {
 	parentID = atoi(attr->value());
-	} else throw parse_error("No \"parentID\" attribute in joint tag found", node->value());
+	} else throw parse_error("No \"parentID\" attribute in joint tag found", node->name());
 
 
 	//childID attribute
 	attr = node->first_attribute("childID");
 	if(attr) {
 	childID = atoi(attr->value());
-	} else throw parse_error("No \"childID\" attribute in hinge tag found", node->value());
+	} else throw parse_error("No \"childID\" attribute in hinge tag found", node->name());
 
 
 	//pivot attribute
 	attr = node->first_attribute("pivot");
 	if(attr) {
 	pivot.assign(attr->value());
-	} else throw parse_error("No \"pivot\" attribute in hinge tag found", node->value());
+	} else throw parse_error("No \"pivot\" attribute in hinge tag found", node->name());
 
 
 	//pinDir attribute
 	attr = node->first_attribute("pinDir");
 	if(attr) {
 	pinDir.assign(attr->value());
-	} else throw parse_error("No \"pinDir\" attribute in joint tag found", node->value());
+	} else throw parse_error("No \"pinDir\" attribute in joint tag found", node->name());
 
 
 	// Get the objects with the required IDs out of the object list
@@ -191,20 +191,20 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	if(attr) {
 	bool limited = atoi(attr->value());
 	float minAngle = 0.0f, maxAngle = 0.0f;
-	} else throw parse_error("No \"limited\" attribute in joint tag found", node->value());
+	} else throw parse_error("No \"limited\" attribute in joint tag found", node->name());
 
 
 	if (limited) {
 		attr = node->first_attribute("minangle");
 		if(attr) {
 		minAngle = atof(attr->value());
-		} else throw parse_error("No \"minangle\" attribute in joint tag found", node->value());
+		} else throw parse_error("No \"minangle\" attribute in joint tag found", node->name());
 
 
 		attr = node->first_attribute("maxangle");
 		if(attr) {
 		maxAngle = atof(attr->value());
-		} else throw parse_error("No \"maxangle\" attribute in joint tag found", node->value());
+		} else throw parse_error("No \"maxangle\" attribute in joint tag found", node->name());
 
 	}
 

@@ -48,43 +48,43 @@ void Material::load(rapidxml::xml_node<>* const node)
 	xml_attribute<>* attr = node->first_attribute("name");
 	if(attr) {
 	name = attr->value();
-	} else throw parse_error("No \"name\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"name\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("texture");
 	if(attr) {
 	texture = attr->value();
-	} else throw parse_error("No \"texture\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"texture\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("shader");
 	if(attr) {
 	shader = attr->value();
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("ambient");
 	if(attr) {
 	ambient.assign(attr->value());
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("diffuse");
 	if(attr) {
 	diffuse.assign(attr->value());
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("specular");
 	if(attr) {
 	specular.assign(attr->value());
-	} else throw parse_error("No \"specular\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"specular\" attribute in material tag found", node->name());
 
 	
 	attr = node->first_attribute("shininess");
 	if(attr) {
 	shininess = atof(attr->value());
-	} else throw parse_error("No \"shininess\" attribute in material tag found", node->value());
+	} else throw parse_error("No \"shininess\" attribute in material tag found", node->name());
 
 
 }
@@ -171,37 +171,37 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 	xml_attribute<> *attr = node->first_attribute("mat0");
 	if(attr) {
 	mat0 = m.getID(attr->value());
-	} else throw parse_error("No \"mat0\" attribute in pair tag found", node->value());
+	} else throw parse_error("No \"mat0\" attribute in pair tag found", node->name());
 
 
 	attr = node->first_attribute("mat1");
 	if(attr) {
 	mat1 = m.getID(attr->value());
-	} else throw parse_error("No \"mat1\" attribute in pair tag found", node->value());
+	} else throw parse_error("No \"mat1\" attribute in pair tag found", node->name());
 
 
 	attr = node->first_attribute("elasticity");
 	if(attr) {
 	elasticity = atof(attr->value());
-	} else throw parse_error("No \"elasticity\" attribute in pair tag found", node->value());
+	} else throw parse_error("No \"elasticity\" attribute in pair tag found", node->name());
 
 
 	attr = node->first_attribute("staticFriction");
 	if(attr) {
 	staticFriction = atof(attr->value());
-	} else throw parse_error("No \"staticFriction\" attribute in pair tag found", node->value());
+	} else throw parse_error("No \"staticFriction\" attribute in pair tag found", node->name());
 
 
 	attr = node->first_attribute("kineticFriction");
 	if(attr) {
 	kineticFriction = atof(attr->value());
-	} else throw parse_error("No \"kineticFriction\" attribute in pair tag found", node->value());
+	} else throw parse_error("No \"kineticFriction\" attribute in pair tag found", node->name());
 
 
 	attr = node->first_attribute("softness");
 	if(attr) {
 	softness = atof(attr->value());
-	} else throw parse_error("No \"softness\" attribute in pair tag found", node->value());
+	} else throw parse_error("No \"softness\" attribute in pair tag found", node->name());
 
 
 	if (mat0 > mat1) {
