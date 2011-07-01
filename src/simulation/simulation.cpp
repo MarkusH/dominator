@@ -424,11 +424,11 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if (1)
 	{
-		//ConvexHull hull = __ConvexHull::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds");
-		//add(hull);
-		//hull->convexCastPlacement();
+		Convex hull = __Convex::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		add(hull);
+		hull->convexCastPlacement();
 
-		ConvexAssembly assembly = __ConvexAssembly::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		Convex assembly = __Convex::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
 		add(assembly);
 		assembly->convexCastPlacement();
 	}

@@ -25,11 +25,8 @@ typedef std::tr1::shared_ptr<__Object> Object;
 class __RigidBody;
 typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
 
-class __ConvexAssembly;
-typedef std::tr1::shared_ptr<__ConvexAssembly> ConvexAssembly;
-
-class __ConvexHull;
-typedef std::tr1::shared_ptr<__ConvexHull> ConvexHull;
+class __Convex;
+typedef std::tr1::shared_ptr<__Convex> Convex;
 
 /**
  * An abstract class that represents all objects in the simulation.
@@ -275,16 +272,24 @@ public:
 /**
  * A simple convex body with a single material. Generates a convex hull of
  * a 3ds file. The visual representation is the one defined in the model.
+ *
+ * A rigid body created from a model file. Each sub-mesh of the given model
+ * is represented by a convex hull. By adding multiple meshes to the model,
+ * this object can have a complex shape.
  */
-class __ConvexHull : public __RigidBody {
+class __Convex : public __RigidBody {
 protected:
+	/** The file the object was loaded from */
 	std::string m_fileName;
+
+	/** The visual representation of the object */
 	ogl::Mesh m_visual;
 
-	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+	// protected constructor to prevent direct public instantiation
+	__Convex(Type type, const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 public:
-	virtual ~__ConvexHull();
+	virtual ~__Convex();
 
 	/**
 	 * Creates a new convex hull from the given model file.
@@ -297,29 +302,8 @@ public:
 	 * @param damping     The initial damping vector of the body: x, y, z = angular, w = linear. default = 0.1 each
 	 * @return            The new convex hull
 	 */
-	static ConvexHull createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+	static Convex createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-
-	virtual void genBuffers(ogl::VertexBuffer& vbo);
-
-	static void save(const __ConvexHull& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
-	static ConvexHull load(rapidxml::xml_node<>* node);
-};
-
-/**
- * A rigid body created from a model file. Each sub-mesh of the given model
- * is represented by a convex hull. By adding multiple meshes to the model,
- * this object can have a complex shape.
- */
-class __ConvexAssembly : public __RigidBody  {
-protected:
-	std::string m_fileName;
-	ogl::Mesh m_visual;
-
-	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
-			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-public:
-	virtual ~__ConvexAssembly();
 
 	/**
 	 * Creates a new convex assembly from the given model file.
@@ -332,13 +316,13 @@ public:
 	 * @param damping     The initial damping vector of the body: x, y, z = angular, w = linear. default = 0.1 each
 	 * @return            The new convex assembly
 	 */
-	static ConvexAssembly createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+	static Convex createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
-	static void save(const __ConvexAssembly& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
-	static ConvexAssembly load(rapidxml::xml_node<>* node);
+	static void save(const __Convex& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static Convex load(rapidxml::xml_node<>* node);
 };
 
 
