@@ -137,6 +137,7 @@ public:
 	static Mat4<T> rotY(const T& angle);
 	static Mat4<T> rotZ(const T& angle);
 	static Mat4<T> rotAxis(const Vec3<T>& vAxis, const T& angle);
+	static Mat4<T> gramSchmidt(const Vec3<T>& dir, const Vec3<T>& pos);
 
 	static Mat4<T> perspective(const T& fovy, const T& aspect, const T& zNear, const T& zFar);
 	static Mat4<T> lookAt(const Vec3<T>& eye, const Vec3<T>& center, const Vec3<T>& up);
@@ -261,6 +262,28 @@ Mat4<T>::Mat4(Vec3<T> up, Vec3<T> front, Vec3<T> pos)
 	_21 = up.x;    _22 = up.y;    _23 = up.z;    _24 = 0.0f;
 	_31 = front.x; _32 = front.y; _33 = front.z; _34 = 0.0f;
 	_41 = pos.x;   _42 = pos.y;   _43 = pos.z;   _44 = 1.0f;
+}
+
+template<typename T>
+inline
+Mat4<T> Mat4<T>::gramSchmidt(const Vec3<T>& dir, const Vec3<T>& pos)
+{
+	Mat4<T> r;
+	Vec3<T> up;
+	Vec3<T> right;
+	Vec3<T> front(dir);
+
+	front.normalize();
+	if (fabs(front.z) > 0.577f) {
+		right = front % Vec3<T>(-front.y, front.z, 0.0f);
+	} else {
+		right = front % Vec3<T>(-front.y, front.x, 0.0f);
+	}
+	right.normalize();
+	up = right % front;
+	front *= -1.0f;
+
+	return Mat4<T>(right, up, front, Vec4<T>(pos.x, pos.y, pos.z, 1.0f));
 }
 
 #ifdef M3D_USE_OPENGL

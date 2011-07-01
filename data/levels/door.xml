@@ -32,6 +32,6 @@
 	<object id="267" type="domino_small" matrix="-0.996804, -0, 0.0798799, 0; 0, 1, 0, 0; -0.0798799, 0, -0.996804, 0; 21.2178, 4.31469, -0.816566, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
 	<object id="268" type="domino_small" matrix="-0.996804, -0, 0.0798799, 0; 0, 1, 0, 0; -0.0798799, 0, -0.996804, 0; 20.8983, 4.31469, -4.80378, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
 	<object id="269" type="domino_small" matrix="-0.996804, -0, 0.0798799, 0; 0, 1, 0, 0; -0.0798799, 0, -0.996804, 0; 20.5788, 4.31469, -8.791, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<environment model="data/models/mattest.3ds" octree="1"/>
+	<environment filename="data/models/mattest.3ds" octree="1"/>
 </level>
 

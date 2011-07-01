@@ -73,11 +73,14 @@ Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Obje
 {
 	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
 	__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
-
+/*
 	dMatrix pinAndPivot(GetIdentityMatrix());
 	pinAndPivot.m_front = dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f);
 	pinAndPivot.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 	pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
+	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
+*/
+	dMatrix pinAndPivot = dgGrammSchmidt(dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f));
 	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
 
 	Hinge result = Hinge(new __Hinge(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL, limited, minAngle, maxAngle));
@@ -239,11 +242,14 @@ Slider __Slider::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Ob
 {
 	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
 	__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
-
+/*
 	dMatrix pinAndPivot(GetIdentityMatrix());
 	pinAndPivot.m_front = dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f);
 	pinAndPivot.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 	pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
+	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
+*/
+	dMatrix pinAndPivot = dgGrammSchmidt(dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f));
 	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
 
 	Slider result = Slider(new __Slider(pivot, pinDir, child, parent,
@@ -514,11 +520,15 @@ BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& c
 {
 	__RigidBody* childBody = dynamic_cast<__RigidBody*>(child.get());
 	__RigidBody* parentBody = parent ? dynamic_cast<__RigidBody*>(parent.get()) : NULL;
-
+/*
 	dMatrix pinAndPivot(GetIdentityMatrix());
 	pinAndPivot.m_front = dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f);
 	pinAndPivot.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 	pinAndPivot.m_right = pinAndPivot.m_front * pinAndPivot.m_up;
+	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
+*/
+
+	dMatrix pinAndPivot = dgGrammSchmidt(dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f));
 	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
 
 	BallAndSocket result = BallAndSocket(new __BallAndSocket(pivot, pinDir,
