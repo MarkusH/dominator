@@ -75,22 +75,22 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 		result = __Domino::createDomino(type, matrix, mass, material, freezeState);
 		break;
 	case __Object::BOX:
-		result = __Object::createBox(matrix, size.x, size.y, size.z, mass, material, freezeState);
+		result = __RigidBody::createBox(matrix, size.x, size.y, size.z, mass, material, freezeState);
 		break;
 	case __Object::SPHERE:
-		result = __Object::createSphere(matrix, size.x, size.y, size.z, mass, material, freezeState);
+		result = __RigidBody::createSphere(matrix, size.x, size.y, size.z, mass, material, freezeState);
 		break;
 	case __Object::CYLINDER:
-		result = __Object::createCylinder(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CAPSULE:
-		result = __Object::createCapsule(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createCapsule(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CONE:
-		result = __Object::createCone(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createCone(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::CHAMFER_CYLINDER:
-		result = __Object::createChamferCylinder(matrix, size.x, size.y, mass, material, freezeState);
+		result = __RigidBody::createChamferCylinder(matrix, size.x, size.y, mass, material, freezeState);
 		break;
 	case __Object::COMPOUND:
 	case __Object::CONVEX_ASSEMBLY:
@@ -274,6 +274,12 @@ void Simulation::save(const std::string& fileName)
 
 void Simulation::load(const std::string& fileName)
 {
+	/* information for error messages */
+	std::string function = "Simulation::load";
+	std::vector<std::string> args;
+	args.push_back(fileName);
+	/* END information for error messages */
+
 	init();
 
 	using namespace rapidxml;
@@ -283,8 +289,15 @@ void Simulation::load(const std::string& fileName)
 
 	try {
 		f = new file<char>(fileName.c_str());
-	} catch (...) {
+	} catch ( std::runtime_error& e ) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
+		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
+		if(f) delete f;
+		return;
+	} catch (...) {
+		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
+		//m_errorAdapter.displayError(function, args);
 		if(f) delete f;
 		return;
 	}
@@ -315,7 +328,7 @@ void Simulation::load(const std::string& fileName)
 			if (node) {
 				m_environment = __TreeCollision::load(node);
 				//((__TreeCollision*)m_environment.get())->createOctree();
-			}
+			} else throw parse_error("No environment node found", m);
 
 			m_clock.reset();
 
@@ -323,9 +336,11 @@ void Simulation::load(const std::string& fileName)
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
 	} catch(...) {
 		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
+		//m_errorAdapter.displayError(function, args);
 	}
 	delete f;
 }
@@ -347,7 +362,7 @@ void Simulation::init()
 
 	NewtonSetSolverModel(m_world, 1);
 	NewtonSetFrictionModel(m_world, 1);
-	NewtonSetThreadsCount(m_world, getThreadCount());
+	NewtonSetThreadsCount(m_world, util::getThreadCount());
 	NewtonSetMultiThreadSolverOnSingleIsland(m_world, 0);
 
 	int id = NewtonMaterialGetDefaultGroupID(m_world);
@@ -363,7 +378,7 @@ void Simulation::init()
 
 /*
 	Mat4f matrix = Mat4f::translate(Vec3f(5.0f, 5.0f, -5.0f));
-	Object obj = __Object::createSphere(matrix, 2.0f, 1.0f, "yellow");
+	Object obj = __RigidBody::createSphere(matrix, 2.0f, 1.0f, "yellow");
 	add(obj);
 
 	matrix =
@@ -372,7 +387,7 @@ void Simulation::init()
 			Mat4f::rotY(25.0f * PI / 180.0f) *
 			Mat4f::translate(Vec3f(-5.0f, 5.0f, -5.0f));
 
-	obj = __Object::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
+	obj = __RigidBody::createBox(matrix, 2.0f, 1.0f, 2.0f, 1.0f, "yellow");
 	add(obj);
 */
 
@@ -383,13 +398,13 @@ void Simulation::init()
 		RigidBody boxes[5];
 		RigidBody spheres[5];
 
-		Compound c(new __Compound(Mat4f::identity()));//translate(Vec3f(0.0f, 5.0f, -10.0f))));
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
+		Compound c = __Compound::createCompound();//translate(Vec3f(0.0f, 5.0f, -10.0f))));
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, 4.5f, 0.0f)), radius * 4.2f * 2.0f, 0.5f, 0.5f, 0.0f, "cradle");
 		c->add(top);
 
 		for (int x = -2; x <= 2; ++x) {
-			boxes[x + 2] = __Object::createBox(Vec3f(x * radius * 2.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
-			spheres[x + 2] = __Object::createSphere(Vec3f(x * radius * 2.0f, 0.0f, 0.0f), radius, 5.0f, "cradle");
+			boxes[x + 2] = __RigidBody::createBox(Vec3f(x * radius * 2.0f, 2.0f, 0.0f), 0.05f, 5.0f, 0.15f, 0.05f, "cradle");
+			spheres[x + 2] = __RigidBody::createSphere(Vec3f(x * radius * 2.0f, 0.0f, 0.0f), radius, 5.0f, "cradle");
 
 			c->add(boxes[x + 2]);
 			c->add(spheres[x + 2]);
@@ -407,23 +422,23 @@ void Simulation::init()
 	}
 
 	// assemlby vs hull comparison
-	if(0)
+	if (0)
 	{
-		Object convex = Object(new __ConvexHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", true));
-		add(convex);
-		convex->convexCastPlacement();
+		//ConvexHull hull = __ConvexHull::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds");
+		//add(hull);
+		//hull->convexCastPlacement();
 
-		convex = Object(new __ConvexAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds", __ConvexAssembly::ORIGINAL));
-		add(convex);
-		convex->convexCastPlacement();
+		ConvexAssembly assembly = __ConvexAssembly::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		add(assembly);
+		assembly->convexCastPlacement();
 	}
 
 	// simple seesaw with hinge
 	if (0)
 	{
-		Compound c = Compound(new __Compound());
-		Object obj0 = __Object::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
-		Object obj1 = __Object::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
+		Compound c = __Compound::createCompound();
+		Object obj0 = __RigidBody::createBox(Mat4f::rotZ(45.0f * PI / 180.0f) * Mat4f::translate(Vec3f(0.0f, -0.5f, 0.0f)), 2.0f, 2.0f, 4.0f, 0.0f, "plankso");
+		Object obj1 = __RigidBody::createBox(Vec3f(0.0f, 0.950f, 0.0f), 10.0f, 0.05f, 3.0f, 2.5f, "planks");
 		c->add(obj0);
 		c->add(obj1);
 		c->createHinge(Vec3f(0.0f, 0.950f, 0.0f), Vec3f::zAxis(), obj0, obj1);
@@ -436,12 +451,12 @@ void Simulation::init()
 	if (0) {
 		const float vertical = 20.0f;
 		const float doorHeight = 3.0f;
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 
-		RigidBody door = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f)), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
+		RigidBody door = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical - doorHeight * 0.5f - 0.25f, 0.0f)), 4.0f, doorHeight, 0.25f, 0.5f, "wood");
 		c->add(door);
 
 		c->createHinge(Vec3f(0.0f, vertical - 0.25f, 0.0f), Vec3f::xAxis(), door, top, true, -75.0f * 3.14f / 180.0f, 75.0f * 3.14f / 180.0f);
@@ -460,18 +475,18 @@ void Simulation::init()
 		rlocation.setW(Vec3f(2.0f, vertical - size.x*0.5f, 0.0f));
 		RigidBody lobj0, lobj1, robj0, robj1;
 
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
-		RigidBody top = __Object::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
+		RigidBody top = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, vertical, 0.0f)), 5.0f, 0.5f, 0.5f, 0.0f, "plankso");
 		c->add(top);
 		lobj0 = robj0 = top;
 
 		for (int i = 0; i < linksCount; i ++) {
 			//create the rigid bodies
-			lobj1 = __Object::createCylinder(llocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			lobj1 = __RigidBody::createCylinder(llocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
 			c->add(lobj1);
 
-			robj1 = __Object::createCylinder(rlocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
+			robj1 = __RigidBody::createCylinder(rlocation, size.y, size.x, 0.25f, "rope", 0, Vec4f());
 			c->add(robj1);
 
 			// left joint
@@ -491,7 +506,7 @@ void Simulation::init()
 			rlocation._42 -= (size.x - size.y);
 		}
 		// Mat4f::translate(Vec3f(0.0f, location._42 - (size.x - size.y) * linksCount + size.x*0.5f, 0.0f))
-		RigidBody bottom = __Object::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
+		RigidBody bottom = __RigidBody::createBox(Mat4f::translate(Vec3f(0.0f, llocation._42+size.x*0.5f, 0.0f)), 4.5f, 0.2f, 1.5f, 2.0f, "planks");
 		c->add(bottom);
 
 		// left attachment
@@ -514,26 +529,26 @@ void Simulation::init()
 		const float ropeHeight = 0.25f;
 		const float ropeLength = 20.0f;
 		const float anchorRopeLength = 5.0f;
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
 		// rope
-		RigidBody rope = __Object::createBox(Mat4f::identity(), ropeLength, ropeHeight, 0.25f, 0.0f, "metal");
+		RigidBody rope = __RigidBody::createBox(Mat4f::identity(), ropeLength, ropeHeight, 0.25f, 0.0f, "metal");
 		c->add(rope);
 
 		// anchor
-		RigidBody anchor = __Object::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
+		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(Vec3f(0.0f, -anchorRadius - ropeHeight*0.5f - 0.1f, 0.0f)), anchorRadius, 1.0f, "wood");
 		c->add(anchor);
 		c->createSlider(Vec3f(0.0f, -ropeHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, rope, true, -ropeLength*0.5f, ropeLength*0.5f);
 
 		// anchor rope
-		RigidBody anchorRope = __Object::createCylinder(
+		RigidBody anchorRope = __RigidBody::createCylinder(
 				Mat4f::rotZ(3.14f*0.5f) * Mat4f::translate(Vec3f(0.0f, -anchorRopeLength*0.5f - ropeHeight*0.5f - 0.1f, 0.0f)),
 				anchorRadius * 2.0f, anchorRopeLength, 0.1f, "rope");
 		c->add(anchorRope);
 
 		c->createBallAndSocket(anchor->getMatrix().getW(), Vec3f::zAxis(), anchorRope, anchor);
 
-		RigidBody load = __Object::createSphere(anchorRope->getMatrix().getW() - Vec3f(0.0f, anchorRopeLength*0.5f, 0.0f), 1.0f, 1.0f, "cradle");
+		RigidBody load = __RigidBody::createSphere(anchorRope->getMatrix().getW() - Vec3f(0.0f, anchorRopeLength*0.5f, 0.0f), 1.0f, 1.0f, "cradle");
 		c->add(load);
 		c->createBallAndSocket(load->getMatrix().getW(), Vec3f::zAxis(), load, anchorRope);
 
@@ -549,21 +564,15 @@ void Simulation::init()
 		Vec3f size(1.0f, 0.05f, 0.15f);
 		Mat4f location = Mat4f::rotZ(90.0f * 3.141592f / 180.0f);
 		location._42 = linksCount * (size.x - size.y * 0.5f) + newton::getVerticalPosition(m_world, location._41, location._43) + 2.0f;
-		Compound rope = Compound(new __Compound());
-		obj0 = __Object::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
+		Compound rope = __Compound::createCompound();
+		obj0 = __RigidBody::createBox(location * Mat4f::translate(Vec3f(0.0f, size.x * 0.5f, 0.0f)), 0.0f, 0.0f, 0.0f, 0.0f, "", 1);
 		rope->add(obj0);
 
 		// create a long vertical rope with limits
 		for (int i = 0; i < linksCount; i ++) {
 			//create the rigid body
-			obj1 = __Object::createCylinder(location, size.y, size.x, 2.0f, "rope");
+			obj1 = __RigidBody::createCylinder(location, size.y, size.x, 2.0f, "rope", 0, Vec4f(0.1f, 0.1f, 0.1f, 0.0f));
 			rope->add(obj1);
-			float dampValue = 0.0f;
-			NewtonBodySetLinearDamping(obj1->m_body, dampValue);
-
-			dampValue = 0.1f;
-			Vec3f angularDamp(dampValue, dampValue, dampValue);
-			NewtonBodySetAngularDamping (obj1->m_body, &angularDamp[0]);
 
 			Vec3f pivot = location.getW();
 			pivot.y += (size.x - size.y) * 0.5f;
@@ -574,7 +583,7 @@ void Simulation::init()
 		}
 		Vec3f pivot = location.getW();
 		pivot.y += (size.x - size.y) * 0.5f;
-		obj1 = __Object::createSphere(location, 0.5f, 5.0f, "wood");
+		obj1 = __RigidBody::createSphere(location, 0.5f, 5.0f, "wood");
 		rope->add(obj1);
 		rope->createBallAndSocket(pivot, location.getY(), obj1, obj0, true);
 		add(rope);
@@ -593,24 +602,24 @@ void Simulation::init()
 
 		// tire size, z = mass
 		Vec3f tires(0.75f, 0.2f, 0.1f);
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
-		Object chassis = __Object::createBox(Mat4f::identity(), size.x, size.y, size.z, 5.0f, "yellow");
+		Object chassis = __RigidBody::createBox(Mat4f::identity(), size.x, size.y, size.z, 5.0f, "yellow");
 		c->add(chassis);
 
-		Object fl = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(fl);
 
 		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object fr = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, -size.z * 0.5f - tires.y * 0.5f - 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(fr);
 
 		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object bl = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(-size.x * 0.5f + 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(bl);
 
 		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __Object::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
+		Object br = __RigidBody::createChamferCylinder(rot * Mat4f::translate(Vec3f(size.x * 0.5f - 0.25f, 0.0f, size.z * 0.5f + tires.y * 0.5f + 0.025f)), tires.x, tires.y, tires.z, "yellow");
 		c->add(br);
 
 		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
@@ -621,18 +630,18 @@ void Simulation::init()
 
 		/*
 		Compound c = Compound(new __Compound());
-		Object chassis = __Object::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
+		Object chassis = __RigidBody::createBox(Mat4f::identity(), 5.0f, 0.5f, 2.5f, 1.0f, "yellow");
 		c->add(chassis);
-		Object fl = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object fl = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(fl);
 		c->createHinge(fl->getMatrix().getW(), Vec3f::zAxis(), chassis, fl);
-		Object fr = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object fr = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, -1.25f - 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(fr);
 		c->createHinge(fr->getMatrix().getW(), Vec3f::zAxis(), chassis, fr);
-		Object bl = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object bl = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f(-2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(bl);
 		c->createHinge(bl->getMatrix().getW(), Vec3f::zAxis(), chassis, bl);
-		Object br = __Object::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
+		Object br = __RigidBody::createCylinder(Mat4f::rotY(90.0f * PI / 180.0f) * Mat4f::translate(Vec3f( 2.25f, -0.0f, 1.25f + 0.125f)), 0.75f, 0.2f, 0.5f, "yellow");
 		c->add(br);
 		c->createHinge(br->getMatrix().getW(), Vec3f::zAxis(), chassis, br);
 		add(c);
@@ -650,9 +659,9 @@ void Simulation::init()
 
 		Mat4f location = Mat4f::identity();
 
-		Compound c = Compound(new __Compound());
+		Compound c = __Compound::createCompound();
 
-		RigidBody link0 = __Object::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		RigidBody link0 = __RigidBody::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
 		c->add(link0);
 		RigidBody link1;
 
@@ -661,7 +670,7 @@ void Simulation::init()
 
 		for (int i = 0; i < linksCount; ++i) {
 
-			link1 = __Object::createBox(location, linkSize.x, linkSize.y, linkSize.z, 0.25f, "plankso", 0, Vec4f(0.5f, 0.5f, 0.5f, 0.5f));
+			link1 = __RigidBody::createBox(location, linkSize.x, linkSize.y, linkSize.z, 0.25f, "plankso", 0, Vec4f(0.5f, 0.5f, 0.5f, 0.5f));
 			c->add(link1);
 
 			Vec3f pivot(location.getW());
@@ -681,7 +690,7 @@ void Simulation::init()
 		location._43 += boxSize.z * 0.5f - linkSize.z * 0.5f;
 		location._42 += linkSize.y * 0.5f - boxSize.y * 0.5f;
 
-		link1 = __Object::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
+		link1 = __RigidBody::createBox(location, boxSize.x, boxSize.y, boxSize.z, 0.0f, "wood");
 		c->add(link1);
 
 		c->createHinge(pivot, Vec3f::xAxis(), link0, link1);
@@ -690,12 +699,37 @@ void Simulation::init()
 		c->setMatrix(c->getMatrix() * Mat4f::translate(Vec3f(0.0f, 10.0f, 0.0f)));
 	}
 
+	// slider
+	if (0) {
+		const float axisHeight = 0.25f;
+		const float axisLength = 20.0f;
+		float anchorRadius = 1.0f;
+		Compound c = __Compound::createCompound();
+
+		// axis
+		RigidBody axis = __RigidBody::createBox(Mat4f::identity(), axisLength, axisHeight, 0.25f, 0.0f, "metal", 1);
+		c->add(axis);
+
+		// anchor
+		RigidBody anchor = __RigidBody::createSphere(Mat4f::translate(Vec3f(axisLength*0.5f, 0.0f, 0.0f)), anchorRadius, anchorRadius, anchorRadius, 1.0f, "wood", 1);
+		c->add(anchor);
+
+		c->createSlider(Vec3f(0.0f, -axisHeight*0.5f, 0.0f), Vec3f(1.0f, 0.0f, 0.0f), anchor, axis, true, -axisLength - anchorRadius * 0.5f, 0);
+		add(c);
+
+		c->setMatrix(Mat4f::rotZ(3.14 * 0.525f));
+		c->convexCastPlacement();
+		c->setMatrix(Mat4f::translate(Vec3f(0.0f, 2.0f, 0.0f)) * c->getMatrix());
+		anchor->setFreezeState(1);
+	}
+
 	//save("data/levels/test_level.xml");
 	setEnabled(false);
 }
 
 void Simulation::clear()
 {
+	m_selectedObject = Object();
 	m_sortedBuffers.clear();
 	m_vertexBuffer.flush();
 	m_objects.clear();
@@ -712,6 +746,8 @@ void Simulation::clear()
 
 int Simulation::add(const Object& object)
 {
+	if (!object.get())
+		return -1;
 	return add(object, m_nextID++);
 }
 
@@ -731,7 +767,8 @@ int Simulation::add(const ObjectInfo& info)
 {
 	Mat4f matrix(Vec3f::yAxis(), m_camera.viewVector(), m_pointer);
 	int result = add(info.create(matrix));
-	m_objects.back()->convexCastPlacement();
+	if (result > -1)
+		m_objects.back()->convexCastPlacement();
 	return result;
 }
 

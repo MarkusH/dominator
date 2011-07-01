@@ -14,13 +14,10 @@
 #include <math.h>
 #include <cstring>
 #include <string>
-#ifdef _WIN32
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
-#else
-#include <dirent.h>
-#endif
 #include <stdexcept>
+
 
 namespace ogl {
 
@@ -183,7 +180,6 @@ Shader ShaderMgr::add(std::string name, Shader shader)
 unsigned ShaderMgr::load(std::string folder)
 {
 	int count = 0;
-#ifdef _WIN32
 	using namespace boost::filesystem;
 
 	path p (folder);
@@ -204,29 +200,6 @@ unsigned ShaderMgr::load(std::string folder)
 		}
 
 	}
-#else
-	if (folder.at(folder.size() - 1) != '/')
-		folder.append("/");
-
-	DIR* dir = opendir(folder.c_str());
-	dirent* ent;
-
-	if (dir != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			std::string vs(ent->d_name);
-			if (vs.find(".vs") != std::string::npos) {
-				std::string fs(vs);
-				fs.replace(fs.size() - 2, 1, "f");
-				Shader shader = __Shader::load(folder + vs, folder + fs);
-				shader->compile();
-				std::string name(vs);
-				name.erase(name.size() - 3, 3);
-				add(name, shader);
-			}
-		}
-		closedir(dir);
-	}
-#endif
 	return count;
 }
 

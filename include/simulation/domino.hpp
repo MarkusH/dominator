@@ -10,8 +10,6 @@
 
 #include <simulation/object.hpp>
 
-
-
 namespace sim {
 
 class __Domino;

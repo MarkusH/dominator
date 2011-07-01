@@ -10,11 +10,7 @@
 
 #include <m3d/m3d.hpp>
 #include <simulation/object.hpp>
-#ifdef _WIN32
 #include <boost/tr1/memory.hpp>
-#else
-#include <tr1/memory>
-#endif
 #include <list>
 #include <simulation/joint.hpp>
 
@@ -42,10 +38,11 @@ protected:
 	Mat4f m_matrix;
 	std::list<Object> m_nodes;
 	std::list<Joint> m_joints;
-public:
+
 	__Compound();
 	__Compound(const Mat4f& matrix);
 	__Compound(const Vec3f& position);
+public:
 	virtual ~__Compound();
 
 	void add(Object object);
@@ -75,6 +72,8 @@ public:
 	virtual bool contains(const __Object* object);
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 	virtual void render();
+
+	static Compound createCompound(const Mat4f& matrix = Mat4f::identity());
 
 	static void save(__Compound& compound, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc);
 	static Compound load(rapidxml::xml_node<>* node);

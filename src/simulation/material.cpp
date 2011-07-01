@@ -10,11 +10,7 @@
 #include <opengl/shader.hpp>
 #include <GL/glew.h>
 #include <limits.h>
-#ifdef _WIN32
 #include <boost/functional/hash.hpp>
-#else
-#include <tr1/functional_hash.h>
-#endif
 #include <Newton.h>
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
@@ -50,25 +46,46 @@ void Material::load(rapidxml::xml_node<>* const node)
 	using namespace rapidxml;
 
 	xml_attribute<>* attr = node->first_attribute("name");
+	if(attr) {
 	name = attr->value();
+	} else throw parse_error("No \"name\" attribute in material tag found", node->value());
+
 
 	attr = node->first_attribute("texture");
+	if(attr) {
 	texture = attr->value();
+	} else throw parse_error("No \"texture\" attribute in material tag found", node->value());
+
 
 	attr = node->first_attribute("shader");
+	if(attr) {
 	shader = attr->value();
+	} else throw parse_error("No \"shader\" attribute in material tag found", node->value());
+
 
 	attr = node->first_attribute("ambient");
+	if(attr) {
 	ambient.assign(attr->value());
+	} else throw parse_error("No \"shader\" attribute in material tag found", node->value());
+
 
 	attr = node->first_attribute("diffuse");
+	if(attr) {
 	diffuse.assign(attr->value());
+	} else throw parse_error("No \"shader\" attribute in material tag found", node->value());
+
 
 	attr = node->first_attribute("specular");
+	if(attr) {
 	specular.assign(attr->value());
+	} else throw parse_error("No \"specular\" attribute in material tag found", node->value());
+
 	
 	attr = node->first_attribute("shininess");
+	if(attr) {
 	shininess = atof(attr->value());
+	} else throw parse_error("No \"shininess\" attribute in material tag found", node->value());
+
 
 }
 
@@ -152,22 +169,40 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 	MaterialMgr& m = MaterialMgr::instance();
 	
 	xml_attribute<> *attr = node->first_attribute("mat0");
+	if(attr) {
 	mat0 = m.getID(attr->value());
+	} else throw parse_error("No \"mat0\" attribute in pair tag found", node->value());
+
 
 	attr = node->first_attribute("mat1");
+	if(attr) {
 	mat1 = m.getID(attr->value());
+	} else throw parse_error("No \"mat1\" attribute in pair tag found", node->value());
+
 
 	attr = node->first_attribute("elasticity");
+	if(attr) {
 	elasticity = atof(attr->value());
+	} else throw parse_error("No \"elasticity\" attribute in pair tag found", node->value());
+
 
 	attr = node->first_attribute("staticFriction");
+	if(attr) {
 	staticFriction = atof(attr->value());
+	} else throw parse_error("No \"staticFriction\" attribute in pair tag found", node->value());
+
 
 	attr = node->first_attribute("kineticFriction");
+	if(attr) {
 	kineticFriction = atof(attr->value());
+	} else throw parse_error("No \"kineticFriction\" attribute in pair tag found", node->value());
+
 
 	attr = node->first_attribute("softness");
+	if(attr) {
 	softness = atof(attr->value());
+	} else throw parse_error("No \"softness\" attribute in pair tag found", node->value());
+
 
 	if (mat0 > mat1) {
 		int tmp = mat0;
@@ -345,7 +380,8 @@ int MaterialMgr::getID(const std::string& name) const
 {
 	if (name.size() == 0)
 		return 0;
-	std::tr1::hash<std::string> string_hash;
+
+	boost::hash<std::string> string_hash;
 	return string_hash(name) % INT_MAX;
 }
 
@@ -367,7 +403,7 @@ Material* MaterialMgr::fromID(unsigned int id)
 
 	std::map<std::string, Material>::iterator it;
 	for (it = m_materials.begin(); it != m_materials.end(); ++it) {
-		std::tr1::hash<std::string> string_hash;
+		boost::hash<std::string> string_hash;
 		if (string_hash(it->first) % INT_MAX == id)
 			return &(it->second);
 	}
@@ -403,17 +439,30 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 }
 
 
-bool MaterialMgr::load(const char* fileName)/// @todo crashes if file doesn't exist
+bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doesn't exist
 {
+	/* information for error messages */
+	std::string function = "MaterialMgr::load";
+	std::vector<std::string> args;
+	args.push_back(fileName);
+	/* END information for error messages */
+
 	using namespace rapidxml;
 
 	char* m;
 	file<char>* f = 0;
 
 	try {
-		f = new file<char>(fileName);
-	} catch (...) {
+		f = new file<char>(fileName.c_str());
+	} catch ( std::runtime_error& e ) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
+		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
+		if(f) delete f;
+		return false;
+	} catch (...) {
+		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
+		//m_errorAdapter.displayError(function, args);
 		if(f) delete f;
 		return false;
 	}
@@ -450,21 +499,22 @@ bool MaterialMgr::load(const char* fileName)/// @todo crashes if file doesn't ex
 			delete f;
 			return false;
 		}
-	}
-	catch ( parse_error& e ) {
+	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
+		//m_errorAdapter.displayError(function, args, e);
 		delete f;
 		return false;
-	} catch (...) {
-		std::cout<<"Caught unknown exception in MaterialMgr::load"<<std::endl;
+	} catch(...) {
+		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
+		//m_errorAdapter.displayError(function, args);
 		delete f;
 		return false;
 	}
 }
 
-bool MaterialMgr::save(const char* fileName)
+bool MaterialMgr::save(const std::string& fileName)
 {
 	using namespace rapidxml;
 	// create document
@@ -498,7 +548,7 @@ bool MaterialMgr::save(const char* fileName)
 
 	// save document
 	std::ofstream myfile;
-	myfile.open (fileName);
+	myfile.open (fileName.c_str());
 	myfile << s;
 	myfile.close();
 

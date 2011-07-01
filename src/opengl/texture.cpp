@@ -7,14 +7,11 @@
 
 #include <opengl/texture.hpp>
 #include "stb_image.hpp"
-#ifdef _WIN32
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
-#else
-#include <dirent.h>
-#endif
 #include <stdexcept>
 #include <iostream>
+
 
 namespace ogl {
 
@@ -99,7 +96,6 @@ Texture TextureMgr::add(std::string name, Texture texture)
 unsigned TextureMgr::load(std::string folder)
 {
 	int count = 0;
-#ifdef _WIN32
 	using namespace boost::filesystem;
 
 	path p (folder);
@@ -121,28 +117,6 @@ unsigned TextureMgr::load(std::string folder)
 	// find *.[a-zA-Z] files
 	// load with Texture Manager
 	// close folder
-#else
-	if (folder.at(folder.size() - 1) != '/')
-		folder.append("/");
-
-	DIR* dir = opendir(folder.c_str());
-	dirent* ent;
-
-	if (dir != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			std::string file(ent->d_name);
-			if (file.size() > 3) {
-				std::string name = file.substr(0, file.rfind(".", file.size()));
-#ifdef _DEBUG
-				std::cout << "load texture " << name << std::endl;
-#endif
-				Texture texture = __Texture::load(folder + file, GL_TEXTURE_2D);
-				add(name, texture);
-			}
-		}
-		closedir(dir);
-	}
-#endif
 	return count;
 }
 

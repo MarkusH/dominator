@@ -142,25 +142,37 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 
 	Vec3f pivot, pinDir;
 	int parentID = -1, childID = -1;
-
-	//type attribute
-	xml_attribute<>* attr = node->first_attribute();
+	bool limited = false;
+	float minAngle = 0.0;
+	float maxAngle = 0.0;
 
 	//parentID attribute
-	attr = attr->next_attribute("parentID");
+	xml_attribute<>* attr = node->first_attribute("parentID");
+	if(attr) {
 	parentID = atoi(attr->value());
+	} else throw parse_error("No \"parentID\" attribute in joint tag found", node->value());
+
 
 	//childID attribute
-	attr = attr->next_attribute("childID");
+	attr = node->first_attribute("childID");
+	if(attr) {
 	childID = atoi(attr->value());
+	} else throw parse_error("No \"childID\" attribute in hinge tag found", node->value());
+
 
 	//pivot attribute
-	attr = attr->next_attribute("pivot");
+	attr = node->first_attribute("pivot");
+	if(attr) {
 	pivot.assign(attr->value());
+	} else throw parse_error("No \"pivot\" attribute in hinge tag found", node->value());
+
 
 	//pinDir attribute
-	attr = attr->next_attribute("pinDir");
+	attr = node->first_attribute("pinDir");
+	if(attr) {
 	pinDir.assign(attr->value());
+	} else throw parse_error("No \"pinDir\" attribute in joint tag found", node->value());
+
 
 	// Get the objects with the required IDs out of the object list
 	Object parent, child;
@@ -172,16 +184,25 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	}
 
 	// limited attribute
-	attr = attr->next_attribute("limited");
+	attr = node->first_attribute("limited");
+	if(attr) {
 	bool limited = atoi(attr->value());
 	float minAngle = 0.0f, maxAngle = 0.0f;
+	} else throw parse_error("No \"limited\" attribute in joint tag found", node->value());
+
 
 	if (limited) {
-		attr = attr->next_attribute("minangle");
+		attr = node->first_attribute("minangle");
+		if(attr) {
 		minAngle = atof(attr->value());
+		} else throw parse_error("No \"minangle\" attribute in joint tag found", node->value());
 
-		attr = attr->next_attribute("maxangle");
+
+		attr = node->first_attribute("maxangle");
+		if(attr) {
 		maxAngle = atof(attr->value());
+		} else throw parse_error("No \"maxangle\" attribute in joint tag found", node->value());
+
 	}
 
 
@@ -294,19 +315,19 @@ Slider __Slider::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	xml_attribute<>* attr = node->first_attribute();
 
 	//parentID attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	parentID = atoi(attr->value());
 
 	//childID attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	childID = atoi(attr->value());
 
 	//pivot attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	pivot.assign(attr->value());
 
 	//pinDir attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	pinDir.assign(attr->value());
 
 
@@ -320,15 +341,15 @@ Slider __Slider::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	}
 
 	// limited attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	bool limited = atoi(attr->value());
 	float minDist = 0.0f, maxDist = 0.0f;
 
 	if (limited) {
-		attr = attr->next_attribute();
+		attr = node->first_attribute();
 		minDist = atof(attr->value());
 
-		attr = attr->next_attribute();
+		attr = node->first_attribute();
 		maxDist = atof(attr->value());
 	}
 
@@ -443,19 +464,19 @@ BallAndSocket __BallAndSocket::load(const std::list<Object>& list, rapidxml::xml
 	xml_attribute<>* attr = node->first_attribute();
 
 	//parentID attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	parentID = atoi(attr->value());
 
 	//childID attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	childID = atoi(attr->value());
 
 	//pivot attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	pivot.assign(attr->value());
 
 	//pinDir attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	pinDir.assign(attr->value());
 
 
@@ -469,18 +490,18 @@ BallAndSocket __BallAndSocket::load(const std::list<Object>& list, rapidxml::xml
 	}
 
 	// limited attribute
-	attr = attr->next_attribute();
+	attr = node->first_attribute();
 	bool limited = atoi(attr->value());
 	float coneAngle = 0.0f, minTwist = 0.0f, maxTwist = 0.0f;
 
 	if (limited) {
-		attr = attr->next_attribute();
+		attr = node->first_attribute();
 		coneAngle = atof(attr->value());
 
-		attr = attr->next_attribute();
+		attr = node->first_attribute();
 		minTwist = atof(attr->value());
 
-		attr = attr->next_attribute();
+		attr = node->first_attribute();
 		maxTwist = atof(attr->value());
 	}
 

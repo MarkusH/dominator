@@ -183,7 +183,7 @@ Object __Object::load(rapidxml::xml_node<>* node)
 
 
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::SPHERE, matrix, material, freezeState, damping));
 
@@ -198,22 +198,22 @@ RigidBody __Object::createSphere(const Mat4f& matrix, float radius_x, float radi
 	return result;
 }
 
-RigidBody __Object::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Vec3f& position, float radius_x, float radius_y, float radius_z, float mass, const std::string& material)
 {
-	return __Object::createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	return createSphere(Mat4f::translate(position), radius_x, radius_y, radius_z, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Mat4f& matrix, float radius, float mass, const std::string& material)
 {
-	return __Object::createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+	return createSphere(matrix, radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
+RigidBody __RigidBody::createSphere(const Vec3f& position, float radius, float mass, const std::string& material)
 {
 	return createSphere(Mat4f::translate(position), radius, radius, radius, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createBox(const Mat4f& matrix, float w, float h, float d, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::BOX, matrix, material, freezeState, damping));
 
@@ -228,12 +228,12 @@ RigidBody __Object::createBox(const Mat4f& matrix, float w, float h, float d, fl
 	return result;
 }
 
-RigidBody __Object::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
+RigidBody __RigidBody::createBox(const Vec3f& position, float w, float h, float d, float mass, const std::string& material)
 {
 	return createBox(Mat4f::translate(position), w, h, d, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CYLINDER, matrix, material, freezeState, damping));
 
@@ -248,12 +248,12 @@ RigidBody __Object::createCylinder(const Mat4f& matrix, float radius, float heig
 	return result;
 }
 
-RigidBody __Object::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createChamferCylinder(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CHAMFER_CYLINDER, matrix, material, freezeState, damping));
 
@@ -268,12 +268,12 @@ RigidBody __Object::createChamferCylinder(const Mat4f& matrix, float radius, flo
 	return result;
 }
 
-RigidBody __Object::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createChamferCylinder(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createChamferCylinder(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCapsule(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CAPSULE, matrix, material, freezeState, damping));
 
@@ -288,12 +288,12 @@ RigidBody __Object::createCapsule(const Mat4f& matrix, float radius, float heigh
 	return result;
 }
 
-RigidBody __Object::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCapsule(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
 
-RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
+RigidBody __RigidBody::createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material, int freezeState, const Vec4f& damping)
 {
 	RigidBody result = RigidBody(new __RigidBody(__Object::CONE, matrix, material, freezeState, damping));
 
@@ -308,7 +308,7 @@ RigidBody __Object::createCone(const Mat4f& matrix, float radius, float height, 
 	return result;
 }
 
-RigidBody __Object::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
+RigidBody __RigidBody::createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material)
 {
 	return createCone(Mat4f::translate(position), radius, height, mass, material, 0, Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 }
@@ -472,31 +472,50 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	float radius;	// chamfer cylinder, cylinder, cone, capsule
 	Type t; int i;	// domino
 
+	std::string type;
+	Mat4f matrix;
+	float mass;
+	std::string material;
+
 	//attribute id is set in Simulation::load()
 	//xml_attribute<>* attr = 
 	
 	//attribute type
 	xml_attribute<>* attr = node->first_attribute("type");
-	std::string type = attr->value();
+	if(attr) {
+	type = attr->value();
+	} else throw parse_error("No \"type\" attribute in object tag found", node->value());
 
 	//attribute matrix
 	attr = node->first_attribute("matrix");
-	Mat4f matrix = Mat4f();
+	if(attr) {
+	matrix = Mat4f();
 	matrix.assign(attr->value());
+	} else throw parse_error("No \"matrix\" attribute in object tag found", node->value());
+
 
 	/* set dimensions for box */
 	if ( type == TypeStr[BOX]) {
 		//attribute width
 		attr = node->first_attribute("width");
+		if(attr) {
 		w = atof(attr->value());
+		} else throw parse_error("No \"width\" attribute in object tag found", node->value());
+
 
 		//attribute height
 		attr = node->first_attribute("height");
+		if(attr) {
 		h = atof(attr->value());
+		} else throw parse_error("No \"height\" attribute in object tag found", node->value());
+
 
 		//attribute depth
 		attr = node->first_attribute("depth");
+		if(attr) {
 		d = atof(attr->value());
+		} else throw parse_error("No \"depth\" attribute in object tag found", node->value());
+
 
 	}/* set dimensions for box END */
 
@@ -504,15 +523,24 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if ( type == TypeStr[SPHERE] ) {
 		//attribute x
 		attr = node->first_attribute("radius_x");
+		if(attr) {
 		x = atof(attr->value());
+		} else throw parse_error("No \"radius_x\" attribute in object tag found", node->value());
+
 
 		//attribute y
 		attr = node->first_attribute("radius_y");
+		if(attr) {
 		y = atof(attr->value());
+		} else throw parse_error("No \"radius_y\" attribute in object tag found", node->value());
+
 
 		//attribute z
 		attr = node->first_attribute("radius_z");
+		if(attr) {
 		z = atof(attr->value());
+		} else throw parse_error("No \"radius_z\" attribute in object tag found", node->value());
+
 	}/* set dimensions for sphere END */
 
 	/* set dimensions for chamfer cylinder, cylinder, cone, capsule */
@@ -520,30 +548,48 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 			type == TypeStr[CONE] || type == TypeStr[CAPSULE]) {
 		//attribute height
 		attr = node->first_attribute("height");
+		if(attr) {
 		h = atof(attr->value());
+		} else throw parse_error("No \"height\" attribute in object tag found", node->value());
+
 
 		//attribute radius
 		attr = node->first_attribute("radius");
+		if(attr) {
 		radius = atof(attr->value());
+		} else throw parse_error("No \"radius\" attribute in object tag found", node->value());
+
 	}/* set dimensions for chamfer cylinder, cylinder, cone, capsule END */
 
 
 	//attribute freezeState
 	attr = node->first_attribute("freezeState");
+	if(attr) {
 	freezeState = atoi(attr->value());
+	} else throw parse_error("No \"freezeState\" attribute in object tag found", node->value());
+
 
 	//attribute damping
 	attr = node->first_attribute("damping");
+	if(attr) {
 	damping = Vec4f();
 	damping.assign(attr->value());
+	} else throw parse_error("No \"damping\" attribute in object tag found", node->value());
+
 
 	//attribute material
 	attr = node->first_attribute("material");
-	std::string material = attr->value();
+	if(attr) {
+	material = attr->value();
+	} else throw parse_error("No \"material\" attribute in object tag found", node->value());
+
 
 	//attribute mass
 	attr = node->first_attribute("mass");
-	float mass = atof(attr->value());
+	if(attr) {
+	mass = atof(attr->value());
+	} else throw parse_error("No \"mass\" attribute in object tag found", node->value());
+
 
 	// find the Type for the Domino
 	for(i = 0; i < 3; ++i) {
@@ -552,17 +598,19 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		}
 	}
 
-	if( type == TypeStr[BOX] ) return __Object::createBox(matrix, w, h, d, mass, material, freezeState, damping);
-	if( type == TypeStr[SPHERE] ) return __Object::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
-	if( type == TypeStr[CHAMFER_CYLINDER] ) return __Object::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CYLINDER] ) return __Object::createCylinder(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CONE] ) return __Object::createCone(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[CAPSULE] ) return __Object::createCapsule(matrix, radius, h, mass, material, freezeState, damping);
-	if( type == TypeStr[DOMINO_SMALL] ) return __Domino::createDomino(t, matrix, mass, material, false);
-	if( type == TypeStr[DOMINO_MIDDLE] ) return __Domino::createDomino(t, matrix, mass, material, false);
-	if( type == TypeStr[DOMINO_LARGE] ) return __Domino::createDomino(t, matrix, mass, material, false);
+	RigidBody result;
 
-	return RigidBody();
+	if( type == TypeStr[BOX] ) result = __RigidBody::createBox(matrix, w, h, d, mass, material, freezeState, damping);
+	if( type == TypeStr[SPHERE] ) result = __RigidBody::createSphere(matrix, x, y, z, mass, material, freezeState, damping);
+	if( type == TypeStr[CHAMFER_CYLINDER] ) result = __RigidBody::createChamferCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CYLINDER] ) result = __RigidBody::createCylinder(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CONE] ) result = __RigidBody::createCone(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[CAPSULE] ) result = __RigidBody::createCapsule(matrix, radius, h, mass, material, freezeState, damping);
+	if( type == TypeStr[DOMINO_SMALL] ) result = __Domino::createDomino(t, matrix, mass, material, false);
+	if( type == TypeStr[DOMINO_MIDDLE] ) result = __Domino::createDomino(t, matrix, mass, material, false);
+	if( type == TypeStr[DOMINO_LARGE] ) result = __Domino::createDomino(t, matrix, mass, material, false);
+
+	return result;
 }
 
 void __RigidBody::setMaterial(const std::string& material)
@@ -616,55 +664,30 @@ bool __RigidBody::scale(const Vec3f& scale, bool add)
 	const NewtonCollision* collision = NewtonBodyGetCollision(m_body);
 	NewtonCollision* scaled = NULL;
 
-	float x = scale.x;
-	float y = scale.y;
-	float z = scale.z;
+	Vec3f temp = add ? getSize() : Vec3f();
+	float x = scale.x + temp.x;
+	float y = scale.y + temp.y;
+	float z = scale.z + temp.z;
 
 	NewtonCollisionInfoRecord info;
 	NewtonCollisionGetInfo(collision, &info);
 	switch (info.m_collisionType) {
 	case SERIALIZE_ID_BOX:
-		if (add) {
-			x += info.m_box.m_x;
-			y += info.m_box.m_y;
-			z += info.m_box.m_z;
-		}
 		scaled = NewtonCreateBox(world, x, y, z, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_SPHERE:
-		if (add) {
-			x += info.m_sphere.m_r0;
-			y += info.m_sphere.m_r1;
-			z += info.m_sphere.m_r2;
-		}
 		scaled = NewtonCreateSphere(world, x, y, z, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CYLINDER:
-		if (add) {
-			x += info.m_cylinder.m_r0;
-			y += info.m_cylinder.m_height;
-		}
 		scaled = NewtonCreateCylinder(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CONE:
-		if (add) {
-			x += info.m_cone.m_r;
-			y += info.m_cone.m_height;
-		}
 		scaled = NewtonCreateCone(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CAPSULE:
-		if (add) {
-			x += info.m_capsule.m_r0;
-			y += info.m_capsule.m_height;
-		}
 		scaled = NewtonCreateCapsule(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	case SERIALIZE_ID_CHAMFERCYLINDER:
-		if (add) {
-			x += info.m_chamferCylinder.m_r;
-			y += info.m_chamferCylinder.m_height;
-		}
 		scaled = NewtonCreateChamferCylinder(world, x, y, info.m_collisionUserID, NULL);
 		break;
 	default:
@@ -704,6 +727,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 	case SPHERE:
 		NewtonMeshApplySphericalMapping(collisionMesh, 0);
 		break;
+	//TODO: this is not working yet
 	//case CYLINDER:
 	//case CHAMFER_CYLINDER:
 	//	NewtonMeshApplyCylindricalMapping(collisionMesh, 0, 0);
@@ -772,7 +796,6 @@ bool __RigidBody::contains(const __Object* object)
 	return false;
 }
 
-
 void __RigidBody::render()
 {
 	if (NewtonBodyGetSleepState(m_body))
@@ -782,88 +805,24 @@ void __RigidBody::render()
 	newton::showCollisionShape(getCollision(), m_matrix);
 }
 
-__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, bool originalGeometry, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_originalGeometry(originalGeometry), m_mesh(NULL), m_fileName(fileName)
+
+
+ConvexHull __ConvexHull::createHull(const Mat4f& matrix, float mass, const std::string& material,
+		const std::string& fileName, int freezeState, const Vec4f& damping)
 {
-	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
-	if (!file)
-		return;
+	ConvexHull result(new __ConvexHull(matrix, mass, material, fileName, freezeState, damping));
+	return result;
+}
+
+__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
+	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_fileName(fileName)
+{
+	m_visual = ogl::__Mesh::load3ds(fileName, this);
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 
-	Lib3dsVector* vertices;
-	int numFaces = 0;
-	int vertexCount = 0;
-	// count the faces
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next)
-		numFaces += mesh->faces;
-
-	if (originalGeometry) {
-		vertexCount = numFaces*3;
-		vertices = new Lib3dsVector[vertexCount];
-		Lib3dsVector* normals = new Lib3dsVector[vertexCount];
-		Lib3dsTexel* uvs = new Lib3dsTexel[vertexCount];
-
-		unsigned finishedFaces = 0;
-
-		// foreach mesh
-		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-			lib3ds_mesh_calculate_normals(mesh, &normals[finishedFaces*3]);
-			// foreach face
-			for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
-				Lib3dsFace* face = &mesh->faceL[cur_face];
-				// foreach index
-				for(unsigned int i = 0;i < 3;i++) {
-					memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-					if (mesh->texelL) memcpy(&uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-				}
-				finishedFaces++;
-			}
-		}
-
-
-		m_data.reserve(vertexCount * (3+3+2));
-		m_data.resize(vertexCount * (3+3+2));
-		for (int i = 0; i < vertexCount; ++i) {
-			memcpy(&m_data[i * (3+3+2) + 0], uvs[i], 2 * sizeof(float));
-			memcpy(&m_data[i * (3+3+2) + 2], normals[i], 3 * sizeof(float));
-			memcpy(&m_data[i * (3+3+2) + 5], vertices[i], 3 * sizeof(float));
-		}
-
-		lib3ds_file_free(file);
-
-		delete normals;
-		delete uvs;
-	} else {
-		vertexCount = numFaces*3;
-		vertices = new Lib3dsVector[numFaces * 3];
-
-		m_mesh = NewtonMeshCreate(world);
-		NewtonMeshBeginFace(m_mesh);
-
-		unsigned finishedFaces = 0;
-
-		// foreach mesh
-		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-			// foreach face
-			for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
-				Lib3dsFace* face = &mesh->faceL[cur_face];
-				// foreach index
-				for(unsigned int i = 0;i < 3;i++) {
-					memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				}
-				NewtonMeshAddFace(m_mesh, 3, vertices[finishedFaces*3], sizeof(Lib3dsVector), materialID);
-				finishedFaces++;
-			}
-		}
-		lib3ds_file_free(file);
-		NewtonMeshEndFace(m_mesh);
-	}
-
-	Mat4f identity = Mat4f::identity();
-	NewtonCollision* collision = NewtonCreateConvexHull(world, vertexCount, vertices[0], sizeof(Lib3dsVector), 0.002f, materialID, identity[0]);
-	delete vertices;
+	NewtonCollision* collision = NewtonCreateConvexHull(world, m_visual->vertexCount(), m_visual->firstVertex(), m_visual->byteSize(), 0.002f, materialID, NULL);
 	this->create(collision, mass, m_freezeState, m_damping);
 	NewtonReleaseCollision(world, collision);
 }
@@ -872,8 +831,8 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName, *pOriginal;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName, *attrOr;
+	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName;
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -899,12 +858,6 @@ void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, r
 	pFileName = doc->allocate_string(body.m_fileName.c_str());
 	attrFileName = doc->allocate_attribute("filename", pFileName);
 	node->append_attribute(attrFileName);
-
-	// set attribute rendering type
-	pOriginal = doc->allocate_string(util::toString(body.m_originalGeometry));
-	attrOr = doc->allocate_attribute("original", pOriginal);
-	node->append_attribute(attrOr);
-
 }
 
 ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
@@ -942,107 +895,16 @@ ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
 	attr = node->first_attribute("filename");
 	std::string filename = attr->value();
 
-	//attribute original
-	attr = node->first_attribute("original");
-	int original = atoi(attr->value());
-
-	return ConvexHull(new __ConvexHull(matrix, mass, material, filename, original, freezeState, damping));
+	return createHull(matrix, mass, material, filename, freezeState, damping);
 }
 
 __ConvexHull::~__ConvexHull()
 {
-	if (m_mesh) NewtonMeshDestroy(m_mesh);
-	m_data.clear();
 }
 
 void __ConvexHull::genBuffers(ogl::VertexBuffer& vbo)
 {
-	if (!m_originalGeometry) {
-		const unsigned vertexSize = vbo.floatSize();
-		const unsigned byteSize = vbo.byteSize();
-		const unsigned floatOffset = vbo.m_data.size();
-		const unsigned vertexOffset = floatOffset / vertexSize;
-
-		int shapeID = NewtonCollisionGetUserID(NewtonBodyGetCollision(m_body));
-		NewtonMeshApplyBoxMapping(m_mesh, shapeID, shapeID, shapeID);
-
-		NewtonMeshCalculateVertexNormals(m_mesh, 45.0f * 3.1416f / 180.0f);
-
-		// allocate the vertex data
-		int vertexCount = NewtonMeshGetPointCount(m_mesh);
-
-		vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
-		vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
-
-		NewtonMeshGetVertexStreams(m_mesh,
-				byteSize, &vbo.m_data[floatOffset + 2 + 3],
-				byteSize, &vbo.m_data[floatOffset + 2],
-				byteSize, &vbo.m_data[floatOffset],
-				byteSize, &vbo.m_data[floatOffset]);
-
-
-		// iterate over the submeshes and store the indices
-		void* const meshCookie = NewtonMeshBeginHandle(m_mesh);
-		for (int handle = NewtonMeshFirstMaterial(m_mesh, meshCookie);
-				handle != -1; handle = NewtonMeshNextMaterial(m_mesh, meshCookie, handle)) {
-
-			int materialID = NewtonMeshMaterialGetMaterial(m_mesh, meshCookie, handle);
-
-			Material* material = MaterialMgr::instance().fromID(materialID);
-
-			// create a new submesh
-			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-			subBuffer->material = material ? material->name : m_material;
-			subBuffer->object = this;
-
-			subBuffer->dataCount = vertexCount;
-			subBuffer->dataOffset = vertexOffset;
-
-			// get the indices
-			subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(m_mesh, meshCookie, handle);
-			uint32_t* indices = new uint32_t[subBuffer->indexCount];
-			NewtonMeshMaterialGetIndexStream(m_mesh, meshCookie, handle, (int*)indices);
-			subBuffer->indexOffset = vbo.m_indices.size();
-
-			// copy the indices to the global list and add the offset
-			vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-			for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-				vbo.m_indices.push_back(vertexOffset + indices[i]);
-
-			delete indices;
-			vbo.m_buffers.push_back(subBuffer);
-		}
-		NewtonMeshEndHandle(m_mesh, meshCookie);
-
-		return;
-	}
-
-	// get the offset in floats and vertices
-	const unsigned vertexSize = vbo.floatSize();
-	//const unsigned byteSize = vbo.byteSize();
-	const unsigned floatOffset = vbo.m_data.size();
-	const unsigned vertexOffset = floatOffset / vertexSize;
-
-	vbo.m_data.reserve(floatOffset + m_data.size());
-	vbo.m_data.resize(floatOffset + m_data.size());
-
-	memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
-
-	ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-	subBuffer->material = m_material;
-	subBuffer->object = this;
-
-	subBuffer->dataCount = m_data.size() / vertexSize;
-	subBuffer->dataOffset = vertexOffset;
-	subBuffer->indexCount = subBuffer->dataCount;
-	subBuffer->indexOffset = vbo.m_indices.size();
-
-	// copy the indices to the global list and add the offset
-	vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-	for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-		vbo.m_indices.push_back(vertexOffset + i);
-
-	vbo.m_buffers.push_back(subBuffer);
+	m_visual->genBuffers(vbo);
 }
 
 struct MeshEntry {
@@ -1057,129 +919,30 @@ struct MeshEntry {
 	}
 };
 
-__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, RenderingType renderingType, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_renderingType(renderingType), m_mesh(NULL), m_fileName(fileName)
+ConvexAssembly __ConvexAssembly::createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+		int freezeState, const Vec4f& damping)
 {
-	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
-	if (!file)
-		return;
+	ConvexAssembly result(new __ConvexAssembly(matrix, mass, material, fileName, freezeState, damping));
+	return result;
+}
+
+__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
+	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_fileName(fileName)
+{
+	ogl::SubBuffers buffers;
+	m_visual = ogl::__Mesh::load3ds(fileName, this, &buffers);
 
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int defaultMaterial = MaterialMgr::instance().getID(material);
-	int numFaces = 0;
-
-	// count the faces
-	for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next)
-		numFaces += mesh->faces;
-
-	int vertexCount = numFaces*3;
-
-	// sort meshes by the material, this way we can combine several meshes
-	// to a single buffer
-	std::list<MeshEntry> sortedMeshes;
-	{
-		for(Lib3dsMesh* mesh = file->meshes; mesh != NULL; mesh = mesh->next) {
-			if (mesh->faces > 0) {
-				sortedMeshes.push_back(MeshEntry(mesh, mesh->faceL[0].material, defaultMaterial));
-			}
-		}
-		sortedMeshes.sort(MeshEntry::compare);
-	}
-
-	Lib3dsVector* vertices = new Lib3dsVector[vertexCount];
-	Lib3dsVector* normals = NULL;
-	Lib3dsTexel* uvs = NULL;
-	if (m_renderingType == ORIGINAL) {
-		normals = new Lib3dsVector[vertexCount];
-		uvs = new Lib3dsTexel[vertexCount];
-	}
-
-	unsigned finishedFaces = 0;
-	unsigned hull_vOffset = 0;
-	unsigned buffer_vOffset = 0;
-	Mat4f identity = Mat4f::identity();
 
 	std::vector<NewtonCollision*> collisions;
 
-	if (m_renderingType == MESH_EXACT) {
-		m_mesh = NewtonMeshCreate(world);
-		NewtonMeshBeginFace(m_mesh);
+	for (ogl::SubBuffers::iterator itr = buffers.begin(); itr != buffers.end(); ++itr) {
+		int meshMaterial = MaterialMgr::instance().getID((*itr)->material);
+		collisions.push_back(NewtonCreateConvexHull(world, (*itr)->dataCount, m_visual->firstVertex() + (*itr)->dataOffset * m_visual->floatSize(),
+				m_visual->byteSize(), 0.002f, meshMaterial, NULL));
+		delete *itr;
 	}
-
-	for (std::list<MeshEntry>::iterator itr = sortedMeshes.begin(); itr != sortedMeshes.end(); ++itr) {
-		Lib3dsMesh* mesh = itr->mesh;
-
-		unsigned hull_vCount = 0;
-		int faceMaterial = itr->materialID; //defaultMaterial;
-
-		if (m_renderingType == ORIGINAL)
-			lib3ds_mesh_calculate_normals(mesh, &normals[finishedFaces*3]);
-
-		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {
-			Lib3dsFace* face = &mesh->faceL[cur_face];
-
-			for(unsigned int i = 0; i < 3; i++) {
-				memcpy(&vertices[finishedFaces*3 + i], mesh->pointL[face->points[i]].pos, sizeof(Lib3dsVector));
-				if (mesh->texelL && m_renderingType == ORIGINAL)
-					memcpy(&uvs[finishedFaces*3 + i], mesh->texelL[face->points[i]], sizeof(Lib3dsTexel));
-			}
-
-			if (m_renderingType == MESH_EXACT) {
-				//faceMaterial = face->material && face->material[0] ? MaterialMgr::instance().getID(face->material) : defaultMaterial;
-				NewtonMeshAddFace(m_mesh, 3, vertices[finishedFaces*3], sizeof(Lib3dsVector), faceMaterial);
-			}
-
-			finishedFaces++;
-		}
-		hull_vCount += mesh->faces * 3;
-
-		// create a new sub-buffer with the mesh material
-		if (m_renderingType == ORIGINAL) {
-			std::list<MeshEntry>::iterator next = itr;
-			++next;
-			// only create it if the next mesh has another material, or this is the last mesh
-			// otherwise combine it with the next mesh
-			if (next == sortedMeshes.end() || next->materialID != faceMaterial) {
-				ogl::SubBuffer* buffer = new ogl::SubBuffer();
-				buffer->object = this;
-				Material* material = MaterialMgr::instance().fromID(faceMaterial);
-				buffer->material = material ? material->name : "";
-
-				buffer->dataCount = finishedFaces*3 - buffer_vOffset;
-				buffer->dataOffset = buffer_vOffset;
-				buffer->indexCount = buffer->dataCount;
-				buffer->indexOffset = buffer->dataOffset;
-				buffer_vOffset = finishedFaces*3;
-				m_buffers.push_back(buffer);
-			}
-		}
-
-		collisions.push_back(NewtonCreateConvexHull(world, hull_vCount, vertices[hull_vOffset], sizeof(Lib3dsVector), 0.002f, faceMaterial, identity[0]));
-		hull_vOffset += hull_vCount;
-	}
-	lib3ds_file_free(file);
-	if (m_renderingType == MESH_EXACT)
-		NewtonMeshEndFace(m_mesh);
-
-	// create buffer data
-	if (m_renderingType == ORIGINAL) {
-		m_data.reserve(vertexCount * (3+3+2));
-		m_data.resize(vertexCount * (3+3+2));
-		for (int i = 0; i < vertexCount; ++i) {
-			memcpy(&m_data[i * (3+3+2) + 0], uvs[i], 2 * sizeof(float));
-			memcpy(&m_data[i * (3+3+2) + 2], normals[i], 3 * sizeof(float));
-			memcpy(&m_data[i * (3+3+2) + 5], vertices[i], 3 * sizeof(float));
-		}
-
-		m_indices.reserve(vertexCount);
-		for (int i = 0; i < vertexCount; ++i)
-			m_indices.push_back(i);
-
-		delete normals;
-		delete uvs;
-	}
-
-	delete vertices;
 
 	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
 	this->create(collision, mass, m_freezeState, m_damping);
@@ -1193,8 +956,8 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 {
 	using namespace rapidxml;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName, *pRendering;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName, *attrRe;
+	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName;
+	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName;
 
 	// set attribute freezeState
 	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
@@ -1220,11 +983,6 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 	pFileName = doc->allocate_string(body.m_fileName.c_str());
 	attrFileName = doc->allocate_attribute("filename", pFileName);
 	node->append_attribute(attrFileName);
-
-	// set attribute rendering type
-	pRendering = doc->allocate_string(util::toString(body.m_renderingType));
-	attrRe = doc->allocate_attribute("rendering", pRendering);
-	node->append_attribute(attrRe);
 }
 
 ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
@@ -1261,191 +1019,16 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	attr = node->first_attribute("filename");
 	std::string filename = attr->value();
 
-	//attribute rendering type
-	attr = node->first_attribute("type");
-	int rendering = atoi(attr->value());
-
-	return ConvexAssembly(new __ConvexAssembly(matrix, mass, material, filename, (RenderingType)rendering, freezeState, damping));
+	return createAssembly(matrix, mass, material, filename, freezeState, damping);
 }
 
 __ConvexAssembly::~__ConvexAssembly()
 {
-	if (m_mesh) NewtonMeshDestroy(m_mesh);
-	m_data.clear();
-	for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
-		delete *itr;
-	m_buffers.clear();
-	m_indices.clear();
 }
 
 void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
 {
-	switch (m_renderingType) {
-	case MESH_EXACT:
-	{
-		// get the offset in floats and vertices
-		const unsigned vertexSize = vbo.floatSize();
-		const unsigned byteSize = vbo.byteSize();
-		const unsigned floatOffset = vbo.m_data.size();
-		const unsigned vertexOffset = floatOffset / vertexSize;
-
-		NewtonMeshApplyBoxMapping(m_mesh, 0, 0, 0);
-		NewtonMeshCalculateVertexNormals(m_mesh, 45.0f * 3.1416f/180.0f);
-
-		// allocate the vertex data
-		int vertexCount = NewtonMeshGetPointCount(m_mesh);
-
-		vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
-		vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
-
-		NewtonMeshGetVertexStreams(m_mesh,
-			byteSize, &vbo.m_data[floatOffset + 2 + 3],
-			byteSize, &vbo.m_data[floatOffset + 2],
-			byteSize, &vbo.m_data[floatOffset],
-			byteSize, &vbo.m_data[floatOffset]);
-
-		// iterate over the submeshes and store the indices
-		void* const meshCookie = NewtonMeshBeginHandle(m_mesh);
-		for (int handle = NewtonMeshFirstMaterial(m_mesh, meshCookie);
-			handle != -1; handle = NewtonMeshNextMaterial(m_mesh, meshCookie, handle)) {
-
-			int materialID = NewtonMeshMaterialGetMaterial(m_mesh, meshCookie, handle);
-			Material* material = MaterialMgr::instance().fromID(materialID);
-
-			// create a new submesh
-			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-			subBuffer->material = material ? material->name : m_material;
-			subBuffer->object = this;
-
-			subBuffer->dataCount = vertexCount;
-			subBuffer->dataOffset = vertexOffset;
-
-			// get the indices
-			subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(m_mesh, meshCookie, handle);
-			uint32_t* indices = new uint32_t[subBuffer->indexCount];
-			NewtonMeshMaterialGetIndexStream(m_mesh, meshCookie, handle, (int*)indices);
-			subBuffer->indexOffset = vbo.m_indices.size();
-
-			// copy the indices to the global list and add the offset
-			vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-			for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-				vbo.m_indices.push_back(vertexOffset + indices[i]);
-
-			delete indices;
-			vbo.m_buffers.push_back(subBuffer);
-		}
-		NewtonMeshEndHandle(m_mesh, meshCookie);
-		break;
-	}
-	case MESH_ASSEMBLY:
-	{
-		/// @todo we can combine sub-meshes with the same material
-		// because all sub-meshes have the same matrix. We could
-		// sort the collisions according to the shapeIDs and then
-		// combine adjacent sub-meshes
-
-		// foreach convex hull in the compound, create a mesh
-		NewtonCollisionInfoRecord info;
-		NewtonCollisionGetInfo(NewtonBodyGetCollision(m_body), &info);
-		if (info.m_collisionType != SERIALIZE_ID_COMPOUND)
-			return __RigidBody::genBuffers(vbo);
-
-		for (int i = 0; i < info.m_compoundCollision.m_chidrenCount; ++i) {
-
-			const unsigned vertexSize = vbo.floatSize();
-			const unsigned byteSize = vbo.byteSize();
-			const unsigned floatOffset = vbo.m_data.size();
-			const unsigned vertexOffset = floatOffset / vertexSize;
-
-			NewtonCollision* collision = info.m_compoundCollision.m_chidren[i];
-			NewtonMesh* collisionMesh = NewtonMeshCreateFromCollision(collision);
-			int shapeID = NewtonCollisionGetUserID(collision);
-			NewtonMeshApplyBoxMapping(collisionMesh, shapeID, shapeID, shapeID);
-
-			// allocate the vertex data
-			int vertexCount = NewtonMeshGetPointCount(collisionMesh);
-
-			vbo.m_data.reserve(floatOffset + vertexCount * vertexSize);
-			vbo.m_data.resize(floatOffset + vertexCount * vertexSize);
-
-			NewtonMeshGetVertexStreams(collisionMesh,
-					byteSize, &vbo.m_data[floatOffset + 2 + 3],
-					byteSize, &vbo.m_data[floatOffset + 2],
-					byteSize, &vbo.m_data[floatOffset],
-					byteSize, &vbo.m_data[floatOffset]);
-
-
-			// iterate over the submeshes and store the indices
-			void* const meshCookie = NewtonMeshBeginHandle(collisionMesh);
-			for (int handle = NewtonMeshFirstMaterial(collisionMesh, meshCookie);
-					handle != -1; handle = NewtonMeshNextMaterial(collisionMesh, meshCookie, handle)) {
-
-				int materialID = NewtonMeshMaterialGetMaterial(collisionMesh, meshCookie, handle);
-
-				Material* material = MaterialMgr::instance().fromID(materialID);
-
-				// create a new submesh
-				ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-				subBuffer->material = material ? material->name : m_material;
-				subBuffer->object = this;
-
-				subBuffer->dataCount = vertexCount;
-				subBuffer->dataOffset = vertexOffset;
-
-				// get the indices
-				subBuffer->indexCount = NewtonMeshMaterialGetIndexCount(collisionMesh, meshCookie, handle);
-				uint32_t* indices = new uint32_t[subBuffer->indexCount];
-				NewtonMeshMaterialGetIndexStream(collisionMesh, meshCookie, handle, (int*)indices);
-				subBuffer->indexOffset = vbo.m_indices.size();
-
-				// copy the indices to the global list and add the offset
-				vbo.m_indices.reserve(vbo.m_indices.size() + subBuffer->indexCount);
-				for (unsigned i = 0; i < subBuffer->indexCount; ++i)
-					vbo.m_indices.push_back(vertexOffset + indices[i]);
-
-				delete indices;
-				vbo.m_buffers.push_back(subBuffer);
-			}
-			NewtonMeshEndHandle(collisionMesh, meshCookie);
-
-			NewtonMeshDestroy(collisionMesh);
-		}
-		break;
-	}
-	case ORIGINAL:
-	{
-		// get the offset in floats and vertices
-		const unsigned vertexSize = vbo.floatSize();
-		//const unsigned byteSize = vbo.byteSize();
-		const unsigned floatOffset = vbo.m_data.size();
-		const unsigned vertexOffset = floatOffset / vertexSize;
-
-		vbo.m_data.reserve(floatOffset + m_data.size());
-		vbo.m_data.resize(floatOffset + m_data.size());
-
-		memcpy(&vbo.m_data[floatOffset], &m_data[0], m_data.size() * sizeof(float));
-
-		for (ogl::SubBuffers::iterator itr = m_buffers.begin(); itr != m_buffers.end(); ++itr) {
-			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
-			subBuffer->material = (*itr)->material;
-			subBuffer->object = (*itr)->object;
-
-			subBuffer->dataCount = (*itr)->dataCount;
-			subBuffer->dataOffset = (*itr)->dataOffset + vertexOffset;
-			subBuffer->indexCount = (*itr)->indexCount;
-			subBuffer->indexOffset = (*itr)->indexOffset + vbo.m_indices.size();
-
-			vbo.m_buffers.push_back(subBuffer);
-		}
-
-		// copy the indices to the global list and add the offset
-		vbo.m_indices.reserve(vbo.m_indices.size() + m_indices.size());
-		for (unsigned i = 0; i < m_indices.size(); ++i)
-			vbo.m_indices.push_back(vertexOffset + m_indices[i]);
-
-		break;
-	}
-	}
+	m_visual->genBuffers(vbo);
 }
 
 }

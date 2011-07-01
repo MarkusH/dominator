@@ -218,7 +218,7 @@ public:
 	 * @param  fileName The XML material file.
 	 * @return True, if successfull, false otherwise
 	 */
-	bool save(const char* fileName);
+	bool save(const std::string& fileName);
 
 	/**
 	 * Loads all material and pairs from the given XML material file.
@@ -226,7 +226,7 @@ public:
 	 * @param fileName The XML material file.
 	 * @return True, if successfull, false otherwise
 	 */
-	bool load(const char* fileName);
+	bool load(const std::string& fileName);
 
 	/**
 	 * Retrieves the material pair of the given material ids. If
