@@ -67,7 +67,7 @@ void __Domino::genBuffers(ogl::VertexBuffer& vbo)
 	buffer->dataOffset = (*itr)->dataOffset;
 	buffer->indexCount = (*itr)->indexCount;
 	buffer->indexOffset = (*itr)->indexOffset;
-	buffer->object = this;
+	buffer->userData = this;
 	buffer->material = m_material;
 	vbo.m_buffers.push_back(buffer);
 
@@ -108,7 +108,7 @@ void __Domino::genDominoBuffers(ogl::VertexBuffer& vbo)
 			// create a new submesh
 			ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
 			subBuffer->material = "";
-			subBuffer->object = NULL;
+			subBuffer->userData = NULL;
 
 			subBuffer->dataCount = vertexCount;
 			subBuffer->dataOffset = vertexOffset;

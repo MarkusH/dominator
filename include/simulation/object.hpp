@@ -25,68 +25,89 @@ typedef std::tr1::shared_ptr<__Object> Object;
 class __RigidBody;
 typedef std::tr1::shared_ptr<__RigidBody> RigidBody;
 
-class __ConvexAssembly;
-typedef std::tr1::shared_ptr<__ConvexAssembly> ConvexAssembly;
-
-class __ConvexHull;
-typedef std::tr1::shared_ptr<__ConvexHull> ConvexHull;
+class __Convex;
+typedef std::tr1::shared_ptr<__Convex> Convex;
 
 /**
- * An __Object is an abstract class that represents all objects
- * in the simulation. It defines the type of the object and provides
- * several abstract methods for manipulating and rendering the objects.
- * The actual objects inherit from this class, and possibly "Body", to
- * form a final, usable object.
+ * An abstract class that represents all objects in the simulation.
+ * It defines the type of the object and provides several abstract
+ * methods for manipulating and rendering the objects. The actual
+ * objects inherit from this class, and possibly "Body", to form a
+ * final, usable object.
  *
- * The class also behaves as a factory to construct these specific objects.
- *
- * __Object should not be used directly, but as the smart pointer version
+ * This class should not be used directly, but as the smart pointer
  * "Object".
  */
 class __Object {
 public:
+	/** The different object types */
 	typedef enum {
-		DOMINO_SMALL = 0,
-		DOMINO_MIDDLE,
-		DOMINO_LARGE,
-		BOX,
-		SPHERE,
-		CYLINDER,
-		CAPSULE,
-		CONE,
-		CHAMFER_CYLINDER,
-		CONVEX_HULL,
-		CONVEX_ASSEMBLY,
-		COMPOUND,
-		TREE_COLLISION,
-		NONE
+		DOMINO_SMALL = 0,//!< A small domino
+		DOMINO_MIDDLE,   //!< A medium sized domino
+		DOMINO_LARGE,    //!< A large domino
+		BOX,             //!< A box with width, height, depth
+		SPHERE,          //!< A sphere with different radiuses on all axes
+		CYLINDER,        //!< A cylinder with radius and height
+		CAPSULE,         //!< A capsule with radius and height
+		CONE,            //!< A cone with radius and height
+		CHAMFER_CYLINDER,//!< A chamfer cylinder (smooth edges) with radius and height
+		CONVEX_HULL,     //!< A convex hull (physics) with a complex representation (graphics)
+		CONVEX_ASSEMBLY, //!< A convex assembly (physics) with a complex representation (graphics)
+		COMPOUND,        //!< A composition of objects and joints
+		TREE_COLLISION,  //!< A complex, static collision for the environment
+		NONE             //!< Dummy type
 	} Type;
+
+	/** Simple string representations for the types above */
 	static const char* TypeStr[];
+
+	/** Nice string representations for the types above */
 	static const char* TypeName[];
+
+	/** Default masses for the types above */
 	static const float TypeMass[];
+
+	/** Default freeze states for the types above */
 	static const bool TypeFreezeState[];
+
+	/** Default sizes for the types above */
 	static const Vec3f TypeSize[];
 protected:
+	/** The type of the object */
 	Type m_type;
+
+	/** The (unique) id of the object */
 	int m_id;
 
+	/**
+	 * Protected constructor to prevent direct public instantiation
+	 *
+	 * @param type The type of the object
+	 */
 	__Object(Type type);
 public:
 	virtual ~__Object();
 
-	const Type& getType() { return m_type; }
+	/** @return The type of the object */
+	const Type& getType();
 
+	/** @return The id of the object */
+	int getID() const;
+
+	/** @param id The new id of the object. Has to be unique */
+	void setID(int id);
+
+	/** @return The matrix of the object */
 	virtual const Mat4f& getMatrix() const = 0;
+
+	/** @param matrix The new matrix */
 	virtual void setMatrix(const Mat4f& matrix) = 0;
 
-	int getID() const { return m_id; }
-	void setID(int id) { m_id = id; }
-
 	/** @param state The new freeze state of the body */
-	virtual void setFreezeState(int state) { }
+	virtual void setFreezeState(int state);
 
 	/** @return The freeze state of the body */
-	virtual int getFreezeState() { return 0; }
+	virtual int getFreezeState();
 
 	/**
 	 * Sets the mass of the object. -1.0 sets the mass according
@@ -94,17 +115,16 @@ public:
 	 *
 	 * @param mass The new mass of the object.
 	 */
-	virtual void setMass(float mass = -1.0f) { }
+	virtual void setMass(float mass = -1.0f);
 
 	/** @return The mass of the object */
-	virtual float getMass() const { return 0.0f; }
-
-	/** @return The size of the object, see scale() for further info */
-	virtual Vec3f getSize() { return Vec3f(); }
+	virtual float getMass() const;
 
 	/** @param material Updates the material of the object */
-	virtual void setMaterial(const std::string& material) { }
-	virtual std::string getMaterial() { return ""; }
+	virtual void setMaterial(const std::string& material);
+
+	/** @return The material of the object */
+	virtual std::string getMaterial();
 
 	/**
 	 * Get the axis-aligned bounding box of the object.
@@ -113,6 +133,9 @@ public:
 	 * @param max The maximum
 	 */
 	virtual void getAABB(Vec3f& min, Vec3f& max) = 0;
+
+	/** @return The size of the object, see scale() for further information. */
+	virtual Vec3f getSize();
 
 	/**
 	 * Scales the object. This does not have any effect on objects besides primitives.
@@ -126,7 +149,7 @@ public:
 	 * @param add   If True, adds the values of scale to the current size
 	 * @return      True, if the object was scaled, False otherwise
 	 */
-	virtual bool scale(const Vec3f& scale, bool add = false) { return false; };
+	virtual bool scale(const Vec3f& scale, bool add = false);
 
 	/**
 	 * Sets the vertical position of the object according to the convex cast of its collision.
@@ -140,15 +163,15 @@ public:
 	 * Checks whether this object contains the given NewtonBody.
 	 *
 	 * @param body The NewtonBody to find
-	 * @return True, if the object contains the NewtonBody, false otherwise
+	 * @return     True, if the object contains the NewtonBody, false otherwise
 	 */
 	virtual bool contains(const NewtonBody* const body) = 0;
 
 	/**
 	 * Checks whether this object contains (or is) the given object.
 	 *
-	 * @param object
-	 * @return
+	 * @param object The object to search for
+	 * @return       True, if the object is contained
 	 */
 	virtual bool contains(const __Object* object) = 0;
 
@@ -161,9 +184,7 @@ public:
 	 */
 	virtual void genBuffers(ogl::VertexBuffer& vbo) = 0;
 
-	/**
-	 * Renders the object in debugging mode.
-	 */
+	/** Renders the object in debugging mode. */
 	virtual void render() = 0;
 
 	/**
@@ -180,12 +201,12 @@ public:
 	 * @return   The generated object
 	 */
 	static Object load(rapidxml::xml_node<>* node);
-
-	friend class __RigidBody;
 };
 
 /**
- * A __Rigidbody is an object that is a single body.
+ * A rigid body in the simulation. It has an initial freeze state, a
+ * damping vector and a material. By default, it provides factory methods
+ * to create primitive objects. Other classes extend the functionality.
  */
 class __RigidBody : public __Object, public Body {
 protected:
@@ -198,24 +219,25 @@ protected:
 	/** The damping of the body. x,y,z = angular, w = linear damping */
 	Vec4f m_damping;
 
+	// protected constructors to prevent direct public instantiation
 	__RigidBody(Type type, NewtonBody* body, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	__RigidBody(Type type, NewtonBody* body, const Mat4f& matrix, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 public:
-	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }
-	virtual void setMatrix(const Mat4f& matrix) { Body::setMatrix(matrix); }
+	virtual const Mat4f& getMatrix() const;
+	virtual void setMatrix(const Mat4f& matrix);
 
-	virtual void setFreezeState(int state) { m_freezeState = state; Body::setFreezeState(state); }
-	virtual int getFreezeState() { return m_freezeState; }
+	virtual void setFreezeState(int state);
+	virtual int getFreezeState();
 
 	virtual void setMass(float mass = -1.0f);
-	virtual float getMass() const { return Body::getMass(); };
+	virtual float getMass() const;
 	virtual Vec3f getSize();
 
 	virtual void setMaterial(const std::string& material);
-	virtual std::string getMaterial() { return m_material; }
+	virtual std::string getMaterial();
 
-	virtual void getAABB(Vec3f& min, Vec3f& max) { NewtonBodyGetAABB(m_body, &min[0], &max[0]); }
+	virtual void getAABB(Vec3f& min, Vec3f& max);
 
 	virtual bool scale(const Vec3f& scale, bool add = false);
 
@@ -245,24 +267,29 @@ public:
 	static RigidBody createCapsule(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
 	static RigidBody createCone(const Mat4f& matrix, float radius, float height, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 	static RigidBody createCone(const Vec3f& position, float radius, float height, float mass, const std::string& material = "");
-
-
-	friend class __Object;
 };
 
 /**
  * A simple convex body with a single material. Generates a convex hull of
  * a 3ds file. The visual representation is the one defined in the model.
+ *
+ * A rigid body created from a model file. Each sub-mesh of the given model
+ * is represented by a convex hull. By adding multiple meshes to the model,
+ * this object can have a complex shape.
  */
-class __ConvexHull : public __RigidBody {
+class __Convex : public __RigidBody {
 protected:
+	/** The file the object was loaded from */
 	std::string m_fileName;
+
+	/** The visual representation of the object */
 	ogl::Mesh m_visual;
 
-	__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+	// protected constructor to prevent direct public instantiation
+	__Convex(Type type, const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 public:
-	virtual ~__ConvexHull();
+	virtual ~__Convex();
 
 	/**
 	 * Creates a new convex hull from the given model file.
@@ -275,39 +302,135 @@ public:
 	 * @param damping     The initial damping vector of the body: x, y, z = angular, w = linear. default = 0.1 each
 	 * @return            The new convex hull
 	 */
-	static ConvexHull createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+	static Convex createHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+
+	/**
+	 * Creates a new convex assembly from the given model file.
+	 *
+	 * @param matrix      The matrix of the object
+	 * @param mass        The mass of the object, where 0 = static and -1 = according to volume
+	 * @param material    The material name of the object
+	 * @param fileName    The model file
+	 * @param freezeState The initial freeze state of the body, default = false
+	 * @param damping     The initial damping vector of the body: x, y, z = angular, w = linear. default = 0.1 each
+	 * @return            The new convex assembly
+	 */
+	static Convex createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
 			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
-	static void save(const __ConvexHull& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
-	static ConvexHull load(rapidxml::xml_node<>* node);
+	static void save(const __Convex& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	static Convex load(rapidxml::xml_node<>* node);
 };
 
-/**
- * A rigid body created from a model file. Each sub-mesh of the given model
- * is represented by a convex hull. By adding multiple meshes to the model,
- * this object can have a complex shape.
- */
-class __ConvexAssembly : public __RigidBody  {
-protected:
-	std::string m_fileName;
-	ogl::Mesh m_visual;
 
-	__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
-			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-public:
-	virtual ~__ConvexAssembly();
+inline
+const __Object::Type& __Object::getType()
+{
+	return m_type;
+}
 
-	static ConvexAssembly createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
-			int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
+inline
+int __Object::getID() const
+{
+	return m_id;
+}
 
-	virtual void genBuffers(ogl::VertexBuffer& vbo);
+inline
+void __Object::setID(int id)
+{
+	m_id = id;
+}
 
-	static void save(const __ConvexAssembly& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
-	static ConvexAssembly load(rapidxml::xml_node<>* node);
-};
+inline
+void __Object::setFreezeState(int state)
+{
+}
 
+inline
+int __Object::getFreezeState()
+{
+	return 0;
+}
+
+inline
+void __Object::setMass(float mass)
+{
+}
+
+inline
+float __Object::getMass() const
+{
+	return 0.0f;
+}
+
+inline
+Vec3f __Object::getSize()
+{ return Vec3f();
+}
+
+inline
+void __Object::setMaterial(const std::string& material)
+{
+}
+
+inline
+std::string __Object::getMaterial()
+{
+	return "";
+}
+
+inline
+bool __Object::scale(const Vec3f& scale, bool add)
+{
+	return false;
+}
+
+
+
+inline
+const Mat4f& __RigidBody::getMatrix() const
+{
+	return Body::getMatrix();
+}
+
+inline
+void __RigidBody::setMatrix(const Mat4f& matrix)
+{
+	Body::setMatrix(matrix);
+}
+
+inline
+void __RigidBody::setFreezeState(int state)
+{
+	m_freezeState = state; Body::setFreezeState(state);
+}
+
+inline
+int __RigidBody::getFreezeState()
+{
+	return m_freezeState;
+}
+
+inline
+float __RigidBody::getMass() const
+{
+	return Body::getMass();
+}
+
+inline
+std::string __RigidBody::getMaterial()
+{
+	return m_material;
+}
+
+inline
+void __RigidBody::getAABB(Vec3f& min, Vec3f& max)
+{
+	NewtonBodyGetAABB(m_body, &min[0], &max[0]);
+}
 
 
 }

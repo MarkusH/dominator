@@ -391,7 +391,7 @@ void __TreeCollision::genBuffers(ogl::VertexBuffer& vbo)
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
 		subBuffer->material = MaterialMgr::instance().fromID(material)->name;
-		subBuffer->object = this;
+		subBuffer->userData = this;
 
 		subBuffer->dataCount = vertexCount;
 		subBuffer->dataOffset = vertexOffset;

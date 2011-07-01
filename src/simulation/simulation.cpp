@@ -371,7 +371,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vertexBuffer);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
+	m_environment = Object(new __TreeCollision(Mat4f::translate(Vec3f(0.0f, 0.0f, 0.0f)), "data/models/mattest.3ds"));
 	//add(m_environment);
 	//((__TreeCollision*)m_environment.get())->createOctree();
 
@@ -422,13 +422,13 @@ void Simulation::init()
 	}
 
 	// assemlby vs hull comparison
-	if (0)
+	if (1)
 	{
-		//ConvexHull hull = __ConvexHull::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/tire.3ds");
-		//add(hull);
-		//hull->convexCastPlacement();
+		Convex hull = __Convex::createHull(Mat4f::translate(Vec3f(0.0f, 0.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		add(hull);
+		hull->convexCastPlacement();
 
-		ConvexAssembly assembly = __ConvexAssembly::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
+		Convex assembly = __Convex::createAssembly(Mat4f::translate(Vec3f(20.0f, 20.0f, -25.0f)), 2.0f, "tire", "data/models/mesh.3ds");
 		add(assembly);
 		assembly->convexCastPlacement();
 	}
@@ -795,7 +795,7 @@ void Simulation::remove(const Object& object)
 	/// @todo think about what happens if a domino is inside a compound
 	if (object->getType() <= __Object::DOMINO_LARGE) {
 		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin(); it != m_vertexBuffer.m_buffers.end(); ++it) {
-			if ((*it)->object == object.get()) {
+			if ((*it)->userData == object.get()) {
 				delete (*it);
 				m_vertexBuffer.m_buffers.erase(it);
 				break;
@@ -806,7 +806,7 @@ void Simulation::remove(const Object& object)
 		for (ogl::SubBuffers::iterator it = m_vertexBuffer.m_buffers.begin();
 				it != m_vertexBuffer.m_buffers.end(); ) {
 
-			__Object* curObj = (__Object*)(*it)->object;
+			__Object* curObj = (__Object*)(*it)->userData;
 			if (curObj == NULL) {
 				++it;
 				continue;
@@ -877,7 +877,7 @@ void Simulation::remove(const Object& object)
 
 static bool isSharedBuffer(const ogl::SubBuffer* const buffer)
 {
-	return buffer->object == NULL;
+	return buffer->userData == NULL;
 }
 
 void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
@@ -1186,7 +1186,7 @@ void Simulation::render()
 	mmgr.applyMaterial(material);
 	for ( ; itr != m_sortedBuffers.end(); ++itr) {
 		const ogl::SubBuffer* const buf = (*itr);
-		const __Object* const obj = (const __Object* const)buf->object;
+		const __Object* const obj = (const __Object* const)buf->userData;
 		if (material != buf->material) {
 			material = buf->material;
 			mmgr.applyMaterial(material);

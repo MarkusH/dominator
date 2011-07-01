@@ -18,6 +18,7 @@
 #include <lib3ds/types.h>
 #include <stdio.h>
 #include <util/tostring.hpp>
+#include <boost/foreach.hpp>
 
 namespace sim {
 
@@ -139,11 +140,7 @@ void __Object::save(__Object& object, rapidxml::xml_node<>* parent, rapidxml::xm
 		attrM = doc->allocate_attribute("matrix", pMatrix);
 		node->append_attribute(attrM);
 
-		if (object.m_type == CONVEX_ASSEMBLY)
-			__ConvexAssembly::save((__ConvexAssembly&)object, node, doc);
-		else
-			__ConvexHull::save((__ConvexHull&)object, node, doc);
-
+		__Convex::save((__Convex&)object, node, doc);
 		break;
 	case COMPOUND:
 		node = doc->allocate_node(node_element, "compound");
@@ -176,8 +173,8 @@ Object __Object::load(rapidxml::xml_node<>* node)
 	else if (std::string(node->name()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
 	else if (std::string(node->name()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
 	else if (std::string(node->name()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
-	else if (std::string(node->name()) == TypeStr[CONVEX_ASSEMBLY]) return __ConvexAssembly::load(node);
-	else if (std::string(node->name()) == TypeStr[CONVEX_HULL]) return __ConvexHull::load(node);
+	else if (std::string(node->name()) == TypeStr[CONVEX_ASSEMBLY]) return __Convex::load(node);
+	else if (std::string(node->name()) == TypeStr[CONVEX_HULL]) return __Convex::load(node);
 	else return __RigidBody::load(node);
 }
 
@@ -760,7 +757,7 @@ void __RigidBody::genBuffers(ogl::VertexBuffer& vbo)
 		// create a new submesh
 		ogl::SubBuffer* subBuffer = new ogl::SubBuffer();
 		subBuffer->material = m_material;
-		subBuffer->object = this;
+		subBuffer->userData = this;
 
 		subBuffer->dataCount = vertexCount;
 		subBuffer->dataOffset = vertexOffset;
@@ -805,154 +802,83 @@ void __RigidBody::render()
 	newton::showCollisionShape(getCollision(), m_matrix);
 }
 
-
-
-ConvexHull __ConvexHull::createHull(const Mat4f& matrix, float mass, const std::string& material,
+__Convex::__Convex(Type type, const Mat4f& matrix, float mass, const std::string& material,
 		const std::string& fileName, int freezeState, const Vec4f& damping)
+	: __RigidBody(type, matrix, material, freezeState, damping), m_fileName(fileName)
 {
-	ConvexHull result(new __ConvexHull(matrix, mass, material, fileName, freezeState, damping));
-	return result;
 }
 
-__ConvexHull::__ConvexHull(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_HULL, matrix, material, freezeState, damping), m_fileName(fileName)
+__Convex::~__Convex()
 {
-	m_visual = ogl::__Mesh::load3ds(fileName, this);
+}
 
+Convex __Convex::createHull(const Mat4f& matrix, float mass, const std::string& material,
+		const std::string& fileName, int freezeState, const Vec4f& damping)
+{
+	Convex result(new __Convex(CONVEX_HULL, matrix, mass, material, fileName, freezeState, damping));
+
+	// load the visual
+	ogl::Mesh visual = ogl::__Mesh::load3ds(fileName, result.get());
+
+	//TODO: move this from here
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int materialID = MaterialMgr::instance().getID(material);
 
-	NewtonCollision* collision = NewtonCreateConvexHull(world, m_visual->vertexCount(), m_visual->firstVertex(), m_visual->byteSize(), 0.002f, materialID, NULL);
-	this->create(collision, mass, m_freezeState, m_damping);
+	// create a hull from the visual
+	NewtonCollision* collision = NewtonCreateConvexHull(world, visual->vertexCount(),
+			visual->firstVertex(), visual->byteSize(), 0.002f, materialID, NULL);
+	result->create(collision, mass, freezeState, damping);
 	NewtonReleaseCollision(world, collision);
-}
 
-void __ConvexHull::save(const __ConvexHull& body , rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc)
-{
-	using namespace rapidxml;
+	result->m_visual = visual;
 
-	char *pFreezeState, *pDamping, *pMaterial, *pMass, *pFileName;
-	xml_attribute<> *attrFS, *attrDamp, *attrMat, *attrMass, *attrFileName;
-
-	// set attribute freezeState
-	pFreezeState = doc->allocate_string(util::toString(body.m_freezeState));
-	attrFS = doc->allocate_attribute("freezeState", pFreezeState);
-	node->append_attribute(attrFS);
-
-	// set attribute damping
-	pDamping = doc->allocate_string(util::toString(body.m_damping));
-	attrDamp = doc->allocate_attribute("damping", pDamping);
-	node->append_attribute(attrDamp);
-
-	// set attribute material
-	pMaterial = doc->allocate_string(body.m_material.c_str());
-	attrMat = doc->allocate_attribute("material", pMaterial);
-	node->append_attribute(attrMat);
-
-	// set attribute mass
-	pMass = doc->allocate_string(util::toString(body.getMass()));
-	attrMass = doc->allocate_attribute("mass", pMass);
-	node->append_attribute(attrMass);
-
-	// set attribute filename to the correct file name
-	pFileName = doc->allocate_string(body.m_fileName.c_str());
-	attrFileName = doc->allocate_attribute("filename", pFileName);
-	node->append_attribute(attrFileName);
-}
-
-ConvexHull __ConvexHull::load(rapidxml::xml_node<>* node)
-{
-	using namespace rapidxml;
-	
-
-	//attribute type
-	xml_attribute<>* attr = node->first_attribute("attribute");
-	std::string type = attr->value();
-
-	//attribute matrix
-	attr = node->first_attribute("matrix");
-	Mat4f matrix = Mat4f();
-	matrix.assign(attr->value());
-
-	//attribute freezeState
-	attr = node->first_attribute("freezeState");
-	int freezeState = atoi(attr->value());
-
-	//attribute damping
-	attr = node->first_attribute("damping");
-	Vec4f damping = Vec4f();
-	damping.assign(attr->value());
-
-	//attribute material
-	attr = node->first_attribute("material");
-	std::string material = attr->value();
-
-	//attribute mass
-	attr = node->first_attribute("mass");
-	float mass = atof(attr->value());
-
-	//attribute filename
-	attr = node->first_attribute("filename");
-	std::string filename = attr->value();
-
-	return createHull(matrix, mass, material, filename, freezeState, damping);
-}
-
-__ConvexHull::~__ConvexHull()
-{
-}
-
-void __ConvexHull::genBuffers(ogl::VertexBuffer& vbo)
-{
-	m_visual->genBuffers(vbo);
-}
-
-struct MeshEntry {
-	Lib3dsMesh* mesh;
-	int materialID;
-	MeshEntry() { }
-	MeshEntry(Lib3dsMesh* mesh, const char* material, int defaultMaterial) : mesh(mesh) {
-		materialID = material && material[0] ? MaterialMgr::instance().getID(material) : defaultMaterial;
-	}
-	static bool compare(const MeshEntry& first, const MeshEntry& second) {
-		return first.materialID < second.materialID;
-	}
-};
-
-ConvexAssembly __ConvexAssembly::createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
-		int freezeState, const Vec4f& damping)
-{
-	ConvexAssembly result(new __ConvexAssembly(matrix, mass, material, fileName, freezeState, damping));
 	return result;
 }
 
-__ConvexAssembly::__ConvexAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName, int freezeState, const Vec4f& damping)
-	: __RigidBody(CONVEX_ASSEMBLY, matrix, material, freezeState, damping), m_fileName(fileName)
+Convex __Convex::createAssembly(const Mat4f& matrix, float mass, const std::string& material, const std::string& fileName,
+		int freezeState, const Vec4f& damping)
 {
-	ogl::SubBuffers buffers;
-	m_visual = ogl::__Mesh::load3ds(fileName, this, &buffers);
+	Convex result(new __Convex(CONVEX_ASSEMBLY, matrix, mass, material, fileName, freezeState, damping));
 
+	// load the visual
+	ogl::SubBuffers buffers;
+	ogl::Mesh visual = ogl::__Mesh::load3ds(fileName, result.get(), &buffers);
+
+	//TODO: move this from here
 	const NewtonWorld* world = Simulation::instance().getWorld();
 	int defaultMaterial = MaterialMgr::instance().getID(material);
 
 	std::vector<NewtonCollision*> collisions;
 
-	for (ogl::SubBuffers::iterator itr = buffers.begin(); itr != buffers.end(); ++itr) {
-		int meshMaterial = MaterialMgr::instance().getID((*itr)->material);
-		collisions.push_back(NewtonCreateConvexHull(world, (*itr)->dataCount, m_visual->firstVertex() + (*itr)->dataOffset * m_visual->floatSize(),
-				m_visual->byteSize(), 0.002f, meshMaterial, NULL));
-		delete *itr;
+	// for each sub-mesh, create a convex hull
+	BOOST_FOREACH(ogl::SubBuffer* buf, buffers) {
+		//TODO: move this from here
+		int meshMaterial = MaterialMgr::instance().getID(buf->material);
+		const float* data = visual->firstVertex() + buf->dataOffset * visual->floatSize();
+		collisions.push_back(NewtonCreateConvexHull(world, buf->dataCount, data, visual->byteSize(), 0.002f, meshMaterial, NULL));
+		delete buf;
 	}
 
+	// create a compound from all hulls
 	NewtonCollision* collision = NewtonCreateCompoundCollision(world, collisions.size(), &collisions[0], defaultMaterial);
-	this->create(collision, mass, m_freezeState, m_damping);
+	result->create(collision, mass, freezeState, damping);
 
 	NewtonReleaseCollision(world, collision);
 	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
 		NewtonReleaseCollision(world, *itr);
+
+	result->m_visual = visual;
+
+	return result;
 }
 
-void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc)
+void __Convex::genBuffers(ogl::VertexBuffer& vbo)
+{
+	m_visual->genBuffers(vbo);
+}
+
+
+void __Convex::save(const __Convex& body , rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc)
 {
 	using namespace rapidxml;
 
@@ -985,16 +911,12 @@ void __ConvexAssembly::save(const __ConvexAssembly& body , rapidxml::xml_node<>*
 	node->append_attribute(attrFileName);
 }
 
-ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
+Convex __Convex::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
 
-	//attribute type
-	xml_attribute<>* attr = node->first_attribute("type");
-	std::string type = attr->value();
-
 	//attribute matrix
-	attr = node->first_attribute("matrix");
+	xml_attribute<>* attr = node->first_attribute("matrix");
 	Mat4f matrix = Mat4f();
 	matrix.assign(attr->value());
 
@@ -1019,16 +941,15 @@ ConvexAssembly __ConvexAssembly::load(rapidxml::xml_node<>* node)
 	attr = node->first_attribute("filename");
 	std::string filename = attr->value();
 
-	return createAssembly(matrix, mass, material, filename, freezeState, damping);
+	std::string type = node->first_attribute("type")->value();
+	if (type == TypeStr[CONVEX_ASSEMBLY])
+		return createAssembly(matrix, mass, material, filename, freezeState, damping);
+	else
+		return createHull(matrix, mass, material, filename, freezeState, damping);
 }
 
-__ConvexAssembly::~__ConvexAssembly()
-{
-}
 
-void __ConvexAssembly::genBuffers(ogl::VertexBuffer& vbo)
-{
-	m_visual->genBuffers(vbo);
-}
+
+
 
 }
