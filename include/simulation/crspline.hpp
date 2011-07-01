@@ -61,7 +61,12 @@ protected:
 	 */
 	unsigned binarySearch(float length);
 
-	unsigned int BOUND(int index);
+	/**
+	 * Returns a valid knot at the given index. All security check included.
+	 *
+	 * @param index The index of the knot
+	 * @return      A valid knot
+	 */
 	Vec2f at(int index);
 public:
 	CRSpline(float error = 0.001f);
@@ -157,18 +162,14 @@ inline CRSpline::HelpTable& CRSpline::table()
 	return m_table;
 }
 
-inline unsigned int CRSpline::BOUND(int index) {
-	if (index < 0)
-		return 0;
-	else if ((unsigned int)index >= m_knots.size() - 1)
-		return m_knots.size() - 1;
-
-	return index;
-}
-
 inline Vec2f CRSpline::at(int index)
 {
-	return m_knots[BOUND(index)];
+	if (index < 0)
+		index = 0;
+	else if ((unsigned int)index >= m_knots.size() - 1)
+		index = m_knots.size() - 1;
+
+	return m_knots[index];
 }
 
 }
