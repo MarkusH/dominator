@@ -306,7 +306,7 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
-	std::string model = "\0";
+	std::string model;
 
 	//attribute model
 	xml_attribute<>* attr = node->first_attribute("filename");
