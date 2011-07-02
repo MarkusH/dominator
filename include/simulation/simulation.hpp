@@ -266,7 +266,18 @@ public:
 	 */
 	void updateObject(const Object& object);
 
+	/**
+	 * Save current simulation to XML
+	 *
+	 * @param fileName Path to save to
+	 */
 	void save(const std::string& fileName);
+
+	/**
+	 *  Load simulation from XML
+	 *
+	 *  @param fileName Path to XML file
+	 */
 	void load(const std::string& fileName);
 	//void saveTemplate(const std::string& fileName, __Object& object);
 	//void loadTemplate(const std::string& fileName);

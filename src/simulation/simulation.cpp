@@ -102,7 +102,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 
 			char* m = f.data();
 
-			// TODO add exception handling
+			/// @todo add exception handling
 			xml_document<> doc;
 			doc.parse<0>(m);
 
@@ -232,6 +232,7 @@ void Simulation::loadTemplate(const std::string& fileName)
 void Simulation::save(const std::string& fileName)
 {
 	using namespace rapidxml;
+
 	// create document
 	xml_document<> doc;
 

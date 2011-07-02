@@ -6,6 +6,12 @@
 
 namespace util {
 
+/**
+ *	Performs conversion to string
+ *
+ *	@param	value	parameter to convert
+ *	@return pointer to converted string
+*/
 template<typename T>
 char* toString(T value)
 {

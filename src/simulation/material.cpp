@@ -98,47 +98,40 @@ void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* d
 	xml_node<>* node = doc->allocate_node(node_element, "material");
 	materials->append_node(node);
 
-	// allocate string for name and create attribute
+	/* allocate strings for attributes  and append them to node */
+
 	char* pName = doc->allocate_string(name.c_str());
 	xml_attribute<>* attrN = doc->allocate_attribute("name", pName);
 	node->append_attribute(attrN);
 
-	// allocate string for texture and create attribute
 	char* pTexture = doc->allocate_string(texture.c_str());
 	xml_attribute<>* attrT = doc->allocate_attribute("texture", pTexture);
 	node->append_attribute(attrT);
 
-	// allocate string for shader and create attribute
 	char* pShader = doc->allocate_string(shader.c_str());
 	xml_attribute<>* attrS = doc->allocate_attribute("shader", pShader);
 	node->append_attribute(attrS);
 
-	// allocate string for ambient and create attribute
 	char* pAmbient = doc->allocate_string(ambient.str().c_str());
 	xml_attribute<>* attrA = doc->allocate_attribute("ambient", pAmbient);
 	node->append_attribute(attrA);
 
-	// allocate string for diffuse and create attribute
 	char* pDiffuse = doc->allocate_string(diffuse.str().c_str());
 	xml_attribute<>* attrD = doc->allocate_attribute("diffuse", pDiffuse);
 	node->append_attribute(attrD);
 
-	// allocate string for specular and create attribute
 	char* pSpecular = doc->allocate_string(specular.str().c_str());
 	xml_attribute<>* attrSp = doc->allocate_attribute("specular", pSpecular);
 	node->append_attribute(attrSp);
 
-	// allocate string for shininess and create attribute
 	//char* pShininess = doc->allocate_string(boost::lexical_cast<std::string>(shininess).c_str());
 	char* pShininess = doc->allocate_string(util::toString(shininess));
 	xml_attribute<>* attrSh = doc->allocate_attribute("shininess", pShininess);
 	node->append_attribute(attrSh);
 	//free(pShininess);
 
-	
-	// save properties
-	// vectors can be saved to a string like that:
-	//	std::string str = diffuse.str()
+	/* END allocate strings for attributes  and append them to node */
+
 }
 
 
@@ -166,6 +159,7 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 void MaterialPair::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
+
 	MaterialMgr& m = MaterialMgr::instance();
 	
 	xml_attribute<> *attr = node->first_attribute("mat0");
@@ -222,7 +216,7 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	xml_node<>* node = doc->allocate_node(node_element, "pair");
 	materials->append_node(node);
 
-	// allocate string for mat0 and create attribute
+	/* allocate strings for attributes  and append them to node */
 	if (m.fromID(mat0) != NULL) {
 		const char* pMat0 = doc->allocate_string(m.fromID(mat0)->name.c_str());
 		xml_attribute<>* attrMat0 = doc->allocate_attribute("mat0", pMat0);
@@ -234,7 +228,6 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 		node->append_attribute(attrMat0);
 	}
 
-	// allocate string for mat1 and create attribute
 	if (m.fromID(mat1) != NULL) {
 		const char* pMat1 = doc->allocate_string(m.fromID(mat1)->name.c_str());
 		xml_attribute<>* attrMat1 = doc->allocate_attribute("mat1", pMat1);
@@ -246,34 +239,30 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 		node->append_attribute(attrMat1);
 	}
 
-
-	// allocate string for elasticity and create attribute
 	//char* pElasticity = doc->allocate_string(boost::lexical_cast<std::string>(elasticity).c_str());
 	char* pElasticity = doc->allocate_string(util::toString(elasticity));
 	xml_attribute<>* attrE = doc->allocate_attribute("elasticity", pElasticity);
 	node->append_attribute(attrE);
 	//free(pElasticity);
 
-	// allocate string for static friction and create attribute
 	//char* pStaticFriction = doc->allocate_string(boost::lexical_cast<std::string>(staticFriction).c_str());
 	char* pStaticFriction = doc->allocate_string(util::toString(staticFriction));
 	xml_attribute<>* attrSF = doc->allocate_attribute("staticFriction", pStaticFriction);
 	node->append_attribute(attrSF);
 	//free(pStaticFriction);
 
-	// allocate string for kinetic friction and create attribute
 	//char* pKineticFriction = doc->allocate_string(boost::lexical_cast<std::string>(kineticFriction).c_str());
 	char* pKineticFriction = doc->allocate_string(util::toString(kineticFriction));
 	xml_attribute<>* attrKF = doc->allocate_attribute("kineticFriction", pKineticFriction);
 	node->append_attribute(attrKF);
 	//free(pKineticFriction);
 
-	// allocate string for softness and create attribute
 	//char* pSoftness = doc->allocate_string(boost::lexical_cast<std::string>(softness).c_str());
 	char* pSoftness = doc->allocate_string(util::toString(softness));
 	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
 	node->append_attribute(attrS);
 	//free(pSoftness);
+	/* END allocate strings for attributes  and append them to node */
 
 }
 
@@ -438,7 +427,6 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 	return std::make_pair(pair.mat0, pair.mat1);
 }
 
-
 bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doesn't exist
 {
 	/* information for error messages */
@@ -468,9 +456,9 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 	}
 
 	try {
+
 		// string containing valid xml for test purposes
-		// char m[] = "<?xml version=\"1.0\" ?><materials><material name=\"wood_shiny\" texture=\"wood_shiny\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.6, 0.6, 0.6, 1\" shininess=\"50\" /><material name=\"wood_matt\" texture=\"wood_matt\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.1, 0.1, 0.1, 1\" shininess=\"20\" /><pair mat0=\"wood_shiny\" mat1=\"wood_shiny\" elasticity=\"0.100000\" staticFriction=\"0.450000\" kineticFriction=\"0.310000\" softness=\"0.050000\" /><pair mat0=\"wood_matt\" mat1=\"wood_matt\" elasticity=\"0.15000\" staticFriction=\"0.55000\" kineticFriction=\"0.45000\" softness=\"0.080000\" /></materials>";
-		
+		// char m[] = "<?xml version=\"1.0\" ?><materials><material name=\"wood_shiny\" texture=\"wood_shiny\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.6, 0.6, 0.6, 1\" shininess=\"50\" /><material name=\"wood_matt\" texture=\"wood_matt\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.1, 0.1, 0.1, 1\" shininess=\"20\" /><pair mat0=\"wood_shiny\" mat1=\"wood_shiny\" elasticity=\"0.100000\" staticFriction=\"0.450000\" kineticFriction=\"0.310000\" softness=\"0.050000\" /><pair mat0=\"wood_matt\" mat1=\"wood_matt\" elasticity=\"0.15000\" staticFriction=\"0.55000\" kineticFriction=\"0.45000\" softness=\"0.080000\" /></materials>";	
 		m = f->data();
 		
 		xml_document<> materials;
@@ -492,11 +480,11 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
 				}
 			}
-
 			delete f;
 			return true;
 		} else {
 			delete f;
+			//throw parse_error("No valid root node found", m);
 			return false;
 		}
 	} catch( parse_error& e ) {
@@ -517,6 +505,7 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 bool MaterialMgr::save(const std::string& fileName)
 {
 	using namespace rapidxml;
+
 	// create document
 	xml_document<> doc;
 
