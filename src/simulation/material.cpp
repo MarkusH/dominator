@@ -456,7 +456,6 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 	try {
 		f = new file<char>(fileName.c_str());
 	} catch ( std::runtime_error& e ) {
-		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
 		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		if(f) delete f;
 		return false;
@@ -499,12 +498,10 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 			return false;
 		}
 	} catch( parse_error& e ) {
-		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
 		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		delete f;
 		return false;
 	} catch(...) {
-		/// @todo tell user in the GUI that an unknown error occurred
 		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		delete f;
 		return false;
