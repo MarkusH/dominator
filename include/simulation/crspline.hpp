@@ -21,13 +21,16 @@ using namespace m3d;
  */
 class CRSpline {
 protected:
-	/** Help point with t parameter of spline, the arc length
-	 *  the position and tangent */
+	/** Help point with t parameter of spline, the arc length the position and tangent */
 	struct HelpPoint {
 		float t, len;
 		Vec2f pos, tangent;
 	};
+
+	/** A vector of help points for indexed access */
 	typedef std::vector<HelpPoint> HelpTable;
+
+	/** A list of help points for fast insertion */
 	typedef std::list<HelpPoint> HelpList;
 
 	/** Table of help points */
@@ -69,12 +72,18 @@ protected:
 	 */
 	Vec2f at(int index);
 public:
+	/**
+	 * Constructs a new Catmull-Rom spline with the given length deviation.
+	 *
+	 * @param error The maximum allowed length error of a single segment.
+	 */
 	CRSpline(float error = 0.001f);
 	virtual ~CRSpline();
 
 	/**
-	 * Calculates the arc length of the spline and updates
-	 * the internal table.
+	 * Calculates the arc length of the spline and updates the internal
+	 * table of help points. Clears the help points if the number of knots
+	 * is smaller than three.
 	 *
 	 * @return The length of the spline
 	 */
@@ -145,9 +154,9 @@ public:
 	 */
 	void renderPoints(float gap, const Vec3f& color = Vec3f(1.0f, 0.0f, 0.0), bool tangent = true, const Vec3f& tangentColor = Vec3f(0.0f, 0.0f, 1.0), float tangentLength = 2.5f);
 
-
 	/** Interpolates the value in the given segment */
 	static Vec2f interpolate(Vec2f p0, Vec2f p1, Vec2f p2, Vec2f p3, float t);
+
 	/** Derives the value in the given segment */
 	static Vec2f derive(Vec2f p0, Vec2f p1, Vec2f p2, Vec2f p3, float t);
 };

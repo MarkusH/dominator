@@ -78,6 +78,7 @@ unsigned CRSpline::binarySearch(float length)
 
 float CRSpline::getT(float length)
 {
+	// check if the length is out of bounds
     if (length <= m_table.front().len)
     	return m_table.front().t;
     else if (length >= m_table.back().len)
@@ -102,6 +103,7 @@ Vec3f CRSpline::getPos(float length)
 		x = m_table.back().pos.x;
 		z = m_table.back().pos.y;
 	} else {
+		// perform a linear interpolation between the two nearest help points
 		unsigned lower = binarySearch(length);
 
 		x = lerp(length, m_table[lower].len, m_table[lower + 1].len,
@@ -116,11 +118,13 @@ Vec3f CRSpline::getPos(float length)
 
 Vec3f CRSpline::getTangent(float length)
 {
+	// check if the length is out of bounds
     if (length <= m_table.front().len)
     	return m_table.front().tangent.xz3(0.0f);
     else if (length >= m_table.back().len)
     	return m_table.back().tangent.xz3(0.0f);
 
+    // perform a linear interpolation between the two nearest help points
     unsigned lower = binarySearch(length);
 
     float x = lerp(length, m_table[lower].len, m_table[lower + 1].len,
