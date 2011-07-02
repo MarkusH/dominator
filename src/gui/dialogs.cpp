@@ -84,12 +84,16 @@ float GravityDialog::run()
 	}
 }
 
-MessageDialog::MessageDialog(QString title, QString message, MessageType type) :
+void QtErrorListerner::displayError(const std::string& message) {
+	gui::MessageDialog("Error", message, gui::MessageDialog::QERROR);
+}
+
+MessageDialog::MessageDialog(const std::string title, const std::string message, const MessageType type) :
 	QMessageBox()
 {
 	QMessageBox msgBox;
-	msgBox.setText(title);
-	msgBox.setInformativeText(message);
+	msgBox.setText(QString::fromStdString(title));
+	msgBox.setInformativeText(QString::fromStdString(message));
 	switch (type) {
 	case QINFO:
 		msgBox.setIcon(QMessageBox::Information);

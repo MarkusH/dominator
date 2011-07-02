@@ -8,6 +8,7 @@
 
 #include <gui/mainwindow.hpp>
 #include <gui/qutils.hpp>
+#include <gui/dialogs.hpp>
 #include <QtGui/QMessageBox>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QGridLayout>
@@ -26,6 +27,8 @@ MainWindow::MainWindow(QApplication* app)
 	SplashScreen splash(100);
 	splash.show();
 	app->processEvents();
+
+	util::ErrorAdapter::instance().addListener(new QtErrorListerner());
 
 	initialize();
 	splash.updateProgress(5);
@@ -50,8 +53,6 @@ MainWindow::MainWindow(QApplication* app)
 	m_renderWidget->show();
 	app->processEvents();
 	splash.updateProgress(85);
-
-
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);

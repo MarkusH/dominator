@@ -14,6 +14,7 @@
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QMessageBox>
+#include <util/erroradapters.hpp>
 
 namespace gui {
 
@@ -79,6 +80,11 @@ private:
 	static const float m_rangeHigh;
 };
 
+class QtErrorListerner: public util::ErrorListener {
+public:
+	void displayError(const std::string& message);
+};
+
 class MessageDialog: public QMessageBox {
 Q_OBJECT
 public:
@@ -87,7 +93,7 @@ public:
 		QWARNING, /**< displays an "!" */
 		QERROR   /**< displays an "x" */
 	} MessageType;
-	MessageDialog(QString title, QString message, MessageType type = QINFO);
+	MessageDialog(const std::string title, const std::string message, const MessageType type = QINFO);
 };
 
 }

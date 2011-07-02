@@ -1,5 +1,5 @@
 /*
- * InputAdapters.hpp
+ * util/inputadapters.hpp
  *
  *  Created on: May 25, 2011
  *      Author: Markus Doellinger
@@ -92,8 +92,8 @@ public:
  * An enumeration defining the mouse buttons
  */
 enum Button {
-	LEFT  = 0, //!< LEFT
-	RIGHT  = 1,//!< RIGHT
+	LEFT = 0, //!< LEFT
+	RIGHT = 1, //!< RIGHT
 	MIDDLE = 2 //!< MIDDLE
 };
 

@@ -17,6 +17,7 @@
 #include <fstream> // for file I/O
 #include <string.h>
 #include <util/tostring.hpp>
+#include <util/erroradapters.hpp>
 
 namespace sim {
 
@@ -455,14 +456,12 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 	try {
 		f = new file<char>(fileName.c_str());
 	} catch ( std::runtime_error& e ) {
-		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
-		//m_errorAdapter.displayError(function, args, e);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		if(f) delete f;
 		return false;
 	} catch (...) {
-		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
-		//m_errorAdapter.displayError(function, args);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		if(f) delete f;
 		return false;
 	}
@@ -500,15 +499,13 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 			return false;
 		}
 	} catch( parse_error& e ) {
-		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
-		//m_errorAdapter.displayError(function, args, e);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		delete f;
 		return false;
 	} catch(...) {
-		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
-		//m_errorAdapter.displayError(function, args);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		delete f;
 		return false;
 	}

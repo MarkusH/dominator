@@ -1,32 +1,53 @@
+/*
+ * util/erroradapter.hpp
+ *
+ *  Created on: Jun 30, 2011
+ *      Author: Robert Waury, Markus Holtermann
+ */
+
 #ifndef ERRORADAPTERS_HPP_
 #define ERRORADAPTERS_HPP_
 
+#include <util/adapter.hpp>
 #include <vector>
 #include <string>
-#include <stdexception>
+#include <stdexcept>
 #include <xml/rapidxml.hpp>
-
 
 namespace util {
 
-	class ErrorAdapter {
-		public;
-			ErrorApdapter();
-			~ErrorAdapter();
+class ErrorListener {
+public:
+	ErrorListener();
+	~ErrorListener();
+	void displayError(const std::string& message);
+};
 
-			void displayErrorMessage(std::string& function, std::vector<std::string>& args);
-			void displayErrorMessage(std::string& function, std::vector<std::string>& args, rapidxml::parse_error& e);
-			void displayErrorMessage(std::string& function, std::vector<std::string>& args, std::runtime_error& e);
-		
-	}
+class ErrorAdapter: public Adapter<ErrorListener> {
+private:
+	static ErrorAdapter* s_instance;
+	/// todo shouldn't we override the public constructor and destructor of an Adapter?!
+	//ErrorAdapter();
+	//virtual ~ErrorAdapter();
 
-	class QtErrorAdapter : public ErrorAdapter {
-		public:
-			QtErrorApdapter();
-			~QtErrorAdapter();
+public:
+	static void createInstance();
+	static void destroyInstance();
+	static ErrorAdapter& instance();
+	void displayErrorMessage(const std::string& function,
+			const std::vector<std::string>& args);
+	void displayErrorMessage(const std::string& function,
+			const std::vector<std::string>& args, rapidxml::parse_error& e);
+	void displayErrorMessage(const std::string& function,
+			const std::vector<std::string>& args, std::runtime_error& e);
 
-			void displayQtMessageBox();
-	}
+};
+
+inline ErrorAdapter& ErrorAdapter::instance() {
+	if (!s_instance)
+		createInstance();
+	return *s_instance;
+}
 
 }
 
