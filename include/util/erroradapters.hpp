@@ -19,8 +19,8 @@ namespace util {
 class ErrorListener {
 public:
 	ErrorListener();
-	~ErrorListener();
-	void displayError(const std::string& message);
+	virtual ~ErrorListener();
+	virtual void displayError(const std::string& message);
 };
 
 class ErrorAdapter: public Adapter<ErrorListener> {
