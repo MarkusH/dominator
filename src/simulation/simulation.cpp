@@ -254,6 +254,21 @@ void Simulation::save(const std::string& fileName)
 	xml_attribute<>* attrG = doc.allocate_attribute("gravity", pG);
 	level->append_attribute(attrG);
 
+	// save attribute "position"
+	char* pPos = doc.allocate_string(m_camera.m_position.str().c_str());
+	xml_attribute<>* attrPos = doc.allocate_attribute("position", pPos);
+	level->append_attribute(attrPos);
+
+	// save attribute "eye"
+	char* pEye = doc.allocate_string(m_camera.m_eye.str().c_str());
+	xml_attribute<>* attrEye = doc.allocate_attribute("eye", pEye);
+	level->append_attribute(attrEye);
+
+	// saveattribute "up
+	char* pUp = doc.allocate_string(m_camera.m_up.str().c_str());
+	xml_attribute<>* attrUp = doc.allocate_attribute("up", pUp);
+	level->append_attribute(attrUp);
+
 	
 	ObjectList::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
@@ -324,8 +339,23 @@ void Simulation::load(const std::string& fileName)
 			// load gravity
 			try {
 				newton::gravity = (float)atof(nodes->first_attribute("gravity")->value()) * -4.0f;
-			} catch (parse_error& e) {
+			} catch (...) {
 				newton::gravity = 9.81f * -4.0f;
+			}
+
+			// load camera stuff
+			try {
+			m_camera.m_position.assign(nodes->first_attribute("position")->value());
+			m_camera.m_eye.assign(nodes->first_attribute("eye")->value());
+			m_camera.m_up.assign(nodes->first_attribute("up")->value());
+
+			m_camera.update();
+			} catch (...) { // so our old XML files don't make trouble
+				m_camera.m_position.assign("0, 10, 0");
+				m_camera.m_eye.assign("0, 10, -1");
+				m_camera.m_up.assign("0, 1, 0");
+
+				m_camera.update();
 			}
 
 			// iterate over all nodes
