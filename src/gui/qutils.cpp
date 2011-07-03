@@ -18,6 +18,18 @@ QObjectAction::QObjectAction(sim::__Object::Type type, QWidget* parent) :
 	m_mass = sim::__Object::TypeMass[type];
 	m_freeze = sim::__Object::TypeFreezeState[type];
 	m_size = sim::__Object::TypeSize[type];
+	m_filename = "";
+}
+
+QObjectAction::QObjectAction(QFileInfo fileinfo, QWidget* parent) :
+	QAction(parent)
+{
+	m_type = sim::__Object::COMPOUND;
+	setText(fileinfo.fileName());
+	m_mass = sim::__Object::TypeMass[m_type];
+	m_freeze = sim::__Object::TypeFreezeState[m_type];
+	m_size = sim::__Object::TypeSize[m_type];
+	m_filename = fileinfo.absoluteFilePath();
 }
 
 SplashScreen::SplashScreen(int max) :

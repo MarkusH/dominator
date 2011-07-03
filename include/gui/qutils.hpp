@@ -10,6 +10,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QProgressBar>
+#include <QtCore/QFileInfo>
 #include <simulation/simulation.hpp>
 
 namespace gui {
@@ -24,16 +25,19 @@ public:
 	 *
 	 */
 	QObjectAction(sim::__Object::Type type, QWidget* parent = 0);
+	QObjectAction(QFileInfo fileinfo, QWidget* parent = 0);
 	sim::__Object::Type getType();
 	float getMass();
 	bool getFreezeState();
 	m3d::Vec3f getSize();
+	QString getFilename();
 
 private:
 	sim::__Object::Type m_type;
 	float m_mass;
 	bool m_freeze;
 	m3d::Vec3f m_size;
+	QString m_filename;
 };
 
 class SplashScreen: public QSplashScreen {
@@ -53,6 +57,11 @@ inline sim::__Object::Type QObjectAction::getType()
 inline float QObjectAction::getMass()
 {
 	return m_mass;
+}
+
+inline QString QObjectAction::getFilename()
+{
+	return m_filename;
 }
 
 inline bool QObjectAction::getFreezeState()

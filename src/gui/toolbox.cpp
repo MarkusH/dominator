@@ -6,12 +6,13 @@
 
 #include <gui/toolbox.hpp>
 #include <gui/dialogs.hpp>
-#include <QtGui/QMenu>
 #include <QtGui/QSizePolicy>
 #include <simulation/material.hpp>
 #include <simulation/object.hpp>
 #include <iostream>
 #include <set>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfoList>
 
 namespace gui {
 
@@ -71,9 +72,9 @@ void ToolBox::create_m_objects()
 	m_objectMenu->addMenu(menu);
 
 	// create the menu for templates
-	menu = new QMenu("Templates");
-	/// @todo Load templates and add them here
-	m_objectMenu->addMenu(menu);
+	m_template_menu = new QMenu("Templates");
+	loadTemplates("data/templates/");
+	m_objectMenu->addMenu(m_template_menu);
 
 	m_objects = new QPushButton("Add an object");
 	m_objects->setMenu(m_objectMenu);
@@ -244,15 +245,14 @@ void ToolBox::create_m_buttonbox()
 void ToolBox::loadMaterials(QString filename)
 {
 	if (sim::MaterialMgr::instance().load(filename.toStdString())) {
+		disconnect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
 		std::set<std::string> materials;
 		sim::MaterialMgr::instance().getMaterials(materials);
 		for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
 			m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
 		}
 		connect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
-	} else {
-		MessageDialog("Error", "Sorry, something went wrong while loading the materials.", MessageDialog::QERROR);
-	}
+	} // otherwise a captched exception message
 }
 
 void ToolBox::updateMaterials(QString filename)
@@ -264,10 +264,15 @@ void ToolBox::updateMaterials(QString filename)
 	materialSelected(0);
 }
 
-void ToolBox::addWidget(QWidget* widget, int stretch, Qt::Alignment alignment)
+void ToolBox::loadTemplates(QString directory)
 {
-	layout->addWidget(widget, stretch, alignment);
-	setLayout(layout);
+	m_template_menu->clear();
+	QFileInfoList list = QDir(directory).entryInfoList(QStringList("*.xml"), QDir::Files | QDir::Readable);
+	for (int i = 0; i < list.size(); ++i) {
+		if (list.at(i).isFile()) {
+			m_template_menu->addAction(new QObjectAction(list.at(i)));
+		}
+	}
 }
 
 void ToolBox::onInteractionPressed(int button)
@@ -288,6 +293,11 @@ void ToolBox::addObject(QAction *action)
 {
 	QObjectAction* a = (QObjectAction*) action;
 	sim::Simulation::instance().setNewObjectType(a->getType());
+	if (a->getType() == sim::__Object::COMPOUND) {
+		sim::Simulation::instance().setNewObjectFilename(a->getFilename().toStdString());
+	} else {
+		sim::Simulation::instance().setNewObjectFilename("");
+	}
 	m_objects->setText(a->text());
 	m_mass->setValue(a->getMass());
 	m_freezeState->setCheckState((a->getFreezeState()) ? Qt::Checked : Qt::Unchecked);
