@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<compound id="0" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 24.1866, -11.215, 38.1254, 1">
+		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 24.1866, 8.78497, 38.1254, 1" width="5" height="0.5" depth="0.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="plankso" mass="0"/>
+		<object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 24.1866, 7.03497, 38.1254, 1" width="4" height="3" depth="0.25" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0.5"/>
+		<joint type="hinge" parentID="0" childID="1" pivot="24.1866, 8.53497, 38.1254" pinDir="1, 0, 0" limited="1" minangle="-1.30833" maxangle="1.30833"/>
+	</compound>
+</template>
+
