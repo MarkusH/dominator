@@ -13,8 +13,8 @@
 
 namespace sim {
 
-__Joint::__Joint(Type type)
-	: type(type)
+__Joint::__Joint(Type type, Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
+	: type(type), pivot(pivot), pinDir(pinDir), child(child), parent(parent)
 {
 
 }
@@ -50,23 +50,11 @@ __Hinge::__Hinge(Vec3f pivot, Vec3f pinDir,
 		const dMatrix& pinAndPivot,
 		const NewtonBody* childBody, const NewtonBody* parentBody,
 		bool limited, float minAngle, float maxAngle)
-	: __Joint(HINGE), CustomHinge(pinAndPivot, childBody, parentBody),
-	  pivot(pivot), pinDir(pinDir),
-	  child(child), parent(parent),
+	: __Joint(HINGE, pivot, pinDir, child, parent), CustomHinge(pinAndPivot, childBody, parentBody),
 	  limited(limited), minAngle(minAngle), maxAngle(maxAngle)
 {
 	this->EnableLimits(limited);
 	this->SetLimis(minAngle, maxAngle);
-}
-
-void __Hinge::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
-{
-	Mat4f tmp = inverse;
-	tmp.setW(Vec3f());
-	pinDir *= tmp;
-	pinDir = pinDir % matrix;
-
-	pivot *= inverse * matrix;
 }
 
 Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited, float minAngle, float maxAngle)
@@ -85,6 +73,17 @@ Hinge __Hinge::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Obje
 
 	Hinge result = Hinge(new __Hinge(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL, limited, minAngle, maxAngle));
 	return result;
+}
+
+void __Hinge::updateMatrix()
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
+	CalculateGlobalMatrix(m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	pinDir = Vec3f(matrix0.m_front.m_x, matrix0.m_front.m_y, matrix0.m_front.m_z);
+	pivot = Vec3f(matrix0.m_posit.m_x, matrix0.m_posit.m_y, matrix0.m_posit.m_z);
 }
 
 void __Hinge::save(const __Hinge& hinge, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
@@ -207,7 +206,6 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 
 	}
 
-
 	Hinge hinge = __Hinge::create(pivot, pinDir, child, parent, limited, minAngle, maxAngle);
 	return hinge;
 }
@@ -218,23 +216,11 @@ __Slider::__Slider(Vec3f pivot, Vec3f pinDir,
 		const dMatrix& pinAndPivot,
 		const NewtonBody* childBody, const NewtonBody* parentBody,
 		bool limited, float minDist, float maxDist)
-	: __Joint(SLIDER), CustomSlider(pinAndPivot, childBody, parentBody),
-	  pivot(pivot), pinDir(pinDir),
-	  child(child), parent(parent),
+	: __Joint(SLIDER, pivot, pinDir, child, parent), CustomSlider(pinAndPivot, childBody, parentBody),
 	  limited(limited), minDist(minDist), maxDist(maxDist)
 {
 	this->EnableLimits(limited);
 	this->SetLimis(minDist, maxDist);
-}
-
-void __Slider::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
-{
-	Mat4f tmp = inverse;
-	tmp.setW(Vec3f());
-	pinDir *= tmp;
-	pinDir = pinDir % matrix;
-
-	pivot *= inverse * matrix;
 }
 
 Slider __Slider::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited, float minDist, float maxDist)
@@ -254,6 +240,17 @@ Slider __Slider::create(Vec3f pivot, Vec3f pinDir, const Object& child, const Ob
 	Slider result = Slider(new __Slider(pivot, pinDir, child, parent,
 			pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL, limited, minDist, maxDist));
 	return result;
+}
+
+void __Slider::updateMatrix()
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
+	CalculateGlobalMatrix(m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	pinDir = Vec3f(matrix0.m_front.m_x, matrix0.m_front.m_y, matrix0.m_front.m_z);
+	pivot = Vec3f(matrix0.m_posit.m_x, matrix0.m_posit.m_y, matrix0.m_posit.m_z);
 }
 
 void __Slider::save(const __Slider& slider, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
@@ -384,37 +381,35 @@ __BallAndSocket::__BallAndSocket(Vec3f pivot, Vec3f pinDir,
 		const dMatrix& pinAndPivot,
 		const NewtonBody* childBody, const NewtonBody* parentBody,
 		bool limited, float coneAngle, float minTwist, float maxTwist)
-	: __Joint(BALL_AND_SOCKET),
-	  pivot(pivot), pinDir(pinDir),
-	  child(child), parent(parent),
+	: __Joint(BALL_AND_SOCKET, pivot, pinDir, child, parent),
 	  limited(limited), coneAngle(coneAngle), minTwist(minTwist), maxTwist(maxTwist)
 {
-	if (limited) {
-		CustomLimitBallAndSocket* tmp = new CustomLimitBallAndSocket(pinAndPivot, childBody, parentBody);
-		tmp->SetConeAngle(coneAngle);
-		tmp->SetTwistAngle(minTwist, maxTwist);
-		m_joint = tmp;
-	}
-	else {
-		m_joint = new CustomBallAndSocket(pinAndPivot, childBody, parentBody);
-	}
+}
 
+__BallAndSocketStd::__BallAndSocketStd(Vec3f pivot, Vec3f pinDir,
+		const Object& child, const Object& parent,
+		const dMatrix& pinAndPivot,
+		const NewtonBody* childBody, const NewtonBody* parentBody,
+		bool limited, float coneAngle, float minTwist, float maxTwist)
+: __BallAndSocket(pivot, pinDir, child, parent, pinAndPivot, childBody, parentBody,
+		limited, coneAngle, minTwist, maxTwist), CustomBallAndSocket(pinAndPivot, childBody, parentBody)
+{
+}
+
+__BallAndSocketLimited::__BallAndSocketLimited(Vec3f pivot, Vec3f pinDir,
+		const Object& child, const Object& parent,
+		const dMatrix& pinAndPivot,
+		const NewtonBody* childBody, const NewtonBody* parentBody,
+		bool limited, float coneAngle, float minTwist, float maxTwist)
+	: __BallAndSocket(pivot, pinDir, child, parent, pinAndPivot, childBody, parentBody,
+			limited, coneAngle, minTwist, maxTwist), CustomLimitBallAndSocket(pinAndPivot, childBody, parentBody)
+{
+	SetConeAngle(coneAngle);
+	SetTwistAngle(minTwist, maxTwist);
 }
 
 __BallAndSocket::~__BallAndSocket()
 {
-	if (m_joint)
-		delete m_joint;
-}
-
-void __BallAndSocket::updateMatrix(const Mat4f& inverse, const Mat4f& matrix)
-{
-	Mat4f tmp = inverse;
-	tmp.setW(Vec3f());
-	pinDir *= tmp;
-	pinDir = pinDir % matrix;
-
-	pivot *= inverse * matrix;
 }
 
 void __BallAndSocket::save(const __BallAndSocket& ball, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
@@ -567,10 +562,40 @@ BallAndSocket __BallAndSocket::create(Vec3f pivot, Vec3f pinDir, const Object& c
 	dMatrix pinAndPivot = dgGrammSchmidt(dVector(pinDir.x, pinDir.y, pinDir.z, 0.0f));
 	pinAndPivot.m_posit = dVector(pivot.x, pivot.y, pivot.z, 1.0f);
 
-	BallAndSocket result = BallAndSocket(new __BallAndSocket(pivot, pinDir,
-			child, parent, pinAndPivot, childBody->m_body, parentBody ? parentBody->m_body : NULL,
-			limited, coneAngle, minTwist, maxTwist));
+	BallAndSocket result;
+	if (limited) {
+		result = BallAndSocket(new __BallAndSocketLimited(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body,
+				parentBody ? parentBody->m_body : NULL, limited, coneAngle, minTwist, maxTwist));
+	} else {
+		result = BallAndSocket(new __BallAndSocketStd(pivot, pinDir, child, parent, pinAndPivot, childBody->m_body,
+				parentBody ? parentBody->m_body : NULL, limited, coneAngle, minTwist, maxTwist));
+	}
+
 	return result;
 }
+
+void __BallAndSocketStd::updateMatrix()
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
+	CalculateGlobalMatrix(m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+
+	pinDir = Vec3f(matrix0.m_front.m_x, matrix0.m_front.m_y, matrix0.m_front.m_z);
+	pivot = Vec3f(matrix0.m_posit.m_x, matrix0.m_posit.m_y, matrix0.m_posit.m_z);
+}
+
+void __BallAndSocketLimited::updateMatrix()
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
+	CalculateGlobalMatrix(m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	pinDir = Vec3f(matrix0.m_front.m_x, matrix0.m_front.m_y, matrix0.m_front.m_z);
+	pivot = Vec3f(matrix0.m_posit.m_x, matrix0.m_posit.m_y, matrix0.m_posit.m_z);
+}
+
 
 }
