@@ -16,6 +16,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
+#include <QtGui/QMenu>
 #include <gui/qutils.hpp>
 #include <simulation/simulation.hpp>
 
@@ -35,12 +36,10 @@ public:
 	 * @param parent	the parent widget
 	 */
 	ToolBox(QWidget* parent = 0);
-	/**
-	 * We overwrite this method to add a widget to the layout from the outside
-	 */
-	void addWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = 0);
+
 	void loadMaterials(QString filename);
 	void updateMaterials(QString filename = "");
+	void loadTemplates(QString directory);
 
 public slots:
 	/**
@@ -69,6 +68,7 @@ private:
 	QPushButton* m_objects;
 	QCheckBox* m_freezeState;
 	QDoubleSpinBox* m_mass;
+	QMenu* m_template_menu;
 
 	QLabel* m_labelSize;
 	QLabel* m_labelLocation;

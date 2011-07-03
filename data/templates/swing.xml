@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<compound id="0" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 10, 0, 50, 1">
+		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 10, 20, 50, 1" width="5" height="0.5" depth="0.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="plankso" mass="0"/>
+		<object id="1" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 19.5, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="2" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 19.5, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="3" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 18.55, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="4" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 18.55, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="5" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 17.6, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="6" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 17.6, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="7" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 16.65, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="8" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 16.65, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="9" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 15.7, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="10" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 15.7, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="11" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 14.75, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="12" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 14.75, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="13" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 13.8, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="14" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 13.8, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="15" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 12.85, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="16" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 12.85, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="17" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 11.9, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="18" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 11.9, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="19" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 10.95, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="20" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 10.95, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="21" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 10, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="22" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 10, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="23" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 9.05, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="24" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 9.05, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="25" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 8.1, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="26" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 8.1, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="27" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 7.15, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="28" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 7.15, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="29" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 8, 6.2, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="30" type="cylinder" matrix="3.13916e-07, 1, 0, 0; -1, 3.13916e-07, 0, 0; 0, 0, 1, 0; 12, 6.2, 50, 1" height="1" radius="0.05" freezeState="0" damping="0, 0, 0, 0" material="rope" mass="0.25"/>
+		<object id="31" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 10, 5.75, 50, 1" width="4.5" height="0.2" depth="1.5" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="planks" mass="2"/>
+		<joint type="ballandsocket" parentID="0" childID="1" pivot="8, 19.975, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="0" childID="2" pivot="12, 19.975, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="1" childID="3" pivot="8, 19.025, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="2" childID="4" pivot="12, 19.025, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="3" childID="5" pivot="8, 18.075, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="4" childID="6" pivot="12, 18.075, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="5" childID="7" pivot="8, 17.125, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="6" childID="8" pivot="12, 17.125, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="7" childID="9" pivot="8, 16.175, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="8" childID="10" pivot="12, 16.175, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="9" childID="11" pivot="8, 15.225, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="10" childID="12" pivot="12, 15.225, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="11" childID="13" pivot="8, 14.275, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="12" childID="14" pivot="12, 14.275, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="13" childID="15" pivot="8, 13.325, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="14" childID="16" pivot="12, 13.325, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="15" childID="17" pivot="8, 12.375, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="16" childID="18" pivot="12, 12.375, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="17" childID="19" pivot="8, 11.425, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="18" childID="20" pivot="12, 11.425, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="19" childID="21" pivot="8, 10.475, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="20" childID="22" pivot="12, 10.475, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="21" childID="23" pivot="8, 9.525, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="22" childID="24" pivot="12, 9.525, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="23" childID="25" pivot="8, 8.575, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="24" childID="26" pivot="12, 8.575, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="25" childID="27" pivot="8, 7.625, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="26" childID="28" pivot="12, 7.625, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="27" childID="29" pivot="8, 6.675, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="28" childID="30" pivot="12, 6.675, 50" pinDir="-1, 3.13916e-07, 0" limited="0"/>
+		<joint type="ballandsocket" parentID="29" childID="31" pivot="8, 5.75, 50" pinDir="-1, 3.13916e-07, 0" limited="1" coneangle="0" mintwist="0" maxtwist="0"/>
+		<joint type="ballandsocket" parentID="30" childID="31" pivot="12, 5.75, 50" pinDir="-1, 3.13916e-07, 0" limited="1" coneangle="0" mintwist="0" maxtwist="0"/>
+	</compound>
+</template>
+

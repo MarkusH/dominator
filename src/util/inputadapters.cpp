@@ -1,5 +1,5 @@
 /*
- * InputAdapters.cpp
+ * util/inputadapters.cpp
  *
  *  Created on: May 25, 2011
  *      Author: Markus Doellinger

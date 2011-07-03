@@ -55,7 +55,20 @@ public:
 	 */
 	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix) { };
 
+	/**
+	 * Saves Joint object to XML node and appends node to document
+	 *
+	 * @param	joint	Reference to Joint object to save
+	 */
 	static void save(const __Joint& joint, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads Joint from XML node
+	 *
+	 * @param	list	List of already loaded Objects that are part of the Joint
+	 * @param	node	Pointer to XML node
+	 * @return	The generated Joint object
+	 */
 	static Joint load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
@@ -83,7 +96,23 @@ public:
 
 	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
 
+	/**
+	 * Saves Hinge object to XML node
+	 *
+	 * @param hinge		Reference to Hinge object to save
+	 * @param parent	Pointer to root node
+	 * @param doc		Pointer to XML document
+	 */
 	static void save(const __Hinge& hinge, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads Joint from XML node
+	 *
+	 * @param	list	List of already loaded Objects that are part of the Hinge
+	 * @param	node	Pointer to XML node
+	 * @throw rapidxml::parse_error Attribute not found
+	 * @return	The generated Hinge object
+	 */
 	static Hinge load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
@@ -111,7 +140,23 @@ public:
 
 	static Slider create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
 
+	/**
+	 * Saves Slider object to XML node
+	 *
+	 * @param slider	Reference to Hinge object to save
+	 * @param parent	Pointer to root node
+	 * @param doc		Pointer to XML document
+	 */
 	static void save(const __Slider& slider, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	
+	/**
+	 * Loads Slider from XML node
+	 *
+	 * @param	list	List of already loaded Objects that are part of the Slider
+	 * @param	node	Pointer to XML node
+	 * @throw rapidxml::parse_error Attribute not found
+	 * @return	The generated Slider object
+	 */
 	static Slider load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
@@ -145,7 +190,23 @@ public:
 			const Object& child, const Object& parent,
 			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
 
+	/**
+	 * Saves BallAndSocket object to XML node
+	 *
+	 * @param ball		Reference to BallAndSocket object to save
+	 * @param parent	Pointer to root node
+	 * @param doc		Pointer to XML document
+	 */
 	static void save(const __BallAndSocket& ball, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads BallAndSocket from XML node
+	 *
+	 * @param	list	List of already loaded Objects that are part of the BallAndSocket
+	 * @param	node	Pointer to XML node
+	 * @throw rapidxml::parse_error Attribute not found
+	 * @return	The generated BallAndSocket object
+	 */
 	static BallAndSocket load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 }

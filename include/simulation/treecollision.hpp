@@ -66,7 +66,22 @@ public:
 	virtual void createOctree();
 	virtual void render();
 
-	static void save(__TreeCollision& object, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+	/**
+	 * Saves TreeCollision object to XML
+	 *
+	 * @param object	Reference to object to save
+	 * @param node		Pointer to root node
+	 * @param doc		Pointer to XML document
+	 */
+	static void save(__TreeCollision& object, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads Compound from XML node
+	 *
+	 * @param	node	Pointer to XML node
+	 * @throws	rapidxml::parse_error	Attribute not found
+	 * @return	TreeCollision object
+	 */
 	static TreeCollision load(rapidxml::xml_node<>* node);
 };
 }

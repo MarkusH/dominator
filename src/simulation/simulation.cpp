@@ -40,9 +40,6 @@ static CRSpline curve_spline;
 ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState, const Vec3f& size)
 	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState), size(size)
 {
-	// use this to test the template
-	//this->type = __Object::COMPOUND;
-	//this->fileName = "data/templates/template.xml";
 	switch (type) {
 	case __Object::BOX:
 	case __Object::SPHERE:
@@ -58,6 +55,9 @@ ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const s
 		break;
 	case __Object::CHAMFER_CYLINDER:
 		this->size = Vec3f(5.0f, 1.0f, 1.0f);
+		break;
+	case __Object::COMPOUND:
+		this->fileName = fileName;
 		break;
 	default:
 		this->size = Vec3f(1.0f, 1.0f, 1.0f);
@@ -102,7 +102,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 
 			char* m = f.data();
 
-			// TODO add exception handling
+			/// @todo add exception handling
 			xml_document<> doc;
 			doc.parse<0>(m);
 
@@ -232,6 +232,7 @@ void Simulation::loadTemplate(const std::string& fileName)
 void Simulation::save(const std::string& fileName)
 {
 	using namespace rapidxml;
+
 	// create document
 	xml_document<> doc;
 

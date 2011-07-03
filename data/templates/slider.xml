@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<compound id="0" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; -0.328209, 5.04214, 0, 1">
+		<object id="0" type="box" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; -0.328209, 5.04214, 0, 1" width="20" height="0.25" depth="0.25" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="metal" mass="0"/>
+		<object id="1" type="sphere" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; 9.53622, 6.68318, 0, 1" radius_x="1" radius_y="1" radius_z="1" freezeState="1" damping="0.1, 0.1, 0.1, 0.025" material="wood" mass="1"/>
+		<joint type="slider" parentID="0" childID="1" pivot="-0.307696, 4.91884, 0" pinDir="0.986443, 0.164104, 0" limited="1" mindist="-20.5" maxdist="0"/>
+	</compound>
+</template>
+

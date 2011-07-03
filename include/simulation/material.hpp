@@ -52,7 +52,20 @@ struct Material {
 	 */
 	Material(const Material& m);
 
-	void load(rapidxml::xml_node<>* n);
+	/**
+	 *	Loads material from XML node
+	 *
+	 *	@param	node	Pointer to current XML material node
+	 *	@throws	rapidxml::parse_error	attribute not found
+	 */
+	void load(rapidxml::xml_node<>* node);
+
+	/**
+	 *	Saves material to XML node
+	 *
+	 *	@param	materials	Pointer to empty XML root node
+	 *	@param	doc			Pointer to XML document
+	 */
 	void save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const;
 };
 
@@ -82,7 +95,20 @@ struct MaterialPair {
 	 */
 	MaterialPair(const MaterialPair& p);
 
+	/**
+	 *	Loads material pair from XML node
+	 *
+	 *	@param	node	Pointer to current XML material pair node
+	 *	@throws	rapidxml::parse_error	attribute not found
+	 */
 	void load(rapidxml::xml_node<>* node);
+
+	/**
+	 *	Saves material pair to XML node
+	 *
+	 *	@param	materials	Pointer to XML root node
+	 *	@param	doc			Pointer to XML document
+	 */
 	void save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* doc) const;
 };
 

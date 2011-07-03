@@ -198,7 +198,7 @@ public:
 	/**
 	 * Loads an object from the given node.
 	 *
-	 * @return   The generated object
+	 * @return The generated object
 	 */
 	static Object load(rapidxml::xml_node<>* node);
 };
@@ -250,7 +250,20 @@ public:
 
 	virtual void render();
 
+	/**
+	 *	Saves RigidBody object to XML node and appends it to document
+	 *
+	 *	@param body		Object to save
+	 *	@param parent	XML root node
+	 */
 	static void save(const __RigidBody& body , rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads an object from the given node.
+	 *
+	 * @return The generated object
+	 * @throws rapidxml::parse_error Attribute not found
+	 */
 	static RigidBody load(rapidxml::xml_node<>* node);
 
 	static RigidBody createSphere(const Mat4f& matrix, float radius_x, float radius_y, float radius_z, float mass, const std::string& material = "", int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
@@ -321,7 +334,20 @@ public:
 
 	virtual void genBuffers(ogl::VertexBuffer& vbo);
 
+	/**
+	 *	Saves Convex object to XML node and appends it to document
+	 *
+	 *	@param body		Object to save
+	 *	@param parent	XML root node
+	 */
 	static void save(const __Convex& body, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads an object from the given node.
+	 *
+	 * @return The generated object
+	 * @throws rapidxml::parse_error Attribute not found
+	 */
 	static Convex load(rapidxml::xml_node<>* node);
 };
 
