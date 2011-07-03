@@ -189,8 +189,7 @@ Hinge __Hinge::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	// limited attribute
 	attr = node->first_attribute("limited");
 	if(attr) {
-	bool limited = atoi(attr->value());
-	float minAngle = 0.0f, maxAngle = 0.0f;
+		limited = atoi(attr->value());
 	} else throw parse_error("No \"limited\" attribute in joint tag found", node->name());
 
 
