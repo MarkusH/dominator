@@ -251,6 +251,11 @@ void __Slider::updateMatrix()
 	CalculateGlobalMatrix(m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 	pinDir = Vec3f(matrix0.m_front.m_x, matrix0.m_front.m_y, matrix0.m_front.m_z);
 	pivot = Vec3f(matrix0.m_posit.m_x, matrix0.m_posit.m_y, matrix0.m_posit.m_z);
+
+	// update the distances according to the current position of the pivot
+	float dist = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
+	minDist -= dist;
+	maxDist -= dist;
 }
 
 void __Slider::save(const __Slider& slider, rapidxml::xml_node<>* sibling, rapidxml::xml_document<>* doc)
