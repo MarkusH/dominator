@@ -13,6 +13,7 @@
 #include <opengl/camera.hpp>
 #include <opengl/vertexbuffer.hpp>
 #include <opengl/skydome.hpp>
+#include <opengl/framebuffer.hpp>
 #include <simulation/object.hpp>
 #include <map>
 #include <Newton.h>
@@ -82,6 +83,7 @@ protected:
 	util::Clock m_clock;
 
 	ogl::Camera m_camera;
+	std::pair<ogl::FrameBuffer, ogl::Texture> m_shadow;
 
 	/** The world position of the mouse pointer */
 	Vec3f m_pointer;

@@ -22,6 +22,8 @@
 #include <opengl/oglutil.hpp>
 #include <util/threadcounter.hpp>
 
+#define SHADOW_MAP_SIZE 4096
+
 namespace sim {
 
 Simulation* Simulation::s_instance = NULL;
@@ -159,6 +161,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
 	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
+	m_shadow = ogl::createShadowFBO(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 }
 
 Simulation::~Simulation()
@@ -1118,9 +1121,83 @@ void Simulation::update()
 
 void Simulation::render()
 {
-	m_camera.apply();
+	m_vbo.bind();
+	const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 2048.0f);
+	const Mat4f lightModelview = Mat4f::lookAt(m_lightPos.xyz(), Vec3f(), Vec3f::yAxis());
+
+	// Render scene from light into FBO and store depth buffer
+	{
+		m_shadow.first->bind();
+		ogl::__Shader::unbind();
+
+		glViewport(0, 0, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(lightProjection[0]);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(lightModelview[0]);
+
+		//glPolygonOffset(2, 4);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
+		ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
+		for ( ; itr != m_sortedBuffers.end(); ++itr) {
+			const ogl::SubBuffer* const buf = (*itr);
+			const __Object* const obj = (const __Object* const)buf->userData;
+			glPushMatrix();
+			glMultMatrixf(obj->getMatrix()[0]);
+			glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
+			glPopMatrix();
+		}
+
+		ogl::VertexBuffer::unbind();
+
+		if (m_environment)
+			m_environment->render();
+
+		ogl::__FrameBuffer::unbind();
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glCullFace(GL_BACK);
+	}
 
 	m_vbo.bind();
+
+	{
+		const GLfloat bias[16] = {
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+		};
+
+		glMatrixMode(GL_TEXTURE);
+		glActiveTextureARB(GL_TEXTURE7);
+
+		glLoadIdentity();
+		glLoadMatrixf(bias);
+
+		glMultMatrixf(lightProjection[0]);
+		glMultMatrixf(lightModelview[0]);
+		glMultMatrixf(m_camera.m_inverse[0]);
+
+		glMatrixMode(GL_MODELVIEW);
+
+		ogl::__Texture::stage(GL_TEXTURE7);
+		m_shadow.second->bind();
+		ogl::__Texture::stage(GL_TEXTURE0);
+		//m_shadow.second->bind();
+	}
+
+	glViewport(m_camera.m_viewport.x, m_camera.m_viewport.y, m_camera.m_viewport.z, m_camera.m_viewport.w);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(m_camera.m_projection[0]);
+	m_camera.apply();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 /*
 	const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
@@ -1143,7 +1220,7 @@ void Simulation::render()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 
-
+	glActiveTextureARB(GL_TEXTURE0);
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
 	if (itr != m_sortedBuffers.end()) {
@@ -1151,12 +1228,25 @@ void Simulation::render()
 	}
 	MaterialMgr& mmgr = MaterialMgr::instance();
 	mmgr.applyMaterial(material);
+	glActiveTextureARB(GL_TEXTURE7);
 	for ( ; itr != m_sortedBuffers.end(); ++itr) {
 		const ogl::SubBuffer* const buf = (*itr);
 		const __Object* const obj = (const __Object* const)buf->userData;
 		if (material != buf->material) {
 			material = buf->material;
+			glActiveTextureARB(GL_TEXTURE0);
 			mmgr.applyMaterial(material);
+			glActiveTextureARB(GL_TEXTURE7);
+
+			Material* m = MaterialMgr::instance().get(material);
+			ogl::Shader shader;
+			if (m)
+				shader = ogl::ShaderMgr::instance().get(m->shader);
+			if (shader) {
+				shader->setUniform1i("ShadowMap", 7);
+				shader->setUniform1i("Texture0", 0);
+				shader->setUniform1f("shadowTexel", 1.0 / SHADOW_MAP_SIZE);
+			}
 		}
 
 		glPushMatrix();
@@ -1167,8 +1257,8 @@ void Simulation::render()
 		glPopMatrix();
 	}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glActiveTextureARB(GL_TEXTURE0);
+	ogl::VertexBuffer::unbind();
 
 	if (m_environment)
 		m_environment->render();

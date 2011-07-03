@@ -7,8 +7,34 @@
 
 #include <opengl/oglutil.hpp>
 #include <GL/glew.h>
+#include <iostream>
 
 namespace ogl {
+
+std::pair<FrameBuffer, Texture> createShadowFBO(unsigned width, unsigned height)
+{
+	Texture depthTexture = __Texture::create();
+	depthTexture->bind();
+
+	depthTexture->setFilter(GL_LINEAR, GL_LINEAR);
+	depthTexture->setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+	depthTexture->setTexParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	depthTexture->setTexParameteri(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	depthTexture->setTexParameteri(GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	depthTexture->unbind();
+
+	FrameBuffer frameBuffer = __FrameBuffer::create();
+	frameBuffer->disableColorBuffer();
+	frameBuffer->attachTexture2D(GL_DEPTH_ATTACHMENT_EXT, depthTexture->m_textureID);
+
+	if (!frameBuffer->check())
+		std::cerr << "Could not create FBO" << std::endl;
+
+	__FrameBuffer::unbind();
+	return std::make_pair(frameBuffer, depthTexture);
+}
 
 void drawAABB(const Vec3f& min, const Vec3f& max)
 {
