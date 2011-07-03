@@ -75,7 +75,22 @@ public:
 
 	static Compound createCompound(const Mat4f& matrix = Mat4f::identity());
 
-	static void save(__Compound& compound, rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc);
+	/**
+	 * Saves Compound object to XML
+	 *
+	 * @param compound	Reference to Compound object to save
+	 * @param parent	Pointer to root node
+	 * @param doc		Pointer to XML document
+	 */
+	static void save(__Compound& compound, rapidxml::xml_node<>* parent, rapidxml::xml_document<>* doc);
+
+	/**
+	 * Loads Compound from XML node
+	 *
+	 * @param	node	Pointer to XML node
+	 * @throws	rapidxml::parse_error	attribute not found
+	 * @return	The generated Compound object
+	 */
 	static Compound load(rapidxml::xml_node<>* node);
 };
 

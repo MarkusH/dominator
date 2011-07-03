@@ -481,14 +481,14 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	xml_attribute<>* attr = node->first_attribute("type");
 	if(attr) {
 	type = attr->value();
-	} else throw parse_error("No \"type\" attribute in object tag found", node->value());
+	} else throw parse_error("No \"type\" attribute in object tag found", node->name());
 
 	//attribute matrix
 	attr = node->first_attribute("matrix");
 	if(attr) {
 	matrix = Mat4f();
 	matrix.assign(attr->value());
-	} else throw parse_error("No \"matrix\" attribute in object tag found", node->value());
+	} else throw parse_error("No \"matrix\" attribute in object tag found", node->name());
 
 
 	/* set dimensions for box */
@@ -497,21 +497,21 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		attr = node->first_attribute("width");
 		if(attr) {
 		w = atof(attr->value());
-		} else throw parse_error("No \"width\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"width\" attribute in object tag found", node->name());
 
 
 		//attribute height
 		attr = node->first_attribute("height");
 		if(attr) {
 		h = atof(attr->value());
-		} else throw parse_error("No \"height\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"height\" attribute in object tag found", node->name());
 
 
 		//attribute depth
 		attr = node->first_attribute("depth");
 		if(attr) {
 		d = atof(attr->value());
-		} else throw parse_error("No \"depth\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"depth\" attribute in object tag found", node->name());
 
 
 	}/* set dimensions for box END */
@@ -522,21 +522,21 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		attr = node->first_attribute("radius_x");
 		if(attr) {
 		x = atof(attr->value());
-		} else throw parse_error("No \"radius_x\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"radius_x\" attribute in object tag found", node->name());
 
 
 		//attribute y
 		attr = node->first_attribute("radius_y");
 		if(attr) {
 		y = atof(attr->value());
-		} else throw parse_error("No \"radius_y\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"radius_y\" attribute in object tag found", node->name());
 
 
 		//attribute z
 		attr = node->first_attribute("radius_z");
 		if(attr) {
 		z = atof(attr->value());
-		} else throw parse_error("No \"radius_z\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"radius_z\" attribute in object tag found", node->name());
 
 	}/* set dimensions for sphere END */
 
@@ -547,14 +547,14 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 		attr = node->first_attribute("height");
 		if(attr) {
 		h = atof(attr->value());
-		} else throw parse_error("No \"height\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"height\" attribute in object tag found", node->name());
 
 
 		//attribute radius
 		attr = node->first_attribute("radius");
 		if(attr) {
 		radius = atof(attr->value());
-		} else throw parse_error("No \"radius\" attribute in object tag found", node->value());
+		} else throw parse_error("No \"radius\" attribute in object tag found", node->name());
 
 	}/* set dimensions for chamfer cylinder, cylinder, cone, capsule END */
 
@@ -563,7 +563,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	attr = node->first_attribute("freezeState");
 	if(attr) {
 	freezeState = atoi(attr->value());
-	} else throw parse_error("No \"freezeState\" attribute in object tag found", node->value());
+	} else throw parse_error("No \"freezeState\" attribute in object tag found", node->name());
 
 
 	//attribute damping
@@ -571,21 +571,21 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if(attr) {
 	damping = Vec4f();
 	damping.assign(attr->value());
-	} else throw parse_error("No \"damping\" attribute in object tag found", node->value());
+	} else throw parse_error("No \"damping\" attribute in object tag found", node->name());
 
 
 	//attribute material
 	attr = node->first_attribute("material");
 	if(attr) {
 	material = attr->value();
-	} else throw parse_error("No \"material\" attribute in object tag found", node->value());
+	} else throw parse_error("No \"material\" attribute in object tag found", node->name());
 
 
 	//attribute mass
 	attr = node->first_attribute("mass");
 	if(attr) {
 	mass = atof(attr->value());
-	} else throw parse_error("No \"mass\" attribute in object tag found", node->value());
+	} else throw parse_error("No \"mass\" attribute in object tag found", node->name());
 
 
 	// find the Type for the Domino
@@ -915,37 +915,62 @@ Convex __Convex::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
 
+	Mat4f matrix = Mat4f();
+	int freezeState;
+	Vec4f damping = Vec4f();
+	std::string material;
+	float mass;
+	std::string filename;
+
 	//attribute matrix
 	xml_attribute<>* attr = node->first_attribute("matrix");
-	Mat4f matrix = Mat4f();
+	if(attr) {
 	matrix.assign(attr->value());
+	} else throw parse_error("No \"matrix\" attribute in object tag found", node->name());
 
 	//attribute freezeState
 	attr = node->first_attribute("freezeState");
-	int freezeState = atoi(attr->value());
+	if(attr) {
+	freezeState = atoi(attr->value());
+	} else throw parse_error("No \"freezeState\" attribute in object tag found", node->name());
+
 
 	//attribute damping
 	attr = node->first_attribute("damping");
-	Vec4f damping = Vec4f();
+	if(attr) {
 	damping.assign(attr->value());
+	} else throw parse_error("No \"damping\" attribute in object tag found", node->name());
+
 
 	//attribute material
 	attr = node->first_attribute("material");
-	std::string material = attr->value();
+	if(attr) {
+	material = attr->value();
+	} else throw parse_error("No \"material\" attribute in object tag found", node->name());
+
 
 	//attribute mass
 	attr = node->first_attribute("mass");
-	float mass = atof(attr->value());
+	if(attr) {
+	mass = atof(attr->value());
+	} else throw parse_error("No \"mass\" attribute in object tag found", node->name());
+
 
 	//attribute filename
 	attr = node->first_attribute("filename");
-	std::string filename = attr->value();
+	if(attr) {
+	filename = attr->value();
+	} else throw parse_error("No \"filename\" attribute in object tag found", node->name());
+
 
 	std::string type = node->first_attribute("type")->value();
-	if (type == TypeStr[CONVEX_ASSEMBLY])
-		return createAssembly(matrix, mass, material, filename, freezeState, damping);
-	else
-		return createHull(matrix, mass, material, filename, freezeState, damping);
+	if(!type.empty()) {
+		if (type == TypeStr[CONVEX_ASSEMBLY])
+			return createAssembly(matrix, mass, material, filename, freezeState, damping);
+		else
+			return createHull(matrix, mass, material, filename, freezeState, damping);
+	} else throw parse_error("No \"type\" attribute in object tag found", node->name());
+
 }
 
 

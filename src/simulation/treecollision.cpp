@@ -306,13 +306,13 @@ void __TreeCollision::save(__TreeCollision& object, rapidxml::xml_node<>* parent
 TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
-	std::string model = "\0";
+	std::string model;
 
 	//attribute model
 	xml_attribute<>* attr = node->first_attribute("filename");
 	if(attr) {
 	model = attr->value();
-	} else throw parse_error("No \"filename\" attribute in environment tag found", node->value());
+	} else throw parse_error("No \"filename\" attribute in environment tag found", node->name());
 
 	//attribute octree
 	attr = attr->next_attribute("octree");
@@ -321,7 +321,7 @@ TreeCollision __TreeCollision::load(rapidxml::xml_node<>* node)
 	if(std::string(attr->value()) == "0") octree = false;
 	else octree = true;
 	/// @todo use octree
-	} else throw parse_error("No \"octree\" attribute in environment tag found", node->value());
+	} else throw parse_error("No \"octree\" attribute in environment tag found", node->name());
 
 	TreeCollision result = TreeCollision(new __TreeCollision(Mat4f::identity(), model));
 	return result;
