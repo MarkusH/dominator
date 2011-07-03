@@ -24,6 +24,7 @@ namespace gui {
 MainWindow::MainWindow(QApplication* app)
 {
 	m_modified = true;
+	m_tmp_file = NULL;
 
 	// load the splash screen
 	SplashScreen splash(100);
@@ -45,7 +46,6 @@ MainWindow::MainWindow(QApplication* app)
 
 	m_toolBox = new ToolBox();
 	splash.updateProgress(50);
-	//m_toolBox->loadMaterials("data/levels/test.xml");
 	m_toolBox->loadMaterials("data/materials.xml");
 	app->processEvents();
 	splash.updateProgress(80);
@@ -139,13 +139,19 @@ void MainWindow::createMenu()
 	connect(m_play, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
 	m_menuSimulation->addAction(m_play);
 
-	m_menuSimulation->addSeparator();
-
 	m_stop = new QAction("&Stop", this);
 	m_stop->setEnabled(false);
 	m_stop->setShortcut(Qt::Key_F9);
 	connect(m_stop, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
 	m_menuSimulation->addAction(m_stop);
+
+	m_stop_no_reset = new QAction("&Stop (no reset)", this);
+	m_stop_no_reset->setEnabled(false);
+	m_stop_no_reset->setShortcut(Qt::CTRL | Qt::Key_F9);
+	connect(m_stop_no_reset, SIGNAL(triggered()), this, SLOT(onSimulationControlsPressed()));
+	m_menuSimulation->addAction(m_stop_no_reset);
+
+	m_menuSimulation->addSeparator();
 
 	m_gravity = new QAction("&Gravity", this);
 	connect(m_gravity, SIGNAL(triggered()), this, SLOT(onGravityPressed()));
@@ -227,6 +233,7 @@ void MainWindow::onClosePressed()
 
 void MainWindow::onSavePressed()
 {
+	sim::Simulation::instance().setEnabled(false);
 	if (m_filename == "" || QObject::sender() == m_saveas) {
 		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.xml)");
 	}
@@ -242,6 +249,7 @@ void MainWindow::onOpenPressed()
 	dialog.setFileMode(QFileDialog::ExistingFile);
 	dialog.setFilter("TUStudios Dominator (*.xml)");
 	if (dialog.exec()) {
+		sim::Simulation::instance().setEnabled(false);
 		m_filename = dialog.selectedFiles().first();
 		m_currentFilename->setText(m_filename);
 		sim::Simulation::instance().load(m_filename.toStdString());
@@ -251,19 +259,35 @@ void MainWindow::onOpenPressed()
 
 void MainWindow::onSimulationControlsPressed()
 {
-	bool set_active;
+	bool status;
 	if (QObject::sender() == m_play) {
-		set_active = true;
-		m_simulationStatus->setText("Simulation started");
-	} else if (QObject::sender() == m_stop) {
-		set_active = false;
-		m_simulationStatus->setText("Simulation stopped");
+		sim::Simulation::instance().setEnabled(false);
+		m_tmp_file = new QTemporaryFile();
+		m_tmp_file->open();
+		sim::Simulation::instance().save(m_tmp_file->fileName().toStdString());
+		status = true;
 	} else {
-		return;
+		status = false;
 	}
-	m_play->setEnabled(!set_active);
-	m_stop->setEnabled(set_active);
-	sim::Simulation::instance().setEnabled(set_active);
+
+	m_play->setEnabled(!status);
+	m_stop->setEnabled(status);
+	m_stop_no_reset->setEnabled(status);
+	sim::Simulation::instance().setEnabled(status);
+
+	if (!status && m_tmp_file) {
+		if (QObject::sender() == m_stop) {
+			sim::Simulation::instance().load(m_tmp_file->fileName().toStdString());
+		}
+		m_tmp_file->close();
+		free(m_tmp_file);
+	}
+
+	if (status) {
+		m_simulationStatus->setText("Simulation started");
+	} else {
+		m_simulationStatus->setText("Simulation stopped");
+	}
 }
 
 void MainWindow::onGravityPressed()
