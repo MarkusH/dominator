@@ -21,6 +21,8 @@
 #include <simulation/crspline.hpp>
 #include <opengl/oglutil.hpp>
 #include <util/threadcounter.hpp>
+#include <util/tostring.hpp>
+#include <stdlib.h>
 
 namespace sim {
 
@@ -247,6 +249,11 @@ void Simulation::save(const std::string& fileName)
 	xml_node<>* level = doc.allocate_node(node_element, "level");
 	doc.append_node(level);
 
+	// save attribute "gravity"
+	char* pG = doc.allocate_string(util::toString(newton::gravity/-4.0f));
+	xml_attribute<>* attrG = doc.allocate_attribute("gravity", pG);
+	level->append_attribute(attrG);
+
 	
 	ObjectList::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
@@ -254,7 +261,6 @@ void Simulation::save(const std::string& fileName)
 		__Object::save(*itr->get(), level, &doc);
 	}
 
-	// save attribute "gravity" to m_gravity
 	// save attribute "environment" __treecollision.save(m_environment)
 	if (m_environment)
 		__TreeCollision::save((__TreeCollision&)*m_environment.get(), level, &doc);
@@ -312,8 +318,17 @@ void Simulation::load(const std::string& fileName)
 
 		// this is important so we don't parse the level tag but the object and compound tags
 		xml_node<>* nodes = doc.first_node("level");
-
+		
 		if (nodes) {
+
+			// load gravity
+			try {
+				newton::gravity = (float)atof(nodes->first_attribute("gravity")->value()) * -4.0f;
+			} catch (parse_error& e) {
+				newton::gravity = 9.81f * -4.0f;
+			}
+
+			// iterate over all nodes
 			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 				std::string type(node->name());
 				if (type == "object" || type == "compound") {
