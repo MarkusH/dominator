@@ -1,3 +1,9 @@
+/**
+ * @author Robert Waury
+ * @date Jun 9, 2011
+ * @file util/tostring.hpp
+ */
+
 #ifndef TOSTRING_HPP_
 #define TOSTRING_HPP_
 

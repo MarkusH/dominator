@@ -1,8 +1,7 @@
-/*
- * Clock.hpp
- *
- *  Created on: May 23, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date May 23, 2011
+ * @file util/clock.hpp
  */
 
 #ifndef CLOCK_HPP_

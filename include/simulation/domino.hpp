@@ -1,8 +1,7 @@
-/*
- * Domino.hpp
- *
- *  Created on: Jun 7, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger
+ * @date Jun 7, 2011
+ * @file simulation/domino.hpp
  */
 
 #ifndef DOMINO_HPP_

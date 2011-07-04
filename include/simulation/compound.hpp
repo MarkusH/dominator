@@ -1,8 +1,7 @@
-/*
- * Compound.hpp
- *
- *  Created on: Jun 1, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger
+ * @date Jun 1, 2011
+ * @file simulation/compound.hpp
  */
 
 #ifndef COMPOUND_HPP_

@@ -1,8 +1,7 @@
-/*
- * Joint.cpp
- *
- *  Created on: Jun 2, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger
+ * @date Jun 2, 2011
+ * @file simulation/joint.cpp
  */
 
 #include <simulation/object.hpp>

@@ -1,8 +1,7 @@
-/*
- * Object.cpp
- *
- *  Created on: May 27, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date May 27, 2011
+ * @file simulation/object.cpp
  */
 
 #include <simulation/object.hpp>

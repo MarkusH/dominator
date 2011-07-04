@@ -1,3 +1,9 @@
+/**
+ * @author Markus Doellinger
+ * @date Jun 30, 2011
+ * @file util/threadcounter.hpp
+ */
+
 #ifndef THREADCOUNTER_HPP_
 #define THREADCOUNTER_HPP_
 

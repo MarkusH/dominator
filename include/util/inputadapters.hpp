@@ -1,8 +1,7 @@
-/*
- * util/inputadapters.hpp
- *
- *  Created on: May 25, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date May 25, 2011
+ * @file util/inputadapters.hpp
  */
 
 #ifndef INPUTADAPTERS_HPP_

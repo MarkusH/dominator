@@ -1,8 +1,7 @@
-/*
- * threadcounter.cpp
- *
- *  Created on: Jun 30, 2011
- *      Author: Robert Waury
+/**
+ * @author Robert Waury
+ * @date Jun 30, 2011
+ * @file util/threadcounter.cpp
  */
 
 #include <util/threadcounter.hpp>

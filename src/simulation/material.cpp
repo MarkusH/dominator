@@ -1,8 +1,7 @@
-/*
- * Material.cpp
- *
- *  Created on: May 24, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date May 24, 2011
+ * @file simulation/material.cpp
  */
 
 #include <simulation/material.hpp>

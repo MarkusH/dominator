@@ -1,8 +1,7 @@
-/*
- * util.cpp
- *
- *  Created on: May 28, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date May 28, 2011
+ * @file newton/util.cpp
  */
 
 #include <opengl/oglutil.hpp>

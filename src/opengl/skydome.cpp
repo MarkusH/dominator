@@ -1,8 +1,7 @@
-/*
- * Skydome.cpp
- *
- *  Created on: Jun 19, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger
+ * @date Jun 23, 2011
+ * @file opengl/skydome.cpp
  */
 
 #include <opengl/skydome.hpp>
