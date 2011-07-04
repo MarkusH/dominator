@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<level>
+<level gravity="9.84" position="0, 10, 0" eye="0, 10, -1" up="0, 1, 0">
 	<compound id="0" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 4.30488, 0, 1">
 		<object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 4.30488, 0, 1" width="0.25" height="6" depth="0.25" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="metal" mass="0"/>
 		<object id="1" type="box" matrix="0.000796274, 1, 0, 0; -1, 0.000796274, 0, 0; 0, 0, 1, 0; 2, 6.55488, 0, 1" width="0.25" height="6" depth="0.25" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="metal" mass="2"/>
