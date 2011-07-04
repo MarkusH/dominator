@@ -337,20 +337,20 @@ void Simulation::load(const std::string& fileName)
 		if (nodes) {
 
 			// load gravity
-			try {
+			if(nodes->first_attribute("gravity")) {
 				newton::gravity = (float)atof(nodes->first_attribute("gravity")->value()) * -4.0f;
-			} catch (...) {
+			} else {
 				newton::gravity = 9.81f * -4.0f;
 			}
 
 			// load camera stuff
-			try {
+			if( nodes->first_attribute("position") && nodes->first_attribute("eye") && nodes->first_attribute("up") ) {
 			m_camera.m_position.assign(nodes->first_attribute("position")->value());
 			m_camera.m_eye.assign(nodes->first_attribute("eye")->value());
 			m_camera.m_up.assign(nodes->first_attribute("up")->value());
 
 			m_camera.update();
-			} catch (...) { // so our old XML files don't make trouble
+			} else { // so our old XML files don't make trouble
 				m_camera.m_position.assign("0, 10, 0");
 				m_camera.m_eye.assign("0, 10, -1");
 				m_camera.m_up.assign("0, 1, 0");

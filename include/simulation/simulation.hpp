@@ -187,9 +187,6 @@ public:
 	void setNewObjectFreezeState(const int freezeState);
 	void setNewObjectSize(const Vec3f size);
 
-	/** @param gravity The new gravity*/
-	void setGravity(float gravity);
-
 	/** @return The camera */
 	ogl::Camera& getCamera();
 
