@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Markus Doellinger, Robert Waury
  * @date May 24, 2011
  * @file simulation/material.cpp
  */

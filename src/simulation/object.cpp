@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Markus Doellinger, Robert Waury
  * @date May 27, 2011
  * @file simulation/object.cpp
  */

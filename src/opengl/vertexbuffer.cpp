@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Markus Doellinger, Robert Waury
  * @date May 28, 2011
  * @file opengl/vertexbuffer.cpp
  */

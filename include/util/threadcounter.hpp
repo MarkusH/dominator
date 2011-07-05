@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Robert Waury
  * @date Jun 30, 2011
  * @file util/threadcounter.hpp
  */

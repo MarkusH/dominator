@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Markus Doellinger, Robert Waury
  * @date Jun 5, 2011
  * @file simulation/treecollision.cpp
  */

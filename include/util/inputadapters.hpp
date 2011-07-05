@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Markus Doellinger, Markus Holtermann
  * @date May 25, 2011
  * @file util/inputadapters.hpp
  */
