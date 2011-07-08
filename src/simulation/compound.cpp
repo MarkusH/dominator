@@ -1,8 +1,7 @@
-/*
- * Compound.cpp
- *
- *  Created on: Jun 1, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date Jun 1, 2011
+ * @file simulation/compound.cpp
  */
 
 #include <simulation/compound.hpp>

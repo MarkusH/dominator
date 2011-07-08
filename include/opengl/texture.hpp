@@ -1,9 +1,9 @@
-/*
- * Texture.hpp
- *
- *  Created on: May 21, 2011
- *      Author: Markus Doellinger, Robert Waury
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 21, 2011
+ * @file opengl/texture.hpp
  */
+
 
 #ifndef TEXTURE_HPP_
 #define TEXTURE_HPP_

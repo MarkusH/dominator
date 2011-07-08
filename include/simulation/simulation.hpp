@@ -1,8 +1,7 @@
-/*
- * Simulation.hpp
- *
- *  Created on: May 27, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Markus Holtermann, Robert Waury
+ * @date May 27, 2011
+ * @file simulation/simulation.hpp
  */
 
 #ifndef SIMULATION_HPP_

@@ -1,8 +1,7 @@
-/*
- * mesh.hpp
- *
- *  Created on: Jun 26, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date Jun 26, 2011
+ * @file opengl/mesh.hpp
  */
 
 #ifndef MESH_HPP_

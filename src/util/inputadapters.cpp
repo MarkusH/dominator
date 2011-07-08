@@ -1,8 +1,7 @@
-/*
- * util/inputadapters.cpp
- *
- *  Created on: May 25, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Markus Holtermann
+ * @date May 25, 2011
+ * @file util/inputadapters.cpp
  */
 
 #include <util/inputadapters.hpp>

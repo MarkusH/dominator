@@ -1,8 +1,7 @@
-/*
- * util/erroradapter.cpp
- *
- *  Created on: Jun 30, 2011
- *      Author: Robert Waury, Markus Holtermann
+/**
+ * @author Markus Holtermann, Robert Waury
+ * @date Jun 30, 2011
+ * @file util/erroradapters.cpp
  */
 
 #include <util/erroradapters.hpp>

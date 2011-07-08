@@ -1,8 +1,7 @@
-/*
- * VertexBuffer.hpp
- *
- *  Created on: May 28, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 28, 2011
+ * @file opengl/vertexbuffer.hpp
  */
 
 #ifndef VERTEXBUFFER_HPP_

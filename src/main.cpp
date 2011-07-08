@@ -1,8 +1,9 @@
-/*
- * main.cpp
- *
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date May 12, 2011
+ * @file main.cpp
  */
+
 #include <iostream>
 #include <QtGui/QApplication>
 #include <gui/mainwindow.hpp>

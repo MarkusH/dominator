@@ -1,8 +1,7 @@
-/*
- * Material.hpp
- *
- *  Created on: May 24, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 24, 2011
+ * @file simulation/material.hpp
  */
 
 #ifndef MATERIAL_HPP_
