@@ -117,7 +117,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 
 			if (type == "object" || type == "compound") {
 				result = __Object::load(node);
-				result->setMatrix(matrix);
+				if (result) result->setMatrix(matrix);
 				return result;
 			}
 		}
@@ -1091,7 +1091,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
 				//Mat4f matrix(Vec3f::yAxis(), q, p);
-				Mat4f matrix = Mat4f::gramSchmidt(q, p);
+				Mat4f matrix = Mat4f::grammSchmidt(q, p);
 				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, m_newObjectMaterial);
 				add(domino);
 			}
@@ -1104,7 +1104,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			Vec3f dir = (end - start);
 			float len = dir.normalize();
 			//Mat4f matrix(Vec3f::yAxis(), dir, start);
-			Mat4f matrix = Mat4f::gramSchmidt(dir, start);
+			Mat4f matrix = Mat4f::grammSchmidt(dir, start);
 			for (float d = 0.0f; d <= len; d += 4.5f) {
 				matrix.setW(start + dir * d);
 				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, m_newObjectMaterial);
@@ -1167,17 +1167,6 @@ void Simulation::render()
 
 	m_vbo.bind();
 
-/*
-	const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
-					 0.0f, 0.5f, 0.0f, 0.0f,
-					 0.0f, 0.0f, 0.5f, 0.0f,
-					 0.5f, 0.5f, 0.5f, 1.0f);
-	const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
-	const Mat4f lightModelview;
-
-	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
-*/
-
 	// set some light properties
 	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
 	GLfloat diffuse[4] = { 0.7, 0.7, 0.7, 1.0 };
@@ -1187,7 +1176,6 @@ void Simulation::render()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-
 
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
@@ -1207,8 +1195,6 @@ void Simulation::render()
 		glPushMatrix();
 		glMultMatrixf(obj->getMatrix()[0]);
 		glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
 		glPopMatrix();
 	}
 

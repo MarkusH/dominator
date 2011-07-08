@@ -28,6 +28,9 @@ struct Material {
 	/** The texture of the material, i.e. the key in the TextureMgr */
 	std::string texture;
 
+	/** Another texture of the material, e.g. a normal map */
+	std::string texture1;
+
 	/** The shader of the material, i.e. the key in the ShaderMgr */
 	std::string shader;
 
