@@ -451,11 +451,11 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if (0)
 	{
-		//Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
-		//add(hull);
-		//hull->convexCastPlacement();
+		Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/tenpin.3ds");
+		add(hull);
+		hull->convexCastPlacement();
 
-		Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
+		Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/barrel.3ds");
 		add(assembly);
 		assembly->convexCastPlacement();
 	}

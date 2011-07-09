@@ -171,8 +171,6 @@ Object __Object::load(rapidxml::xml_node<>* node)
 	else if (std::string(node->name()) == TypeStr[DOMINO_SMALL]) return __Domino::load(node);
 	else if (std::string(node->name()) == TypeStr[DOMINO_MIDDLE]) return __Domino::load(node);
 	else if (std::string(node->name()) == TypeStr[DOMINO_LARGE]) return __Domino::load(node);
-	else if (std::string(node->name()) == TypeStr[CONVEX_ASSEMBLY]) return __Convex::load(node);
-	else if (std::string(node->name()) == TypeStr[CONVEX_HULL]) return __Convex::load(node);
 	else return __RigidBody::load(node);
 }
 
@@ -474,6 +472,9 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if(attr) {
 	type = attr->value();
 	} else throw parse_error("No \"type\" attribute in object tag found", node->name());
+
+	if (type == TypeStr[CONVEX_ASSEMBLY]) return __Convex::load(node);
+	if (type == TypeStr[CONVEX_HULL]) return __Convex::load(node);
 
 	//attribute matrix
 	attr = node->first_attribute("matrix");
