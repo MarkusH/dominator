@@ -451,13 +451,22 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if (0)
 	{
-		Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/tenpin.3ds");
-		add(hull);
-		hull->convexCastPlacement();
+		//Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/tenpin.3ds");
+		//add(hull);
+		//hull->convexCastPlacement();
 
-		Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/barrel.3ds");
-		add(assembly);
-		assembly->convexCastPlacement();
+		Mat4f rot = Mat4f::rotX(-3.14f * 0.5f);
+		for (int i = 1; i < 5; ++i) {
+			for (int j = 0; j < i; ++j) {
+				Convex hull = __Convex::createHull(rot * Mat4f::translate(j * 1.5f - i * 1.5f*0.5f, 0.0f, -25.0f + i * 1.5f), 2.0f, "tire", "data/models/tenpin.3ds");
+				add(hull);
+				hull->convexCastPlacement();
+			}
+		}
+
+		//Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/barrel.3ds");
+		//add(assembly);
+		//assembly->convexCastPlacement();
 	}
 
 	// simple seesaw with hinge
