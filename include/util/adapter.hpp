@@ -1,8 +1,7 @@
-/*
- * util/adapter.hpp
- *
- *  Created on: Jul 2, 2011
- *      Author: Markus Holtermann
+/**
+ * @author Markus Holtermann
+ * @date Jul 2, 2011
+ * @file util/adapter.hpp
  */
 
 #ifndef LISTENER_HPP_

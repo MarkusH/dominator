@@ -1,8 +1,7 @@
-/*
- * Shader.hpp
- *
- *  Created on: May 21, 2011
- *      Author: Markus Doellinger, Robert Waury
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 21, 2011
+ * @file opengl/shader.hpp
  */
 
 #ifndef SHADER_HPP_

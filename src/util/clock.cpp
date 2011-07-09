@@ -1,8 +1,7 @@
-/*
- * Clock.cpp
- *
- *  Created on: May 23, 2011
- *      Author: Markus Doellinger, Robert Waury
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 23, 2011
+ * @file util/clock.cpp
  */
 
 #include <util/clock.hpp>

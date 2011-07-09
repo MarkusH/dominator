@@ -1,8 +1,7 @@
-/*
- * Material.hpp
- *
- *  Created on: May 24, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 24, 2011
+ * @file simulation/material.hpp
  */
 
 #ifndef MATERIAL_HPP_
@@ -27,6 +26,9 @@ struct Material {
 
 	/** The texture of the material, i.e. the key in the TextureMgr */
 	std::string texture;
+
+	/** Another texture of the material, e.g. a normal map */
+	std::string texture1;
 
 	/** The shader of the material, i.e. the key in the ShaderMgr */
 	std::string shader;
