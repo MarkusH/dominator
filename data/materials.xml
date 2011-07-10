@@ -25,15 +25,17 @@
 	<material name="tire" texture="tire" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="box" texture="box" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.3, 0.3, 0.3, 1" shininess="20" />
 	<material name="crate__" texture="crate" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.3, 0.3, 0.3, 1" shininess="20" />
-	<material name="crate" texture="crate" texture1="crate_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.3, 0.3, 0.3, 1" shininess="20" />
+	<material name="crate" texture="crate" texture1="crate_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="wood" texture="wood" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="sand" texture="sand" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="planks" texture="planks" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="plankso" texture="plankso" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="barrel__" texture="barrel" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
-	<material name="barrel" texture="barrel" texture1="barrel_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
+	<material name="barrel" texture="barrel" texture1="barrel_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="50" />
+    <material name="cap__" texture="cap" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
+	<material name="cap" texture="cap" texture1="cap_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="50" />
 	<material name="metal__" texture="metal" texture1="metal" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
-	<material name="metal" texture="metal" texture1="metal_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />	
+	<material name="metal" texture="metal" texture1="metal_normal" shader="ppl_normal_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="5" />	
 	<material name="yellow" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
 	<material name="rope" texture="rope" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="domino" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
