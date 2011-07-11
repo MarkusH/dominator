@@ -10,6 +10,7 @@
 
 namespace sim {
 
+
 NewtonCollision* __Domino::s_domino_collision[3] = { NULL, NULL, NULL };
 Vec3f __Domino::s_domino_size[3] = { Vec3f(3.0f, 8.0f, 0.5f) * 0.75f, Vec3f(3.0f, 8.0f, 0.5f), Vec3f(3.0f, 8.0f, 0.5f) * 1.25f };
 

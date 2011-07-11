@@ -12,6 +12,17 @@
 
 namespace sim {
 
+static float atof(const char* str)
+{
+	std::stringstream sst;
+	sst << str;
+	sst.seekg(0, std::ios::beg);
+	float result;
+	sst >> result;
+	return result;
+}
+
+
 __Joint::__Joint(Type type, Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
 	: type(type), pivot(pivot), pinDir(pinDir), child(child), parent(parent)
 {

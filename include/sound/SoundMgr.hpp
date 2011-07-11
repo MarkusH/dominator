@@ -11,23 +11,18 @@
 #include <fmodex/fmod.hpp>
 #include <fmodex/fmod_errors.h>
 #include <string>
+#include <map>
 #include <list>
 
 namespace snd {
 
 class SoundMgr {
 private:
-	FMOD::System     *system;
-	FMOD::Sound      *sound1;
-	FMOD::Channel    *channel;
-	FMOD_RESULT       result;
-	int               key;
-	unsigned int      version;
-	void             *buff;
-	int               length;
-	FMOD_CREATESOUNDEXINFO exinfo;
-    FMOD_VECTOR       listenerpos;
-    std::list<FMOD::Sound> SoundList;
+	FMOD::System     *m_system;
+	FMOD::Channel    *m_musicChannel;
+	std::map<std::string, FMOD::Sound*>::iterator m_currentMusic;
+	std::map<std::string, FMOD::Sound*> m_sounds;
+	std::map<std::string, FMOD::Sound*> m_music;
 
 	static SoundMgr* s_instance;
 	SoundMgr();
@@ -41,11 +36,11 @@ public:
 	static void destroy();
 
 	void SoundUpdate();
-	void SetListenerPos();
-	//FMOD::Sound* LoadSound();//anderer return?
-	unsigned LoadSound(std::string folder);
-	void PlaySound(const char *name, int volume);//param: pos
-	void PlayMusic(const char *name, int volume);//wie anhalten?
+	void SetListenerPos(float* listenerpos, float* forward, float* upward, float* velocity);
+	unsigned LoadSound(const std::string& folder);
+	unsigned LoadMusic(const std::string& folder);
+	void PlaySound(const char *name, int volume, float* position, float* velocity);
+	void PlayMusic(int volume);
 };
 
 }

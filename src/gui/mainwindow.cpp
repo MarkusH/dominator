@@ -255,6 +255,7 @@ void MainWindow::onOpenPressed()
 		sim::Simulation::instance().load(m_filename.toStdString());
 		m_modified = false;
 	}
+	sim::Simulation::instance().load("data/levels/default.xml");
 }
 
 void MainWindow::onSimulationControlsPressed()

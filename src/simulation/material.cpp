@@ -17,12 +17,25 @@
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
+#include <sound/SoundMgr.hpp>
+#include <simulation/simulation.hpp>
 
 namespace sim {
 
 using namespace m3d;
 
 MaterialMgr* MaterialMgr::s_instance = NULL;
+
+static float atof(const char* str)
+{
+	std::stringstream sst;
+	sst << str;
+	sst.seekg(0, std::ios::beg);
+	float result;
+	sst >> result;
+	return result;
+}
+
 
 Material::Material(const std::string& name)
 		: name(name)
@@ -163,7 +176,6 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 	  softness(p.softness)
 {
 }
-
 
 
 void MaterialPair::load(rapidxml::xml_node<>* node)
@@ -499,6 +511,7 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 					MaterialPair p;
 					p.load(node);
 					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
+					std::cout << p.mat0 << p.mat1 << std::endl;
 				}
 			}
 			delete f;
@@ -591,7 +604,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 
 	// get the contact material
 	NewtonMaterial* material;
-	const NewtonBody *body0, *body1;
+	NewtonBody *body0, *body1;
 
 	body0 = NewtonJointGetBody0(contactJoint);
 	body1 = NewtonJointGetBody1(contactJoint);
@@ -623,6 +636,28 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		NewtonMaterialSetContactSoftness(material, pair.softness);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 0);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 1);
+
+
+		dFloat volume;
+		dFloat dist2;
+		Vec3f contactPosit, normal;
+		NewtonMaterialGetContactPositionAndNormal (material, body0, &contactPosit[0], &normal[0]);
+		float speed = NewtonMaterialGetContactNormalSpeed(material);
+		// control sound volume based on camera distance to the contact
+		Vec3f eyePoint (Simulation::instance().getCamera().m_position - contactPosit);
+		dist2 = eyePoint * eyePoint;
+		const float MAX_SOUND_DISTANCE = 10.0f;
+		const float MIN_SOUND_DISTANCE = 0.1f;
+		//if (dist2 < (MAX_SOUND_DISTANCE * MAX_SOUND_DISTANCE)) {
+			volume = 1.0f;
+			if (dist2 > (MIN_SOUND_DISTANCE * MIN_SOUND_DISTANCE)) {
+				volume = 1.0f - (sqrt(dist2) - MIN_SOUND_DISTANCE) / (MAX_SOUND_DISTANCE -  MIN_SOUND_DISTANCE);
+			}
+			// play this sound effect
+			Vec3f vel;
+			if (speed > 5.5f)
+			snd::SoundMgr::instance().PlaySound("wood_wood", 100, &contactPosit[0], &vel[0]);
+		//}
 
 		/*
 		bool conv = false;

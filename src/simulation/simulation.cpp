@@ -22,8 +22,20 @@
 #include <util/threadcounter.hpp>
 #include <util/tostring.hpp>
 #include <stdlib.h>
+#include <sound/SoundMgr.hpp>
 
 namespace sim {
+
+float atof(const char* str)
+{
+	std::stringstream sst;
+	sst << str;
+	sst.seekg(0, std::ios::beg);
+	float result;
+	sst >> result;
+	return result;
+}
+
 
 Simulation* Simulation::s_instance = NULL;
 
@@ -1138,6 +1150,10 @@ void Simulation::update()
 
 	static float timeSlice = 0.0f;
 
+	Vec3f dir = m_camera.viewVector();
+	Vec3f vel;
+	snd::SoundMgr::instance().SetListenerPos(&m_camera.m_position[0], &dir[0], &m_camera.m_up[0], &vel[0]);
+	snd::SoundMgr::instance().SoundUpdate();
 	if (m_enabled) {
 		timeSlice += delta * 1000.0f;
 
