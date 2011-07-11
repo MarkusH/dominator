@@ -53,6 +53,14 @@ Texture __Texture::load(std::string file, GLuint target)
     glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    // TODO: check for config value
+    // enable anisotropic filtering
+    if (GLEW_EXT_texture_filter_anisotropic) {
+		float maxAF;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAF);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAF);
+    }
+
     Texture result(new __Texture(textureID, target));
     return result;
 }

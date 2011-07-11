@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level gravity="9.84" position="0, 10, 0" eye="0, 10, -1" up="0, 1, 0">
-	<environment filename="data/models/ramps.3ds" octree="0"/>
+	<environment filename="data/models/spielplatz.3ds" octree="0"/>
 </level>
 
