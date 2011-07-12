@@ -26,16 +26,6 @@
 
 namespace sim {
 
-float atof(const char* str)
-{
-	std::stringstream sst;
-	sst << str;
-	sst.seekg(0, std::ios::beg);
-	float result;
-	sst >> result;
-	return result;
-}
-
 
 Simulation* Simulation::s_instance = NULL;
 

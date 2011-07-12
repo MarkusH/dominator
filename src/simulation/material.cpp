@@ -26,17 +26,6 @@ using namespace m3d;
 
 MaterialMgr* MaterialMgr::s_instance = NULL;
 
-static float atof(const char* str)
-{
-	std::stringstream sst;
-	sst << str;
-	sst.seekg(0, std::ios::beg);
-	float result;
-	sst >> result;
-	return result;
-}
-
-
 Material::Material(const std::string& name)
 		: name(name)
 {
@@ -165,6 +154,7 @@ MaterialPair::MaterialPair()
 	staticFriction = 0.9f;
 	kineticFriction = 0.5f;
 	softness = 0.1f;
+	impactSound = "";
 }
 
 MaterialPair::MaterialPair(const MaterialPair& p)
@@ -173,7 +163,8 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 	  elasticity(p.elasticity),
 	  staticFriction(p.staticFriction),
 	  kineticFriction(p.kineticFriction),
-	  softness(p.softness)
+	  softness(p.softness),
+	  impactSound(p.impactSound)
 {
 }
 
@@ -511,7 +502,6 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 					MaterialPair p;
 					p.load(node);
 					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
-					std::cout << p.mat0 << p.mat1 << std::endl;
 				}
 			}
 			delete f;
@@ -600,6 +590,10 @@ MaterialPair& MaterialMgr::getPair(int mat0, int mat1)
 
 void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep, int threadIndex)
 {
+	Vec3f contactPos, contactNormal;
+	float bestNormalSpeed = 7.5f;
+	std::string bestSound = "";
+
 	int mat0, mat1;
 
 	// get the contact material
@@ -637,27 +631,12 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 0);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 1);
 
-
-		dFloat volume;
-		dFloat dist2;
-		Vec3f contactPosit, normal;
-		NewtonMaterialGetContactPositionAndNormal (material, body0, &contactPosit[0], &normal[0]);
-		float speed = NewtonMaterialGetContactNormalSpeed(material);
-		// control sound volume based on camera distance to the contact
-		Vec3f eyePoint (Simulation::instance().getCamera().m_position - contactPosit);
-		dist2 = eyePoint * eyePoint;
-		const float MAX_SOUND_DISTANCE = 10.0f;
-		const float MIN_SOUND_DISTANCE = 0.1f;
-		//if (dist2 < (MAX_SOUND_DISTANCE * MAX_SOUND_DISTANCE)) {
-			volume = 1.0f;
-			if (dist2 > (MIN_SOUND_DISTANCE * MIN_SOUND_DISTANCE)) {
-				volume = 1.0f - (sqrt(dist2) - MIN_SOUND_DISTANCE) / (MAX_SOUND_DISTANCE -  MIN_SOUND_DISTANCE);
-			}
-			// play this sound effect
-			Vec3f vel;
-			if (speed > 5.5f)
-			snd::SoundMgr::instance().PlaySound("wood_wood", 100, &contactPosit[0], &vel[0]);
-		//}
+		float normalSpeed = NewtonMaterialGetContactNormalSpeed(material);
+		if (normalSpeed > bestNormalSpeed){
+			bestNormalSpeed = normalSpeed;
+			NewtonMaterialGetContactPositionAndNormal(material, body0, &contactPos[0], &contactNormal[0]);
+			bestSound = "wood_wood"; //pair.impactSound;
+		}
 
 		/*
 		bool conv = false;
@@ -680,10 +659,16 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		    NewtonMaterialSetContactTangentAcceleration(material, (convSpeed - speed) / timestep, 0);
 		}
 	*/
-		/// @todo get impact information and play a sound
 	}
 
-	//std::cout << "\tmaterial end" << std::endl;
+	if (bestSound.size()) {
+		Vec3f distance(Simulation::instance().getCamera().m_position - contactPos);
+		float dist2 = distance * distance;
+		if (dist2 < (MAX_SOUND_DISTANCE * MAX_SOUND_DISTANCE)) {
+			Vec3f vel;
+			snd::SoundMgr::instance().PlaySound(bestSound, 100, &contactPos[0], &vel[0]);
+		}
+	}
 }
 
 void MaterialMgr::GenericContactCallback(const NewtonJoint* contactJoint,

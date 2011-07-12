@@ -18,8 +18,9 @@ namespace snd {
 
 class SoundMgr {
 private:
-	FMOD::System     *m_system;
-	FMOD::Channel    *m_musicChannel;
+	FMOD::System* m_system;
+	FMOD::Channel* m_musicChannel;
+	bool m_musicEnabled;
 	std::map<std::string, FMOD::Sound*>::iterator m_currentMusic;
 	std::map<std::string, FMOD::Sound*> m_sounds;
 	std::map<std::string, FMOD::Sound*> m_music;
@@ -35,13 +36,25 @@ public:
 	static SoundMgr& instance();
 	static void destroy();
 
+	void setMusicEnabled(bool enabled);
+
 	void SoundUpdate();
 	void SetListenerPos(float* listenerpos, float* forward, float* upward, float* velocity);
 	unsigned LoadSound(const std::string& folder);
 	unsigned LoadMusic(const std::string& folder);
-	void PlaySound(const char *name, int volume, float* position, float* velocity);
+	void PlaySound(const std::string& name, int volume, float* position, float* velocity);
 	void PlayMusic(int volume);
 };
+
+inline
+void SoundMgr::setMusicEnabled(bool enabled)
+{
+	if (!enabled && m_musicChannel) {
+		m_musicChannel->stop();
+		m_musicChannel = NULL;
+	}
+	m_musicEnabled = enabled;
+}
 
 }
 

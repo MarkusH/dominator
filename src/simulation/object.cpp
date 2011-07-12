@@ -20,17 +20,6 @@
 
 namespace sim {
 
-static float atof(const char* str)
-{
-	std::stringstream sst;
-	sst << str;
-	sst.seekg(0, std::ios::beg);
-	float result;
-	sst >> result;
-	return result;
-}
-
-
 /*
  * only append strings for new Objects in TypeStr!!!
  * prepending Object strings will break code in __RigidBody::load()
