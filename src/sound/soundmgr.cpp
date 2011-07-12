@@ -1,15 +1,11 @@
-/*
- * SoundMgr.cpp
- *
- *  Created on: 09.06.2011
- *      Author: Alexander Tenberge
+/**
+ * @author Alexander Tenberge
+ * @date Jun 5, 2011
+ * @file sound/soundmgr.cpp
  */
 
-#include <sound/SoundMgr.hpp>
+#include <sound/soundmgr.hpp>
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <boost/filesystem.hpp>
 
 namespace snd {

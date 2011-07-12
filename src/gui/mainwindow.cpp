@@ -18,7 +18,7 @@
 #include <QtCore/QList>
 
 #include <newton/util.hpp>
-#include <sound/SoundMgr.hpp>
+#include <sound/soundmgr.hpp>
 
 namespace gui {
 

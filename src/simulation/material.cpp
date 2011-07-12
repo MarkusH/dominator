@@ -13,11 +13,11 @@
 #include <Newton.h>
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
-#include <fstream> // for file I/O
+#include <fstream>
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
-#include <sound/SoundMgr.hpp>
+#include <sound/soundmgr.hpp>
 #include <simulation/simulation.hpp>
 
 namespace sim {

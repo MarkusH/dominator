@@ -22,7 +22,7 @@
 #include <util/threadcounter.hpp>
 #include <util/tostring.hpp>
 #include <stdlib.h>
-#include <sound/SoundMgr.hpp>
+#include <sound/soundmgr.hpp>
 
 namespace sim {
 
@@ -1143,7 +1143,6 @@ void Simulation::update()
 	Vec3f dir = m_camera.viewVector();
 	Vec3f vel;
 	snd::SoundMgr::instance().SetListenerPos(&m_camera.m_position[0], &dir[0], &m_camera.m_up[0], &vel[0]);
-	snd::SoundMgr::instance().SoundUpdate();
 	if (m_enabled) {
 		timeSlice += delta * 1000.0f;
 
@@ -1152,6 +1151,7 @@ void Simulation::update()
 			timeSlice = timeSlice - 12.0f;
 		}
 	}
+	snd::SoundMgr::instance().SoundUpdate();
 	m_skydome.update(delta);
 	float step = delta * (m_keyAdapter.shift() ? 25.f : 10.0f);
 

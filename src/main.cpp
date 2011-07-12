@@ -7,7 +7,7 @@
 #include <iostream>
 #include <QtGui/QApplication>
 #include <gui/mainwindow.hpp>
-#include <sound/SoundMgr.hpp>//test
+
 int main(int argc, char **argv) {
 	std::cout << "Totally Unrelated Studios proudly presents:" << std::endl
 			  << "\tDOMINATOR" << std::endl << std::endl;

@@ -1,9 +1,9 @@
-/*
- * SoundMgr.hpp
- *
- *  Created on: 09.06.2011
- *      Author: Alexander Tenberge
+/**
+ * @author Alexander Tenberge
+ * @date Jun 5, 2011
+ * @file sound/soundmgr.hpp
  */
+
 
 #ifndef SOUNDMGR_HPP_
 #define SOUNDMGR_HPP_
