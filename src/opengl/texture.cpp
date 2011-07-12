@@ -55,7 +55,7 @@ Texture __Texture::load(std::string file, GLuint target)
 
     // TODO: check for config value
     // enable anisotropic filtering
-    if (GLEW_EXT_texture_filter_anisotropic) {
+    if (false && GLEW_EXT_texture_filter_anisotropic) {
 		float maxAF;
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAF);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAF);
