@@ -416,7 +416,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vbo);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/playground.3ds"));
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/spielplatz.3ds"));
 
 	// newtons cradle
 	if (0)
@@ -448,7 +448,7 @@ void Simulation::init()
 		//c->convexCastPlacement();
 	}
 
-	// assemlby vs hull comparison
+	// assemlby vs hull comparison / bowling
 	if (0)
 	{
 		//Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/tenpin.3ds");
@@ -481,6 +481,20 @@ void Simulation::init()
 		add(c);
 		c->setMatrix(c->getMatrix() * Mat4f::translate(10.0f, 0.50f + 0.70f, 50.0f));
 		//c->convexCastPlacement();
+	}
+
+	// direction changer with ball
+	if (0) {
+		const Vec3f sh(0.25f, 3.5f, 0.25f);
+		const Vec3f sv(6.0f, 0.25f, 0.25f);
+
+		Compound c = __Compound::createCompound();
+		RigidBody horz = __RigidBody::createBox(Vec3f(0.0f, sh.y*0.5f, 0.0f), sh.x, sh.y, sh.z, 0.0f, "metal");
+		c->add(horz);
+		RigidBody vert = __RigidBody::createBox(Vec3f(0.0f, sh.y, 0.0f), sv.x, sv.y, sv.z, 0.0f, "metal");
+		c->add(vert);
+
+		add(c);
 	}
 
 	// hinge door
@@ -1077,6 +1091,9 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		rot_mat_start = m_selectedObject->getMatrix();
 
 	if (m_interactionTypes[button] == INT_DOMINO_CURVE && !m_enabled) {
+		__Object::Type type = __Domino::DOMINO_SMALL;
+		float gap = __Domino::s_domino_gap[type];
+
 		// Remove knots that are too close to each other, this improves the
 		// spline and removes unwanted knots when closing the spline
 		bool stop = false;
@@ -1096,14 +1113,14 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		if (curve_spline.knots().size() > 2) {
 			curve_spline.update();
 			Domino domino;
-			for (float t = 0.0f; t < curve_spline.table().back().len; t += 4.5f) {
+			for (float t = 0.0f; t < curve_spline.table().back().len; t += gap) {
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
-				if (domino && (t + 4.5f) < curve_spline.table().back().len)
-					q = (curve_spline.getPos(t-4.5f) - curve_spline.getPos(t+4.5f)).normalized();
+				if (domino && (t + gap) < curve_spline.table().back().len)
+					q = (curve_spline.getPos(t-gap) - curve_spline.getPos(t+gap)).normalized();
 				Mat4f matrix(Vec3f::yAxis(), q, p);
 				//Mat4f matrix = Mat4f::grammSchmidt(q, p);
-				domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, m_newObjectMaterial);
+				domino = __Domino::createDomino(type, matrix, -1.0f, m_newObjectMaterial);
 				add(domino);
 			}
 		// line
@@ -1116,9 +1133,9 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			float len = dir.normalize();
 			Mat4f matrix(Vec3f::yAxis(), dir, start);
 			//Mat4f matrix = Mat4f::grammSchmidt(dir, start);
-			for (float d = 0.0f; d <= len; d += 4.5f) {
+			for (float d = 0.0f; d <= len; d += gap) {
 				matrix.setW(start + dir * d);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, m_newObjectMaterial);
+				Domino domino = __Domino::createDomino(type, matrix, -1.0f, m_newObjectMaterial);
 				add(domino);
 			}
 		}
