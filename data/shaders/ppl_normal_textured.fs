@@ -25,12 +25,22 @@ void main()
 	
 	//if (shadowCoords.w > 0.0)
 	{
-		// single lookup with texture filtering
+		// single lookup
 		//shadow = lookup(vec2(0.0,0.0));
+
+        // 2x2 lookup
+        /*
+        float x, y;
+		for (y = -0.5; y <= 0.5; y += 1.0)
+			for (x = -0.5; x <= 0.5; x += 1.0)
+				shadow += lookup(vec2(x, y));
 		
-		// 4x4 lookup with pcf
+		shadow *= 0.25;
+        */
+		
+		// 4x4 lookup
 		float x, y;
-		for (y = -1.5; y <= 1.5 ; y += 1.0)
+		for (y = -1.5; y <= 1.5; y += 1.0)
 			for (x = -1.5; x <= 1.5; x += 1.0)
 				shadow += lookup(vec2(x, y));
 		

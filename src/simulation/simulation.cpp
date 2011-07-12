@@ -1196,7 +1196,7 @@ void Simulation::render()
 		glLoadMatrixf(lightModelview[0]);
 
 		//glPolygonOffset(2, 4);
-		glEnable(GL_POLYGON_OFFSET_FILL);
+		//glEnable(GL_POLYGON_OFFSET_FILL);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 
@@ -1216,7 +1216,7 @@ void Simulation::render()
 			m_environment->render();
 
 		ogl::__FrameBuffer::unbind();
-		glDisable(GL_POLYGON_OFFSET_FILL);
+		//glDisable(GL_POLYGON_OFFSET_FILL);
 		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 		glCullFace(GL_BACK);
 	}
