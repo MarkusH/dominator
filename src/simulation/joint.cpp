@@ -8,7 +8,7 @@
 #include <simulation/joint.hpp>
 #include <iostream>
 #include <util/tostring.hpp>
-#include <locale>
+#include <clocale>
 
 
 namespace sim {

@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <util/tostring.hpp>
 #include <boost/foreach.hpp>
-#include <locale>
+#include <clocale>
 
 namespace sim {
 

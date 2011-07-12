@@ -17,7 +17,7 @@
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
-#include <locale>
+#include <clocale>
 
 namespace sim {
 

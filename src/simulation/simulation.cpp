@@ -22,7 +22,7 @@
 #include <util/threadcounter.hpp>
 #include <util/tostring.hpp>
 #include <stdlib.h>
-#include <locale>
+#include <clocale>
 
 namespace sim {
 
