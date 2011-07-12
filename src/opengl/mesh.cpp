@@ -1,8 +1,7 @@
-/*
- * mesh.cpp
- *
- *  Created on: Jun 26, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date Jun 26, 2011
+ * @file opengl/mesh.cpp
  */
 
 #include <opengl/mesh.hpp>

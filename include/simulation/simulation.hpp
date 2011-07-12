@@ -1,8 +1,7 @@
-/*
- * Simulation.hpp
- *
- *  Created on: May 27, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Markus Holtermann, Robert Waury
+ * @date May 27, 2011
+ * @file simulation/simulation.hpp
  */
 
 #ifndef SIMULATION_HPP_
@@ -19,6 +18,7 @@
 #include <Newton.h>
 #include <iostream>
 
+#define SHADOW_MAP_SIZE 4096
 
 namespace sim {
 
@@ -188,9 +188,6 @@ public:
 	void setNewObjectMass(const float mass);
 	void setNewObjectFreezeState(const int freezeState);
 	void setNewObjectSize(const Vec3f size);
-
-	/** @param gravity The new gravity*/
-	void setGravity(float gravity);
 
 	/** @return The camera */
 	ogl::Camera& getCamera();

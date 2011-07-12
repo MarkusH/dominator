@@ -1,8 +1,7 @@
-/*
- * CRSpline.hpp
- *
- *  Created on: Jun 11, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger
+ * @date Jun 11, 2011
+ * @file simulation/crspline.hpp
  */
 
 #ifndef CRSPLINE_HPP_

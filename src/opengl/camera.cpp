@@ -1,8 +1,7 @@
-/*
- * Camera.cpp
- *
- *  Created on: May 26, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date May 26, 2011
+ * @file opengl/camera.cpp
  */
 
 #include <opengl/camera.hpp>

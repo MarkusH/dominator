@@ -8,6 +8,7 @@
 #define MAINWINDOW_HPP_
 
 #include <QtCore/QTextCodec>
+#include <QtCore/QTemporaryFile>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWidget>
@@ -84,7 +85,8 @@ private slots:
 	//Simulation
 	/**
 	 * The slot function onSimulationControlsPressed() is executed each time
-	 * the user clicks on MainWindow::m_play or MainWindow::m_stop
+	 * the user clicks on MainWindow::m_play, MainWindow::m_stop or
+	 * MainWindow::m_stop_no_reset
 	 */
 	void onSimulationControlsPressed();
 	/**
@@ -170,6 +172,7 @@ private:
 	 * When triggered MainWindow::onSimulationControlsPressed() is executed
 	 */
 	QAction* m_stop;
+	QAction* m_stop_no_reset;
 	/**
 	 * When triggered MainWindow::onGravityPressed() is executed
 	 */
@@ -227,6 +230,7 @@ private:
 	 * Updated by onSavePressed() and onOpenPressed()
 	 */
 	QString m_filename;
+	QTemporaryFile* m_tmp_file;
 	/**
 	 * MainWindow::m_modified holds the modification status of the current sim::Simulation.
 	 * Updated by onSavePressed() and onOpenPressed()

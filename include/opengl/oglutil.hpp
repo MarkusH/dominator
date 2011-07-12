@@ -1,8 +1,7 @@
-/*
- * util.hpp
- *
- *  Created on: Jun 5, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger
+ * @date Jun 5, 2011
+ * @file opengl/oglutil.hpp
  */
 
 #ifndef OGL_UTIL_HPP_

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<level>
+<level gravity="9.84" position="0, 10, 0" eye="0, 10, -1" up="0, 1, 0">
 	<compound id="0" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; -0.328209, 5.04214, 0, 1">
 		<object id="0" type="box" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; -0.328209, 5.04214, 0, 1" width="20" height="0.25" depth="0.25" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="metal" mass="0"/>
 		<object id="1" type="sphere" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; 9.53622, 6.68318, 0, 1" radius_x="1" radius_y="1" radius_z="1" freezeState="1" damping="0.1, 0.1, 0.1, 0.025" material="wood" mass="1"/>

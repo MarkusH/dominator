@@ -1,8 +1,7 @@
-/*
- * Joint.hpp
- *
- *  Created on: Jun 2, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date Jun 2, 2011
+ * @file simulation/joint.hpp
  */
 
 #ifndef JOINT_HPP_
@@ -41,19 +40,20 @@ public:
 	typedef enum { HINGE, SLIDER, BALL_AND_SOCKET } Type;
 
 	Type type;
+	Vec3f pivot;
+	Vec3f pinDir;
+	Object child;
+	Object parent;
 
-	__Joint(Type type);
+	__Joint(Type type, Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent);
 
 	/**
 	 * This method is called whenever the matrix of the parent bodies changes.
 	 * All sub-classes have to ensure that their pin and pivot points are updated
 	 * according to the changes. The changes must not be forwarded to Newton but
 	 * are required for XML serialization.
-	 *
-	 * @param inverse The old matrix, but inverted
-	 * @param matrix  The new matrix
 	 */
-	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix) { };
+	virtual void updateMatrix() = 0;
 
 	/**
 	 * Saves Joint object to XML node and appends node to document
@@ -84,18 +84,13 @@ protected:
 			const NewtonBody* childBody, const NewtonBody* parentBody,
 			bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
 public:
-	Vec3f pivot;
-	Vec3f pinDir;
-	Object child;
-	Object parent;
 	bool limited;
 	float minAngle;
 	float maxAngle;
 
-	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
-
 	static Hinge create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited = false, float minAngle = -1.0f, float maxAngle = 1.0f);
 
+	virtual void updateMatrix();
 	/**
 	 * Saves Hinge object to XML node
 	 *
@@ -128,18 +123,13 @@ protected:
 			const NewtonBody* childBody, const NewtonBody* parentBody,
 			bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
 public:
-	Vec3f pivot;
-	Vec3f pinDir;
-	Object child;
-	Object parent;
 	bool limited;
 	float minDist;
 	float maxDist;
 
-	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
-
 	static Slider create(Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent, bool limited = false, float minDist = -1.0f, float maxDist = 1.0f);
 
+	virtual void updateMatrix();
 	/**
 	 * Saves Slider object to XML node
 	 *
@@ -165,26 +155,17 @@ public:
  */
 class __BallAndSocket : public __Joint {
 protected:
-	CustomBallAndSocket* m_joint;
-
 	__BallAndSocket(Vec3f pivot, Vec3f pinDir,
 			const Object& child, const Object& parent,
 			const dMatrix& pinAndPivot,
 			const NewtonBody* childBody, const NewtonBody* parentBody,
 			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
 public:
-	Vec3f pivot;
-	Vec3f pinDir;
-	Object child;
-	Object parent;
 	bool limited;
-	// if limited:
 	float coneAngle;
 	float minTwist, maxTwist;
 
 	~__BallAndSocket();
-
-	virtual void updateMatrix(const Mat4f& inverse, const Mat4f& matrix);
 
 	static BallAndSocket create(Vec3f pivot, Vec3f pinDir,
 			const Object& child, const Object& parent,
@@ -209,6 +190,33 @@ public:
 	 */
 	static BallAndSocket load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
+
+class __BallAndSocketStd : public __BallAndSocket, public CustomBallAndSocket {
+protected:
+	__BallAndSocketStd(Vec3f pivot, Vec3f pinDir,
+			const Object& child, const Object& parent,
+			const dMatrix& pinAndPivot,
+			const NewtonBody* childBody, const NewtonBody* parentBody,
+			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
+
+	virtual void updateMatrix();
+
+	friend class __BallAndSocket;
+};
+
+class __BallAndSocketLimited : public __BallAndSocket, public CustomLimitBallAndSocket {
+protected:
+	__BallAndSocketLimited(Vec3f pivot, Vec3f pinDir,
+			const Object& child, const Object& parent,
+			const dMatrix& pinAndPivot,
+			const NewtonBody* childBody, const NewtonBody* parentBody,
+			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
+
+	virtual void updateMatrix();
+
+	friend class __BallAndSocket;
+};
+
 }
 
 #endif /* JOINT_HPP_ */

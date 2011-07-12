@@ -1,8 +1,7 @@
-/*
- * TreeCollision.cpp
- *
- *  Created on: Jun 5, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date Jun 5, 2011
+ * @file simulation/treecollision.cpp
  */
 
 #include <simulation/treecollision.hpp>

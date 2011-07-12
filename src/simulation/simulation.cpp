@@ -1,8 +1,7 @@
-/*
- * Simulation.cpp
- *
- *  Created on: May 27, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Markus Holtermann, Robert Waury
+ * @date May 27, 2011
+ * @file simulation/simulation.cpp
  */
 
 #include <xml/rapidxml.hpp>
@@ -21,8 +20,10 @@
 #include <simulation/crspline.hpp>
 #include <opengl/oglutil.hpp>
 #include <util/threadcounter.hpp>
+#include <util/tostring.hpp>
+#include <stdlib.h>
 
-#define SHADOW_MAP_SIZE 4096
+
 
 namespace sim {
 
@@ -117,7 +118,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 
 			if (type == "object" || type == "compound") {
 				result = __Object::load(node);
-				result->setMatrix(matrix);
+				if (result) result->setMatrix(matrix);
 				return result;
 			}
 		}
@@ -250,6 +251,26 @@ void Simulation::save(const std::string& fileName)
 	xml_node<>* level = doc.allocate_node(node_element, "level");
 	doc.append_node(level);
 
+	// save attribute "gravity"
+	char* pG = doc.allocate_string(util::toString(newton::gravity/-4.0f));
+	xml_attribute<>* attrG = doc.allocate_attribute("gravity", pG);
+	level->append_attribute(attrG);
+
+	// save attribute "position"
+	char* pPos = doc.allocate_string(m_camera.m_position.str().c_str());
+	xml_attribute<>* attrPos = doc.allocate_attribute("position", pPos);
+	level->append_attribute(attrPos);
+
+	// save attribute "eye"
+	char* pEye = doc.allocate_string(m_camera.m_eye.str().c_str());
+	xml_attribute<>* attrEye = doc.allocate_attribute("eye", pEye);
+	level->append_attribute(attrEye);
+
+	// saveattribute "up
+	char* pUp = doc.allocate_string(m_camera.m_up.str().c_str());
+	xml_attribute<>* attrUp = doc.allocate_attribute("up", pUp);
+	level->append_attribute(attrUp);
+
 	
 	ObjectList::iterator itr = m_objects.begin();
 	for ( ; itr != m_objects.end(); ++itr) {
@@ -257,7 +278,6 @@ void Simulation::save(const std::string& fileName)
 		__Object::save(*itr->get(), level, &doc);
 	}
 
-	// save attribute "gravity" to m_gravity
 	// save attribute "environment" __treecollision.save(m_environment)
 	if (m_environment)
 		__TreeCollision::save((__TreeCollision&)*m_environment.get(), level, &doc);
@@ -315,8 +335,32 @@ void Simulation::load(const std::string& fileName)
 
 		// this is important so we don't parse the level tag but the object and compound tags
 		xml_node<>* nodes = doc.first_node("level");
-
+		
 		if (nodes) {
+
+			// load gravity
+			if(nodes->first_attribute("gravity")) {
+				newton::gravity = (float)atof(nodes->first_attribute("gravity")->value()) * -4.0f;
+			} else {
+				newton::gravity = 9.81f * -4.0f;
+			}
+
+			// load camera stuff
+			if( nodes->first_attribute("position") && nodes->first_attribute("eye") && nodes->first_attribute("up") ) {
+			m_camera.m_position.assign(nodes->first_attribute("position")->value());
+			m_camera.m_eye.assign(nodes->first_attribute("eye")->value());
+			m_camera.m_up.assign(nodes->first_attribute("up")->value());
+
+			m_camera.update();
+			} else { // so our old XML files don't make trouble
+				m_camera.m_position.assign("0, 10, 0");
+				m_camera.m_eye.assign("0, 10, -1");
+				m_camera.m_up.assign("0, 1, 0");
+
+				m_camera.update();
+			}
+
+			// iterate over all nodes
 			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 				std::string type(node->name());
 				if (type == "object" || type == "compound") {
@@ -375,7 +419,7 @@ void Simulation::init()
 	__Domino::genDominoBuffers(m_vbo);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
 
-	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/mattest.3ds"));
+	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/playground.3ds"));
 
 	// newtons cradle
 	if (0)
@@ -410,13 +454,22 @@ void Simulation::init()
 	// assemlby vs hull comparison
 	if (0)
 	{
-		//Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
+		//Convex hull = __Convex::createHull(Mat4f::translate(0.0f, 0.0f, -25.0f), 2.0f, "tire", "data/models/tenpin.3ds");
 		//add(hull);
 		//hull->convexCastPlacement();
 
-		Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/mesh.3ds");
-		add(assembly);
-		assembly->convexCastPlacement();
+		Mat4f rot = Mat4f::rotX(-3.14f * 0.5f);
+		for (int i = 1; i < 5; ++i) {
+			for (int j = 0; j < i; ++j) {
+				Convex hull = __Convex::createHull(rot * Mat4f::translate(i * 1.5f - 4*1.5f, 0.0f, j * 1.5f - i * 1.5f*0.5f), 2.0f, "tire", "data/models/tenpin.3ds");
+				add(hull);
+				//hull->convexCastPlacement();
+			}
+		}
+
+		//Convex assembly = __Convex::createAssembly(Mat4f::translate(20.0f, 20.0f, -25.0f), 2.0f, "tire", "data/models/barrel.3ds");
+		//add(assembly);
+		//assembly->convexCastPlacement();
 	}
 
 	// simple seesaw with hinge
@@ -1045,12 +1098,15 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		// spline
 		if (curve_spline.knots().size() > 2) {
 			curve_spline.update();
+			Domino domino;
 			for (float t = 0.0f; t < curve_spline.table().back().len; t += 4.5f) {
 				Vec3f p = curve_spline.getPos(t);
 				Vec3f q = curve_spline.getTangent(t).normalized();
-				//Mat4f matrix(Vec3f::yAxis(), q, p);
-				Mat4f matrix = Mat4f::gramSchmidt(q, p);
-				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, m_newObjectMaterial);
+				if (domino && (t + 4.5f) < curve_spline.table().back().len)
+					q = (curve_spline.getPos(t-4.5f) - curve_spline.getPos(t+4.5f)).normalized();
+				Mat4f matrix(Vec3f::yAxis(), q, p);
+				//Mat4f matrix = Mat4f::grammSchmidt(q, p);
+				domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0, m_newObjectMaterial);
 				add(domino);
 			}
 		// line
@@ -1061,8 +1117,8 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			end.y = newton::getVerticalPosition(end.x, end.z);
 			Vec3f dir = (end - start);
 			float len = dir.normalize();
-			//Mat4f matrix(Vec3f::yAxis(), dir, start);
-			Mat4f matrix = Mat4f::gramSchmidt(dir, start);
+			Mat4f matrix(Vec3f::yAxis(), dir, start);
+			//Mat4f matrix = Mat4f::grammSchmidt(dir, start);
 			for (float d = 0.0f; d <= len; d += 4.5f) {
 				matrix.setW(start + dir * d);
 				Domino domino = __Domino::createDomino(__Domino::DOMINO_SMALL, matrix, 5.0f, m_newObjectMaterial);
@@ -1190,7 +1246,6 @@ void Simulation::render()
 		ogl::__Texture::stage(GL_TEXTURE7);
 		m_shadow.second->bind();
 		ogl::__Texture::stage(GL_TEXTURE0);
-		//m_shadow.second->bind();
 	}
 
 	glViewport(m_camera.m_viewport.x, m_camera.m_viewport.y, m_camera.m_viewport.z, m_camera.m_viewport.w);
@@ -1198,17 +1253,6 @@ void Simulation::render()
 	glLoadMatrixf(m_camera.m_projection[0]);
 	m_camera.apply();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-/*
-	const Mat4f bias(0.5f, 0.0f, 0.0f, 0.0f,
-					 0.0f, 0.5f, 0.0f, 0.0f,
-					 0.0f, 0.0f, 0.5f, 0.0f,
-					 0.5f, 0.5f, 0.5f, 1.0f);
-	const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 1024.0f);
-	const Mat4f lightModelview;
-
-	const Mat4f transform = bias * lightProjection * lightModelview * m_camera.m_inverse;
-*/
 
 	// set some light properties
 	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
@@ -1220,7 +1264,6 @@ void Simulation::render()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 
-	glActiveTextureARB(GL_TEXTURE0);
 	ogl::SubBuffers::const_iterator itr = m_sortedBuffers.begin();
 	std::string material = "";
 	if (itr != m_sortedBuffers.end()) {
@@ -1228,36 +1271,20 @@ void Simulation::render()
 	}
 	MaterialMgr& mmgr = MaterialMgr::instance();
 	mmgr.applyMaterial(material);
-	glActiveTextureARB(GL_TEXTURE7);
 	for ( ; itr != m_sortedBuffers.end(); ++itr) {
 		const ogl::SubBuffer* const buf = (*itr);
 		const __Object* const obj = (const __Object* const)buf->userData;
 		if (material != buf->material) {
 			material = buf->material;
-			glActiveTextureARB(GL_TEXTURE0);
 			mmgr.applyMaterial(material);
-			glActiveTextureARB(GL_TEXTURE7);
-
-			Material* m = MaterialMgr::instance().get(material);
-			ogl::Shader shader;
-			if (m)
-				shader = ogl::ShaderMgr::instance().get(m->shader);
-			if (shader) {
-				shader->setUniform1i("ShadowMap", 7);
-				shader->setUniform1i("Texture0", 0);
-				shader->setUniform1f("shadowTexel", 1.0 / SHADOW_MAP_SIZE);
-			}
 		}
 
 		glPushMatrix();
 		glMultMatrixf(obj->getMatrix()[0]);
 		glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)(buf->indexOffset * 4));
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glDrawElements(GL_TRIANGLES, buf->indexCount, GL_UNSIGNED_INT, (void*)&m_vertexBuffer.m_indices[(buf->indexOffset)]);
 		glPopMatrix();
 	}
 
-	glActiveTextureARB(GL_TEXTURE0);
 	ogl::VertexBuffer::unbind();
 
 	if (m_environment)

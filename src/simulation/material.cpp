@@ -1,8 +1,7 @@
-/*
- * Material.cpp
- *
- *  Created on: May 24, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date May 24, 2011
+ * @file simulation/material.cpp
  */
 
 #include <simulation/material.hpp>
@@ -14,10 +13,11 @@
 #include <Newton.h>
 #include <xml/rapidxml_utils.hpp>
 #include <xml/rapidxml_print.hpp>
-#include <fstream> // for file I/O
+#include <fstream>
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
+#include <simulation/simulation.hpp>
 
 namespace sim {
 
@@ -33,6 +33,7 @@ Material::Material(const std::string& name)
 Material::Material(const Material& m)
 	: name(m.name),
 	  texture(m.texture),
+	  texture1(m.texture1),
 	  shader(m.shader),
 	  ambient(m.ambient),
 	  diffuse(m.diffuse),
@@ -57,6 +58,9 @@ void Material::load(rapidxml::xml_node<>* const node)
 	texture = attr->value();
 	} else throw parse_error("No \"texture\" attribute in material tag found", node->name());
 
+	// texture1 is optional
+	attr = node->first_attribute("texture1");
+	texture1 = attr ? attr->value() : "";
 
 	attr = node->first_attribute("shader");
 	if(attr) {
@@ -108,6 +112,12 @@ void Material::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<>* d
 	char* pTexture = doc->allocate_string(texture.c_str());
 	xml_attribute<>* attrT = doc->allocate_attribute("texture", pTexture);
 	node->append_attribute(attrT);
+
+	if (texture1.size() > 0) {
+		char* pTexture1 = doc->allocate_string(texture1.c_str());
+		xml_attribute<>* attrT = doc->allocate_attribute("texture1", pTexture1);
+		node->append_attribute(attrT);
+	}
 
 	char* pShader = doc->allocate_string(shader.c_str());
 	xml_attribute<>* attrS = doc->allocate_attribute("shader", pShader);
@@ -304,12 +314,24 @@ void MaterialMgr::applyMaterial(const std::string& material) {
 	if (_mat != NULL) {
 		const Material& mat = *_mat;
 		ogl::Texture texture = ogl::TextureMgr::instance().get(mat.texture);
+		ogl::Texture texture1 = ogl::TextureMgr::instance().get(mat.texture1);
 
 		if (texture) {
 			glEnable(GL_TEXTURE_2D);
 			texture->bind();
 		} else {
 			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		if (texture1) {
+			glEnable(GL_TEXTURE_2D);
+			glActiveTexture(GL_TEXTURE1);
+			texture1->bind();
+			glActiveTexture(GL_TEXTURE0);
+		} else {
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
 		}
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
 		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
@@ -319,14 +341,19 @@ void MaterialMgr::applyMaterial(const std::string& material) {
 		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
 		if (shader) {
 			shader->bind();
+			shader->setUniform1i("Texture0", 0);
+			shader->setUniform1i("Texture1", 1);
+
+			shader->setUniform1i("ShadowMap", 7);
+			shader->setUniform1f("shadowTexel", 1.0 / SHADOW_MAP_SIZE);
 		} else {
 			ogl::__Shader::unbind();
 		}
 
 	} else {
-		glDisable(GL_TEXTURE_2D);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glUseProgram(0);
+		//glDisable(GL_TEXTURE_2D);
+		//glColor3f(1.0f, 1.0f, 1.0f);
+		//glUseProgram(0);
 	}
 }
 

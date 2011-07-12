@@ -1,8 +1,7 @@
-/*
- * Domino.cpp
- *
- *  Created on: Jun 7, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger
+ * @date Jun 7, 2011
+ * @file simulation/domino.cpp
  */
 
 #include <simulation/domino.hpp>

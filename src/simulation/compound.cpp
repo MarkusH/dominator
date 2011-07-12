@@ -1,8 +1,7 @@
-/*
- * Compound.cpp
- *
- *  Created on: Jun 1, 2011
- *      Author: markus
+/**
+ * @author Markus Doellinger, Robert Waury
+ * @date Jun 1, 2011
+ * @file simulation/compound.cpp
  */
 
 #include <simulation/compound.hpp>
@@ -90,9 +89,9 @@ void __Compound::save(__Compound& compound, rapidxml::xml_node<>* node, rapidxml
 	}
 
 	// foreach joint
-	for (std::list<Joint>::iterator itr = compound.m_joints.begin();
-				itr != compound.m_joints.end(); ++itr) {
-					__Joint::save(*itr->get(), node, doc);
+	for (std::list<Joint>::iterator itr = compound.m_joints.begin(); itr != compound.m_joints.end(); ++itr) {
+		(*itr)->updateMatrix();
+		__Joint::save(*itr->get(), node, doc);
 	}
 }
 
@@ -202,11 +201,6 @@ void __Compound::setMatrix(const Mat4f& matrix)
 		Mat4f newMatrix = (*itr)->getMatrix();
 		newMatrix *= inverse * matrix;
 		(*itr)->setMatrix(newMatrix);
-	}
-	// The joints need to be update
-	for (std::list<Joint>::iterator itr = m_joints.begin();
-				itr != m_joints.end(); ++itr) {
-		(*itr)->updateMatrix(inverse, matrix);
 	}
 	m_matrix = matrix;
 }

@@ -15,4 +15,3 @@ void main()
 	gl_Position = gl_ProjectionMatrix * pos;
 	shadowCoords = gl_TextureMatrix[7] * pos;
 }
-

@@ -1,8 +1,7 @@
-/*
- * Object.hpp
- *
- *  Created on: May 27, 2011
- *      Author: Markus Doellinger
+/**
+ * @author Markus Doellinger, Markus Holtermann, Robert Waury
+ * @date May 27, 2011
+ * @file simulation/object.hpp
  */
 
 #ifndef OBJECT_HPP_
