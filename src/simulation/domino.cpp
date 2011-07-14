@@ -12,7 +12,8 @@ namespace sim {
 
 
 NewtonCollision* __Domino::s_domino_collision[3] = { NULL, NULL, NULL };
-Vec3f __Domino::s_domino_size[3] = { Vec3f(3.0f, 8.0f, 0.5f) * 0.75f, Vec3f(3.0f, 8.0f, 0.5f), Vec3f(3.0f, 8.0f, 0.5f) * 1.25f };
+Vec3f __Domino::s_domino_size[3] = { Vec3f(3.0f, 8.0f, 0.5f) * 0.4f, Vec3f(3.0f, 8.0f, 0.5f) * 0.55f, Vec3f(3.0f, 8.0f, 0.5f) * 0.75f };
+float __Domino::s_domino_gap[3] = { 2.5f, 3.5f, 4.5f };
 
 
 __Domino::__Domino(Type type, const Mat4f& matrix, const std::string& material, int freezeState)

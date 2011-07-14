@@ -55,9 +55,9 @@ public:
 	static TextureMgr& instance();
 	static void destroy();
 
-	Texture add(std::string name, Texture texture);
-	unsigned load(std::string folder);
-	Texture get(std::string name);
+	Texture add(const std::string& name, Texture texture);
+	unsigned load(const std::string& folder);
+	Texture get(const std::string& name);
 };
 
 
