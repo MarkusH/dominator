@@ -53,7 +53,8 @@
 	- softness			: The softness of the two materials during a collision
 
 	(- impactSound		: The sound that is played whenever the two materials
-							collide)
+							collide. If "" no sound, if not present, the sound
+                            of the default pair.
 	(- impactStrength	: The strength of the impact that is required to trigger
 							a sound event
 
@@ -63,9 +64,9 @@
 	NewtonMaterialSetDefaultFriction (world, defaultID, defaultID, 1.0f, 0.5f);
 
 	-->
-    <pair mat0="" mat1="" elasticity="0.400000" staticFriction="0.900000" kineticFriction="0.500000" softness="0.100000" />
-	<pair mat0="rope" mat1="rope" elasticity="0.4" staticFriction="1.0" kineticFriction="0.5" softness="0.05" />
-	<pair mat0="yellow" mat1="domino" elasticity="0.1" staticFriction="1.0" kineticFriction="1.0" softness="0.1" />
-	<pair mat0="cradle" mat1="domino" elasticity="1.000000" staticFriction="0.590000" kineticFriction="0.310000" softness="0.050000" />
-	<pair mat0="cradle" mat1="cradle" elasticity="1.000000" staticFriction="0.590000" kineticFriction="0.310000" softness="0.050000" />
+    <pair mat0="" mat1="" elasticity="0.400000" staticFriction="0.900000" kineticFriction="0.500000" softness="0.100000" impactSound="wood_wood" />
+	<pair mat0="rope" mat1="rope" elasticity="0.4" staticFriction="1.0" kineticFriction="0.5" softness="0.05" impactSound="wood_wood" />
+	<pair mat0="yellow" mat1="domino" elasticity="0.1" staticFriction="1.0" kineticFriction="1.0" softness="0.1" impactSound="wood_wood" />
+	<pair mat0="cradle" mat1="domino" elasticity="1.000000" staticFriction="0.590000" kineticFriction="0.310000" softness="0.050000" impactSound="wood_wood" />
+	<pair mat0="cradle" mat1="cradle" elasticity="1.000000" staticFriction="0.590000" kineticFriction="0.310000" softness="0.050000"/>
 </materials>

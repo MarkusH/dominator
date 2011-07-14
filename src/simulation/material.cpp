@@ -210,6 +210,11 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 	softness = atof(attr->value());
 	} else throw parse_error("No \"softness\" attribute in pair tag found", node->name());
 
+	attr = node->first_attribute("impactSound");
+	if(attr) {
+		impactSound = attr->value();
+	} else impactSound = MaterialMgr::instance().getPair(0, 0).impactSound;
+
 
 	if (mat0 > mat1) {
 		int tmp = mat0;
@@ -275,6 +280,10 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
 	node->append_attribute(attrS);
 	//free(pSoftness);
+
+	const char* pImpactSound = doc->allocate_string(impactSound.c_str());
+	xml_attribute<>* attrIS = doc->allocate_attribute("impactSound", pImpactSound);
+	node->append_attribute(attrIS);
 	/* END allocate strings for attributes  and append them to node */
 
 }
@@ -635,7 +644,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		if (normalSpeed > bestNormalSpeed){
 			bestNormalSpeed = normalSpeed;
 			NewtonMaterialGetContactPositionAndNormal(material, body0, &contactPos[0], &contactNormal[0]);
-			bestSound = "wood_wood"; //pair.impactSound;
+			bestSound = pair.impactSound;
 		}
 
 		/*
