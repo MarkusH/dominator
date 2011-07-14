@@ -17,6 +17,8 @@
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
+#include <clocale>
+#include <sound/soundmgr.hpp>
 #include <simulation/simulation.hpp>
 
 namespace sim {
@@ -46,6 +48,10 @@ Material::Material(const Material& m)
 void Material::load(rapidxml::xml_node<>* const node)
 {
 	using namespace rapidxml;
+
+	// this prevents that the atof functions fails on German systems
+	// since they use "," as a separator for floats
+	setlocale(LC_ALL,"C");
 
 	xml_attribute<>* attr = node->first_attribute("name");
 	if(attr) {
@@ -153,6 +159,7 @@ MaterialPair::MaterialPair()
 	staticFriction = 0.9f;
 	kineticFriction = 0.5f;
 	softness = 0.1f;
+	impactSound = "";
 }
 
 MaterialPair::MaterialPair(const MaterialPair& p)
@@ -161,15 +168,19 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 	  elasticity(p.elasticity),
 	  staticFriction(p.staticFriction),
 	  kineticFriction(p.kineticFriction),
-	  softness(p.softness)
+	  softness(p.softness),
+	  impactSound(p.impactSound)
 {
 }
-
 
 
 void MaterialPair::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
+
+	// this prevents that the atof functions fails on German systems
+	// since they use "," as a separator for floats
+	setlocale(LC_ALL,"C");
 
 	MaterialMgr& m = MaterialMgr::instance();
 	
@@ -207,6 +218,11 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 	if(attr) {
 	softness = atof(attr->value());
 	} else throw parse_error("No \"softness\" attribute in pair tag found", node->name());
+
+	attr = node->first_attribute("impactSound");
+	if(attr) {
+		impactSound = attr->value();
+	} else impactSound = MaterialMgr::instance().getPair(0, 0).impactSound;
 
 
 	if (mat0 > mat1) {
@@ -273,6 +289,10 @@ void MaterialPair::save(rapidxml::xml_node<>* materials, rapidxml::xml_document<
 	xml_attribute<>* attrS = doc->allocate_attribute("softness", pSoftness);
 	node->append_attribute(attrS);
 	//free(pSoftness);
+
+	const char* pImpactSound = doc->allocate_string(impactSound.c_str());
+	xml_attribute<>* attrIS = doc->allocate_attribute("impactSound", pImpactSound);
+	node->append_attribute(attrIS);
 	/* END allocate strings for attributes  and append them to node */
 
 }
@@ -591,11 +611,15 @@ MaterialPair& MaterialMgr::getPair(int mat0, int mat1)
 
 void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep, int threadIndex)
 {
+	Vec3f contactPos, contactNormal;
+	float bestNormalSpeed = 7.5f;
+	std::string bestSound = "";
+
 	int mat0, mat1;
 
 	// get the contact material
 	NewtonMaterial* material;
-	const NewtonBody *body0, *body1;
+	NewtonBody *body0, *body1;
 
 	body0 = NewtonJointGetBody0(contactJoint);
 	body1 = NewtonJointGetBody1(contactJoint);
@@ -628,6 +652,13 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 0);
 		NewtonMaterialSetContactFrictionCoef(material, pair.staticFriction, pair.kineticFriction, 1);
 
+		float normalSpeed = NewtonMaterialGetContactNormalSpeed(material);
+		if (normalSpeed > bestNormalSpeed){
+			bestNormalSpeed = normalSpeed;
+			NewtonMaterialGetContactPositionAndNormal(material, body0, &contactPos[0], &contactNormal[0]);
+			bestSound = pair.impactSound;
+		}
+
 		/*
 		bool conv = false;
 		Material* mat = fromID(mat0);
@@ -649,10 +680,16 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		    NewtonMaterialSetContactTangentAcceleration(material, (convSpeed - speed) / timestep, 0);
 		}
 	*/
-		/// @todo get impact information and play a sound
 	}
 
-	//std::cout << "\tmaterial end" << std::endl;
+	if (bestSound.size()) {
+		Vec3f distance(Simulation::instance().getCamera().m_position - contactPos);
+		float dist2 = distance * distance;
+		if (dist2 < (MAX_SOUND_DISTANCE * MAX_SOUND_DISTANCE)) {
+			Vec3f vel;
+			snd::SoundMgr::instance().PlaySound(bestSound, 100, &contactPos[0], &vel[0]);
+		}
+	}
 }
 
 void MaterialMgr::GenericContactCallback(const NewtonJoint* contactJoint,

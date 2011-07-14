@@ -18,6 +18,7 @@
 #include <QtCore/QList>
 
 #include <newton/util.hpp>
+#include <sound/soundmgr.hpp>
 
 namespace gui {
 
@@ -47,6 +48,9 @@ MainWindow::MainWindow(QApplication* app)
 	m_toolBox = new ToolBox();
 	splash.updateProgress(50);
 	m_toolBox->loadMaterials("data/materials.xml");
+	snd::SoundMgr::instance().LoadSound("data/sounds");
+	snd::SoundMgr::instance().LoadMusic("data/music");
+	snd::SoundMgr::instance().setMusicEnabled(true);
 	app->processEvents();
 	splash.updateProgress(80);
 
