@@ -21,6 +21,8 @@ protected:
 	static NewtonCollision* getCollision(Type type, int materialID);
 	static Vec3f s_domino_size[3];
 public:
+	static float s_domino_gap[3];
+
 	__Domino(Type type, const Mat4f& matrix, const std::string& material = "", int freezeState = 1);
 	virtual ~__Domino();
 

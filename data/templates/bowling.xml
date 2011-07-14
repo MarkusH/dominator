@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+    <compound id="0" matrix="-0, 0, -1, 0; 0, 1, 0, 0; 1, 0, 0, 0; 0, 0, 0, 1">
+	    <object id="0" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; -4.5, 0, -0.75, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="1" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; -3, 0, -1.5, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="2" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; -3, 0, 0, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="3" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; -1.5, 0, -2.25, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="4" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; -1.5, 0, -0.75, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="5" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; -1.5, 0, 0.75, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="6" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; 0, 0, -3, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="7" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; 0, 0, -1.5, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="8" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; 0, 0, 0, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+	    <object id="9" type="hull" matrix="1, 0, 0, 0; 0, 0.000796274, -1, 0; 0, 1, 0.000796274, 0; 0, 0, 1.5, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
+    </compound>
+</template>
