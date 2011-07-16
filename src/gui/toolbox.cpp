@@ -553,6 +553,8 @@ void ToolBox::updateData()
 		m_mouseinteraction->setExclusive(false);
 		m_mouseinteraction->checkedButton()->setChecked(false);
 		m_mouseinteraction->setExclusive(true);
+		m_selectedInteraction = Simulation::INT_CREATE_OBJECT;
+		emit interactionSelected(m_selectedInteraction);
 	}
 	int i;
 	for (i = 0; i < m_modifyWidgetsRotation.size(); i++) {
