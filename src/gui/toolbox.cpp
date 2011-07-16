@@ -100,7 +100,7 @@ void ToolBox::create_m_mass()
 	// construct the spin box for the object's mass
 	m_mass = new QDoubleSpinBox();
 	m_mass->setDecimals(3);
-	m_mass->setRange(0, 1000);
+	m_mass->setRange(-0.001, 1000);
 	m_mass->setSingleStep(1);
 	connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(massChanged(double)));
 }
@@ -281,7 +281,7 @@ void ToolBox::onInteractionPressed(int button)
 		m_mouseinteraction->setExclusive(false);
 		m_mouseinteraction->checkedButton()->setChecked(false);
 		m_mouseinteraction->setExclusive(true);
-		m_selectedInteraction = sim::Simulation::INT_NONE;
+		m_selectedInteraction = sim::Simulation::INT_CREATE_OBJECT;
 		emit interactionSelected(m_selectedInteraction);
 		return;
 	}
@@ -292,6 +292,11 @@ void ToolBox::onInteractionPressed(int button)
 void ToolBox::addObject(QAction *action)
 {
 	QObjectAction* a = (QObjectAction*) action;
+	if (m_mouseinteraction->checkedButton()) {
+		m_mouseinteraction->setExclusive(false);
+		m_mouseinteraction->checkedButton()->setChecked(false);
+		m_mouseinteraction->setExclusive(true);
+	}
 	sim::Simulation::instance().setNewObjectType(a->getType());
 	if (a->getType() == sim::__Object::COMPOUND) {
 		sim::Simulation::instance().setNewObjectFilename(a->getFilename().toStdString());
