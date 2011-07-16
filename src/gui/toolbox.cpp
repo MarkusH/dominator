@@ -10,7 +10,6 @@
 #include <simulation/material.hpp>
 #include <simulation/object.hpp>
 #include <iostream>
-#include <set>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfoList>
 
@@ -125,14 +124,8 @@ void ToolBox::create_m_size()
 	m_depth->setSingleStep(1);
 	connect(m_depth, SIGNAL(valueChanged(double)), this, SLOT(updateSize(double)));
 
-	m_modifyWidgetsFull.push_back(m_labelSize);
-	m_modifyWidgetsFull.push_back(m_width);
-	m_modifyWidgetsFull.push_back(m_height);
-	m_modifyWidgetsFull.push_back(m_depth);
-
-	m_modifyWidgets.push_back(m_labelSize);
-	m_modifyWidgets.push_back(m_width);
-	m_modifyWidgets.push_back(m_height);
+	m_modifyWidgetsSize <<  m_labelSize <<  m_width <<  m_height <<  m_depth;
+	m_modifyWidgetsRadius <<  m_labelSize <<  m_width <<  m_height;
 }
 
 void ToolBox::create_m_location()
@@ -157,20 +150,7 @@ void ToolBox::create_m_location()
 	m_locationZ->setSingleStep(0.1);
 	connect(m_locationZ, SIGNAL(valueChanged(double)), this, SLOT(updateLocation(double)));
 
-	m_modifyWidgetsFull.push_back(m_labelLocation);
-	m_modifyWidgetsFull.push_back(m_locationX);
-	m_modifyWidgetsFull.push_back(m_locationY);
-	m_modifyWidgetsFull.push_back(m_locationZ);
-
-	m_modifyWidgetsDominos.push_back(m_labelLocation);
-	m_modifyWidgetsDominos.push_back(m_locationX);
-	m_modifyWidgetsDominos.push_back(m_locationY);
-	m_modifyWidgetsDominos.push_back(m_locationZ);
-
-	m_modifyWidgets.push_back(m_labelLocation);
-	m_modifyWidgets.push_back(m_locationX);
-	m_modifyWidgets.push_back(m_locationY);
-	m_modifyWidgets.push_back(m_locationZ);
+	m_modifyWidgetsLocation <<  m_labelLocation <<  m_locationX <<  m_locationY <<  m_locationZ;
 }
 
 void ToolBox::create_m_rotation()
@@ -201,20 +181,7 @@ void ToolBox::create_m_rotation()
 	m_rotationZ->setWrapping(true);
 	connect(m_rotationZ, SIGNAL(valueChanged(double)), this, SLOT(updateRotation(double)));
 
-	m_modifyWidgetsFull.push_back(m_labelRotation);
-	m_modifyWidgetsFull.push_back(m_rotationX);
-	m_modifyWidgetsFull.push_back(m_rotationY);
-	m_modifyWidgetsFull.push_back(m_rotationZ);
-
-	m_modifyWidgetsDominos.push_back(m_labelRotation);
-	m_modifyWidgetsDominos.push_back(m_rotationX);
-	m_modifyWidgetsDominos.push_back(m_rotationY);
-	m_modifyWidgetsDominos.push_back(m_rotationZ);
-
-	m_modifyWidgets.push_back(m_labelRotation);
-	m_modifyWidgets.push_back(m_rotationX);
-	m_modifyWidgets.push_back(m_rotationY);
-	m_modifyWidgets.push_back(m_rotationZ);
+	m_modifyWidgetsRotation <<  m_labelRotation <<  m_rotationX <<  m_rotationY <<  m_rotationZ;
 }
 
 void ToolBox::create_m_buttonbox()
@@ -472,22 +439,55 @@ void ToolBox::updateData(sim::Object object)
 		 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
 		 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
 		 */
-		if (object->getType() == sim::__Object::DOMINO_SMALL || object->getType() == sim::__Object::DOMINO_MIDDLE || object->getType()
-				== sim::__Object::DOMINO_LARGE) {
-			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsDominos.rbegin(); rit != m_modifyWidgetsDominos.rend(); rit++) {
-				layout->insertWidget(position, (QWidget*) *rit);
+		int i;
+		switch (object->getType()) {
+		case sim::__Object::DOMINO_SMALL:
+		case sim::__Object::DOMINO_MIDDLE:
+		case sim::__Object::DOMINO_LARGE:
+			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
 			}
-
-		} else if (object->getType() == sim::__Object::BOX || object->getType() == sim::__Object::SPHERE) {
-			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsFull.rbegin(); rit != m_modifyWidgetsFull.rend(); rit++) {
-				layout->insertWidget(position, (QWidget*) *rit);
+			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
 			}
-
-		} else if (object->getType() == sim::__Object::CYLINDER || object->getType() == sim::__Object::CONE || object->getType() == sim::__Object::CAPSULE
-				|| object->getType() == sim::__Object::CHAMFER_CYLINDER) {
-			for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgets .rbegin(); rit != m_modifyWidgets.rend(); rit++) {
-				layout->insertWidget(position, (QWidget*) *rit);
+			break;
+		case sim::__Object::BOX:
+		case sim::__Object::SPHERE:
+			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
 			}
+			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
+			}
+			for (i = m_modifyWidgetsSize.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsSize.at(i));
+			}
+			break;
+		case sim::__Object::CAPSULE:
+		case sim::__Object::CHAMFER_CYLINDER:
+		case sim::__Object::CONE:
+		case sim::__Object::CYLINDER:
+			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
+			}
+			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
+			}
+			for (i = m_modifyWidgetsRadius.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsRadius.at(i));
+			}
+			break;
+		case sim::__Object::COMPOUND:
+			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
+			}
+			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
+				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
+			}
+			break;
+		default:
+			updateData();
+			break;
 		}
 	}
 	doUpdate = true;
@@ -495,10 +495,24 @@ void ToolBox::updateData(sim::Object object)
 
 void ToolBox::updateData()
 {
-	for (std::list<QWidget*>::reverse_iterator rit = m_modifyWidgetsFull.rbegin(); rit != m_modifyWidgetsFull.rend(); rit++) {
-		layout->removeWidget((QWidget*) *rit);
-		((QWidget*) *rit)->setParent(0);
+	int i;
+	for (i = 0; i < m_modifyWidgetsSize.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsSize.at(i));
+		m_modifyWidgetsSize.at(i)->setParent(0);
 	}
+	for (i = 0; i < m_modifyWidgetsRadius.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsRadius.at(i));
+		m_modifyWidgetsRadius.at(i)->setParent(0);
+	}
+	for (i = 0; i < m_modifyWidgetsLocation.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsLocation.at(i));
+		m_modifyWidgetsLocation.at(i)->setParent(0);
+	}
+	for (i = 0; i < m_modifyWidgetsRotation.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsRotation.at(i));
+		m_modifyWidgetsRotation.at(i)->setParent(0);
+	}
+
 }
 
 }

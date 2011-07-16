@@ -152,9 +152,10 @@ private:
 	 */
 	sim::Simulation::InteractionType m_selectedInteraction;
 
-	std::list<QWidget*> m_modifyWidgetsFull;
-	std::list<QWidget*> m_modifyWidgetsDominos;
-	std::list<QWidget*> m_modifyWidgets;
+	QList<QWidget*> m_modifyWidgetsSize;
+	QList<QWidget*> m_modifyWidgetsLocation;
+	QList<QWidget*> m_modifyWidgetsRotation;
+	QList<QWidget*> m_modifyWidgetsRadius;
 private slots:
 	/**
 	 * This slot function is invoked by clicking ToolBox::m_moveH,
