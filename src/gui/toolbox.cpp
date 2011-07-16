@@ -286,17 +286,24 @@ void ToolBox::addObject(QAction *action)
 	} else {
 		Simulation::instance().setNewObjectFilename("");
 	}
+
+	doUpdate = false;
+	updateData();
 	m_objects->setText(a->text());
-	m_mass->setValue(a->getMass());
-	m_freezeState->setCheckState((a->getFreezeState()) ? Qt::Checked : Qt::Unchecked);
-	m_width->setValue(a->getSize().x);
-	m_height->setValue(a->getSize().y);
-	m_depth->setValue(a->getSize().z);
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
+		Simulation::instance().setNewObjectMass(obj->getMass());
+		Simulation::instance().setNewObjectFreezeState(obj->getFreezeState());
+		Simulation::instance().setNewObjectSize(obj->getSize());
+	} else {
+		m_mass->setValue(a->getMass());
+		m_freezeState->setCheckState((a->getFreezeState()) ? Qt::Checked : Qt::Unchecked);
+		m_width->setValue(a->getSize().x);
+		m_height->setValue(a->getSize().y);
+		m_depth->setValue(a->getSize().z);
+	}
 	m_selectedInteraction = Simulation::INT_CREATE_OBJECT;
 	emit interactionSelected(m_selectedInteraction);
-
-	updateData();
-	doUpdate = false;
 
 	int position = layout->indexOf(m_objects) + 1;
 	int i;
@@ -339,6 +346,7 @@ void ToolBox::addObject(QAction *action)
 			layout->insertWidget(position, m_modifyWidgetsMaterial.at(i));
 		}
 	}
+	doUpdate = true;
 }
 
 void ToolBox::materialSelected(int index)
