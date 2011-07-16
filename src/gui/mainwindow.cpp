@@ -181,34 +181,44 @@ void MainWindow::createStatusBar()
 	m_framesPerSec->setMinimumSize(m_framesPerSec->sizeHint());
 	m_framesPerSec->setAlignment(Qt::AlignLeft);
 	m_framesPerSec->setToolTip("Current frames per second not yet initialized.");
-	statusBar()->addWidget(m_framesPerSec, 2);
+	statusBar()->addWidget(m_framesPerSec);
 
 	m_objectsCount = new QLabel("1 objects");
 	m_objectsCount->setMinimumSize(m_objectsCount->sizeHint());
 	m_objectsCount->setAlignment(Qt::AlignLeft);
 	m_objectsCount->setToolTip("There is 1 object in the world");
-	statusBar()->addWidget(m_objectsCount, 2);
+	statusBar()->addWidget(m_objectsCount);
 
 	m_simulationStatus = new QLabel("");
 	m_simulationStatus->setMinimumSize(m_simulationStatus->sizeHint());
 	m_simulationStatus->setAlignment(Qt::AlignLeft);
-	statusBar()->addWidget(m_simulationStatus, 2);
+	statusBar()->addWidget(m_simulationStatus, 1);
 
 	m_currentFilename = new QLabel("unsaved document");
 	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
 	m_currentFilename->setAlignment(Qt::AlignRight);
 	m_currentFilename->setToolTip("The world is not saved");
-	statusBar()->addWidget(m_currentFilename, 2);
+	statusBar()->addWidget(m_currentFilename, 8);
 }
 
 void MainWindow::updateFramesPerSecond(int frames)
 {
-	m_framesPerSec->setText(QString("%1 fps").arg(frames));
+	m_framesPerSec->setText(QString("%1 fps   ").arg(frames));
 }
 
 void MainWindow::updateObjectsCount(int count)
 {
-	m_objectsCount->setText(QString("%1").arg(count));
+	switch (count) {
+	case 0:
+		m_objectsCount->setText("No objects   ");
+		break;
+	case 1:
+		m_objectsCount->setText(QString("%1 object   ").arg(count));
+		break;
+	default:
+		m_objectsCount->setText(QString("%1 objects   ").arg(count));
+		break;
+	}
 }
 
 void MainWindow::selectInteraction(sim::Simulation::InteractionType type)
