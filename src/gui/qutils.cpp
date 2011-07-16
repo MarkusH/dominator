@@ -24,8 +24,12 @@ QObjectAction::QObjectAction(sim::__Object::Type type, QWidget* parent) :
 QObjectAction::QObjectAction(QFileInfo fileinfo, QWidget* parent) :
 	QAction(parent)
 {
+	QString name = fileinfo.baseName().toLower();
+	if(!name.isEmpty())
+		name[0] = name.at(0).toUpper();
+
 	m_type = sim::__Object::COMPOUND;
-	setText(fileinfo.fileName());
+	setText(name);
 	m_mass = sim::__Object::TypeMass[m_type];
 	m_freeze = sim::__Object::TypeFreezeState[m_type];
 	m_size = sim::__Object::TypeSize[m_type];
