@@ -45,12 +45,16 @@ SplashScreen::SplashScreen(int max) :
 	m_bar->setGeometry(10, 10, width() - 20, 20);
 	m_bar->setMaximum(max);
 	m_bar->setValue(0);
+	m_message = new QLabel(this);
+	m_message->setGeometry(10, 30, width() - 20, 20);
+	m_message->setText("Loading ...");
 }
 
-void SplashScreen::updateProgress(int progress)
+void SplashScreen::updateProgress(const int progress, const QString message)
 {
 	m_bar->setValue(progress);
 	m_bar->repaint(10, 10, width() - 20, 20);
+	m_message->setText(message);
 }
 
 }

@@ -35,30 +35,32 @@ MainWindow::MainWindow(QApplication* app)
 	util::ErrorAdapter::instance().addListener(new QtErrorListerner());
 
 	initialize();
-	splash.updateProgress(5);
+	splash.updateProgress(5, "Creating UI – Menues");
 
 	createMenu();
-	splash.updateProgress(15);
+	splash.updateProgress(15, "Creating UI – Notification area");
 	app->processEvents();
 
 	createStatusBar();
-	splash.updateProgress(20);
+	splash.updateProgress(20, "Creating UI – Building interfaces");
 	app->processEvents();
 
 	m_toolBox = new ToolBox();
-	splash.updateProgress(50);
+	splash.updateProgress(50, "Loading materials");
 	m_toolBox->loadMaterials("data/materials.xml");
+	splash.updateProgress(60, "Loading sounds");
 	snd::SoundMgr::instance().LoadSound("data/sounds");
+	splash.updateProgress(70, "Loading music");
 	snd::SoundMgr::instance().LoadMusic("data/music");
 	snd::SoundMgr::instance().setMusicEnabled(true);
 	app->processEvents();
-	splash.updateProgress(80);
+	splash.updateProgress(80, "Creating UI – Apply screen resolution");
 
 	m_renderWidget = new RenderWidget(this);
 	m_renderWidget->setMinimumWidth(400);
 	m_renderWidget->show();
 	app->processEvents();
-	splash.updateProgress(85);
+	splash.updateProgress(85, "Creating UI – Building dependencies");
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);
@@ -82,13 +84,13 @@ MainWindow::MainWindow(QApplication* app)
 	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(updateData()));
 
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
-	splash.updateProgress(100);
+	splash.updateProgress(90, "Finished loading");
 
 	showMaximized();
 	m_renderWidget->updateGL();
 	m_renderWidget->m_timer->start();
 	m_toolBox->updateMaterials();
-	splash.updateProgress(90);
+	splash.updateProgress(100, "Starting ...");
 
 
 	splash.finish(this);
