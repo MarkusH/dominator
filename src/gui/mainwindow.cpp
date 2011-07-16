@@ -251,6 +251,7 @@ void MainWindow::onOpenPressed()
 	QFileDialog dialog(this);
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
+	dialog.setDirectory("data/levels/");
 	dialog.setFilter("TUStudios Dominator (*.xml)");
 	if (dialog.exec()) {
 		sim::Simulation::instance().setEnabled(false);
