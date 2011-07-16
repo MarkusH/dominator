@@ -13,12 +13,33 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfoList>
 
+using namespace sim;
+
 namespace gui {
 
 ToolBox::ToolBox(QWidget *parent)
 {
+	m_allowMaterial << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER
+			<< __Object::CAPSULE << __Object::CONE << __Object::CHAMFER_CYLINDER;
+	m_allowFreeze << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER
+			<< __Object::CAPSULE << __Object::CONE << __Object::CHAMFER_CYLINDER;
+	m_allowMass << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER
+			<< __Object::CAPSULE << __Object::CONE << __Object::CHAMFER_CYLINDER;
+	m_allowSize << __Object::BOX << __Object::SPHERE;
+	m_allowLocation << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER << __Object::CAPSULE
+			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND;
+	m_allowRotation << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER << __Object::CAPSULE
+			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND;
+	m_allowRadius << __Object::CYLINDER << __Object::CAPSULE << __Object::CONE
+			<< __Object::CHAMFER_CYLINDER;
+
 	setMaximumWidth(250);
-	m_selectedInteraction = sim::Simulation::INT_NONE;
+	m_selectedInteraction = Simulation::INT_NONE;
 
 	layout = new QVBoxLayout();
 
@@ -34,12 +55,6 @@ ToolBox::ToolBox(QWidget *parent)
 	// add all default widgets to the layout
 	layout->addWidget(new QLabel("Object:"));
 	layout->addWidget(m_objects);
-	layout->addWidget(new QLabel("Material:"));
-	layout->addWidget(m_materials);
-	layout->addWidget(new QLabel("Freeze State:"));
-	layout->addWidget(m_freezeState);
-	layout->addWidget(new QLabel("Mass:"));
-	layout->addWidget(m_mass);
 
 	layout->addLayout(buttonLayout);
 
@@ -55,19 +70,19 @@ void ToolBox::create_m_objects()
 	// Create the menu for dominos
 	QMenu* m_objectMenu = new QMenu();
 	QMenu* menu = new QMenu("Domino");
-	menu->addAction(new QObjectAction(sim::__Object::DOMINO_SMALL));
-	menu->addAction(new QObjectAction(sim::__Object::DOMINO_MIDDLE));
-	menu->addAction(new QObjectAction(sim::__Object::DOMINO_LARGE));
+	menu->addAction(new QObjectAction(__Object::DOMINO_SMALL));
+	menu->addAction(new QObjectAction(__Object::DOMINO_MIDDLE));
+	menu->addAction(new QObjectAction(__Object::DOMINO_LARGE));
 	m_objectMenu->addMenu(menu);
 
 	// create the menu for primitive objects
 	menu = new QMenu("Primitives");
-	menu->addAction(new QObjectAction(sim::__Object::BOX));
-	menu->addAction(new QObjectAction(sim::__Object::CAPSULE));
-	menu->addAction(new QObjectAction(sim::__Object::CHAMFER_CYLINDER));
-	menu->addAction(new QObjectAction(sim::__Object::CONE));
-	menu->addAction(new QObjectAction(sim::__Object::CYLINDER));
-	menu->addAction(new QObjectAction(sim::__Object::SPHERE));
+	menu->addAction(new QObjectAction(__Object::BOX));
+	menu->addAction(new QObjectAction(__Object::CAPSULE));
+	menu->addAction(new QObjectAction(__Object::CHAMFER_CYLINDER));
+	menu->addAction(new QObjectAction(__Object::CONE));
+	menu->addAction(new QObjectAction(__Object::CYLINDER));
+	menu->addAction(new QObjectAction(__Object::SPHERE));
 	m_objectMenu->addMenu(menu);
 
 	// create the menu for templates
@@ -82,26 +97,32 @@ void ToolBox::create_m_objects()
 
 void ToolBox::create_m_materials()
 {
+	m_labelMaterial = new QLabel("Size:");
 	// just create the materials QComboBox. we connect the slot after loading
 	// the content to prevent crashes due to changed selection list
 	m_materials = new QComboBox();
+	m_modifyWidgetsMaterial << m_labelMaterial << m_materials;
 }
 
 void ToolBox::create_m_freezeState()
 {
+	m_labelFreeze = new QLabel("Freeze State:");
 	// build the QCheckBox for the object's freeze state
 	m_freezeState = new QCheckBox("Freeze");
 	connect(m_freezeState, SIGNAL(stateChanged(int)), this, SLOT(freezeStateChanged(int)));
+	m_modifyWidgetsFreeze << m_labelFreeze << m_freezeState;
 }
 
 void ToolBox::create_m_mass()
 {
+	m_labelMass = new QLabel("Mass:");
 	// construct the spin box for the object's mass
 	m_mass = new QDoubleSpinBox();
 	m_mass->setDecimals(3);
 	m_mass->setRange(-1, 1000);
 	m_mass->setSingleStep(1);
 	connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(massChanged(double)));
+	m_modifyWidgetsMass << m_labelMass << m_mass;
 }
 
 void ToolBox::create_m_size()
@@ -192,17 +213,17 @@ void ToolBox::create_m_buttonbox()
 
 	m_moveH = new QPushButton("Move &Ground");
 	m_moveH->setCheckable(true);
-	m_mouseinteraction->addButton(m_moveH, (int) sim::Simulation::INT_MOVE_GROUND);
+	m_mouseinteraction->addButton(m_moveH, (int) Simulation::INT_MOVE_GROUND);
 	buttonLayout->addWidget(m_moveH);
 
 	m_moveV = new QPushButton("Move Billboard");
 	m_moveV->setCheckable(true);
-	m_mouseinteraction->addButton(m_moveV, (int) sim::Simulation::INT_MOVE_BILLBOARD);
+	m_mouseinteraction->addButton(m_moveV, (int) Simulation::INT_MOVE_BILLBOARD);
 	buttonLayout->addWidget(m_moveV);
 
 	m_rotate = new QPushButton("Rotate");
 	m_rotate->setCheckable(true);
-	m_mouseinteraction->addButton(m_rotate, (int) sim::Simulation::INT_ROTATE_GROUND);
+	m_mouseinteraction->addButton(m_rotate, (int) Simulation::INT_ROTATE_GROUND);
 	buttonLayout->addWidget(m_rotate);
 
 	m_mouseinteraction->setParent(this);
@@ -211,10 +232,10 @@ void ToolBox::create_m_buttonbox()
 
 void ToolBox::loadMaterials(QString filename)
 {
-	if (sim::MaterialMgr::instance().load(filename.toStdString())) {
+	if (MaterialMgr::instance().load(filename.toStdString())) {
 		disconnect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
 		std::set<std::string> materials;
-		sim::MaterialMgr::instance().getMaterials(materials);
+		MaterialMgr::instance().getMaterials(materials);
 		for (std::set<std::string>::iterator itr = materials.begin(); itr != materials.end(); itr++) {
 			m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
 		}
@@ -248,27 +269,22 @@ void ToolBox::onInteractionPressed(int button)
 		m_mouseinteraction->setExclusive(false);
 		m_mouseinteraction->checkedButton()->setChecked(false);
 		m_mouseinteraction->setExclusive(true);
-		m_selectedInteraction = sim::Simulation::INT_CREATE_OBJECT;
+		m_selectedInteraction = Simulation::INT_CREATE_OBJECT;
 		emit interactionSelected(m_selectedInteraction);
 		return;
 	}
-	m_selectedInteraction = (sim::Simulation::InteractionType) m_mouseinteraction->checkedId();
+	m_selectedInteraction = (Simulation::InteractionType) m_mouseinteraction->checkedId();
 	emit interactionSelected(m_selectedInteraction);
 }
 
 void ToolBox::addObject(QAction *action)
 {
 	QObjectAction* a = (QObjectAction*) action;
-	if (m_mouseinteraction->checkedButton()) {
-		m_mouseinteraction->setExclusive(false);
-		m_mouseinteraction->checkedButton()->setChecked(false);
-		m_mouseinteraction->setExclusive(true);
-	}
-	sim::Simulation::instance().setNewObjectType(a->getType());
-	if (a->getType() == sim::__Object::COMPOUND) {
-		sim::Simulation::instance().setNewObjectFilename(a->getFilename().toStdString());
+	Simulation::instance().setNewObjectType(a->getType());
+	if (a->getType() == __Object::COMPOUND) {
+		Simulation::instance().setNewObjectFilename(a->getFilename().toStdString());
 	} else {
-		sim::Simulation::instance().setNewObjectFilename("");
+		Simulation::instance().setNewObjectFilename("");
 	}
 	m_objects->setText(a->text());
 	m_mass->setValue(a->getMass());
@@ -276,63 +292,84 @@ void ToolBox::addObject(QAction *action)
 	m_width->setValue(a->getSize().x);
 	m_height->setValue(a->getSize().y);
 	m_depth->setValue(a->getSize().z);
-	m_selectedInteraction = sim::Simulation::INT_CREATE_OBJECT;
+	m_selectedInteraction = Simulation::INT_CREATE_OBJECT;
 	emit interactionSelected(m_selectedInteraction);
 
 	updateData();
+	doUpdate = false;
 
-	int position = layout->indexOf(m_mass) + 1;
-	// todo
-	switch (a->getType()) {
-	case sim::__Object::BOX:
-	case sim::__Object::SPHERE:
-		layout->insertWidget(position, m_depth);
-		layout->insertWidget(position, m_height);
-		layout->insertWidget(position, m_width);
-		layout->insertWidget(position, m_labelSize);
-		break;
-	case sim::__Object::CYLINDER:
-	case sim::__Object::CONE:
-	case sim::__Object::CAPSULE:
-	case sim::__Object::CHAMFER_CYLINDER:
-		layout->insertWidget(position, m_height);
-		layout->insertWidget(position, m_width);
-		layout->insertWidget(position, m_labelSize);
-		break;
-	default:
-		break;
+	int position = layout->indexOf(m_objects) + 1;
+	int i;
+	// add size widgets
+	if (m_allowSize.contains(a->getType())) {
+		for (i = m_modifyWidgetsSize.size() -1; i >= 0; i--) {
+			m_modifyWidgetsSize.at(i)->setParent(this);
+			layout->insertWidget(position, m_modifyWidgetsSize.at(i));
+		}
+	} else {
+		// add radius widgets
+		if (m_allowRadius.contains(a->getType())) {
+			for (i = m_modifyWidgetsRadius.size() -1; i >= 0; i--) {
+				m_modifyWidgetsRadius.at(i)->setParent(this);
+				layout->insertWidget(position, m_modifyWidgetsRadius.at(i));
+			}
+		}
+	}
+
+	// add mass widgets
+	if (m_allowMass.contains(a->getType())) {
+		for (i = m_modifyWidgetsMass.size() -1; i >= 0; i--) {
+			m_modifyWidgetsMass.at(i)->setParent(this);
+			layout->insertWidget(position, m_modifyWidgetsMass.at(i));
+		}
+	}
+
+	// add freeze state widgets
+	if (m_allowFreeze.contains(a->getType())) {
+		for (i = m_modifyWidgetsFreeze.size() -1; i >= 0; i--) {
+			m_modifyWidgetsFreeze.at(i)->setParent(this);
+			layout->insertWidget(position, m_modifyWidgetsFreeze.at(i));
+		}
+	}
+
+	// add material widgets
+	if (m_allowMaterial.contains(a->getType())) {
+		for (i = m_modifyWidgetsMaterial.size() -1; i >= 0; i--) {
+			m_modifyWidgetsMaterial.at(i)->setParent(this);
+			layout->insertWidget(position, m_modifyWidgetsMaterial.at(i));
+		}
 	}
 }
 
 void ToolBox::materialSelected(int index)
 {
 	std::string material = m_materials->itemText(index).toStdString();
-	sim::Simulation::instance().setNewObjectMaterial(material);
+	Simulation::instance().setNewObjectMaterial(material);
 
 	if (!doUpdate)
 		return;
 
-	if (sim::Simulation::instance().getSelectedObject()) {
-		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
 		obj->setMaterial(material);
-		sim::Simulation::instance().updateObject(obj);
-		updateData(obj);
+		Simulation::instance().updateObject(obj);
+		//updateData(obj);
 	}
 }
 
 void ToolBox::freezeStateChanged(int state)
 {
 	state = (state == Qt::Checked) ? true : false;
-	sim::Simulation::instance().setNewObjectFreezeState(state);
+	Simulation::instance().setNewObjectFreezeState(state);
 
 	if (!doUpdate)
 		return;
 
-	if (sim::Simulation::instance().getSelectedObject()) {
-		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
 		obj->setFreezeState(state);
-		sim::Simulation::instance().updateObject(obj);
-		updateData(obj);
+		Simulation::instance().updateObject(obj);
+		//updateData(obj);
 	}
 }
 
@@ -341,38 +378,36 @@ void ToolBox::massChanged(double mass)
 	if (mass < 0.0) {
 		mass = -1.0;
 	}
-	sim::Simulation::instance().setNewObjectMass((float) mass);
+	Simulation::instance().setNewObjectMass((float) mass);
 
 	if (!doUpdate)
 		return;
 
-	if (sim::Simulation::instance().getSelectedObject()) {
-		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
 		obj->setMass(mass);
-		sim::Simulation::instance().updateObject(obj);
-		updateData(obj);
+		Simulation::instance().updateObject(obj);
 	}
 }
 
 void ToolBox::updateSize(double value)
 {
-	sim::Simulation::instance().setNewObjectSize(m3d::Vec3f(m_width->value(), m_height->value(), m_depth->value()));
+	Simulation::instance().setNewObjectSize(m3d::Vec3f(m_width->value(), m_height->value(), m_depth->value()));
 
 	if (!doUpdate)
 		return;
 
-	if (sim::Simulation::instance().getSelectedObject()) {
-		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
 		m3d::Vec3f scale;
-		if (obj->getType() == sim::__Object::BOX || obj->getType() == sim::__Object::SPHERE) {
+		if (obj->getType() == __Object::BOX || obj->getType() == __Object::SPHERE) {
 			scale = m3d::Vec3f(m_width->value(), m_height->value(), m_depth->value());
-		} else if (obj->getType() == sim::__Object::CYLINDER || obj->getType() == sim::__Object::CONE || obj->getType() == sim::__Object::CAPSULE
-				|| obj->getType() == sim::__Object::CHAMFER_CYLINDER) {
+		} else if (obj->getType() == __Object::CYLINDER || obj->getType() == __Object::CONE || obj->getType() == __Object::CAPSULE
+				|| obj->getType() == __Object::CHAMFER_CYLINDER) {
 			scale = m3d::Vec3f(m_width->value(), m_height->value(), 0);
 		}
 		obj->scale(scale);
-		sim::Simulation::instance().updateObject(obj);
-		updateData(obj);
+		Simulation::instance().updateObject(obj);
 	}
 }
 
@@ -381,8 +416,8 @@ void ToolBox::updateLocation(double value)
 	if (!doUpdate)
 		return;
 
-	if (sim::Simulation::instance().getSelectedObject()) {
-		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
 		m3d::Mat4f matrix = obj->getMatrix();
 		if (QObject::sender() == m_locationX) {
 			matrix._41 = (float) value;
@@ -392,7 +427,6 @@ void ToolBox::updateLocation(double value)
 			matrix._43 = (float) value;
 		}
 		obj->setMatrix(matrix);
-		updateData(obj);
 	}
 }
 
@@ -401,18 +435,17 @@ void ToolBox::updateRotation(double value)
 	if (!doUpdate)
 		return;
 
-	if (sim::Simulation::instance().getSelectedObject()) {
-		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+	if (Simulation::instance().getSelectedObject()) {
+		Object obj = Simulation::instance().getSelectedObject();
 
 		Mat4f matrix = Mat4f::rotZ(m_rotationZ->value() * PI / 180.0f) * Mat4f::rotX(m_rotationX->value() * PI / 180.0f) * Mat4f::rotY(
 				m_rotationY->value() * PI / 180.0f) * Mat4f::translate(obj->getMatrix().getW());
 
 		obj->setMatrix(matrix);
-		updateData(obj);
 	}
 }
 
-void ToolBox::updateData(sim::Object object)
+void ToolBox::updateData(Object object)
 {
 	// set a temporary variable to prevent widgets
 	// from updating and sending their signals
@@ -433,8 +466,8 @@ void ToolBox::updateData(sim::Object object)
 		m_rotationZ->setValue(matrix->eulerAngles().z * 180.0f / PI);
 	}
 
-	if (object->getType() != sim::__Object::NONE) {
-		int position = layout->indexOf(m_mass) + 1;
+	if (object->getType() != __Object::NONE) {
+		int position = layout->indexOf(m_objects) + 1;
 
 		m_width->setValue(object->getSize().x);
 		m_height->setValue(object->getSize().y);
@@ -444,85 +477,100 @@ void ToolBox::updateData(sim::Object object)
 		m_freezeState->setChecked(object->getFreezeState());
 		m_mass->setValue(object->getMass());
 
-		/**
-		 * BOX: x = width, y = height, z = depth
-		 * SPHERE: x = radiusX, y = radiusY, z = radiusZ
-		 * CYLINDER, CONE, CAPSULE, CHAMFER_CYLINDER x = radius, y = height
-		 */
 		int i;
-		switch (object->getType()) {
-		case sim::__Object::DOMINO_SMALL:
-		case sim::__Object::DOMINO_MIDDLE:
-		case sim::__Object::DOMINO_LARGE:
+
+		// add rotation widgets
+		if (m_allowRotation.contains(object->getType())) {
 			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
+				m_modifyWidgetsRotation.at(i)->setParent(this);
 				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
 			}
+		}
+
+		// add location widgets
+		if (m_allowLocation.contains(object->getType())) {
 			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
+				m_modifyWidgetsLocation.at(i)->setParent(this);
 				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
 			}
-			break;
-		case sim::__Object::BOX:
-		case sim::__Object::SPHERE:
-			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
-			}
-			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
-			}
+		}
+
+		// add size widgets
+		if (m_allowSize.contains(object->getType())) {
 			for (i = m_modifyWidgetsSize.size() -1; i >= 0; i--) {
+				m_modifyWidgetsSize.at(i)->setParent(this);
 				layout->insertWidget(position, m_modifyWidgetsSize.at(i));
 			}
-			break;
-		case sim::__Object::CAPSULE:
-		case sim::__Object::CHAMFER_CYLINDER:
-		case sim::__Object::CONE:
-		case sim::__Object::CYLINDER:
-			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
+		} else {
+			// add radius widgets
+			if (m_allowRadius.contains(object->getType())) {
+				for (i = m_modifyWidgetsRadius.size() -1; i >= 0; i--) {
+					m_modifyWidgetsRadius.at(i)->setParent(this);
+					layout->insertWidget(position, m_modifyWidgetsRadius.at(i));
+				}
 			}
-			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
-			}
-			for (i = m_modifyWidgetsRadius.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsRadius.at(i));
-			}
-			break;
-		case sim::__Object::COMPOUND:
-			for (i = m_modifyWidgetsRotation.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsRotation.at(i));
-			}
-			for (i = m_modifyWidgetsLocation.size() -1; i >= 0; i--) {
-				layout->insertWidget(position, m_modifyWidgetsLocation.at(i));
-			}
-			break;
-		default:
-			updateData();
-			break;
 		}
+
+		// add mass widgets
+		if (m_allowMass.contains(object->getType())) {
+			for (i = m_modifyWidgetsMass.size() -1; i >= 0; i--) {
+				m_modifyWidgetsMass.at(i)->setParent(this);
+				layout->insertWidget(position, m_modifyWidgetsMass.at(i));
+			}
+		}
+
+		// add freeze state widgets
+		if (m_allowFreeze.contains(object->getType())) {
+			for (i = m_modifyWidgetsFreeze.size() -1; i >= 0; i--) {
+				m_modifyWidgetsFreeze.at(i)->setParent(this);
+				layout->insertWidget(position, m_modifyWidgetsFreeze.at(i));
+			}
+		}
+
+		// add material widgets
+		if (m_allowMaterial.contains(object->getType())) {
+			for (i = m_modifyWidgetsMaterial.size() -1; i >= 0; i--) {
+				m_modifyWidgetsMaterial.at(i)->setParent(this);
+				layout->insertWidget(position, m_modifyWidgetsMaterial.at(i));
+			}
+		}
+
 	}
 	doUpdate = true;
 }
 
 void ToolBox::updateData()
 {
-	int i;
-	for (i = 0; i < m_modifyWidgetsSize.size(); i++) {
-		layout->removeWidget(m_modifyWidgetsSize.at(i));
-		m_modifyWidgetsSize.at(i)->setParent(0);
+	if (m_mouseinteraction->checkedButton()) {
+		m_mouseinteraction->setExclusive(false);
+		m_mouseinteraction->checkedButton()->setChecked(false);
+		m_mouseinteraction->setExclusive(true);
 	}
-	for (i = 0; i < m_modifyWidgetsRadius.size(); i++) {
-		layout->removeWidget(m_modifyWidgetsRadius.at(i));
-		m_modifyWidgetsRadius.at(i)->setParent(0);
+	int i;
+	for (i = 0; i < m_modifyWidgetsRotation.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsRotation.at(i));
+		m_modifyWidgetsRotation.at(i)->setParent(0);
 	}
 	for (i = 0; i < m_modifyWidgetsLocation.size(); i++) {
 		layout->removeWidget(m_modifyWidgetsLocation.at(i));
 		m_modifyWidgetsLocation.at(i)->setParent(0);
 	}
-	for (i = 0; i < m_modifyWidgetsRotation.size(); i++) {
-		layout->removeWidget(m_modifyWidgetsRotation.at(i));
-		m_modifyWidgetsRotation.at(i)->setParent(0);
+	for (i = 0; i < m_modifyWidgetsSize.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsSize.at(i));
+		m_modifyWidgetsSize.at(i)->setParent(0);
 	}
-
+	for (i = 0; i < m_modifyWidgetsMass.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsMass.at(i));
+		m_modifyWidgetsMass.at(i)->setParent(0);
+	}
+	for (i = 0; i < m_modifyWidgetsFreeze.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsFreeze.at(i));
+		m_modifyWidgetsFreeze.at(i)->setParent(0);
+	}
+	for (i = 0; i < m_modifyWidgetsMaterial.size(); i++) {
+		layout->removeWidget(m_modifyWidgetsMaterial.at(i));
+		m_modifyWidgetsMaterial.at(i)->setParent(0);
+	}
 }
 
 }
