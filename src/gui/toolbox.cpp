@@ -99,7 +99,7 @@ void ToolBox::create_m_mass()
 	// construct the spin box for the object's mass
 	m_mass = new QDoubleSpinBox();
 	m_mass->setDecimals(3);
-	m_mass->setRange(-0.001, 1000);
+	m_mass->setRange(-1, 1000);
 	m_mass->setSingleStep(1);
 	connect(m_mass, SIGNAL(valueChanged(double)), this, SLOT(massChanged(double)));
 }
@@ -316,6 +316,7 @@ void ToolBox::materialSelected(int index)
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		obj->setMaterial(material);
 		sim::Simulation::instance().updateObject(obj);
+		updateData(obj);
 	}
 }
 
@@ -331,11 +332,15 @@ void ToolBox::freezeStateChanged(int state)
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		obj->setFreezeState(state);
 		sim::Simulation::instance().updateObject(obj);
+		updateData(obj);
 	}
 }
 
 void ToolBox::massChanged(double mass)
 {
+	if (mass < 0.0) {
+		mass = -1.0;
+	}
 	sim::Simulation::instance().setNewObjectMass((float) mass);
 
 	if (!doUpdate)
@@ -345,6 +350,7 @@ void ToolBox::massChanged(double mass)
 		sim::Object obj = sim::Simulation::instance().getSelectedObject();
 		obj->setMass(mass);
 		sim::Simulation::instance().updateObject(obj);
+		updateData(obj);
 	}
 }
 
@@ -366,6 +372,7 @@ void ToolBox::updateSize(double value)
 		}
 		obj->scale(scale);
 		sim::Simulation::instance().updateObject(obj);
+		updateData(obj);
 	}
 }
 
@@ -375,7 +382,8 @@ void ToolBox::updateLocation(double value)
 		return;
 
 	if (sim::Simulation::instance().getSelectedObject()) {
-		m3d::Mat4f matrix = sim::Simulation::instance().getSelectedObject()->getMatrix();
+		sim::Object obj = sim::Simulation::instance().getSelectedObject();
+		m3d::Mat4f matrix = obj->getMatrix();
 		if (QObject::sender() == m_locationX) {
 			matrix._41 = (float) value;
 		} else if (QObject::sender() == m_locationY) {
@@ -383,7 +391,8 @@ void ToolBox::updateLocation(double value)
 		} else if (QObject::sender() == m_locationZ) {
 			matrix._43 = (float) value;
 		}
-		sim::Simulation::instance().getSelectedObject()->setMatrix(matrix);
+		obj->setMatrix(matrix);
+		updateData(obj);
 	}
 }
 
@@ -399,6 +408,7 @@ void ToolBox::updateRotation(double value)
 				m_rotationY->value() * PI / 180.0f) * Mat4f::translate(obj->getMatrix().getW());
 
 		obj->setMatrix(matrix);
+		updateData(obj);
 	}
 }
 
