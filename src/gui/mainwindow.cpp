@@ -161,6 +161,19 @@ void MainWindow::createMenu()
 	connect(m_gravity, SIGNAL(triggered()), this, SLOT(onGravityPressed()));
 	m_menuSimulation->addAction(m_gravity);
 
+	// Options
+	m_menuOptions = menuBar()->addMenu("&Options");
+
+	m_sound_play = new QAction("&Play Sound", this);
+	m_sound_play->setEnabled(false);
+	connect(m_sound_play, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
+	m_menuOptions->addAction(m_sound_play);
+
+	m_sound_stop = new QAction("&Stop Sound", this);
+	m_sound_stop->setEnabled(true);
+	connect(m_sound_stop, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
+	m_menuOptions->addAction(m_sound_stop);
+
 	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
 
@@ -309,6 +322,19 @@ void MainWindow::onGravityPressed()
 {
 	GravityDialog* dialog = new GravityDialog(newton::gravity, this);
 	newton::gravity = dialog->run();
+}
+
+void MainWindow::onSoundControlsPressed()
+{
+	bool status;
+	if (QObject::sender() == m_sound_play) {
+		status = true;
+	} else {
+		status = false;
+	}
+	m_sound_play->setEnabled(!status);
+	m_sound_stop->setEnabled(status);
+	snd::SoundMgr::instance().setMusicEnabled(status);
 }
 
 /**
