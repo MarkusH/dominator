@@ -55,7 +55,7 @@ Texture __Texture::load(std::string file, GLuint target)
 
     // TODO: check for config value
     // enable anisotropic filtering
-    if (GLEW_EXT_texture_filter_anisotropic) {
+    if (false && GLEW_EXT_texture_filter_anisotropic) {
 		float maxAF;
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAF);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAF);
@@ -94,13 +94,13 @@ void TextureMgr::destroy()
 		delete s_instance;
 }
 
-Texture TextureMgr::add(std::string name, Texture texture)
+Texture TextureMgr::add(const std::string& name, Texture texture)
 {
 	(*this)[name] = texture;
 	return texture;
 }
 
-unsigned TextureMgr::load(std::string folder)
+unsigned TextureMgr::load(const std::string& folder)
 {
 	int count = 0;
 	using namespace boost::filesystem;
@@ -127,7 +127,7 @@ unsigned TextureMgr::load(std::string folder)
 	return count;
 }
 
-Texture TextureMgr::get(std::string name)
+Texture TextureMgr::get(const std::string& name)
 {
 	TextureMgr::iterator it = this->find(name);
 	if (it == this->end()) {

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <util/tostring.hpp>
 #include <boost/foreach.hpp>
+#include <clocale>
 
 namespace sim {
 
@@ -452,6 +453,10 @@ void __RigidBody::save(const __RigidBody& body, rapidxml::xml_node<>* node, rapi
 RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
+
+	// this prevents that the atof functions fails on German systems
+	// since they use "," as a separator for floats
+	setlocale(LC_ALL,"C");
 
 	int freezeState = 0; Vec4f damping(0.1f, 0.1f, 0.1f, 0.1f);	// all except dominos use it
 	float w, h, d;	// box
@@ -900,6 +905,10 @@ void __Convex::save(const __Convex& body , rapidxml::xml_node<>* node, rapidxml:
 Convex __Convex::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
+
+	// this prevents that the atof functions fails on German systems
+	// since they use "," as a separator for floats
+	setlocale(LC_ALL,"C");
 
 	Mat4f matrix = Mat4f();
 	int freezeState;

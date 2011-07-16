@@ -15,6 +15,9 @@
 #include <set>
 #include <xml/rapidxml.hpp>
 
+
+#define MAX_SOUND_DISTANCE 500
+
 namespace sim {
 
 /**
@@ -83,7 +86,7 @@ struct MaterialPair {
 	float kineticFriction;
 	float softness;
 
-	/// @todo add sounds
+	std::string impactSound;
 
 	/**
 	 * Constructs the default material.

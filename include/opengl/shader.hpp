@@ -80,16 +80,16 @@ public:
 	static void destroy();
 
 	/** Adds the pair of name and shader to the manager. */
-	Shader add(std::string name, Shader shader);
+	Shader add(const std::string& name, Shader shader);
 
 	/** Loads all shaders in the specified folder. Vertex (*.vs) and
 	 * fragment shader (*.fs) files with the same name are linked together
 	 * and stored with the file name as a key.
 	 */
-	unsigned load(std::string folder);
+	unsigned load(const std::string& folder);
 
 	/** Returns the associated shader or an empty smart pointer */
-	Shader get(std::string name);
+	Shader get(const std::string& name);
 };
 
 

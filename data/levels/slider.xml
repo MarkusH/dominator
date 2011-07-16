@@ -5,21 +5,21 @@
 		<object id="1" type="sphere" matrix="0.986443, 0.164104, 0, 0; -0.164104, 0.986443, 0, 0; 0, 0, 1, 0; 9.53622, 6.68318, 0, 1" radius_x="1" radius_y="1" radius_z="1" freezeState="1" damping="0.1, 0.1, 0.1, 0.025" material="wood" mass="1"/>
 		<joint type="slider" parentID="0" childID="1" pivot="-0.307696, 4.91884, 0" pinDir="0.986443, 0.164104, 0" limited="1" mindist="-20.5" maxdist="0"/>
 	</compound>
-	<object id="1" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -11.1838, 4.31469, -0.039286, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="2" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -15.6796, 4.31469, -0.234204, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="3" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -20.1754, 4.31469, -0.429122, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="4" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -24.6712, 4.31469, -0.62404, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="5" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -29.1669, 4.31469, -0.818957, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="6" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -33.6627, 4.31469, -1.01388, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="7" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -38.1585, 4.31469, -1.20879, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="8" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -42.6543, 4.31469, -1.40371, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="9" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -47.15, 4.31469, -1.59863, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="10" type="domino_small" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -51.6458, 4.31469, -1.79355, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="1" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -11.1838, 4.31469, -0.039286, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="2" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -15.6796, 4.31469, -0.234204, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="3" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -20.1754, 4.31469, -0.429122, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="4" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -24.6712, 4.31469, -0.62404, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="5" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -29.1669, 4.31469, -0.818957, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="6" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -33.6627, 4.31469, -1.01388, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="7" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -38.1585, 4.31469, -1.20879, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="8" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -42.6543, 4.31469, -1.40371, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="9" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -47.15, 4.31469, -1.59863, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="10" type="domino_large" matrix="-0.0433151, -0, 0.999061, 0; 0, 1, 0, 0; -0.999061, 0, -0.0433151, 0; -51.6458, 4.31469, -1.79355, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
 	<object id="387" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 20.7866, 3.15479, -0.0838778, 1" width="19.75" height="3.7" depth="15.25" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="557.197"/>
-	<object id="388" type="domino_small" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 11.6508, 8.0147, 0.0390506, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="389" type="domino_small" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 16.1483, 8.0147, -0.111192, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="390" type="domino_small" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 20.6457, 8.0147, -0.261435, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
-	<object id="391" type="domino_small" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 25.1432, 8.0147, -0.411678, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="388" type="domino_large" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 11.6508, 8.0147, 0.0390506, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="389" type="domino_large" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 16.1483, 8.0147, -0.111192, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="390" type="domino_large" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 20.6457, 8.0147, -0.261435, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
+	<object id="391" type="domino_large" matrix="-0.0333873, 0, -0.999442, 0; 0, 1, 0, 0; 0.999442, -0, -0.0333873, 0; 25.1432, 8.0147, -0.411678, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="asphalt" mass="5"/>
 	<environment filename="data/models/mattest.3ds" octree="1"/>
 </level>
 
