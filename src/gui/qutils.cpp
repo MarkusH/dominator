@@ -24,8 +24,12 @@ QObjectAction::QObjectAction(sim::__Object::Type type, QWidget* parent) :
 QObjectAction::QObjectAction(QFileInfo fileinfo, QWidget* parent) :
 	QAction(parent)
 {
+	QString name = fileinfo.baseName().toLower();
+	if(!name.isEmpty())
+		name[0] = name.at(0).toUpper();
+
 	m_type = sim::__Object::COMPOUND;
-	setText(fileinfo.fileName());
+	setText(name);
 	m_mass = sim::__Object::TypeMass[m_type];
 	m_freeze = sim::__Object::TypeFreezeState[m_type];
 	m_size = sim::__Object::TypeSize[m_type];
@@ -41,12 +45,16 @@ SplashScreen::SplashScreen(int max) :
 	m_bar->setGeometry(10, 10, width() - 20, 20);
 	m_bar->setMaximum(max);
 	m_bar->setValue(0);
+	m_message = new QLabel(this);
+	m_message->setGeometry(10, 30, width() - 20, 20);
+	m_message->setText("Loading ...");
 }
 
-void SplashScreen::updateProgress(int progress)
+void SplashScreen::updateProgress(const int progress, const QString message)
 {
 	m_bar->setValue(progress);
 	m_bar->repaint(10, 10, width() - 20, 20);
+	m_message->setText(message);
 }
 
 }

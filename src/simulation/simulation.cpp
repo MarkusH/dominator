@@ -22,7 +22,6 @@
 #include <util/threadcounter.hpp>
 #include <util/tostring.hpp>
 #include <stdlib.h>
-#include <clocale>
 #include <sound/soundmgr.hpp>
 
 
@@ -45,31 +44,7 @@ static CRSpline curve_spline;
 
 ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState, const Vec3f& size)
 	: type(type), material(material), fileName(fileName), mass(mass), freezeState(freezeState), size(size)
-{
-	switch (type) {
-	case __Object::BOX:
-	case __Object::SPHERE:
-		this->size = Vec3f(1.0f, 1.0f, 1.0f);
-		this->size = Vec3f(1.0f, 1.0f, 1.0f);
-		break;
-	case __Object::CYLINDER:
-	case __Object::CONE:
-		this->size = Vec3f(1.0f, 2.0f, 1.0f);
-		break;
-	case __Object::CAPSULE:
-		this->size = Vec3f(1.0f, 6.0f, 1.0f);
-		break;
-	case __Object::CHAMFER_CYLINDER:
-		this->size = Vec3f(5.0f, 1.0f, 1.0f);
-		break;
-	case __Object::COMPOUND:
-		this->fileName = fileName;
-		break;
-	default:
-		this->size = Vec3f(1.0f, 1.0f, 1.0f);
-		break;
-	}
-}
+{}
 
 Object ObjectInfo::create(const Mat4f& matrix) const
 {
@@ -249,10 +224,6 @@ void Simulation::load(const std::string& fileName)
 
 	using namespace rapidxml;
 
-	// this prevents that the atof functions fails on German systems
-	// since they use "," as a separator for floats
-	setlocale(LC_ALL,"C");
-
 	char* m;
 	file<char>* f = 0;
 
@@ -261,12 +232,12 @@ void Simulation::load(const std::string& fileName)
 	} catch ( std::runtime_error& e ) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
-		//m_errorAdapter.displayError(function, args, e);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		if(f) delete f;
 		return;
 	} catch (...) {
 		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
-		//m_errorAdapter.displayError(function, args);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		if(f) delete f;
 		return;
 	}
@@ -329,11 +300,11 @@ void Simulation::load(const std::string& fileName)
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
-		//m_errorAdapter.displayError(function, args, e);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 	} catch(...) {
 		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
-		//m_errorAdapter.displayError(function, args);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 	}
 	delete f;
 }

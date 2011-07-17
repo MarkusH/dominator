@@ -11,7 +11,7 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QComboBox>
 #include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
+#include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
@@ -19,6 +19,8 @@
 #include <QtGui/QMenu>
 #include <gui/qutils.hpp>
 #include <simulation/simulation.hpp>
+
+typedef QList<sim::__Object::Type> QOTypeList;
 
 namespace gui {
 
@@ -50,7 +52,9 @@ public slots:
 	 * 		ToolBox::m_rotationX, ToolBox::m_rotationY, ToolBox::m_rotationZ
 	 */
 	void updateData(sim::Object object);
-	void updateData();
+	void deselectInteraction();
+	void showModificationWidgets(sim::__Object::Type type);
+	void hideModificationWidgets();
 
 private:
 	void create_m_objects();
@@ -63,13 +67,16 @@ private:
 	void create_m_buttonbox();
 
 	QVBoxLayout* layout;
-	QHBoxLayout* buttonLayout;
+	QGridLayout* buttonLayout;
 	QComboBox* m_materials;
 	QPushButton* m_objects;
 	QCheckBox* m_freezeState;
 	QDoubleSpinBox* m_mass;
 	QMenu* m_template_menu;
 
+	QLabel* m_labelMaterial;
+	QLabel* m_labelFreeze;
+	QLabel* m_labelMass;
 	QLabel* m_labelSize;
 	QLabel* m_labelLocation;
 	QLabel* m_labelRotation;
@@ -128,21 +135,28 @@ private:
 	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
 	 * is emitted with sim::Simulation::InteractionType::INT_MOVE_GROUND as parameter.
 	 * If the button is deactivated, the parameter of the signal is
-	 * sim::Simulation::InteractionType::INT_NONE
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
 	 */
 	QPushButton* m_moveH;
 	/**
 	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
 	 * is emitted with sim::Simulation::InteractionType::INT_MOVE_BILLBOARD as parameter.
 	 * If the button is deactivated, the parameter of the signal is
-	 * sim::Simulation::InteractionType::INT_NONE
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
 	 */
 	QPushButton* m_moveV;
 	/**
 	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
+	 * is emitted with sim::Simulation::InteractionType::INT_ROTATE_GROUND as
+	 * parameter. If the button is deactivated, the parameter of the signal is
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
+	 */
+	QPushButton* m_rotateG;
+	/**
+	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
 	 * is emitted with sim::Simulation::InteractionType::INT_ROTATE as parameter.
 	 * If the button is deactivated, the parameter of the signal is
-	 * sim::Simulation::InteractionType::INT_NONE
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
 	 */
 	QPushButton* m_rotate;
 
@@ -152,9 +166,21 @@ private:
 	 */
 	sim::Simulation::InteractionType m_selectedInteraction;
 
-	std::list<QWidget*> m_modifyWidgetsFull;
-	std::list<QWidget*> m_modifyWidgetsDominos;
-	std::list<QWidget*> m_modifyWidgets;
+	QList<QWidget*> m_modifyWidgetsMaterial;
+	QList<QWidget*> m_modifyWidgetsFreeze;
+	QList<QWidget*> m_modifyWidgetsMass;
+	QList<QWidget*> m_modifyWidgetsSize;
+	QList<QWidget*> m_modifyWidgetsLocation;
+	QList<QWidget*> m_modifyWidgetsRotation;
+	QList<QWidget*> m_modifyWidgetsRadius;
+
+	QOTypeList m_allowMaterial;
+	QOTypeList m_allowFreeze;
+	QOTypeList m_allowMass;
+	QOTypeList m_allowSize;
+	QOTypeList m_allowLocation;
+	QOTypeList m_allowRotation;
+	QOTypeList m_allowRadius;
 private slots:
 	/**
 	 * This slot function is invoked by clicking ToolBox::m_moveH,

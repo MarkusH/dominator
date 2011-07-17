@@ -10,6 +10,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QSplashScreen>
 #include <QtGui/QProgressBar>
+#include <QtGui/QLabel>
 #include <QtCore/QFileInfo>
 #include <simulation/simulation.hpp>
 
@@ -44,9 +45,10 @@ class SplashScreen: public QSplashScreen {
 	Q_OBJECT
 public:
 	SplashScreen(int max);
-	void updateProgress(int progrss);
+	void updateProgress(const int progress, const QString message);
 private:
 	QProgressBar* m_bar;
+	QLabel* m_message;
 };
 
 inline sim::__Object::Type QObjectAction::getType()
