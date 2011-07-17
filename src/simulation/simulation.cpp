@@ -22,7 +22,6 @@
 #include <util/threadcounter.hpp>
 #include <util/tostring.hpp>
 #include <stdlib.h>
-#include <clocale>
 
 namespace sim {
 
@@ -244,10 +243,6 @@ void Simulation::load(const std::string& fileName)
 
 	using namespace rapidxml;
 
-	// this prevents that the atof functions fails on German systems
-	// since they use "," as a separator for floats
-	setlocale(LC_ALL,"C");
-
 	char* m;
 	file<char>* f = 0;
 
@@ -256,12 +251,12 @@ void Simulation::load(const std::string& fileName)
 	} catch ( std::runtime_error& e ) {
 		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
-		//m_errorAdapter.displayError(function, args, e);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		if(f) delete f;
 		return;
 	} catch (...) {
 		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
-		//m_errorAdapter.displayError(function, args);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		if(f) delete f;
 		return;
 	}
@@ -324,11 +319,11 @@ void Simulation::load(const std::string& fileName)
 	} catch( parse_error& e ) {
 		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
 		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
-		//m_errorAdapter.displayError(function, args, e);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 	} catch(...) {
 		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
 		/// @todo tell user in the GUI that an unknown error occurred
-		//m_errorAdapter.displayError(function, args);
+		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 	}
 	delete f;
 }

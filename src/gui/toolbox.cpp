@@ -252,7 +252,7 @@ void ToolBox::loadMaterials(QString filename)
 			m_materials->addItem(QString::fromStdString(*itr), QString::fromStdString(*itr));
 		}
 		connect(m_materials, SIGNAL(currentIndexChanged(int)), this, SLOT(materialSelected(int)));
-	} // otherwise a captched exception message
+	} // otherwise a catched exception message
 }
 
 void ToolBox::updateMaterials(QString filename)
