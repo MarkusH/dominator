@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
 <config>
   <data key="useAF" value="true" />
-  <data key="defaultG" value="9.81" />
+  <data key="gravity" value="9.81" />
 </config>

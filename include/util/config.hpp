@@ -3,37 +3,65 @@
 
 #include <string>
 #include <map>
+#include <boost/lexical_cast.hpp>
 
 namespace util {
 
-class ConfigMgr: public std::map<std::string, std::string> {
+class Config: public std::map<std::string, std::string> {
 private:
 	// Singleton
-	static ConfigMgr* s_instance;
-	ConfigMgr();
-	virtual ~ConfigMgr();
+	static Config* s_instance;
+	Config();
+	virtual ~Config();
 
 protected:
 public:
-	static ConfigMgr& instance();
-
+	static Config& instance();
 	void destroy();
 
 	void save(const std::string& path);
-
 	void load(const std::string& path);
 
-	const std::string& getValue(const std::string& key);
-
 	void set(const std::string& key, const std::string& value);
+
+	bool get(const std::string& key, bool def);
+	template<typename T> T get(const std::string& key, T def);
 };
 
-inline ConfigMgr& ConfigMgr::instance()
+inline Config& Config::instance()
 {
 	if (!s_instance)
-		s_instance = new ConfigMgr();
+		s_instance = new Config();
 	return *s_instance;
 }
+
+inline
+bool Config::get(const std::string& key, bool def)
+{
+	// lexical_cast does not convert "true" and "false"
+	std::map<std::string, std::string>::iterator itr = find(key);
+	if (itr != end()) {
+		if (itr->second == "true") return true;
+		if (itr->second == "false") return false;
+		return get<bool>(key, def);
+	}
+	return def;
+}
+
+template<typename T>
+inline
+T Config::get(const std::string& key, T def)
+{
+	try {
+		std::map<std::string, std::string>::iterator itr = find(key);
+		if (itr != end())
+			return boost::lexical_cast<T, std::string>(itr->second);
+	} catch (...) {
+	}
+	return def;
+}
+
+
 
 }
 

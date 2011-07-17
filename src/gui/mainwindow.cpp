@@ -18,7 +18,6 @@
 #include <QtCore/QList>
 
 #include <newton/util.hpp>
-#include <util/config.hpp>
 #include <sound/soundmgr.hpp>
 
 namespace gui {
@@ -27,8 +26,6 @@ MainWindow::MainWindow(QApplication* app)
 {
 	m_modified = true;
 	m_tmp_file = NULL;
-
-	util::ConfigMgr::instance().load("data/config.xml");
 
 	// load the splash screen
 	SplashScreen splash(100);

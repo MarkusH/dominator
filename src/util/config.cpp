@@ -5,23 +5,23 @@
 
 namespace util {
 
-ConfigMgr* ConfigMgr::s_instance = NULL;
+Config* Config::s_instance = NULL;
 
-ConfigMgr::ConfigMgr()
+Config::Config()
 {
 }
 
-ConfigMgr::~ConfigMgr()
+Config::~Config()
 {
 }
 
-void ConfigMgr::destroy()
+void Config::destroy()
 {
 	if (s_instance)
 		delete s_instance;
 }
 
-void ConfigMgr::save(const std::string& path)
+void Config::save(const std::string& path)
 {
 	using namespace rapidxml;
 
@@ -45,7 +45,7 @@ void ConfigMgr::save(const std::string& path)
 	xml_attribute<>* value;
 	char* pValue;
 
-	ConfigMgr::iterator it;
+	Config::iterator it;
 	for(it = this->begin(); it != this->end(); ++it) {
 		data = doc.allocate_node(node_element, "data");
 		config->append_node(data);
@@ -60,7 +60,7 @@ void ConfigMgr::save(const std::string& path)
 	}
 }
 
-void ConfigMgr::load(const std::string& fileName)
+void Config::load(const std::string& fileName)
 {
 	using namespace rapidxml;
 
@@ -116,20 +116,11 @@ void ConfigMgr::load(const std::string& fileName)
 	}
 }
 
-const std::string& ConfigMgr::getValue(const std::string& key)
-{
-	ConfigMgr::iterator it = (*this).begin();
-	it = (*this).find(key);
-	if(it != (*this).end())	
-		return it->second;
-	else 
-		return std::string("");
-}
 
-void ConfigMgr::set(const std::string& key, const std::string& value)
+void Config::set(const std::string& key, const std::string& value)
 {
 	bool exists = false;
-	ConfigMgr::iterator it = (*this).begin();
+	Config::iterator it = (*this).begin();
 	it = (*this).find(key);
 	if(it != (*this).end()) 
 		exists = true;
