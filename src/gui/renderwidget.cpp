@@ -83,6 +83,9 @@ void RenderWidget::paintGL()
 	if (m_clock.get() >= 1.0f) {
 		emit framesPerSecondChanged(frames);
 		emit objectsCountChanged(sim::Simulation::instance().getObjectCount());
+		if (sim::Simulation::instance().getSelectedObject()) {
+			emit objectSelected(sim::Simulation::instance().getSelectedObject());
+		}
 		m_clock.reset();
 		frames = 0;
 	}
@@ -124,6 +127,7 @@ void RenderWidget::mouseDoubleClickEvent(QMouseEvent* event)
 
 	if (sim::Simulation::instance().getSelectedObject()) {
 		emit objectSelected(sim::Simulation::instance().getSelectedObject());
+		emit objectSelected(sim::Simulation::instance().getSelectedObject()->getType());
 	} else {
 		emit objectSelected();
 	}

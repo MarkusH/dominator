@@ -149,6 +149,7 @@ signals:
 	 * an object. The signal is connected to ModifyBox::updateData(m3d::Mat4f)
 	 */
 	void objectSelected(sim::Object);
+	void objectSelected(sim::__Object::Type);
 	void objectSelected();
 };
 
