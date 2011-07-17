@@ -17,7 +17,6 @@
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
-#include <clocale>
 #include <sound/soundmgr.hpp>
 #include <simulation/simulation.hpp>
 
@@ -48,10 +47,6 @@ Material::Material(const Material& m)
 void Material::load(rapidxml::xml_node<>* const node)
 {
 	using namespace rapidxml;
-
-	// this prevents that the atof functions fails on German systems
-	// since they use "," as a separator for floats
-	setlocale(LC_ALL,"C");
 
 	xml_attribute<>* attr = node->first_attribute("name");
 	if(attr) {
