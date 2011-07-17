@@ -20,6 +20,8 @@
 #include <gui/qutils.hpp>
 #include <simulation/simulation.hpp>
 
+typedef QList<sim::__Object::Type> QOTypeList;
+
 namespace gui {
 
 /**
@@ -70,6 +72,9 @@ private:
 	QDoubleSpinBox* m_mass;
 	QMenu* m_template_menu;
 
+	QLabel* m_labelMaterial;
+	QLabel* m_labelFreeze;
+	QLabel* m_labelMass;
 	QLabel* m_labelSize;
 	QLabel* m_labelLocation;
 	QLabel* m_labelRotation;
@@ -152,9 +157,21 @@ private:
 	 */
 	sim::Simulation::InteractionType m_selectedInteraction;
 
-	std::list<QWidget*> m_modifyWidgetsFull;
-	std::list<QWidget*> m_modifyWidgetsDominos;
-	std::list<QWidget*> m_modifyWidgets;
+	QList<QWidget*> m_modifyWidgetsMaterial;
+	QList<QWidget*> m_modifyWidgetsFreeze;
+	QList<QWidget*> m_modifyWidgetsMass;
+	QList<QWidget*> m_modifyWidgetsSize;
+	QList<QWidget*> m_modifyWidgetsLocation;
+	QList<QWidget*> m_modifyWidgetsRotation;
+	QList<QWidget*> m_modifyWidgetsRadius;
+
+	QOTypeList m_allowMaterial;
+	QOTypeList m_allowFreeze;
+	QOTypeList m_allowMass;
+	QOTypeList m_allowSize;
+	QOTypeList m_allowLocation;
+	QOTypeList m_allowRotation;
+	QOTypeList m_allowRadius;
 private slots:
 	/**
 	 * This slot function is invoked by clicking ToolBox::m_moveH,

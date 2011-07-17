@@ -96,6 +96,8 @@ private slots:
 	 */
 	void onGravityPressed();
 
+	void onSoundControlsPressed();
+
 	//Help
 	/**
 	 * The slot function onHelpPressed() is executed each time the user clicks
@@ -177,6 +179,10 @@ private:
 	 * When triggered MainWindow::onGravityPressed() is executed
 	 */
 	QAction* m_gravity;
+
+	QMenu* m_menuOptions;
+	QAction* m_sound_play;
+	QAction* m_sound_stop;
 
 	/**
 	 * The File menu. Holds MainWindow::m_help, MainWindow::m_about
