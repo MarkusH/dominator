@@ -23,7 +23,7 @@ public:
 
 	void load(const std::string& path);
 
-	std::string& getValue(const std::string& key);
+	const std::string& getValue(const std::string& key);
 
 	void set(const std::string& key, const std::string& value);
 };

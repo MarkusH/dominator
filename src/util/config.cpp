@@ -116,7 +116,7 @@ void ConfigMgr::load(const std::string& fileName)
 	}
 }
 
-std::string& ConfigMgr::getValue(const std::string& key)
+const std::string& ConfigMgr::getValue(const std::string& key)
 {
 	ConfigMgr::iterator it = (*this).begin();
 	it = (*this).find(key);
