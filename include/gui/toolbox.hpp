@@ -52,7 +52,9 @@ public slots:
 	 * 		ToolBox::m_rotationX, ToolBox::m_rotationY, ToolBox::m_rotationZ
 	 */
 	void updateData(sim::Object object);
-	void updateData();
+	void deselectInteraction();
+	void showModificationWidgets(sim::__Object::Type type);
+	void hideModificationWidgets();
 
 private:
 	void create_m_objects();

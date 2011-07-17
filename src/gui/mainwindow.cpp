@@ -81,7 +81,9 @@ MainWindow::MainWindow(QApplication* app)
 	connect(m_renderWidget, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
 
 	connect(m_renderWidget, SIGNAL(objectSelected(sim::Object)), m_toolBox, SLOT(updateData(sim::Object)));
-	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(updateData()));
+	connect(m_renderWidget, SIGNAL(objectSelected(sim::__Object::Type)), m_toolBox, SLOT(showModificationWidgets(sim::__Object::Type)));
+	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(deselectInteraction()));
+	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(hideModificationWidgets()));
 
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
 	splash.updateProgress(90, "Finished loading");
