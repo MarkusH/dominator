@@ -11,7 +11,7 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QComboBox>
 #include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
+#include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
@@ -67,7 +67,7 @@ private:
 	void create_m_buttonbox();
 
 	QVBoxLayout* layout;
-	QHBoxLayout* buttonLayout;
+	QGridLayout* buttonLayout;
 	QComboBox* m_materials;
 	QPushButton* m_objects;
 	QCheckBox* m_freezeState;
@@ -135,21 +135,28 @@ private:
 	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
 	 * is emitted with sim::Simulation::InteractionType::INT_MOVE_GROUND as parameter.
 	 * If the button is deactivated, the parameter of the signal is
-	 * sim::Simulation::InteractionType::INT_NONE
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
 	 */
 	QPushButton* m_moveH;
 	/**
 	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
 	 * is emitted with sim::Simulation::InteractionType::INT_MOVE_BILLBOARD as parameter.
 	 * If the button is deactivated, the parameter of the signal is
-	 * sim::Simulation::InteractionType::INT_NONE
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
 	 */
 	QPushButton* m_moveV;
 	/**
 	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
+	 * is emitted with sim::Simulation::InteractionType::INT_ROTATE_GROUND as
+	 * parameter. If the button is deactivated, the parameter of the signal is
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
+	 */
+	QPushButton* m_rotateG;
+	/**
+	 * If activated, ToolBox::interactionSelected(sim::Simulation::InteractionType)
 	 * is emitted with sim::Simulation::InteractionType::INT_ROTATE as parameter.
 	 * If the button is deactivated, the parameter of the signal is
-	 * sim::Simulation::InteractionType::INT_NONE
+	 * sim::Simulation::InteractionType::INT_CREATE_OBJECT
 	 */
 	QPushButton* m_rotate;
 

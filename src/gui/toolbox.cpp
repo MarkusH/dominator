@@ -208,23 +208,28 @@ void ToolBox::create_m_rotation()
 void ToolBox::create_m_buttonbox()
 {
 	// mouse interaction buttons
-	buttonLayout = new QHBoxLayout();
+	buttonLayout = new QGridLayout();
 	m_mouseinteraction = new QButtonGroup();
 
-	m_moveH = new QPushButton("Move &Ground");
+	m_moveH = new QPushButton("Move\nGround");
 	m_moveH->setCheckable(true);
 	m_mouseinteraction->addButton(m_moveH, (int) Simulation::INT_MOVE_GROUND);
-	buttonLayout->addWidget(m_moveH);
+	buttonLayout->addWidget(m_moveH, 0, 0);
 
-	m_moveV = new QPushButton("Move Billboard");
+	m_moveV = new QPushButton("Move\nBillboard");
 	m_moveV->setCheckable(true);
 	m_mouseinteraction->addButton(m_moveV, (int) Simulation::INT_MOVE_BILLBOARD);
-	buttonLayout->addWidget(m_moveV);
+	buttonLayout->addWidget(m_moveV, 0, 1);
 
-	m_rotate = new QPushButton("Rotate");
+	m_rotateG = new QPushButton("Rotate\nGround");
+	m_rotateG->setCheckable(true);
+	m_mouseinteraction->addButton(m_rotateG, (int) Simulation::INT_ROTATE_GROUND);
+	buttonLayout->addWidget(m_rotateG, 1, 0);
+
+	m_rotate = new QPushButton("Rotate\nFree");
 	m_rotate->setCheckable(true);
-	m_mouseinteraction->addButton(m_rotate, (int) Simulation::INT_ROTATE_GROUND);
-	buttonLayout->addWidget(m_rotate);
+	m_mouseinteraction->addButton(m_rotate, (int) Simulation::INT_ROTATE);
+	buttonLayout->addWidget(m_rotate, 1, 1);
 
 	m_mouseinteraction->setParent(this);
 	connect(m_mouseinteraction, SIGNAL(buttonClicked(int)), this, SLOT(onInteractionPressed(int)));
