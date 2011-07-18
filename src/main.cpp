@@ -26,5 +26,8 @@ int main(int argc, char **argv) {
 
 	gui::MainWindow mainwindow(&app);
 
-	return app.exec();
+	int result = app.exec();
+	Config::instance().save("data/config.xml");
+
+	return result;
 }

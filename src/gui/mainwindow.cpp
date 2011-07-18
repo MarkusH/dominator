@@ -17,6 +17,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+#include <util/config.hpp>
 #include <newton/util.hpp>
 #include <sound/soundmgr.hpp>
 
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QApplication* app)
 	snd::SoundMgr::instance().LoadSound("data/sounds");
 	splash.updateProgress(70, "Loading music");
 	snd::SoundMgr::instance().LoadMusic("data/music");
-	snd::SoundMgr::instance().setMusicEnabled(true);
+	snd::SoundMgr::instance().setMusicEnabled(util::Config::instance().get("enableMusic", false));
 	app->processEvents();
 	splash.updateProgress(80, "Creating UI – Apply screen resolution");
 
@@ -169,12 +170,12 @@ void MainWindow::createMenu()
 	m_menuOptions = menuBar()->addMenu("&Options");
 
 	m_sound_play = new QAction("&Play Sound", this);
-	m_sound_play->setEnabled(false);
+	m_sound_play->setEnabled(!util::Config::instance().get("enableMusic", false));
 	connect(m_sound_play, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_play);
 
 	m_sound_stop = new QAction("&Stop Sound", this);
-	m_sound_stop->setEnabled(true);
+	m_sound_stop->setEnabled(util::Config::instance().get("enableMusic", false));
 	connect(m_sound_stop, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_stop);
 
@@ -339,6 +340,7 @@ void MainWindow::onSoundControlsPressed()
 	m_sound_play->setEnabled(!status);
 	m_sound_stop->setEnabled(status);
 	snd::SoundMgr::instance().setMusicEnabled(status);
+	util::Config::instance().set("enableMusic", status);
 }
 
 /**

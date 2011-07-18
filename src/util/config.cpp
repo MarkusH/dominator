@@ -2,6 +2,7 @@
 #include <xml/rapidxml.hpp>
 #include <xml/rapidxml_utils.hpp>
 #include <util/erroradapters.hpp>
+#include <xml/rapidxml_print.hpp>
 
 namespace util {
 
@@ -58,6 +59,18 @@ void Config::save(const std::string& path)
 		value = doc.allocate_attribute("value", pValue);
 		data->append_attribute(value);
 	}
+
+	std::string s;
+	print(std::back_inserter(s), doc, 0);
+
+	// save document
+	std::ofstream myfile;
+	myfile.open (path.c_str());
+	myfile << s;
+	myfile.close();
+
+	// frees all memory allocated to the nodes
+	doc.clear();
 }
 
 void Config::load(const std::string& fileName)
@@ -119,14 +132,12 @@ void Config::load(const std::string& fileName)
 
 void Config::set(const std::string& key, const std::string& value)
 {
-	bool exists = false;
-	Config::iterator it = (*this).begin();
-	it = (*this).find(key);
-	if(it != (*this).end()) 
-		exists = true;
-	if(exists) 
-		(*this)[key] = value;
-	else 
-		return;
+	(*this)[key] = value;
 }
+
+void Config::set(const std::string& key, bool value)
+{
+	(*this)[key] = value ? "true" : "false";
+}
+
 }

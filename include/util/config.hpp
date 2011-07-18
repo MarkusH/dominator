@@ -23,6 +23,8 @@ public:
 	void load(const std::string& path);
 
 	void set(const std::string& key, const std::string& value);
+	void set(const std::string& key, bool value);
+	template<typename T> void set(const std::string& key, T value);
 
 	bool get(const std::string& key, bool def);
 	template<typename T> T get(const std::string& key, T def);
@@ -61,6 +63,12 @@ T Config::get(const std::string& key, T def)
 	return def;
 }
 
+template<typename T>
+inline
+void Config::set(const std::string& key, T value)
+{
+	(*this)[key] = boost::lexical_cast<std::string, T>(value);
+}
 
 
 }
