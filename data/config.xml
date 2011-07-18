@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <config>
-  <data key="useAF" value="true" />
+  <data key="useAF" value="false" />
   <data key="gravity" value="9.81" />
+  <data key="enableMusic" value="true" />
 </config>
