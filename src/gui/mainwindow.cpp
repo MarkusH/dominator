@@ -95,7 +95,6 @@ MainWindow::MainWindow(QApplication* app)
 	m_toolBox->updateMaterials();
 	splash.updateProgress(100, "Starting ...");
 
-
 	splash.finish(this);
 }
 
@@ -178,6 +177,12 @@ void MainWindow::createMenu()
 	m_sound_stop->setEnabled(util::Config::instance().get("enableMusic", false));
 	connect(m_sound_stop, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_stop);
+
+	m_menuOptions->addSeparator();
+
+	m_preferences = new QAction("&Preferences", this);
+	connect(m_preferences, SIGNAL(triggered()), this, SLOT(onPreferencesPressed()));
+	m_menuOptions->addAction(m_preferences);
 
 	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
@@ -340,7 +345,18 @@ void MainWindow::onSoundControlsPressed()
 	m_sound_play->setEnabled(!status);
 	m_sound_stop->setEnabled(status);
 	snd::SoundMgr::instance().setMusicEnabled(status);
-	util::Config::instance().set("enableMusic", status);
+	//util::Config::instance().set("enableMusic", status);
+}
+
+void MainWindow::onPreferencesPressed()
+{
+	ConfigDialog configdialog;
+	if (configdialog.exec()) {
+		util::Config::instance().save("data/config.xml");
+	} else {
+		util::Config::instance().destroy();
+		util::Config::instance().load("data/config.xml");
+	}
 }
 
 /**

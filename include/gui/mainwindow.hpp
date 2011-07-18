@@ -98,6 +98,8 @@ private slots:
 
 	void onSoundControlsPressed();
 
+	void onPreferencesPressed();
+
 	//Help
 	/**
 	 * The slot function onHelpPressed() is executed each time the user clicks
@@ -183,6 +185,7 @@ private:
 	QMenu* m_menuOptions;
 	QAction* m_sound_play;
 	QAction* m_sound_stop;
+	QAction* m_preferences;
 
 	/**
 	 * The File menu. Holds MainWindow::m_help, MainWindow::m_about
