@@ -85,4 +85,6 @@
     <pair mat0="rough" mat1="metal" elasticity="0.3" staticFriction="0.59" kineticFriction="0.31" softness="0.05"/>
     <pair mat0="rough" mat1="crate" elasticity="0.3" staticFriction="0.49" kineticFriction="0.25" softness="0.05"/>
     <pair mat0="wood" mat1="rough" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05"/>
+
+    <pair mat0="barrel" mat1="metal" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05"/>
 </materials>
