@@ -171,7 +171,7 @@ public:
 	 *
 	 * @param material
 	 */
-	void applyMaterial(const std::string& material);
+	void applyMaterial(const std::string& material, bool useShadows = false);
 
 	/**
 	 * Adds a material to the internal material map and returns the

@@ -81,6 +81,7 @@ protected:
 	util::Clock m_clock;
 
 	ogl::Camera m_camera;
+	bool m_useShadows;
 	std::pair<ogl::FrameBuffer, ogl::Texture> m_shadow;
 
 	/** The world position of the mouse pointer */

@@ -19,6 +19,7 @@
 #include <simulation/domino.hpp>
 #include <simulation/crspline.hpp>
 #include <opengl/oglutil.hpp>
+#include <util/config.hpp>
 #include <util/threadcounter.hpp>
 #include <util/tostring.hpp>
 #include <stdlib.h>
@@ -140,7 +141,9 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
 	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
-	m_shadow = ogl::createShadowFBO(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+	m_useShadows = util::Config::instance().get("enableShadows", false);
+	if (m_useShadows)
+		m_shadow = ogl::createShadowFBO(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 }
 
 Simulation::~Simulation()
@@ -1114,12 +1117,12 @@ void Simulation::update()
 
 void Simulation::render()
 {
-	m_vbo.bind();
 	const Mat4f lightProjection = Mat4f::perspective(45.0f, 1.0f, 10.0f, 2048.0f);
 	const Mat4f lightModelview = Mat4f::lookAt(m_lightPos.xyz(), Vec3f(), Vec3f::yAxis());
 
 	// Render scene from light into FBO and store depth buffer
-	{
+	if (m_useShadows) {
+		m_vbo.bind();
 		m_shadow.first->bind();
 		ogl::__Shader::unbind();
 
@@ -1156,11 +1159,8 @@ void Simulation::render()
 		//glDisable(GL_POLYGON_OFFSET_FILL);
 		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 		glCullFace(GL_BACK);
-	}
 
-	m_vbo.bind();
-
-	{
+		// set matrix
 		const GLfloat bias[16] = {
 			0.5, 0.0, 0.0, 0.0,
 			0.0, 0.5, 0.0, 0.0,
@@ -1183,13 +1183,15 @@ void Simulation::render()
 		ogl::__Texture::stage(GL_TEXTURE7);
 		m_shadow.second->bind();
 		ogl::__Texture::stage(GL_TEXTURE0);
+
+		glViewport(m_camera.m_viewport.x, m_camera.m_viewport.y, m_camera.m_viewport.z, m_camera.m_viewport.w);
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(m_camera.m_projection[0]);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	glViewport(m_camera.m_viewport.x, m_camera.m_viewport.y, m_camera.m_viewport.z, m_camera.m_viewport.w);
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(m_camera.m_projection[0]);
+	m_vbo.bind();
 	m_camera.apply();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set some light properties
 	GLfloat ambient[4] = { 0.1, 0.1, 0.1, 1.0 };
@@ -1207,13 +1209,13 @@ void Simulation::render()
 		material = (*itr)->material;
 	}
 	MaterialMgr& mmgr = MaterialMgr::instance();
-	mmgr.applyMaterial(material);
+	mmgr.applyMaterial(material, m_useShadows);
 	for ( ; itr != m_sortedBuffers.end(); ++itr) {
 		const ogl::SubBuffer* const buf = (*itr);
 		const __Object* const obj = (const __Object* const)buf->userData;
 		if (material != buf->material) {
 			material = buf->material;
-			mmgr.applyMaterial(material);
+			mmgr.applyMaterial(material, m_useShadows);
 		}
 
 		glPushMatrix();

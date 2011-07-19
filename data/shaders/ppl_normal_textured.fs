@@ -1,52 +1,12 @@
-varying vec4 shadowCoords;
-uniform float shadowTexel;
-uniform float yPixelOffset;
-
 varying vec3 v;
 varying vec3 lightvec;
 varying vec3 normal;
 
 uniform sampler2D Texture0;
 uniform sampler2D Texture1;
-uniform sampler2DShadow ShadowMap;
 
-float lookup(vec2 offset)
-{
-    return shadow2DProj(ShadowMap, shadowCoords + vec4(
-			    offset.x * shadowTexel * shadowCoords.w, 
-			    offset.y * shadowTexel * shadowCoords.w,
-			    0.0005 - 0.005,
-			    0.0)).w;
-}
 void main()
 {
-
-	float shadow = 0.0;
-	
-	//if (shadowCoords.w > 0.0)
-	{
-		// single lookup
-		//shadow = lookup(vec2(0.0,0.0));
-
-        // 2x2 lookup
-        /*
-        float x, y;
-		for (y = -0.5; y <= 0.5; y += 1.0)
-			for (x = -0.5; x <= 0.5; x += 1.0)
-				shadow += lookup(vec2(x, y));
-		
-		shadow *= 0.25;
-        */
-		
-		// 4x4 lookup
-		float x, y;
-		for (y = -1.5; y <= 1.5; y += 1.0)
-			for (x = -1.5; x <= 1.5; x += 1.0)
-				shadow += lookup(vec2(x, y));
-		
-		shadow *= 0.0625;
-	}
-
 	vec3 Eye = normalize(-v);
 	vec2 uv = vec2(gl_TexCoord[0]);
 
@@ -67,7 +27,6 @@ void main()
 	vec4 IAmbient  = gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
 	vec4 IDiffuse  = gl_LightSource[0].diffuse * max(dot(norm, lightvec), 0.0) * gl_FrontMaterial.diffuse;
 	vec4 ISpecular = gl_LightSource[0].specular * pow(max(dot(Reflected, Eye), 0.0), gl_FrontMaterial.shininess) * gl_FrontMaterial.specular;
-    IDiffuse *= shadow;
 
-	gl_FragColor = vec4((gl_FrontLightModelProduct.sceneColor * min(shadow + 0.2, 1.0) + IAmbient + IDiffuse) * texture2D(Texture0, uv) + ISpecular);
+	gl_FragColor = vec4((gl_FrontLightModelProduct.sceneColor + IAmbient + IDiffuse) * texture2D(Texture0, uv) + ISpecular);
 }
