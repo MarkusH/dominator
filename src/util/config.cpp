@@ -20,6 +20,7 @@ void Config::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 void Config::save(const std::string& path)
