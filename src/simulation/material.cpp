@@ -324,7 +324,7 @@ int MaterialMgr::getMaterials(std::set<std::string>& materials)
 	return m_materials.size();
 }
 
-void MaterialMgr::applyMaterial(const std::string& material) {
+void MaterialMgr::applyMaterial(const std::string& material, bool useShadows) {
 	const Material* const _mat = get(material);
 	/// @todo only switch shader/texture if necessary
 	if (_mat != NULL) {
@@ -360,8 +360,10 @@ void MaterialMgr::applyMaterial(const std::string& material) {
 			shader->setUniform1i("Texture0", 0);
 			shader->setUniform1i("Texture1", 1);
 
-			shader->setUniform1i("ShadowMap", 7);
-			shader->setUniform1f("shadowTexel", 1.0 / SHADOW_MAP_SIZE);
+			if (useShadows) {
+				shader->setUniform1i("ShadowMap", 7);
+				shader->setUniform1f("shadowTexel", 1.0 / SHADOW_MAP_SIZE);
+			}
 		} else {
 			ogl::__Shader::unbind();
 		}

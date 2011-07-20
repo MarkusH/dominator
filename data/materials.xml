@@ -41,6 +41,9 @@
 	<material name="rope" texture="rope" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<material name="domino" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
 	<material name="cradle" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
+
+    <material name="rubber" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.6, 0.6, 0.6, 1" shininess="20" />
+    <material name="rough" texture="asphalt" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
 	<!-- 
 	For each pair of materials, there can be a material-pair that defines their
 	mutual interactions. If there is no pair defines for two materials, the
@@ -72,4 +75,16 @@
 	<pair mat0="yellow" mat1="domino" elasticity="0.1" staticFriction="1.0" kineticFriction="1.0" softness="0.1" impactSound="wood_wood" />
 	<pair mat0="cradle" mat1="domino" elasticity="1.0" staticFriction="0.59" kineticFriction="0.31" softness="0.05" impactSound="wood_wood" />
 	<pair mat0="cradle" mat1="cradle" elasticity="1.0" staticFriction="0.59" kineticFriction="0.31" softness="0.05"/>
+
+    <pair mat0="rubber" mat1="rubber" elasticity="1.0" staticFriction="0.29" kineticFriction="0.21" softness="0.05"/>
+    <pair mat0="rubber" mat1="asphalt" elasticity="0.85" staticFriction="0.29" kineticFriction="0.21" softness="0.05"/>
+    <pair mat0="wood" mat1="asphalt" elasticity="0.55" staticFriction="0.29" kineticFriction="0.21" softness="0.05"/>
+
+    <pair mat0="rough" mat1="rough" elasticity="0.3" staticFriction="0.89" kineticFriction="0.91" softness="0.05"/>
+    <pair mat0="metal" mat1="metal" elasticity="0.3" staticFriction="0.19" kineticFriction="0.11" softness="0.05"/>
+    <pair mat0="rough" mat1="metal" elasticity="0.3" staticFriction="0.59" kineticFriction="0.31" softness="0.05"/>
+    <pair mat0="rough" mat1="crate" elasticity="0.3" staticFriction="0.49" kineticFriction="0.25" softness="0.05"/>
+    <pair mat0="wood" mat1="rough" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05"/>
+
+    <pair mat0="barrel" mat1="metal" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05"/>
 </materials>

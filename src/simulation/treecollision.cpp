@@ -4,6 +4,7 @@
  * @file simulation/treecollision.cpp
  */
 
+#include <util/config.hpp>
 #include <simulation/treecollision.hpp>
 #include <simulation/object.hpp>
 #include <simulation/compound.hpp>
@@ -15,6 +16,7 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/types.h>
 #include <simulation/simulation.hpp>
+
 
 #define OCTREE_NODE_SIZE 60000
 
@@ -225,7 +227,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 		if (mesh->faces) {
 			faceMaterial = mesh->faceL[0].material && mesh->faceL[0].material[0] ? MaterialMgr::instance().getID(mesh->faceL[0].material) : defaultMaterial;
 			Material* mat = MaterialMgr::instance().fromID(faceMaterial);
-			MaterialMgr::instance().applyMaterial(mat ? mat->name : "yellow");
+			MaterialMgr::instance().applyMaterial(mat ? mat->name : "yellow", util::Config::instance().get("enableShadows", false));
 		}
 		glBegin(GL_TRIANGLES);
 		for(unsigned cur_face = 0; cur_face < mesh->faces; cur_face++) {

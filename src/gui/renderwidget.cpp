@@ -15,6 +15,7 @@
 #include <opengl/texture.hpp>
 #include <iostream>
 #include <simulation/material.hpp>
+#include <util/config.hpp>
 
 using namespace m3d;
 
@@ -40,7 +41,9 @@ void RenderWidget::initializeGL()
 	}
 
 	// load per-pixel lighting shader
-	ogl::ShaderMgr::instance().load("data/shaders/");
+
+	ogl::ShaderMgr::instance().load(
+			util::Config::instance().get("enableShadows", false) ? "data/shaders_shadow/" : "data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
 
 	glShadeModel(GL_SMOOTH);
