@@ -9,6 +9,8 @@
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 
+#define SOUND_MAX_CHANNELS 32
+
 namespace snd {
 
 SoundMgr* SoundMgr::s_instance = NULL;
@@ -47,7 +49,7 @@ SoundMgr::SoundMgr()
 	//result = m_system->setSpeakerMode(FMOD_SPEAKERMODE_STEREO);
 	//ERRCHECK(result);
 
-	result = m_system->init(32, FMOD_INIT_NORMAL, 0);
+	result = m_system->init(SOUND_MAX_CHANNELS, FMOD_INIT_NORMAL, 0);
 	ERRCHECK(result);
 }
 
@@ -64,11 +66,13 @@ SoundMgr::~SoundMgr()
 	ERRCHECK(result);
 }
 
-void SoundMgr::ERRCHECK(FMOD_RESULT result)
+bool SoundMgr::ERRCHECK(FMOD_RESULT result)
 {
 	if (result != FMOD_OK) {
 		std::cerr << "FMOD error! (" << result << ") " << FMOD_ErrorString(result) << std::endl;
+		return false;
 	}
+	return true;
 }
 
 
@@ -88,6 +92,9 @@ void SoundMgr::SoundUpdate()
 
 void SoundMgr::SetListenerPos(float* listenerpos, float* forward, float* upward, float* velocity)
 {
+	//TODO remove
+	return;
+
 	FMOD_RESULT result;
 	FMOD_VECTOR pos;
 	pos.x = listenerpos[0] * 0.025f;
@@ -120,27 +127,26 @@ unsigned SoundMgr::LoadSound(const std::string& folder)
 
 	path p(folder);
 
-	if (is_directory(p)) {
-		if (!is_empty(p)) {
-			directory_iterator end_itr;
-			for (directory_iterator itr(p); itr != end_itr; ++itr) {
-				if (itr->leaf().size() > 3) {
-					count++;
+	if (is_directory(p) && !is_empty(p)) {
+		directory_iterator end_itr;
+		for (directory_iterator itr(p); itr != end_itr; ++itr) {
+			if (itr->leaf().size() > 3) {
+				count++;
 
-					result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE | FMOD_3D, 0, &sound);
-					ERRCHECK(result);
+				//TODO enable 3d sound
+				// FMOD_HARDWARE | FMOD_3D
+				result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE, 0, &sound);
+				ERRCHECK(result);
 
-					result = sound->set3DMinMaxDistance(0.5f, 200000.0f);
-					ERRCHECK(result);
+				//result = sound->set3DMinMaxDistance(0.5f, 200000.0f);
+				//ERRCHECK(result);
 
-					result = sound->setMode(FMOD_LOOP_OFF);
-					ERRCHECK(result);
+				result = sound->setMode(FMOD_LOOP_OFF);
+				ERRCHECK(result);
 
-					m_sounds[basename(*itr)] = sound;
-				}
+				m_sounds[basename(*itr)] = sound;
 			}
 		}
-
 	}
 	return count;
 }
@@ -154,21 +160,18 @@ unsigned SoundMgr::LoadMusic(const std::string& folder)
 
 	path p(folder);
 
-	if (is_directory(p)) {
-		if (!is_empty(p)) {
-			directory_iterator end_itr;
-			for (directory_iterator itr(p); itr != end_itr; ++itr) {
-				if (itr->leaf().size() > 3) {
-					count++;
-					result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE | FMOD_CREATESTREAM, 0, &sound);
-					ERRCHECK(result);
-					result = sound->setMode(FMOD_LOOP_OFF);
-					ERRCHECK(result);
-					m_music[basename(*itr)] = sound;
-				}
+	if (is_directory(p) && !is_empty(p)) {
+		directory_iterator end_itr;
+		for (directory_iterator itr(p); itr != end_itr; ++itr) {
+			if (itr->leaf().size() > 3) {
+				count++;
+				result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE | FMOD_CREATESTREAM, 0, &sound);
+				ERRCHECK(result);
+				result = sound->setMode(FMOD_LOOP_OFF);
+				ERRCHECK(result);
+				m_music[basename(*itr)] = sound;
 			}
 		}
-
 	}
 	m_currentMusic = m_music.begin();
 	return count;
@@ -177,12 +180,22 @@ unsigned SoundMgr::LoadMusic(const std::string& folder)
 void SoundMgr::PlaySound(const std::string& name, int volume, float* position, float* velocity)
 {
 	FMOD_RESULT result;
+
+	// check if there is a channel left
+	int channels = 0;
+	result = m_system->getChannelsPlaying(&channels);
+	if (channels >= SOUND_MAX_CHANNELS-1 || result != FMOD_OK)
+		return;
+
 	std::map<std::string, FMOD::Sound*>::iterator itr = m_sounds.find(name);
 
 	if (itr != m_sounds.end()) {
 		FMOD::Channel* channel;
-		result = m_system->playSound(FMOD_CHANNEL_FREE, itr->second, true, &channel);
-		ERRCHECK(result);
+		//TODO paused = true
+		result = m_system->playSound(FMOD_CHANNEL_FREE, itr->second, false, &channel);
+		if (!ERRCHECK(result)) return;
+
+		/*
 		FMOD_VECTOR pos;
 		pos.x = position[0] * 0.025f;
 		pos.y = position[1] * 0.025f;
@@ -193,9 +206,11 @@ void SoundMgr::PlaySound(const std::string& name, int volume, float* position, f
 		vel.z = velocity[2];
 		result = channel->set3DAttributes(&pos, &vel);
 		ERRCHECK(result);
+		*/
 		channel->setVolume(volume * 100.0f);
-		result = channel->setPaused(false);
 		ERRCHECK(result);
+		//result = channel->setPaused(false);
+		//ERRCHECK(result);
 	}
 
 }
