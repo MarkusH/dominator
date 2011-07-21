@@ -29,7 +29,7 @@ private:
 	SoundMgr();
 	SoundMgr(const SoundMgr& other);
 	virtual ~SoundMgr();
-	void ERRCHECK(FMOD_RESULT result);
+	bool ERRCHECK(FMOD_RESULT result);
 	void LoadFileIntoMemory(const char *name, void **buff, int *length);
 protected:
 public:

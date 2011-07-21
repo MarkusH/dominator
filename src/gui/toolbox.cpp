@@ -23,18 +23,22 @@ ToolBox::ToolBox(QWidget *parent)
 			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER
 			<< __Object::CAPSULE << __Object::CONE << __Object::CHAMFER_CYLINDER;
 	m_allowFreeze << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
-			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER
-			<< __Object::CAPSULE << __Object::CONE << __Object::CHAMFER_CYLINDER;
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER << __Object::CAPSULE
+			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND
+			<< __Object::CONVEX_ASSEMBLY << __Object::CONVEX_HULL;
 	m_allowMass << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
-			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER
-			<< __Object::CAPSULE << __Object::CONE << __Object::CHAMFER_CYLINDER;
+			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER << __Object::CAPSULE
+			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::CONVEX_ASSEMBLY
+			<< __Object::CONVEX_HULL;
 	m_allowSize << __Object::BOX << __Object::SPHERE;
 	m_allowLocation << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
 			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER << __Object::CAPSULE
-			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND;
+			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND
+			<< __Object::CONVEX_ASSEMBLY << __Object::CONVEX_HULL;
 	m_allowRotation << __Object::DOMINO_SMALL << __Object::DOMINO_MIDDLE << __Object::DOMINO_LARGE
 			<< __Object::BOX << __Object::SPHERE << __Object::CYLINDER << __Object::CAPSULE
-			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND;
+			<< __Object::CONE << __Object::CHAMFER_CYLINDER << __Object::COMPOUND
+			<< __Object::CONVEX_ASSEMBLY << __Object::CONVEX_HULL;
 	m_allowRadius << __Object::CYLINDER << __Object::CAPSULE << __Object::CONE
 			<< __Object::CHAMFER_CYLINDER;
 

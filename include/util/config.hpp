@@ -3,6 +3,9 @@
 
 #include <string>
 #include <map>
+#undef min
+#undef max
+
 #include <boost/lexical_cast.hpp>
 
 namespace util {
