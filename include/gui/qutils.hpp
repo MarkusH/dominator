@@ -51,6 +51,11 @@ private:
 	QLabel* m_message;
 };
 
+class QtErrorListerner: public util::ErrorListener {
+public:
+	void displayError(const std::string& message);
+};
+
 inline sim::__Object::Type QObjectAction::getType()
 {
 	return m_type;

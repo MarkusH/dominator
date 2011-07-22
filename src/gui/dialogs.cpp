@@ -92,11 +92,6 @@ float GravityDialog::run()
 	}
 }
 
-void QtErrorListerner::displayError(const std::string& message)
-{
-	gui::MessageDialog("Error", message, gui::MessageDialog::QERROR);
-}
-
 MessageDialog::MessageDialog(const std::string title, const std::string message, const MessageType type) :
 		QMessageBox()
 {

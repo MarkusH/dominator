@@ -5,8 +5,8 @@
  */
 
 #include <gui/qutils.hpp>
+#include <gui/dialogs.hpp>
 #include <QtGui/QPixmap>
-#include <iostream>
 
 namespace gui {
 
@@ -57,4 +57,8 @@ void SplashScreen::updateProgress(const int progress, const QString message)
 	m_message->setText(message);
 }
 
+void QtErrorListerner::displayError(const std::string& message)
+{
+	gui::MessageDialog("Error", message, gui::MessageDialog::QERROR);
+}
 }

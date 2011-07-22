@@ -88,11 +88,6 @@ private:
 	static const float m_rangeHigh;
 };
 
-class QtErrorListerner: public util::ErrorListener {
-public:
-	void displayError(const std::string& message);
-};
-
 class MessageDialog: public QMessageBox {
 Q_OBJECT
 public:
