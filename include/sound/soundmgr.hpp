@@ -12,9 +12,17 @@
 #include <fmodex/fmod_errors.h>
 #include <string>
 #include <map>
-#include <list>
+#include <queue>
+#include <boost/thread.hpp>
 
 namespace snd {
+
+struct SoundEvent {
+	std::string name;
+	int volume;
+	float* position;
+	float* velocity;
+};
 
 class SoundMgr {
 private:
@@ -24,6 +32,8 @@ private:
 	std::map<std::string, FMOD::Sound*>::iterator m_currentMusic;
 	std::map<std::string, FMOD::Sound*> m_sounds;
 	std::map<std::string, FMOD::Sound*> m_music;
+	std::queue<struct SoundEvent> m_soundQueue;
+	boost::mutex m_mutex;
 
 	static SoundMgr* s_instance;
 	SoundMgr();
@@ -31,6 +41,7 @@ private:
 	virtual ~SoundMgr();
 	bool ERRCHECK(FMOD_RESULT result);
 	void LoadFileIntoMemory(const char *name, void **buff, int *length);
+	void ExecSoundQueue(const std::string& name, int volume, float* position, float* velocity);
 protected:
 public:
 	static SoundMgr& instance();

@@ -80,12 +80,21 @@ bool SoundMgr::ERRCHECK(FMOD_RESULT result)
 void SoundMgr::SoundUpdate()
 {
 	m_system->update();
+	//@Todo empty queue
+
+	struct SoundEvent NextSound;
+	while(!m_soundQueue.empty()) {
+	NextSound = m_soundQueue.front();
+	m_soundQueue.pop();
+	SoundMgr::instance().ExecSoundQueue(NextSound.name, NextSound.volume, NextSound.position, NextSound.velocity);
+	}
+
 	if (m_musicEnabled) {
 		bool playing = false;
 		if (m_musicChannel)
 			m_musicChannel->isPlaying(&playing);
 		if (!playing) {
-			PlayMusic(100);
+			PlayMusic(1);
 		}
 	}
 }
@@ -122,7 +131,6 @@ unsigned SoundMgr::LoadSound(const std::string& folder)
 	int count = 0;
 	FMOD::Sound *sound;
 	FMOD_RESULT result;
-
 	using namespace boost::filesystem;
 
 	path p(folder);
@@ -167,8 +175,10 @@ unsigned SoundMgr::LoadMusic(const std::string& folder)
 				count++;
 				result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE | FMOD_CREATESTREAM, 0, &sound);
 				ERRCHECK(result);
+
 				result = sound->setMode(FMOD_LOOP_OFF);
 				ERRCHECK(result);
+
 				m_music[basename(*itr)] = sound;
 			}
 		}
@@ -179,11 +189,25 @@ unsigned SoundMgr::LoadMusic(const std::string& folder)
 
 void SoundMgr::PlaySound(const std::string& name, int volume, float* position, float* velocity)
 {
+	struct SoundEvent NewEvent;
+	NewEvent.name = name;
+	NewEvent.volume = volume;
+	NewEvent.position = position;
+	NewEvent.velocity = velocity;
+
+	m_mutex.lock();
+	m_soundQueue.push(NewEvent);
+	m_mutex.unlock();
+}
+
+void SoundMgr::ExecSoundQueue(const std::string& name, int volume, float* position, float* velocity)
+{
 	FMOD_RESULT result;
 
 	// check if there is a channel left
 	int channels = 0;
 	result = m_system->getChannelsPlaying(&channels);
+	ERRCHECK(result);
 	if (channels >= SOUND_MAX_CHANNELS-1 || result != FMOD_OK)
 		return;
 
@@ -207,8 +231,7 @@ void SoundMgr::PlaySound(const std::string& name, int volume, float* position, f
 		result = channel->set3DAttributes(&pos, &vel);
 		ERRCHECK(result);
 		*/
-		channel->setVolume(volume * 100.0f);
-		ERRCHECK(result);
+		channel->setVolume(volume);
 		//result = channel->setPaused(false);
 		//ERRCHECK(result);
 	}
@@ -223,7 +246,10 @@ void SoundMgr::PlayMusic(int volume)
 		m_currentMusic++;
 		if (m_currentMusic == m_music.end())
 			m_currentMusic = m_music.begin();
-		result = m_system->playSound(FMOD_CHANNEL_FREE, m_currentMusic->second, false, &m_musicChannel);
+		result = m_system->playSound(FMOD_CHANNEL_FREE, m_currentMusic->second, true, &m_musicChannel);
+		ERRCHECK(result);
+		m_musicChannel->setVolume(volume);
+		result = m_musicChannel->setPaused(false);
 		ERRCHECK(result);
 	}
 }

@@ -684,7 +684,7 @@ void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep
 		float dist2 = distance * distance;
 		if (dist2 < (MAX_SOUND_DISTANCE * MAX_SOUND_DISTANCE)) {
 			Vec3f vel;
-			snd::SoundMgr::instance().PlaySound(bestSound, 100, &contactPos[0], &vel[0]);
+			snd::SoundMgr::instance().PlaySound(bestSound, 1, &contactPos[0], &vel[0]);
 		}
 	}
 }
