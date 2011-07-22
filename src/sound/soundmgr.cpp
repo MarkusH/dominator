@@ -95,11 +95,7 @@ void SoundMgr::SoundUpdate()
 				break;
 			}
 
-			FMOD_VECTOR pos;
-			pos = NextSound->position;
-			FMOD_VECTOR vel;
-			vel = NextSound->velocity;
-			result = channel->set3DAttributes(&pos, &vel);
+			result = channel->set3DAttributes(&NextSound->position, &NextSound->velocity);
 			ERRCHECK(result);
 
 			channel->setVolume(NextSound->volume);
