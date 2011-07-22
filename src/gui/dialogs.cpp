@@ -186,6 +186,8 @@ void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previou
 ConfigurationPage::ConfigurationPage(QWidget *parent) :
 		QWidget(parent)
 {
+	m_layout = new QGridLayout();
+	this->setLayout(m_layout);
 }
 
 SettingsPage::SettingsPage(QWidget *parent) :

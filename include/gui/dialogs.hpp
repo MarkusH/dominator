@@ -121,6 +121,8 @@ private:
 class ConfigurationPage: public QWidget {
 public:
 	ConfigurationPage(QWidget *parent = 0);
+protected:
+	QGridLayout* m_layout;
 };
 
 class SettingsPage: public ConfigurationPage {
