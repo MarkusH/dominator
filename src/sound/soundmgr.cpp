@@ -23,6 +23,7 @@ SoundMgr& SoundMgr::instance() {
 void SoundMgr::destroy() {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 SoundMgr::SoundMgr()

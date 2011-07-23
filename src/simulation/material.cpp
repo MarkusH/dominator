@@ -17,6 +17,7 @@
 #include <string.h>
 #include <util/tostring.hpp>
 #include <util/erroradapters.hpp>
+#include <clocale>
 #include <sound/soundmgr.hpp>
 #include <simulation/simulation.hpp>
 
@@ -313,6 +314,7 @@ void MaterialMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 int MaterialMgr::getMaterials(std::set<std::string>& materials)

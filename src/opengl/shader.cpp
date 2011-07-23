@@ -168,6 +168,7 @@ void ShaderMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 Shader ShaderMgr::add(const std::string& name, Shader shader)
