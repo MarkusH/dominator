@@ -314,6 +314,7 @@ void MaterialMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 int MaterialMgr::getMaterials(std::set<std::string>& materials)

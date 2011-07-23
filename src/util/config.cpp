@@ -19,6 +19,7 @@ void ConfigMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 void ConfigMgr::save(const std::string& path)
