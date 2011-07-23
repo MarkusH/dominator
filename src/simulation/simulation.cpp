@@ -122,7 +122,8 @@ void Simulation::createInstance(util::KeyAdapter& keyAdapter,
 
 void Simulation::destroyInstance()
 {
-	if (s_instance) delete s_instance;
+	if (s_instance)
+		delete s_instance;
 	s_instance = NULL;
 }
 

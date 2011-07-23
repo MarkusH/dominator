@@ -91,6 +91,7 @@ void TextureMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
 Texture TextureMgr::add(const std::string& name, Texture texture)
