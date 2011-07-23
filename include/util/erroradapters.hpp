@@ -25,9 +25,6 @@ public:
 class ErrorAdapter: public Adapter<ErrorListener> {
 private:
 	static ErrorAdapter* s_instance;
-	/// todo shouldn't we override the public constructor and destructor of an Adapter?!
-	//ErrorAdapter();
-	//virtual ~ErrorAdapter();
 
 public:
 	static void createInstance();

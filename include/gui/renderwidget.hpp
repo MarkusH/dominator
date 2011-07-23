@@ -17,6 +17,7 @@
 #include <util/inputadapters.hpp>
 #include <QtGui/QWheelEvent>
 #include <simulation/object.hpp>
+#include <gui/qutils.hpp>
 
 namespace gui {
 
@@ -124,12 +125,12 @@ public:
 	 * An instance of a util::QtMouseAdapter for any mouse interaction with
 	 * the sim:Simulation
 	 */
-	util::QtMouseAdapter m_mouseAdapter;
+	QtMouseAdapter m_mouseAdapter;
 	/**
 	 * An instance of a util::QtKeyAdapter for any key interaction with the
 	 * sim:Simulation
 	 */
-	util::QtKeyAdapter m_keyAdapter;
+	QtKeyAdapter m_keyAdapter;
 
 signals:
 	/**

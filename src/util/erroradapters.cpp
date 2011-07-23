@@ -22,9 +22,6 @@ void ErrorListener::displayError(const std::string& message) {
 
 ErrorAdapter* ErrorAdapter::s_instance = NULL;
 
-//ErrorAdapter::ErrorAdapter() {}
-//ErrorAdapter::~ErrorAdapter() {}
-
 void ErrorAdapter::createInstance() {
 	destroyInstance();
 	s_instance = new ErrorAdapter();
