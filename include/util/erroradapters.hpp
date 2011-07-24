@@ -30,6 +30,7 @@ public:
 	static void createInstance();
 	static void destroyInstance();
 	static ErrorAdapter& instance();
+	void displayErrorMessage(const std::string& message);
 	void displayErrorMessage(const std::string& function,
 			const std::vector<std::string>& args);
 	void displayErrorMessage(const std::string& function,

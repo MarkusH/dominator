@@ -34,6 +34,13 @@ void ErrorAdapter::destroyInstance() {
 	s_instance = NULL;
 }
 
+void ErrorAdapter::displayErrorMessage(const std::string& message) {
+	for (std::list<ErrorListener*>::iterator itr = m_listeners.begin();
+			itr != m_listeners.end(); ++itr) {
+		(*itr)->displayError(message);
+	}
+}
+
 void ErrorAdapter::displayErrorMessage(const std::string& function,
 		const std::vector<std::string>& args) {
 	std::string msg = function;

@@ -12,6 +12,7 @@
 #include <gui/toolbox.hpp>
 #include <simulation/simulation.hpp>
 #include <QtGui/QMainWindow>
+#include <QtGui/QMessageBox>
 
 class QSplitter;
 class QTemporaryFile;

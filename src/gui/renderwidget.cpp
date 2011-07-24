@@ -40,17 +40,15 @@ RenderWidget::RenderWidget(QWidget* parent) :
 
 void RenderWidget::initializeGL()
 {
-	std::cout << "initGL" << std::endl;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
-		std::cerr << "could not initialize GLEW" << std::endl;
+		util::ErrorAdapter::instance().displayErrorMessage("Could not initialize GLEW!");
 		exit(1);
 	}
 
 	// load per-pixel lighting shader
 
-	ogl::ShaderMgr::instance().load(
-			util::Config::instance().get("enableShadows", false) ? "data/shaders_shadow/" : "data/shaders/");
+	ogl::ShaderMgr::instance().load(util::Config::instance().get("enableShadows", false) ? "data/shaders_shadow/" : "data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
 
 	glShadeModel(GL_SMOOTH);

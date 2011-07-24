@@ -5,6 +5,7 @@
  */
 
 #include <gui/dialogs.hpp>
+
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QGridLayout>
