@@ -7,17 +7,12 @@
 #ifndef RENDERWIDGET_HPP_
 #define RENDERWIDGET_HPP_
 
-#include <GL/glew.h>
-#include <QtCore/QTimer>
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QString>
-#include <opengl/shader.hpp>
-#include <m3d/m3d.hpp>
-#include <util/clock.hpp>
-#include <util/inputadapters.hpp>
-#include <QtGui/QWheelEvent>
-#include <simulation/object.hpp>
 #include <gui/qutils.hpp>
+#include <simulation/object.hpp>
+#include <util/clock.hpp>
+#include <GL/glew.h>
+#include <QtOpenGL/QGLWidget>
+#include <QtCore/QTimer>
 
 namespace gui {
 

@@ -5,17 +5,24 @@
  */
 
 #include <gui/renderwidget.hpp>
+
+#include <iostream>
+
 #include <m3d/m3d.hpp>
-#include <util/clock.hpp>
-#include <iostream>
-#include <QtGui/QWidget>
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QString>
-#include <simulation/simulation.hpp>
+#include <opengl/shader.hpp>
 #include <opengl/texture.hpp>
-#include <iostream>
+#include <util/inputadapters.hpp>
 #include <simulation/material.hpp>
+#include <simulation/simulation.hpp>
 #include <util/config.hpp>
+
+#include <QtCore/QString>
+
+#include <QtGui/QWheelEvent>
+#include <QtGui/QWidget>
+
+#include <QtOpenGL/QGLWidget>
+
 
 using namespace m3d;
 

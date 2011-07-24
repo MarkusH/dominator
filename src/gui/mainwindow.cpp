@@ -4,22 +4,34 @@
  * @file gui/mainwindow.cpp
  */
 
+#include <gui/mainwindow.hpp>
+
 #include <iostream>
 
-#include <gui/mainwindow.hpp>
-#include <gui/qutils.hpp>
 #include <gui/dialogs.hpp>
-#include <QtGui/QMessageBox>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QGridLayout>
-#include <QtGui/QLabel>
-
-#include <QtCore/QString>
-#include <QtCore/QList>
-
-#include <util/config.hpp>
+#include <gui/qutils.hpp>
 #include <newton/util.hpp>
 #include <sound/soundmgr.hpp>
+#include <util/config.hpp>
+
+#include <QtCore/QList>
+#include <QtCore/QTextCodec>
+#include <QtCore/QTemporaryFile>
+#include <QtCore/QString>
+
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QFileDialog>
+#include <QtGui/QGridLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QMenuBar>
+#include <QtGui/QMessageBox>
+#include <QtGui/QWidget>
+#include <QtGui/QSplitter>
+#include <QtGui/QStatusBar>
+#include <QtGui/QVBoxLayout>
+
 
 namespace gui {
 

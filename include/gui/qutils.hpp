@@ -7,16 +7,16 @@
 #ifndef QUTILSS_HPP_
 #define QUTILSS_HPP_
 
-#include <QtGui/QAction>
-#include <QtGui/QSplashScreen>
-#include <QtGui/QProgressBar>
-#include <QtGui/QLabel>
-#include <QtCore/QFileInfo>
 #include <simulation/simulation.hpp>
 #include <util/inputadapters.hpp>
+#include <QtGui/QAction>
+#include <QtGui/QSplashScreen>
 
+class QFileInfo;
 class QKeyEvent;
+class QLabel;
 class QMouseEvent;
+class QProgressBar;
 class QWheelEvent;
 
 namespace gui {

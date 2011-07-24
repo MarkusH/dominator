@@ -7,21 +7,14 @@
 #ifndef MAINWINDOW_HPP_
 #define MAINWINDOW_HPP_
 
-#include <QtCore/QTextCodec>
-#include <QtCore/QTemporaryFile>
-#include <QtGui/QApplication>
-#include <QtGui/QMainWindow>
-#include <QtGui/QWidget>
-#include <QtGui/QSplitter>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QStatusBar>
-#include <QtGui/QAction>
-#include <QtGui/QFileDialog>
 #include <gui/renderwidget.hpp>
 #include <gui/dialogs.hpp>
 #include <gui/toolbox.hpp>
 #include <simulation/simulation.hpp>
+#include <QtGui/QMainWindow>
+
+class QSplitter;
+class QTemporaryFile;
 
 namespace gui {
 

@@ -6,9 +6,12 @@
 
 #include <gui/qutils.hpp>
 #include <gui/dialogs.hpp>
+#include <QtCore/QFileInfo>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QLabel>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPixmap>
+#include <QtGui/QProgressBar>
 #include <QtGui/QWheelEvent>
 
 namespace gui {

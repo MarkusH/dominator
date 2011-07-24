@@ -5,13 +5,28 @@
  */
 
 #include <gui/toolbox.hpp>
+
+#include <iostream>
+
 #include <gui/dialogs.hpp>
-#include <QtGui/QSizePolicy>
 #include <simulation/material.hpp>
 #include <simulation/object.hpp>
-#include <iostream>
+#include <simulation/simulation.hpp>
+
 #include <QtCore/QDir>
 #include <QtCore/QFileInfoList>
+
+#include <QtGui/QButtonGroup>
+#include <QtGui/QCheckBox>
+#include <QtGui/QComboBox>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QGridLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QPushButton>
+#include <QtGui/QSizePolicy>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QWidget>
 
 using namespace sim;
 
