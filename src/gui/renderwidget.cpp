@@ -5,17 +5,24 @@
  */
 
 #include <gui/renderwidget.hpp>
+
+#include <iostream>
+
 #include <m3d/m3d.hpp>
-#include <util/clock.hpp>
-#include <iostream>
-#include <QtGui/QWidget>
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QString>
-#include <simulation/simulation.hpp>
+#include <opengl/shader.hpp>
 #include <opengl/texture.hpp>
-#include <iostream>
+#include <util/inputadapters.hpp>
 #include <simulation/material.hpp>
+#include <simulation/simulation.hpp>
 #include <util/config.hpp>
+
+#include <QtCore/QString>
+
+#include <QtGui/QWheelEvent>
+#include <QtGui/QWidget>
+
+#include <QtOpenGL/QGLWidget>
+
 
 using namespace m3d;
 
@@ -33,17 +40,15 @@ RenderWidget::RenderWidget(QWidget* parent) :
 
 void RenderWidget::initializeGL()
 {
-	std::cout << "initGL" << std::endl;
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
-		std::cerr << "could not initialize GLEW" << std::endl;
+		util::ErrorAdapter::instance().displayErrorMessage("Could not initialize GLEW!");
 		exit(1);
 	}
 
 	// load per-pixel lighting shader
 
-	ogl::ShaderMgr::instance().load(
-			util::Config::instance().get("enableShadows", false) ? "data/shaders_shadow/" : "data/shaders/");
+	ogl::ShaderMgr::instance().load(util::Config::instance().get("enableShadows", false) ? "data/shaders_shadow/" : "data/shaders/");
 	ogl::TextureMgr::instance().load("data/textures/");
 
 	glShadeModel(GL_SMOOTH);

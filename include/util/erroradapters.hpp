@@ -25,14 +25,12 @@ public:
 class ErrorAdapter: public Adapter<ErrorListener> {
 private:
 	static ErrorAdapter* s_instance;
-	/// todo shouldn't we override the public constructor and destructor of an Adapter?!
-	//ErrorAdapter();
-	//virtual ~ErrorAdapter();
 
 public:
 	static void createInstance();
 	static void destroyInstance();
 	static ErrorAdapter& instance();
+	void displayErrorMessage(const std::string& message);
 	void displayErrorMessage(const std::string& function,
 			const std::vector<std::string>& args);
 	void displayErrorMessage(const std::string& function,

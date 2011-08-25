@@ -5,6 +5,7 @@
  */
 
 #include <gui/dialogs.hpp>
+
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QGridLayout>
@@ -90,11 +91,6 @@ float GravityDialog::run()
 	} else {
 		return m_value;
 	}
-}
-
-void QtErrorListerner::displayError(const std::string& message)
-{
-	gui::MessageDialog("Error", message, gui::MessageDialog::QERROR);
 }
 
 MessageDialog::MessageDialog(const std::string title, const std::string message, const MessageType type) :
@@ -186,6 +182,8 @@ void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previou
 ConfigurationPage::ConfigurationPage(QWidget *parent) :
 		QWidget(parent)
 {
+	m_layout = new QGridLayout();
+	this->setLayout(m_layout);
 }
 
 SettingsPage::SettingsPage(QWidget *parent) :

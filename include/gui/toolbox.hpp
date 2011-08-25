@@ -7,20 +7,17 @@
 #ifndef TOOLBOX_HPP_
 #define TOOLBOX_HPP_
 
-#include <QtGui/QButtonGroup>
-#include <QtGui/QCheckBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QGridLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
-#include <QtGui/QMenu>
 #include <gui/qutils.hpp>
-#include <simulation/simulation.hpp>
 
 typedef QList<sim::__Object::Type> QOTypeList;
+
+class QButtonGroup;
+class QCheckBox;
+class QComboBox;
+class QDoubleSpinBox;
+class QGridLayout;
+class QPushButton;
+class QVBoxLayout;
 
 namespace gui {
 
