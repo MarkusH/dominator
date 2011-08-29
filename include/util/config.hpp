@@ -30,6 +30,7 @@ public:
 	template<typename T> void set(const std::string& key, T value);
 
 	bool get(const std::string& key, bool def);
+	const std::string getString(const std::string& key, const std::string& def);
 	template<typename T> T get(const std::string& key, T def);
 };
 
@@ -49,6 +50,16 @@ bool Config::get(const std::string& key, bool def)
 		if (itr->second == "true") return true;
 		if (itr->second == "false") return false;
 		return get<bool>(key, def);
+	}
+	return def;
+}
+
+inline
+const std::string Config::getString(const std::string& key, const std::string& def)
+{
+	std::map<std::string, std::string>::iterator itr = find(key);
+	if (itr != end()) {
+		return itr->second;
 	}
 	return def;
 }

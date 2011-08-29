@@ -12,17 +12,19 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QWidget>
 
+class QString;
+class QCheckBox;
 class QDialogButtonBox;
 class QDoubleSpinBox;
 class QGridLayout;
 class QImage;
 class QLabel;
-class QListWidget;
-class QPushButton;
-class QStackedWidget;
+class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
+class QPushButton;
 class QStackedWidget;
+
 
 namespace gui {
 
@@ -114,6 +116,7 @@ private:
 };
 
 class ConfigurationPage: public QWidget {
+Q_OBJECT
 public:
 	ConfigurationPage(QWidget *parent = 0);
 protected:
@@ -121,13 +124,33 @@ protected:
 };
 
 class SettingsPage: public ConfigurationPage {
+Q_OBJECT
 public:
 	SettingsPage(QWidget *parent = 0);
+
+private:
+	QCheckBox* m_enableMusic;
+	QCheckBox* m_enableShadows;
+	QDoubleSpinBox* m_gravity;
+	QCheckBox* m_useAF;
+private slots:
+	void onBooleanSettingChanged(int state);
+	void onDoubleSettingChanged(double d);
 };
 
 class DataPage: public ConfigurationPage {
+Q_OBJECT
 public:
 	DataPage(QWidget *parent = 0);
+
+private:
+	QLineEdit* m_materialsXML;
+	QLineEdit* m_sounds;
+	QLineEdit* m_music;
+	QLineEdit* m_levels;
+
+private slots:
+	void onStringSettingChanged(QString text);
 };
 
 }
