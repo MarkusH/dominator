@@ -247,25 +247,25 @@ DataPage::DataPage(QWidget *parent) :
 {
 	m_layout->addWidget(new QLabel("Material Specifications:"));
 	m_materialsXML = new QLineEdit();
-	m_materialsXML->setText(QString::fromStdString(util::Config::instance().getString("materialsxml", "data/materials.xml")));
+	m_materialsXML->setText(QString::fromStdString(util::Config::instance().get<std::string>("materialsxml", "data/materials.xml")));
 	m_layout->addWidget(m_materialsXML);
 	connect(m_materialsXML, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
 
 	m_layout->addWidget(new QLabel("Sounds:"));
 	m_sounds = new QLineEdit();
-	m_sounds->setText(QString::fromStdString(util::Config::instance().getString("sounds", "data/sounds/")));
+	m_sounds->setText(QString::fromStdString(util::Config::instance().get<std::string>("sounds", "data/sounds/")));
 	m_layout->addWidget(m_sounds);
 	connect(m_sounds, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
 
 	m_layout->addWidget(new QLabel("Background Music:"));
 	m_music = new QLineEdit();
-	m_music->setText(QString::fromStdString(util::Config::instance().getString("music", "data/music/")));
+	m_music->setText(QString::fromStdString(util::Config::instance().get<std::string>("music", "data/music/")));
 	m_layout->addWidget(m_music);
 	connect(m_music, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
 
 	m_layout->addWidget(new QLabel("Background Music:"));
 	m_levels = new QLineEdit();
-	m_levels->setText(QString::fromStdString(util::Config::instance().getString("levels", "data/levels/")));
+	m_levels->setText(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/")));
 	m_layout->addWidget(m_levels);
 	connect(m_levels, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
 }

@@ -58,11 +58,11 @@ MainWindow::MainWindow(QApplication* app)
 
 	m_toolBox = new ToolBox();
 	splash.updateProgress(50, "Loading materials");
-	m_toolBox->loadMaterials(QString::fromStdString(util::Config::instance().getString("materialsxml", "data/materials.xml")));
+	m_toolBox->loadMaterials(QString::fromStdString(util::Config::instance().get<std::string>("materialsxml", "data/materials.xml")));
 	splash.updateProgress(60, "Loading sounds");
-	snd::SoundMgr::instance().LoadSound(util::Config::instance().getString("sounds", "data/sounds"));
+	snd::SoundMgr::instance().LoadSound(util::Config::instance().get<std::string>("sounds", "data/sounds"));
 	splash.updateProgress(70, "Loading music");
-	snd::SoundMgr::instance().LoadMusic(util::Config::instance().getString("music", "data/music"));
+	snd::SoundMgr::instance().LoadMusic(util::Config::instance().get<std::string>("music", "data/music"));
 	snd::SoundMgr::instance().setMusicEnabled(util::Config::instance().get("enableMusic", false));
 	app->processEvents();
 	splash.updateProgress(80, "Creating UI – Apply screen resolution");
@@ -294,7 +294,7 @@ void MainWindow::onOpenPressed()
 	QFileDialog dialog(this);
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
-	dialog.setDirectory(QString::fromStdString(util::Config::instance().getString("levels", "data/levels/")));
+	dialog.setDirectory(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/")));
 	dialog.setFilter("TUStudios Dominator (*.xml)");
 	if (dialog.exec()) {
 		sim::Simulation::instance().setEnabled(false);
