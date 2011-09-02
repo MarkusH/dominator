@@ -21,6 +21,7 @@ void m3dTest::tearDown()
 
 static inline float frand(float a = 0.0f, float b = 1.0f)
 {
+	// return a random float in [a, b]
 	return ((b - a) * ((float)rand() / RAND_MAX)) + a;
 }
 
@@ -37,7 +38,10 @@ void m3dTest::invertTest()
 
 	for (int x = 0; x < 4; ++x) {
 		for (int y = 0; y < 4; ++y) {
+			// check if equal
 			CPPUNIT_ASSERT(fabs(result[x][y] - identity[x][y]) < EPSILON);
+
+			// check for NaN
 			CPPUNIT_ASSERT(result[x][y] == result[x][y]);
 		}
 	}
@@ -50,9 +54,21 @@ void m3dTest::grammSchmidtTest()
 	Vec3f pos(frand(), frand(), frand());
 	Mat4f matrix = Mat4f::grammSchmidt(dir, pos);
 
+	// check if all axes are perpendicular
 	CPPUNIT_ASSERT(fabs(matrix.getX() * matrix.getY()) < EPSILON);
 	CPPUNIT_ASSERT(fabs(matrix.getY() * matrix.getZ()) < EPSILON);
 	CPPUNIT_ASSERT(fabs(matrix.getX() * matrix.getZ()) < EPSILON);
+
+	for (int x = 0; x < 4; ++x) {
+		for (int y = 0; y < 4; ++y) {
+
+			// check for NaN
+			CPPUNIT_ASSERT(matrix[x][y] == matrix[x][y]);
+		}
+	}
+
+	// check if position is correct
+	CPPUNIT_ASSERT(matrix.getW() == pos);
 }
 
 
