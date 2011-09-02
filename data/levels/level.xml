@@ -34,19 +34,19 @@
 		<joint type="hinge" parentID="3" childID="0" pivot="1.375, 42.9159, -22.75" pinDir="1, 0, -4.37114e-008" limited="0"/>
 		<joint type="hinge" parentID="4" childID="0" pivot="1.375, 42.9159, -27.25" pinDir="1, 0, -4.37114e-008" limited="0"/>
 	</compound>
-	<object id="17" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.157097, 3.01006, 111.463, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="18" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.231722, 3.01006, 115.962, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="19" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.306347, 3.01006, 120.462, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="20" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.380972, 3.01006, 124.961, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="21" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.455597, 3.01006, 129.46, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="22" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.530222, 3.01006, 133.96, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="23" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.604847, 3.01006, 138.459, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="24" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.679473, 3.01006, 142.959, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="25" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.754098, 3.01006, 147.458, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="26" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.828723, 3.01006, 151.957, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="27" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.903348, 3.01006, 156.457, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="28" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.977973, 3.01006, 160.956, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="29" type="domino_small" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 1.0526, 3.01006, 165.455, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="17" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.157097, 3.01006, 111.463, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="18" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.231722, 3.01006, 115.962, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="19" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.306347, 3.01006, 120.462, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="20" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.380972, 3.01006, 124.961, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="21" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.455597, 3.01006, 129.46, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="22" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.530222, 3.01006, 133.96, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="23" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.604847, 3.01006, 138.459, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="24" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.679473, 3.01006, 142.959, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="25" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.754098, 3.01006, 147.458, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="26" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.828723, 3.01006, 151.957, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="27" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.903348, 3.01006, 156.457, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="28" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 0.977973, 3.01006, 160.956, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="29" type="domino_large" matrix="0.999862, -0, -0.0165833, 0; 0, 1, 0, 0; 0.0165833, -0, 0.999862, 0; 1.0526, 3.01006, 165.455, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
 	<environment filename="data/models/ramps.3ds" octree="1"/>
 </level>
 

@@ -96,6 +96,8 @@ public:
 	 */
 	void bind(bool setup = true);
 
+	static void unbind();
+
 	/**
 	 * Uploads and creates the buffers.
 	 */
@@ -107,7 +109,8 @@ public:
 	void flush();
 };
 
-inline unsigned VertexBuffer::floatSize()
+inline
+unsigned VertexBuffer::floatSize()
 {
 	switch (m_format) {
 	case GL_T2F_N3F_V3F:
@@ -116,9 +119,17 @@ inline unsigned VertexBuffer::floatSize()
 	return 0;
 }
 
-inline unsigned VertexBuffer::byteSize()
+inline
+unsigned VertexBuffer::byteSize()
 {
 	return floatSize() * 4;
+}
+
+inline
+void VertexBuffer::unbind()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 }

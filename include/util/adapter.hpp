@@ -38,7 +38,6 @@ public:
 
 template<class T>
 inline Adapter<T>::Adapter() {
-	//m_listeners = std::list<T>;
 }
 
 template<class T>

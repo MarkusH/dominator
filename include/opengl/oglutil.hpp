@@ -9,10 +9,14 @@
 
 #include <m3d/m3d.hpp>
 #include <opengl/camera.hpp>
+#include <opengl/framebuffer.hpp>
+#include <opengl/texture.hpp>
 
 namespace ogl {
 
 using namespace m3d;
+
+std::pair<FrameBuffer, Texture> createShadowFBO(unsigned width, unsigned height);
 
 /**
  * Draws the given axis-aligned bounding box

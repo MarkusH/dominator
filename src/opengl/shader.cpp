@@ -168,15 +168,16 @@ void ShaderMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
-Shader ShaderMgr::add(std::string name, Shader shader)
+Shader ShaderMgr::add(const std::string& name, Shader shader)
 {
 	(*this)[name] = shader;
 	return shader;
 }
 
-unsigned ShaderMgr::load(std::string folder)
+unsigned ShaderMgr::load(const std::string& folder)
 {
 	int count = 0;
 	using namespace boost::filesystem;
@@ -202,7 +203,7 @@ unsigned ShaderMgr::load(std::string folder)
 	return count;
 }
 
-Shader ShaderMgr::get(std::string name)
+Shader ShaderMgr::get(const std::string& name)
 {
 	ShaderMgr::iterator it = this->find(name);
 	if (it == this->end()) {

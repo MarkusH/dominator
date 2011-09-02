@@ -7,14 +7,22 @@
 #ifndef DIALOGS_HPP_
 #define DIALOGS_HPP_
 
-#include <QtGui/QDialog>
-#include <QtGui/QLabel>
-#include <QtGui/QGridLayout>
-#include <QtGui/QImage>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QMessageBox>
 #include <util/erroradapters.hpp>
+#include <QtGui/QDialog>
+#include <QtGui/QMessageBox>
+#include <QtGui/QWidget>
+
+class QDialogButtonBox;
+class QDoubleSpinBox;
+class QGridLayout;
+class QImage;
+class QLabel;
+class QListWidget;
+class QPushButton;
+class QStackedWidget;
+class QListWidget;
+class QListWidgetItem;
+class QStackedWidget;
 
 namespace gui {
 
@@ -80,20 +88,46 @@ private:
 	static const float m_rangeHigh;
 };
 
-class QtErrorListerner: public util::ErrorListener {
-public:
-	void displayError(const std::string& message);
-};
-
 class MessageDialog: public QMessageBox {
 Q_OBJECT
 public:
 	typedef enum {
 		QINFO = 0, /**< displays an "i". */
 		QWARNING, /**< displays an "!" */
-		QERROR   /**< displays an "x" */
+		QERROR
+	/**< displays an "x" */
 	} MessageType;
 	MessageDialog(const std::string title, const std::string message, const MessageType type = QINFO);
+};
+
+class ConfigDialog: public QDialog {
+Q_OBJECT
+public:
+	ConfigDialog(QWidget* parent = 0);
+public slots:
+	void changePage(QListWidgetItem* current, QListWidgetItem* previous);
+
+private:
+	void createPages();
+	QListWidget* contentsWidget;
+	QStackedWidget* pagesWidget;
+};
+
+class ConfigurationPage: public QWidget {
+public:
+	ConfigurationPage(QWidget *parent = 0);
+protected:
+	QGridLayout* m_layout;
+};
+
+class SettingsPage: public ConfigurationPage {
+public:
+	SettingsPage(QWidget *parent = 0);
+};
+
+class DataPage: public ConfigurationPage {
+public:
+	DataPage(QWidget *parent = 0);
 };
 
 }

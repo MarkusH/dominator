@@ -6,13 +6,13 @@
 		<joint type="hinge" parentID="1" childID="0" pivot="10, 2.15, 50" pinDir="0, 0, 1" limited="0"/>
 	</compound>
 	<object id="12" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 14.8697, 2.3331, 49.8701, 1" width="1.6" height="1.6" depth="1.6" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="crate" mass="2.048"/>
-	<object id="14" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 21.6083, 4.31469, 49.6804, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="15" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 26.1075, 4.31469, 49.596, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="16" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 30.6067, 4.31469, 49.5116, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="17" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 35.1059, 4.31469, 49.4271, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="18" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 39.6052, 4.31469, 49.3427, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="19" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 44.1044, 4.31469, 49.2583, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
-	<object id="20" type="domino_small" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 48.6036, 4.31469, 49.1739, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="14" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 21.6083, 4.31469, 49.6804, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="15" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 26.1075, 4.31469, 49.596, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="16" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 30.6067, 4.31469, 49.5116, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="17" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 35.1059, 4.31469, 49.4271, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="18" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 39.6052, 4.31469, 49.3427, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="19" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 44.1044, 4.31469, 49.2583, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
+	<object id="20" type="domino_large" matrix="-0.0187615, 0, -0.999824, 0; 0, 1, 0, 0; 0.999824, -0, -0.0187615, 0; 48.6036, 4.31469, 49.1739, 1" freezeState="1" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="5"/>
 	<object id="30" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 5.427, 15.505, 50.063, 1" width="2" height="2" depth="2" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="stone" mass="6.5"/>
 	<environment filename="data/models/mattest.3ds" octree="1"/>
 </level>

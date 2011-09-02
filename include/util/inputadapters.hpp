@@ -9,12 +9,7 @@
 
 #include <set>
 #include <list>
-
-// forward declarations, no need to include the Qt headers here.
-// we will do in in the .cpp file for faster compilation
-class QKeyEvent;
-class QMouseEvent;
-class QWheelEvent;
+#include <util/adapter.hpp>
 
 namespace util {
 
@@ -71,20 +66,6 @@ public:
 	void changeAlt(bool alt) { m_alt = alt; };
 	void changeCtrl(bool ctrl) { m_ctrl = ctrl; };
 	void changeShift(bool shift) { m_shift = shift; };
-};
-
-/**
- * A key adapter for the Qt windowing system
- */
-class QtKeyAdapter : public KeyAdapter {
-public:
-	/**
-	 * Must be called if a new Qt key event is received. The method
-	 * will set the appropriate modifier and key states.
-	 *
-	 * @param event The received Qt key event
-	 */
-	void keyEvent(QKeyEvent* event);
 };
 
 /**
@@ -146,11 +127,8 @@ public:
  * The actual monitoring functionality is implemented by the
  * classes inheriting from MouseAdapter.
  */
-class MouseAdapter {
+class MouseAdapter: public Adapter<MouseListener> {
 protected:
-	/** A list of registered listeners */
-	std::list<MouseListener*> m_listeners;
-
 	/** Indicates the state of the three buttons */
 	bool m_down[3];
 
@@ -158,22 +136,6 @@ protected:
 	int m_x, m_y;
 public:
 	MouseAdapter();
-	virtual ~MouseAdapter();
-
-	/**
-	 * Adds a new listener.
-	 *
-	 * @param listener The listener to register.
-	 */
-	void addListener(MouseListener* listener);
-
-	/**
-	 * Removes a registered listener. Note that the listener
-	 * will not be destroyed.
-	 *
-	 * @param listener THe listener to remove
-	 */
-	void removeListener(MouseListener* listener);
 
 	/**
 	 * Queries the state of a mouse button
@@ -217,26 +179,6 @@ public:
 	 * @param y      The y position of the mouse
 	 */
 	void mouseButton(Button button, bool down, int x, int y);
-};
-
-/**
- * A mouse adapter for the Qt windowing system.
- */
-class QtMouseAdapter : public MouseAdapter {
-public:
-	/**
-	 * Must be called if a new Qt mouse event is received. The
-	 * method will set the appropriate button and position states.
-	 *
-	 * @param event The received Qt mouse event
-	 */
-	void mouseEvent(QMouseEvent* event);
-
-	/**
-	 *
-	 * @param event The received Qt wheel event
-	 */
-	void mouseWheelEvent(QWheelEvent* event);
 };
 
 }

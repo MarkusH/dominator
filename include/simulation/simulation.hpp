@@ -9,14 +9,17 @@
 
 #include <util/inputadapters.hpp>
 #include <util/clock.hpp>
+#include <util/erroradapters.hpp>
 #include <opengl/camera.hpp>
 #include <opengl/vertexbuffer.hpp>
 #include <opengl/skydome.hpp>
+#include <opengl/framebuffer.hpp>
 #include <simulation/object.hpp>
 #include <map>
 #include <Newton.h>
 #include <iostream>
 
+#define SHADOW_MAP_SIZE 4096
 
 namespace sim {
 
@@ -72,15 +75,14 @@ protected:
 	util::KeyAdapter& m_keyAdapter;
 	util::MouseAdapter& m_mouseAdapter;
 
-	// error adapter
-	//util::ErrorAdapter& m_errorAdapter;
-
 	/** The interaction types for the buttons: util::LEFT util::RIGHT util::MIDDLE */
 	InteractionType m_interactionTypes[3];
 
 	util::Clock m_clock;
 
 	ogl::Camera m_camera;
+	bool m_useShadows;
+	std::pair<ogl::FrameBuffer, ogl::Texture> m_shadow;
 
 	/** The world position of the mouse pointer */
 	Vec3f m_pointer;

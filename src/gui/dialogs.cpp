@@ -6,13 +6,22 @@
 
 #include <gui/dialogs.hpp>
 
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QGridLayout>
+#include <QtGui/QImage>
+#include <QtGui/QLabel>
+#include <QtGui/QListWidget>
+#include <QtGui/QPushButton>
+#include <QtGui/QStackedWidget>
+
 namespace gui {
 
 const float GravityDialog::m_rangeLow = -100.0f;
 const float GravityDialog::m_rangeHigh = 0.0f;
 
 AboutDialog::AboutDialog(QWidget* parent) :
-	QDialog(parent)
+		QDialog(parent)
 {
 	QGridLayout* layout = new QGridLayout();
 	QPixmap pixmap = QPixmap("data/splash.png");
@@ -45,12 +54,12 @@ AboutDialog::AboutDialog(QWidget* parent) :
 }
 
 GravityDialog::GravityDialog(const float gravity, QWidget* parent) :
-	QDialog(parent)
+		QDialog(parent)
 {
 	QGridLayout* m_layout = new QGridLayout();
 	QDialogButtonBox* m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	m_gravity = new QDoubleSpinBox();
-	
+
 	// validate the given gravity
 	if (gravity < m_rangeLow)
 		m_value = m_rangeLow;
@@ -84,12 +93,8 @@ float GravityDialog::run()
 	}
 }
 
-void QtErrorListerner::displayError(const std::string& message) {
-	gui::MessageDialog("Error", message, gui::MessageDialog::QERROR);
-}
-
 MessageDialog::MessageDialog(const std::string title, const std::string message, const MessageType type) :
-	QMessageBox()
+		QMessageBox()
 {
 	QMessageBox msgBox;
 	msgBox.setText(QString::fromStdString(title));
@@ -107,6 +112,88 @@ MessageDialog::MessageDialog(const std::string title, const std::string message,
 	}
 	msgBox.setStandardButtons(QMessageBox::Ok);
 	msgBox.exec();
+}
+
+ConfigDialog::ConfigDialog(QWidget* parent) :
+		QDialog(parent)
+{
+	contentsWidget = new QListWidget;
+	contentsWidget->setViewMode(QListView::IconMode);
+	contentsWidget->setIconSize(QSize(96, 84));
+	contentsWidget->setMovement(QListView::Static);
+	contentsWidget->setMaximumWidth(128);
+	contentsWidget->setSpacing(12);
+
+	pagesWidget = new QStackedWidget;
+	pagesWidget->addWidget(new SettingsPage);
+	pagesWidget->addWidget(new DataPage);
+
+	QPushButton* closeButton = new QPushButton("Close");
+	QPushButton* saveButton = new QPushButton("Save");
+
+	createPages();
+	contentsWidget->setCurrentRow(0);
+
+	connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
+	connect(saveButton, SIGNAL(clicked()), this, SLOT(accept()));
+
+	QHBoxLayout* horizontalLayout = new QHBoxLayout;
+	horizontalLayout->addWidget(contentsWidget);
+	horizontalLayout->addWidget(pagesWidget, 1);
+
+	QHBoxLayout* buttonsLayout = new QHBoxLayout;
+	buttonsLayout->addStretch(1);
+	buttonsLayout->addWidget(closeButton);
+	buttonsLayout->addWidget(saveButton);
+
+	QVBoxLayout* mainLayout = new QVBoxLayout;
+	mainLayout->addLayout(horizontalLayout);
+	mainLayout->addStretch(1);
+	mainLayout->addSpacing(12);
+	mainLayout->addLayout(buttonsLayout);
+	setLayout(mainLayout);
+
+	setWindowTitle("Config Dialog");
+}
+
+void ConfigDialog::createPages()
+{
+	QListWidgetItem* settings = new QListWidgetItem(contentsWidget);
+	settings->setText("Settings");
+	settings->setTextAlignment(Qt::AlignHCenter);
+	settings->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+	QListWidgetItem* data = new QListWidgetItem(contentsWidget);
+	data->setText("Data");
+	data->setTextAlignment(Qt::AlignHCenter);
+	data->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+	connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(changePage(QListWidgetItem*,QListWidgetItem*)));
+}
+
+void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
+{
+	if (!current)
+		current = previous;
+
+	pagesWidget->setCurrentIndex(contentsWidget->row(current));
+}
+
+ConfigurationPage::ConfigurationPage(QWidget *parent) :
+		QWidget(parent)
+{
+	m_layout = new QGridLayout();
+	this->setLayout(m_layout);
+}
+
+SettingsPage::SettingsPage(QWidget *parent) :
+		ConfigurationPage(parent)
+{
+}
+
+DataPage::DataPage(QWidget *parent) :
+		ConfigurationPage(parent)
+{
 }
 
 }

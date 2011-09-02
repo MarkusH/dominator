@@ -7,16 +7,12 @@
 #ifndef RENDERWIDGET_HPP_
 #define RENDERWIDGET_HPP_
 
-#include <GL/glew.h>
-#include <QtCore/QTimer>
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QString>
-#include <opengl/shader.hpp>
-#include <m3d/m3d.hpp>
-#include <util/clock.hpp>
-#include <util/inputadapters.hpp>
-#include <QtGui/QWheelEvent>
+#include <gui/qutils.hpp>
 #include <simulation/object.hpp>
+#include <util/clock.hpp>
+#include <GL/glew.h>
+#include <QtOpenGL/QGLWidget>
+#include <QtCore/QTimer>
 
 namespace gui {
 
@@ -124,12 +120,12 @@ public:
 	 * An instance of a util::QtMouseAdapter for any mouse interaction with
 	 * the sim:Simulation
 	 */
-	util::QtMouseAdapter m_mouseAdapter;
+	QtMouseAdapter m_mouseAdapter;
 	/**
 	 * An instance of a util::QtKeyAdapter for any key interaction with the
 	 * sim:Simulation
 	 */
-	util::QtKeyAdapter m_keyAdapter;
+	QtKeyAdapter m_keyAdapter;
 
 signals:
 	/**
@@ -149,6 +145,7 @@ signals:
 	 * an object. The signal is connected to ModifyBox::updateData(m3d::Mat4f)
 	 */
 	void objectSelected(sim::Object);
+	void objectSelected(sim::__Object::Type);
 	void objectSelected();
 };
 

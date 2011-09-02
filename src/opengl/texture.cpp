@@ -10,7 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <iostream>
-
+#include <util/config.hpp>
 
 namespace ogl {
 
@@ -53,6 +53,13 @@ Texture __Texture::load(std::string file, GLuint target)
     glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    // enable anisotropic filtering
+    if (util::Config::instance().get("useAF", false) && GLEW_EXT_texture_filter_anisotropic) {
+		float maxAF;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAF);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAF);
+    }
+
     Texture result(new __Texture(textureID, target));
     return result;
 }
@@ -84,15 +91,16 @@ void TextureMgr::destroy()
 {
 	if (s_instance)
 		delete s_instance;
+	s_instance = NULL;
 }
 
-Texture TextureMgr::add(std::string name, Texture texture)
+Texture TextureMgr::add(const std::string& name, Texture texture)
 {
 	(*this)[name] = texture;
 	return texture;
 }
 
-unsigned TextureMgr::load(std::string folder)
+unsigned TextureMgr::load(const std::string& folder)
 {
 	int count = 0;
 	using namespace boost::filesystem;
@@ -119,7 +127,7 @@ unsigned TextureMgr::load(std::string folder)
 	return count;
 }
 
-Texture TextureMgr::get(std::string name)
+Texture TextureMgr::get(const std::string& name)
 {
 	TextureMgr::iterator it = this->find(name);
 	if (it == this->end()) {

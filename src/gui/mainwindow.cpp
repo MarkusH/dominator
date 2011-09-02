@@ -4,20 +4,33 @@
  * @file gui/mainwindow.cpp
  */
 
+#include <gui/mainwindow.hpp>
+
 #include <iostream>
 
-#include <gui/mainwindow.hpp>
-#include <gui/qutils.hpp>
 #include <gui/dialogs.hpp>
-#include <QtGui/QMessageBox>
-#include <QtGui/QVBoxLayout>
+#include <gui/qutils.hpp>
+#include <newton/util.hpp>
+#include <sound/soundmgr.hpp>
+#include <util/config.hpp>
+
+#include <QtCore/QList>
+#include <QtCore/QTextCodec>
+#include <QtCore/QTemporaryFile>
+#include <QtCore/QString>
+
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QFileDialog>
 #include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
+#include <QtGui/QMenu>
+#include <QtGui/QMenuBar>
+#include <QtGui/QWidget>
+#include <QtGui/QSplitter>
+#include <QtGui/QStatusBar>
+#include <QtGui/QVBoxLayout>
 
-#include <QtCore/QString>
-#include <QtCore/QList>
-
-#include <newton/util.hpp>
 
 namespace gui {
 
@@ -34,27 +47,32 @@ MainWindow::MainWindow(QApplication* app)
 	util::ErrorAdapter::instance().addListener(new QtErrorListerner());
 
 	initialize();
-	splash.updateProgress(5);
+	splash.updateProgress(5, "Creating UI – Menues");
 
 	createMenu();
-	splash.updateProgress(15);
+	splash.updateProgress(15, "Creating UI – Notification area");
 	app->processEvents();
 
 	createStatusBar();
-	splash.updateProgress(20);
+	splash.updateProgress(20, "Creating UI – Building interfaces");
 	app->processEvents();
 
 	m_toolBox = new ToolBox();
-	splash.updateProgress(50);
+	splash.updateProgress(50, "Loading materials");
 	m_toolBox->loadMaterials("data/materials.xml");
+	splash.updateProgress(60, "Loading sounds");
+	snd::SoundMgr::instance().LoadSound("data/sounds");
+	splash.updateProgress(70, "Loading music");
+	snd::SoundMgr::instance().LoadMusic("data/music");
+	snd::SoundMgr::instance().setMusicEnabled(util::Config::instance().get("enableMusic", false));
 	app->processEvents();
-	splash.updateProgress(80);
+	splash.updateProgress(80, "Creating UI – Apply screen resolution");
 
 	m_renderWidget = new RenderWidget(this);
 	m_renderWidget->setMinimumWidth(400);
 	m_renderWidget->show();
 	app->processEvents();
-	splash.updateProgress(85);
+	splash.updateProgress(85, "Creating UI – Building dependencies");
 
 	m_splitter = new QSplitter(Qt::Horizontal);
 	m_splitter->insertWidget(0, m_toolBox);
@@ -75,17 +93,18 @@ MainWindow::MainWindow(QApplication* app)
 	connect(m_renderWidget, SIGNAL(objectsCountChanged(int)), this, SLOT(updateObjectsCount(int)));
 
 	connect(m_renderWidget, SIGNAL(objectSelected(sim::Object)), m_toolBox, SLOT(updateData(sim::Object)));
-	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(updateData()));
+	connect(m_renderWidget, SIGNAL(objectSelected(sim::__Object::Type)), m_toolBox, SLOT(showModificationWidgets(sim::__Object::Type)));
+	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(deselectInteraction()));
+	connect(m_renderWidget, SIGNAL(objectSelected()), m_toolBox, SLOT(hideModificationWidgets()));
 
 	connect(m_toolBox, SIGNAL(interactionSelected(sim::Simulation::InteractionType)), this, SLOT(selectInteraction(sim::Simulation::InteractionType)));
-	splash.updateProgress(100);
+	splash.updateProgress(90, "Finished loading");
 
 	showMaximized();
 	m_renderWidget->updateGL();
 	m_renderWidget->m_timer->start();
 	m_toolBox->updateMaterials();
-	splash.updateProgress(90);
-
+	splash.updateProgress(100, "Starting ...");
 
 	splash.finish(this);
 }
@@ -157,6 +176,25 @@ void MainWindow::createMenu()
 	connect(m_gravity, SIGNAL(triggered()), this, SLOT(onGravityPressed()));
 	m_menuSimulation->addAction(m_gravity);
 
+	// Options
+	m_menuOptions = menuBar()->addMenu("&Options");
+
+	m_sound_play = new QAction("&Play Sound", this);
+	m_sound_play->setEnabled(!util::Config::instance().get("enableMusic", false));
+	connect(m_sound_play, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
+	m_menuOptions->addAction(m_sound_play);
+
+	m_sound_stop = new QAction("&Stop Sound", this);
+	m_sound_stop->setEnabled(util::Config::instance().get("enableMusic", false));
+	connect(m_sound_stop, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
+	m_menuOptions->addAction(m_sound_stop);
+
+	m_menuOptions->addSeparator();
+
+	m_preferences = new QAction("&Preferences", this);
+	connect(m_preferences, SIGNAL(triggered()), this, SLOT(onPreferencesPressed()));
+	m_menuOptions->addAction(m_preferences);
+
 	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
 
@@ -177,34 +215,44 @@ void MainWindow::createStatusBar()
 	m_framesPerSec->setMinimumSize(m_framesPerSec->sizeHint());
 	m_framesPerSec->setAlignment(Qt::AlignLeft);
 	m_framesPerSec->setToolTip("Current frames per second not yet initialized.");
-	statusBar()->addWidget(m_framesPerSec, 2);
+	statusBar()->addWidget(m_framesPerSec);
 
 	m_objectsCount = new QLabel("1 objects");
 	m_objectsCount->setMinimumSize(m_objectsCount->sizeHint());
 	m_objectsCount->setAlignment(Qt::AlignLeft);
 	m_objectsCount->setToolTip("There is 1 object in the world");
-	statusBar()->addWidget(m_objectsCount, 2);
+	statusBar()->addWidget(m_objectsCount);
 
 	m_simulationStatus = new QLabel("");
 	m_simulationStatus->setMinimumSize(m_simulationStatus->sizeHint());
 	m_simulationStatus->setAlignment(Qt::AlignLeft);
-	statusBar()->addWidget(m_simulationStatus, 2);
+	statusBar()->addWidget(m_simulationStatus, 1);
 
 	m_currentFilename = new QLabel("unsaved document");
 	m_currentFilename->setMinimumSize(m_currentFilename->sizeHint());
 	m_currentFilename->setAlignment(Qt::AlignRight);
 	m_currentFilename->setToolTip("The world is not saved");
-	statusBar()->addWidget(m_currentFilename, 2);
+	statusBar()->addWidget(m_currentFilename, 8);
 }
 
 void MainWindow::updateFramesPerSecond(int frames)
 {
-	m_framesPerSec->setText(QString("%1 fps").arg(frames));
+	m_framesPerSec->setText(QString("%1 fps   ").arg(frames));
 }
 
 void MainWindow::updateObjectsCount(int count)
 {
-	m_objectsCount->setText(QString("%1").arg(count));
+	switch (count) {
+	case 0:
+		m_objectsCount->setText("No objects   ");
+		break;
+	case 1:
+		m_objectsCount->setText(QString("%1 object   ").arg(count));
+		break;
+	default:
+		m_objectsCount->setText(QString("%1 objects   ").arg(count));
+		break;
+	}
 }
 
 void MainWindow::selectInteraction(sim::Simulation::InteractionType type)
@@ -247,6 +295,7 @@ void MainWindow::onOpenPressed()
 	QFileDialog dialog(this);
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
+	dialog.setDirectory("data/levels/");
 	dialog.setFilter("TUStudios Dominator (*.xml)");
 	if (dialog.exec()) {
 		sim::Simulation::instance().setEnabled(false);
@@ -294,6 +343,31 @@ void MainWindow::onGravityPressed()
 {
 	GravityDialog* dialog = new GravityDialog(newton::gravity, this);
 	newton::gravity = dialog->run();
+}
+
+void MainWindow::onSoundControlsPressed()
+{
+	bool status;
+	if (QObject::sender() == m_sound_play) {
+		status = true;
+	} else {
+		status = false;
+	}
+	m_sound_play->setEnabled(!status);
+	m_sound_stop->setEnabled(status);
+	snd::SoundMgr::instance().setMusicEnabled(status);
+	//util::Config::instance().set("enableMusic", status);
+}
+
+void MainWindow::onPreferencesPressed()
+{
+	ConfigDialog configdialog;
+	if (configdialog.exec()) {
+		util::Config::instance().save("data/config.xml");
+	} else {
+		util::Config::instance().destroy();
+		util::Config::instance().load("data/config.xml");
+	}
 }
 
 /**

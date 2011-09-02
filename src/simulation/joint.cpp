@@ -9,8 +9,8 @@
 #include <iostream>
 #include <util/tostring.hpp>
 
-
 namespace sim {
+
 
 __Joint::__Joint(Type type, Vec3f pivot, Vec3f pinDir, const Object& child, const Object& parent)
 	: type(type), pivot(pivot), pinDir(pinDir), child(child), parent(parent)

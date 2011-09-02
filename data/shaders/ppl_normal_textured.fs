@@ -27,6 +27,6 @@ void main()
 	vec4 IAmbient  = gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
 	vec4 IDiffuse  = gl_LightSource[0].diffuse * max(dot(norm, lightvec), 0.0) * gl_FrontMaterial.diffuse;
 	vec4 ISpecular = gl_LightSource[0].specular * pow(max(dot(Reflected, Eye), 0.0), gl_FrontMaterial.shininess) * gl_FrontMaterial.specular;
- 
+
 	gl_FragColor = vec4((gl_FrontLightModelProduct.sceneColor + IAmbient + IDiffuse) * texture2D(Texture0, uv) + ISpecular);
 }
