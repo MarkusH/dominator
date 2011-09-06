@@ -1042,7 +1042,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 				if (domino && (t + gap) < curve_spline.table().back().len)
 					q = (curve_spline.getPos(t-gap) - curve_spline.getPos(t+gap)).normalized();
 				Mat4f matrix(Vec3f::yAxis(), q, p);
-				//Mat4f matrix = Mat4f::grammSchmidt(q, p);
+				//Mat4f matrix = Mat4f::gramSchmidt(q, p);
 				domino = __Domino::createDomino(type, matrix, -1.0f, m_newObjectMaterial);
 				add(domino);
 			}
@@ -1055,7 +1055,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 			Vec3f dir = (end - start);
 			float len = dir.normalize();
 			Mat4f matrix(Vec3f::yAxis(), dir, start);
-			//Mat4f matrix = Mat4f::grammSchmidt(dir, start);
+			//Mat4f matrix = Mat4f::gramSchmidt(dir, start);
 			for (float d = 0.0f; d <= len; d += gap) {
 				matrix.setW(start + dir * d);
 				Domino domino = __Domino::createDomino(type, matrix, -1.0f, m_newObjectMaterial);
