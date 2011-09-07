@@ -124,7 +124,7 @@ void m3dTest::gramSchmidtTest()
 	using namespace m3d;
 	Vec3f dir(frand(), frand(), frand());
 	Vec3f pos(frand(), frand(), frand());
-	Mat4f matrix = Mat4f::grammSchmidt(dir, pos);
+	Mat4f matrix = Mat4f::gramSchmidt(dir, pos);
 
 	// check if all axes are perpendicular
 	CPPUNIT_ASSERT(fabs(matrix.getX() * matrix.getY()) < EPSILON);
