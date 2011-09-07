@@ -128,6 +128,18 @@ public:
 	Mat4<T> inverse() const;
 	Mat4<T> orthonormalInverse() const;
 
+	/**
+	 * Creates the euler angles for the following sequence of
+	 * rotation matrices: rotY * rotX * rotZ
+	 *
+	 * Note that when multiplying these matrices with a vector,
+	 * one has to multiply the matrices in reverse order:
+	 *
+	 * v' = ((rotZ * rotX) * rotY) * v
+	 *   or
+	 * m = rotZ * rotX * rotY
+	 * v' = m * v
+	 */
 	Vec3<T> eulerAngles() const;
 
 	static Mat4<T> identity();

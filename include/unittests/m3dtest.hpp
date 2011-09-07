@@ -17,8 +17,12 @@ namespace test {
  */
 class m3dTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST_SUITE(m3dTest);
+	CPPUNIT_TEST(saveLoadTest);
+	CPPUNIT_TEST(quaternionTest);
+	CPPUNIT_TEST(eulerAnglesTest);
+	CPPUNIT_TEST(orthonormalInverseTest);
 	CPPUNIT_TEST(invertTest);
-	CPPUNIT_TEST(grammSchmidtTest);
+	CPPUNIT_TEST(gramSchmidtTest);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -26,6 +30,47 @@ public:
 	void tearDown();
 
 protected:
+
+	/**
+	 * Tests the vector and matrix save and load methods.
+	 *
+	 * Creates an arbitrary vector and matrix and saves them to a
+	 * string. The resulting string is then used to load
+	 * the vector and matrix back. The input and output should be
+	 * equal.
+	 */
+	void saveLoadTest();
+
+	/**
+	 * Tests the conversion from matrix to quaternion and back.
+	 *
+	 * This is done by creating an arbitrary rotation matrix and
+	 * calculating the corresponding quaternion from it. The quaternion
+	 * is then used to create a rotation matrix. This matrix and the
+	 * initial rotation matrix should be equal.
+	 */
+	void quaternionTest();
+
+	/**
+	 * Tests the m3d orthonormal inverse and inverse method.
+	 *
+	 * Creates an arbitrary orthonormal matrix and calculates the inverse
+	 * of it using (1) the inverse() and (2) the orthonormalInverse()
+	 * method. These should be equal.
+	 */
+	void orthonormalInverseTest();
+
+	/**
+	 * Tests the m3d euler angles extraction method, the rotation matrix
+	 * generation and the matrix multiplication.
+	 *
+	 * Creates an arbitrary rotation matrix and extracts its euler angles.
+	 * Using these, three rotation matrices (one for each axis) are created
+	 * and multiplied to generate the final rotation matrix. This matrix is
+	 * then compared to the initial rotation matrix, which should be equal.
+	 */
+	void eulerAnglesTest();
+
 	/**
 	 * Tests the m3d matrix multiplication and inversion methods.
 	 *
@@ -44,7 +89,7 @@ protected:
 	 * orthonormal matrix is generated. This matrix is then checked for
 	 * sanity (perpendicular axes, correct position, NaN).
 	 */
-	void grammSchmidtTest();
+	void gramSchmidtTest();
 
 private:
 };
