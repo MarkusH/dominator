@@ -150,7 +150,7 @@ public:
 	static Mat4<T> rotY(const T& angle);
 	static Mat4<T> rotZ(const T& angle);
 	static Mat4<T> rotAxis(const Vec3<T>& vAxis, const T& angle);
-	static Mat4<T> grammSchmidt(const Vec3<T>& dir, const Vec3<T>& pos);
+	static Mat4<T> gramSchmidt(const Vec3<T>& dir, const Vec3<T>& pos);
 
 	static Mat4<T> perspective(const T& fovy, const T& aspect, const T& zNear, const T& zFar);
 	static Mat4<T> lookAt(const Vec3<T>& eye, const Vec3<T>& center, const Vec3<T>& up);
@@ -280,7 +280,7 @@ Mat4<T>::Mat4(Vec3<T> up, Vec3<T> front, Vec3<T> pos)
 
 template<typename T>
 inline
-Mat4<T> Mat4<T>::grammSchmidt(const Vec3<T>& dir, const Vec3<T>& pos)
+Mat4<T> Mat4<T>::gramSchmidt(const Vec3<T>& dir, const Vec3<T>& pos)
 {
 	Mat4<T> r;
 	Vec3<T> up;
