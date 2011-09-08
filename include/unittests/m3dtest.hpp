@@ -26,6 +26,9 @@ class m3dTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST_SUITE_END();
 
 public:
+	/**
+	 * Sets a new random seed using the system time.
+	 */
 	void setUp();
 	void tearDown();
 
@@ -42,12 +45,15 @@ protected:
 	void saveLoadTest();
 
 	/**
-	 * Tests the conversion from matrix to quaternion and back.
+	 * Tests the functionality of the quaternion multiplication and
+	 * conversion to a 4x4 matrix.
 	 *
-	 * This is done by creating an arbitrary rotation matrix and
-	 * calculating the corresponding quaternion from it. The quaternion
-	 * is then used to create a rotation matrix. This matrix and the
-	 * initial rotation matrix should be equal.
+	 * This is done by creating an arbitrary two arbitrary axes and
+	 * angles. Using these, two matrices and two quaternions describing
+	 * the rotation of the angle around the respective axis are created.
+	 * The two quaternions are then multiplicated and converted to a
+	 * 4x4 rotation matrix. This matrix should be equal to the multiplication
+	 * of the two matrices created initially.
 	 */
 	void quaternionTest();
 
