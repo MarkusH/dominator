@@ -22,7 +22,7 @@ void m3dTest::setUp()
 	// initialize the rand seed
 #ifdef __WIN32
 	//TODO do some win32 stuff here
-	srand();
+	//srand();
 #else
 	timeval time = { 0, 0 };
 	gettimeofday(&time, 0);
@@ -83,23 +83,26 @@ void m3dTest::saveLoadTest()
 void m3dTest::quaternionTest()
 {
 	using namespace m3d;
+
+	// generate first matrix and quaternion
 	Vec3f axis(frand(), frand(), frand());
 	float angle = frand(0, 2.0f*PI);
 	Mat4f input1 = Mat4f::rotAxis(axis, angle);
+	Quatf quat1(axis, angle);
 
+	// generate second matrix and quaternion
 	Vec3f axis2(frand(), frand(), frand());
 	float angle2 = frand(0, 2.0f*PI);
 	Mat4f input2 = Mat4f::rotAxis(axis2, angle2);
-
-	Mat4f input = input1 * input2;
-
-	Quatf quat1(axis, angle);
 	Quatf quat2(axis2, angle2);
 
+	// multiply them
+	Mat4f input = input1 * input2;
 	Quatf quat = quat1 * quat2;
 
 	Mat4f output = quat.mat4();
 
+	// normalize all axes
 	input.setX(input.getX().normalized());
 	input.setY(input.getY().normalized());
 	input.setZ(input.getZ().normalized());
@@ -108,6 +111,7 @@ void m3dTest::quaternionTest()
 	output.setY(input.getY().normalized());
 	output.setZ(input.getZ().normalized());
 
+	// compare
 	for (int x = 0; x < 4; ++x) {
 		for (int y = 0; y < 4; ++y) {
 			// check if equal, allow a reasonable deviation

@@ -13,7 +13,15 @@
 namespace test {
 
 /**
- * This class tests the m3d module for correctness.
+ * This class tests the m3d module for correctness. The following tests
+ * are being performed:
+ *
+ * save/load
+ * quaternion
+ * eulerAngles
+ * orthonormalInverse
+ * inverse
+ * gramSchmidt
  */
 class m3dTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST_SUITE(m3dTest);
@@ -96,8 +104,6 @@ protected:
 	 * sanity (perpendicular axes, correct position, NaN).
 	 */
 	void gramSchmidtTest();
-
-private:
 };
 
 }
