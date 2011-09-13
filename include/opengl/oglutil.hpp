@@ -16,6 +16,15 @@ namespace ogl {
 
 using namespace m3d;
 
+/**
+ * Creates a frame buffer with disabled color buffer and a 2D texture of the given
+ * size as the depth attachment. Deleting the frame buffer and the texture is the
+ * responsibility of the caller.
+
+ * @param width  The width of the depth texture
+ * @param height The height of the depth texture
+ * @return A pair of frame buffer and the attached depth texture
+ */
 std::pair<FrameBuffer, Texture> createShadowFBO(unsigned width, unsigned height);
 
 /**

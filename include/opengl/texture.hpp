@@ -16,8 +16,17 @@
 namespace ogl {
 
 class __Texture;
+
+/**
+ * @see __Texture
+ */
 typedef std::tr1::shared_ptr<__Texture> Texture;
 
+/**
+ * This class is a wrapper for OpenGL textures. It provides
+ * methods to load them from many different file types and
+ * allows to set texture parameters.
+ */
 class __Texture {
 public:
 	__Texture(GLuint textureID, GLuint stage);
@@ -34,16 +43,39 @@ public:
 	void bind();
 	void unbind();
 
+	/**
+	 * Activates the given (n-th) texture stage.
+	 *
+	 * @param stage The new stage, GL_TEXTURE0 + n.
+	 */
 	static void stage(GLuint stage);
 
+	/**
+	 * Creates and binds a new texture using the specified image file and
+	 * the given target.
+	 *
+	 * @param file   The texture file in a common image format
+	 * @param target The target of the texture
+	 * @return       The newly create texture object
+	 */
 	static Texture load(std::string file, GLuint target = GL_TEXTURE_2D);
+
+	/**
+	 * Creates a new (empty) texture and binds it.
+	 *
+	 * @param target The target of the texture
+	 * @return       The newly created texture object
+	 */
 	static Texture create(GLuint target = GL_TEXTURE_2D);
 
 	GLuint m_textureID;
 	GLuint m_target;
 };
 
-
+/**
+ * A simple texture manager for named texture objects. Provides
+ * methods to load and add new textures efficiently.
+ */
 class TextureMgr : public std::map<std::string, Texture> {
 private:
 	static TextureMgr* s_instance;
@@ -55,8 +87,30 @@ public:
 	static TextureMgr& instance();
 	static void destroy();
 
+	/**
+	 * Adds the given texture and associates it with the specified name.
+	 *
+	 * @param name    The name of the texture
+	 * @param texture The texture object to add
+	 * @return        The added texture object
+	 */
 	Texture add(const std::string& name, Texture texture);
+
+	/**
+	 * Loads all textures within the given folder. The texture names will
+	 * be the base name of the files, i.e. the file name without its extension.
+	 *
+	 * @param folder The folder to load the textures from
+	 */
 	unsigned load(const std::string& folder);
+
+	/**
+	 * Returns the texture object with the given name, or an empty
+	 * smart pointer if it does not exist.
+	 *
+	 * @param name The name of the texture
+	 * @return     The associated texture object or an empty smart pointer
+	 */
 	Texture get(const std::string& name);
 };
 

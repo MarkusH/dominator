@@ -17,6 +17,9 @@ namespace ogl {
 
 using namespace m3d;
 
+/**
+ * A fancy skydome with dynamic clouds and a sun with optional lens flares.
+ */
 class Skydome {
 protected:
 	GLuint m_flares;
@@ -31,10 +34,12 @@ public:
 	typedef enum { BIG_GLOW = 0, GLOW, HALO, STREAK } Flares;
 
 	Skydome();
-	Skydome(float radius, const std::string& clouds, const std::string& shader, const std::string& fileName, const std::string& flares);
+	Skydome(float radius, const std::string& clouds, const std::string& shader,
+			const std::string& fileName, const std::string& flares);
 	virtual ~Skydome();
 
-	void load(float radius, const std::string& clouds, const std::string& shader, const std::string& fileName, const std::string& flares);
+	void load(float radius, const std::string& clouds, const std::string& shader,
+			const std::string& fileName, const std::string& flares);
 	void clear();
 
 	void update(float dt);

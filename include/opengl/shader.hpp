@@ -49,15 +49,31 @@ public:
 	__Shader(GLchar* vertexSource, GLchar* fragmentSource);
 	virtual ~__Shader();
 
+	/**
+	 * Compiles and links the shader objects. Returns true if successful.
+	 *
+	 * @return true if successful, false else
+	 */
 	bool compile();
 
+	/** Binds the shader program */
 	void bind();
+
+	/** Unbinds the current shader program */
 	static void unbind();
 
 	void setUniform4fv(const char* uniform, GLfloat* data);
 	void setUniform1f(const char* uniform, GLfloat data);
 	void setUniform1i(const char* uniform, GLint data);
 
+	/**
+	 * Returns a new shader object with the vertex and fragment shader
+	 * loaded from the given files. Does not compile and link the shader.
+	 *
+	 * @param vertexFile   A file containing the vertex shader
+	 * @param fragmentFile A file containing the fragment shader
+	 * @return             The newly created shader object.
+	 */
 	static Shader load(std::string vertexFile, std::string fragmentFile);
 };
 

@@ -15,10 +15,13 @@ using namespace m3d;
 
 /**
  * A first person camera that supports forward and strafe
- * movement as well as rotations.
+ * movement as well as rotations. It also supports frustum
+ * culling with partial visibility tests for axis-aligned
+ * bounding boxes and spheres.
  */
 class Camera {
 public:
+	/** Visibility state for frustum checks */
 	typedef enum { OUTSIDE = 0, INTERSECT, INSIDE } Visibility;
 
 	Camera();
@@ -36,9 +39,16 @@ public:
 	/** A vector perpendicular to the viewVector() and the up vector */
 	Vec3f m_strafe;
 
+	/** The camera position and rotation matrix */
 	Mat4f m_modelview;
+
+	/** The perspective matrix */
 	Mat4f m_projection;
+
+	/** The inverse of the modelview matrix. It is calculated by update() */
 	Mat4f m_inverse;
+
+	/** The viewport vector (left, top, right, bottom)*/
 	Vec4<GLint> m_viewport;
 
 	/**
@@ -87,7 +97,8 @@ public:
 	void update();
 
 	/**
-	 * Applies the camera matrix.
+	 * Applies the modelview matrix and overrides the previous
+	 * matrix. Does not set the projection matrix.
 	 */
 	void apply();
 
@@ -128,10 +139,10 @@ public:
 
 	/**
 	 * Tests the visibility of the given axis-aligned bounding box.
-	 * Returns Visibility.OUTSIDE if the bounding box is completly
+	 * Returns Visibility.OUTSIDE if the bounding box is completely
 	 * outside of the frustum. Returns Visibility.INTERSECT if a part
 	 * but not all of the AABB is inside the frustum. Returns
-	 * Visibility.INSIDE if all of the AABB is inside the AABB.
+	 * Visibility.INSIDE if all of the AABB is inside the frustum.
 	 *
 	 * @param min The minimum of the AABB
 	 * @param max The maximum of the AABB
@@ -140,10 +151,15 @@ public:
 	Visibility testAABB(const Vec3f& min, const Vec3f& max) const;
 
 	/**
+	 * Tests the visibility of the given sphere. Returns Visibility.OUTSIDE
+	 * if the sphere is completely outside of the frustum. Returns
+	 * Visibility.INTERSECT if a part but not all of the sphere is inside
+	 * the frustum. Returns Visibility.INSIDE if all of the sphere is inside
+	 * the frustum.
 	 *
-	 * @param center
-	 * @param radius
-	 * @return
+	 * @param center The center of the sphere
+	 * @param radius The radius of the sphere
+	 * @return       The visibility of the sphere
 	 */
 	Visibility testSphere(const Vec3f& center, float radius) const;
 };

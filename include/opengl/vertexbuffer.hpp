@@ -55,6 +55,7 @@ struct SubBuffer {
 	}
 };
 
+/** A linked list of SubBuffers */
 typedef std::list<SubBuffer*> SubBuffers;
 
 /**
