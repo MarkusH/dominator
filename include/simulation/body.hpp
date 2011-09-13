@@ -14,21 +14,75 @@ using namespace m3d;
 
 namespace sim {
 
+/**
+ * This class is a wrapper for a NewtonBody. It provides methods
+ * to create and modify a body. It also handles its transformation
+ * and provides methods to query the state of the body, for example
+ * to render it at its current position.
+ */
 class Body {
 private:
+	/**
+	 * This callback is used to clear any resources of the body.
+	 *
+	 * @param body The NewtonBody handle
+	 */
 	static void __destroyBodyCallback(const NewtonBody* body);
+
+	/**
+	 * This callback is used to notify the body object of a transformation
+	 * caused by the physics simulation.
+	 *
+	 * @param body        The NewtonBody handle
+	 * @param matrix      The new matrix of the body after the transformation
+	 * @param threadIndex The id of the calling thread
+	 */
 	static void __setTransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
+
+	/**
+	 * This callback is used to update the force and torque of the body. It
+	 * can be used to apply gravity and similar outer influences.
+	 *
+	 * @param body        The NewtonBody handle
+	 * @param timestep    The time step of the update process
+	 * @param threadIndex The id of the calling thread
+	 */
 	static void __applyForceAndTorqueCallback(const NewtonBody* body, dFloat timestep, int threadIndex);
 protected:
 	/** The matrix of the body, access has to be monitored
 	 * in order to alert Newton when the matrix changes.
 	 */
 	Mat4f m_matrix;
+
 public:
+	/** Creates an empty body object. Does not create a NewtonBody. */
 	Body();
+
+	/**
+	 * Creates a new body object for the given NewtonBody.
+	 *
+	 * @param body The NewtonBody to create the object for
+	 */
 	Body(NewtonBody* body);
+
+	/**
+	 * Creates an empty body object with the given matrix. Does not
+	 * create a NewtonBody.
+	 *
+	 * @param matrix The matrix of the body object
+	 */
 	Body(const Mat4f& matrix);
+
+	/**
+	 * Creates a new body object for the given NewtonBody at the
+	 * specified position.
+	 *
+	 * @param body   The NewtonBody to create the object for
+	 * @param matrix The matrix of the body
+	 */
 	Body(NewtonBody* body, const Mat4f& matrix);
+
+	/** Destroys the body object and the NewtonBody (if any). */
 	virtual ~Body();
 
 	/**
@@ -40,12 +94,8 @@ public:
 	 * @param damping     The damping coefficients, x,y,z = angular, w = linear damping
 	 * @return            The handle to the NewtonBody
 	 */
-	NewtonBody* create(NewtonCollision* collision, float mass, int freezeState = 0, const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
-
-	/// @todo lets see if we need member functions to propagate the events to child classes
-	//virtual void destroyBodyCallback(const NewtonBody* body);
-	//virtual void setTransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
-	//virtual void applyForceAndTorqueCallback(const NewtonBody* body, dFloat timestep, int threadIndex);
+	NewtonBody* create(NewtonCollision* collision, float mass, int freezeState = 0,
+			const Vec4f& damping = Vec4f(0.1f, 0.1f, 0.1f, 0.1f));
 
 	/** @return The mass of this body */
 	float getMass() const;
