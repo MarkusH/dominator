@@ -143,8 +143,10 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_environment = Object();
 	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
 	m_useShadows = util::Config::instance().get("enableShadows", false);
+#ifndef UNIT_TESTS
 	if (m_useShadows)
 		m_shadow = ogl::createShadowFBO(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+#endif
 }
 
 Simulation::~Simulation()
@@ -186,7 +188,7 @@ void Simulation::save(const std::string& fileName)
 	xml_attribute<>* attrEye = doc.allocate_attribute("eye", pEye);
 	level->append_attribute(attrEye);
 
-	// saveattribute "up
+	// saveattribute "up"
 	char* pUp = doc.allocate_string(m_camera.m_up.str().c_str());
 	xml_attribute<>* attrUp = doc.allocate_attribute("up", pUp);
 	level->append_attribute(attrUp);
@@ -216,7 +218,7 @@ void Simulation::save(const std::string& fileName)
 
 }
 
-void Simulation::load(const std::string& fileName)
+bool Simulation::load(const std::string& fileName)
 {
 	/* information for error messages */
 	std::string function = "Simulation::load";
@@ -228,30 +230,25 @@ void Simulation::load(const std::string& fileName)
 
 	using namespace rapidxml;
 
-	char* m;
 	file<char>* f = 0;
 
 	try {
 		f = new file<char>(fileName.c_str());
 	} catch ( std::runtime_error& e ) {
-		std::cout<<"Exception was caught when loading file "<<fileName<<std::endl;
-		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
 		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
-		if(f) delete f;
-		return;
+		delete f;
+		return false;
 	} catch (...) {
 		std::cout<<"Unknown exception was caught when loading file "<<fileName<<std::endl;
 		util::ErrorAdapter::instance().displayErrorMessage(function, args);
-		if(f) delete f;
-		return;
+		delete f;
+		return false;
 	}
 	
 	try {
 
-		m = f->data();
-
 		xml_document<> doc;
-		doc.parse<0>(m);
+		doc.parse<0>(f->data());
 
 		// this is important so we don't parse the level tag but the object and compound tags
 		xml_node<>* nodes = doc.first_node("level");
@@ -296,33 +293,34 @@ void Simulation::load(const std::string& fileName)
 			if (node) {
 				m_environment = __TreeCollision::load(node);
 				//((__TreeCollision*)m_environment.get())->createOctree();
-			} else throw parse_error("No environment node found", m);
+			} else throw parse_error("No environment node found", (void*)function.c_str());
 
 			m_clock.reset();
 
-		} else throw parse_error("No valid root node found", m);
+		} else throw parse_error("No valid root node found", (void*)function.c_str());
 	} catch( parse_error& e ) {
-		std::cout<<"Parse Exception: \""<<e.what()<<"\" caught in \""<<e.where<char>()<<"\""<<std::endl;
-		/// @todo tell user in the GUI that XML file he is trying to load is invalid / cannot be parsed
 		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
+		delete f;
+		return false;
 	} catch(...) {
-		std::cout<<"Caught unknown exception in Simulation::load"<<std::endl;
-		/// @todo tell user in the GUI that an unknown error occurred
 		util::ErrorAdapter::instance().displayErrorMessage(function, args);
+		delete f;
+		return false;
 	}
 	delete f;
+	return true;
 }
 
 void Simulation::init()
 {
 	clear();
+#ifndef UNIT_TESTS
 	m_camera.positionCamera(Vec3f(0.0f, 10.0f, 0.0f), -Vec3f::zAxis(), Vec3f::yAxis());
-
+#endif
 	newton::world = NewtonCreate();
 	NewtonWorldSetUserData(newton::world, this);
 
 	NewtonSetPlatformArchitecture(newton::world, 3);
-
 	// set a fixed world size
 	Vec3f minSize(-2000.0f, -2000.0f, -2000.0f);
 	Vec3f maxSize(2000.0f, 2000.0f, 2000.0f);
@@ -336,9 +334,10 @@ void Simulation::init()
 	int id = NewtonMaterialGetDefaultGroupID(newton::world);
 	NewtonMaterialSetCollisionCallback(newton::world, id, id, NULL, NULL, MaterialMgr::GenericContactCallback);
 
+#ifndef UNIT_TESTS
 	__Domino::genDominoBuffers(m_vbo);
 	m_skydome.load(2000.0f, "clouds", "skydome", "data/models/skydome.3ds", "flares");
-
+#endif
 	//m_environment = Object(new __TreeCollision(Mat4f::translate(0.0f, 0.0f, 0.0f), "data/models/spielplatz.3ds"));
 
 	// newtons cradle
@@ -680,8 +679,10 @@ void Simulation::init()
 void Simulation::clear()
 {
 	m_selectedObject = Object();
+#ifndef UNIT_TESTS
 	m_sortedBuffers.clear();
 	m_vbo.flush();
+#endif
 	m_objects.clear();
 	m_environment = Object();
 	__Domino::freeCollisions();
@@ -724,6 +725,7 @@ int Simulation::add(const ObjectInfo& info)
 
 void Simulation::remove(const Object& object)
 {
+#ifndef UNIT_TESTS
 	// check if it is a compound, if so we have to check whether
 	// one of its children is in a sub-mesh
 
@@ -819,7 +821,7 @@ void Simulation::remove(const Object& object)
 			} /* end check if domino is in compound */
 		} /* end for-loop */
 	} /* end check if object is domino */
-
+#endif
 	m_objects.remove(object);
 
 	if (m_environment == object)
@@ -839,6 +841,7 @@ static bool isSharedBuffer(const ogl::SubBuffer* const buffer)
 
 void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::iterator& end)
 {
+#ifndef UNIT_TESTS
 	for (ObjectList::iterator itr = begin; itr != end; ++itr)
 		(*itr)->genBuffers(m_vbo);
 
@@ -846,6 +849,7 @@ void Simulation::upload(const ObjectList::iterator& begin, const ObjectList::ite
 	m_sortedBuffers.assign(m_vbo.m_buffers.begin(), m_vbo.m_buffers.end());
 	m_sortedBuffers.remove_if(isSharedBuffer);
 	m_sortedBuffers.sort();
+#endif
 }
 
 void Simulation::updateObject(const Object& object)

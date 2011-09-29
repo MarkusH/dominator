@@ -74,7 +74,7 @@ void Config::save(const std::string& path)
 	doc.clear();
 }
 
-void Config::load(const std::string& fileName)
+bool Config::load(const std::string& fileName)
 {
 	using namespace rapidxml;
 
@@ -86,48 +86,53 @@ void Config::load(const std::string& fileName)
 
 	using namespace rapidxml;
 
-	char* m;
 	file<char>* f = 0;
 
 	std::string key;
 	std::string value;
+	bool rc = true;
 
 	try {
 		f = new file<char>(fileName.c_str());
 	} catch ( std::runtime_error& e ) {
 		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		if(f) delete f;
+		return false;
 	} catch (...) {
 		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		if(f) delete f;
+		return false;
 	}
 
 	try {
-		m = f->data();
 		
-		xml_document<> materials;
-		materials.parse<0>(m);
+		xml_document<> config;
+		config.parse<0>(f->data());
 
 		// this is important so we don't parse the config tag but the data tags
-		xml_node<>* nodes = materials.first_node("config");
+		xml_node<>* nodes = config.first_node("config");
 		if( nodes ) { 
 			for (xml_node<>* node = nodes->first_node("data"); node; node = node->next_sibling("data")) {
-				key = std::string(node->first_attribute("key")->value());
-				value = std::string(node->first_attribute("value")->value());
-				(*this)[key] = value;
+				if(node->first_attribute("key") && node->first_attribute("value")) {
+					key = std::string(node->first_attribute("key")->value());
+					value = std::string(node->first_attribute("value")->value());
+					(*this)[key] = value;
+				} else rc = false;
 			}
-			delete f;
 		} else {
-			delete f;
-			throw parse_error("No valid root node found", m);
+			throw parse_error("No valid root node found", (void*)function.c_str());
 		}
 	} catch( parse_error& e ) {
 		util::ErrorAdapter::instance().displayErrorMessage(function, args, e);
 		delete f;
+		return false;
 	} catch(...) {
 		util::ErrorAdapter::instance().displayErrorMessage(function, args);
 		delete f;
+		return false;
 	}
+	delete f;
+	return rc;
 }
 
 

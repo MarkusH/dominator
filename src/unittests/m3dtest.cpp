@@ -8,7 +8,8 @@
 #include <m3d/m3d.hpp>
 
 #ifdef _WIN32
-	#include <windows.h>
+	#include <time.h>
+	#include <stdlib.h>
 #else
 	#include <sys/time.h>
 #endif
@@ -20,9 +21,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(m3dTest);
 void m3dTest::setUp()
 {
 	// initialize the rand seed
-#ifdef __WIN32
-	//TODO do some win32 stuff here
-	//srand();
+#ifdef _WIN32
+	srand(42);
 #else
 	timeval time = { 0, 0 };
 	gettimeofday(&time, 0);

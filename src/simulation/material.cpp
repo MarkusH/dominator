@@ -174,10 +174,6 @@ void MaterialPair::load(rapidxml::xml_node<>* node)
 {
 	using namespace rapidxml;
 
-	// this prevents that the atof functions fails on German systems
-	// since they use "," as a separator for floats
-	setlocale(LC_ALL,"C");
-
 	MaterialMgr& m = MaterialMgr::instance();
 	
 	xml_attribute<> *attr = node->first_attribute("mat0");

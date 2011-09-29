@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <data key="enableMusic" value="false"/>
+  <data key="enableShadows" value="false"/>
+  <data key="gravity" value="9.81"/>
+  <data key="useAF" value="false"/>
