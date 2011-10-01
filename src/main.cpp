@@ -4,7 +4,7 @@
  * @file main.cpp
  */
 
-#define UNIT_TESTS
+//#define UNIT_TESTS
 #ifdef UNIT_TESTS
 
 #include <cppunit/CompilerOutputter.h>

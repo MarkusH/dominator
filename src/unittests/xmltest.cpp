@@ -68,6 +68,7 @@ namespace test {
 		util::KeyAdapter ka;
 		sim::Simulation::createInstance(ka, ma);
 		std::string no_such_file = "data/levels/no_such_file.xml";
+		// expected to fail
 		CPPUNIT_ASSERT(!sim::Simulation::instance().load(no_such_file));
 		sim::Simulation::destroyInstance();
 	}
@@ -77,7 +78,8 @@ namespace test {
 		util::KeyAdapter ka;
 		sim::Simulation::createInstance(ka, ma);
 		std::string filename = "data/levels/bridge.xml";
-		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		// should work
+		CPPUNIT_ASSERT(sim::Simulation::instance().load(filename));
 		sim::Simulation::destroyInstance();
 	}
 
@@ -86,7 +88,158 @@ namespace test {
 		util::KeyAdapter ka;
 		sim::Simulation::createInstance(ka, ma);
 		std::string filename = "data/unittest_xml/level/level_empty_root.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelEnvOnlyTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_environment_only.xml";
+		// should work
 		CPPUNIT_ASSERT(sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelNoEnvTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_no_environment.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelNoRootTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_no_root.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelCompoundMatrixBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_compound_matrix_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelRootEyeBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_eye_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelRootPositionBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_position_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelRootUpBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_up_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelJointTypeBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_joint_type_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelJointPivotBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_pivot_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelJointPinDirBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_pindir_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelEnvNoSuchModelTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_environment_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelObjectTypeBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_object_type_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelObjectMaterialBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_material_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelObjectMatrixBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_object_matrix_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
+		sim::Simulation::destroyInstance();
+	}
+
+	void xmlTest::loadLevelObjectDampingBrokenTest() {
+		util::MouseAdapter ma;
+		util::KeyAdapter ka;
+		sim::Simulation::createInstance(ka, ma);
+		std::string filename = "data/unittest_xml/level/level_damping_broken.xml";
+		// expected to fail
+		CPPUNIT_ASSERT(!sim::Simulation::instance().load(filename));
 		sim::Simulation::destroyInstance();
 	}
 	/* level file tests END */

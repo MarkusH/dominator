@@ -168,7 +168,7 @@ int __TreeCollision::Node::draw(bool test) {
 	return result;
 }
 
-__TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileName)
+__TreeCollision::__TreeCollision(const Mat4f& matrix, std::string& fileName)
 	: __Object(TREE_COLLISION), Body(matrix), m_fileName(fileName), m_nodeCount(0), m_node(NULL)
 {
 	m_list = 0;
@@ -186,8 +186,11 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, const std::string& fileNam
 	 */
 
 	Lib3dsFile* file = lib3ds_file_load(fileName.c_str());
-	if (!file)
-		return;
+	
+	if (!file) {
+		fileName.append(" couldn't be loaded");
+		throw std::exception(fileName.c_str());
+	}
 
 	int defaultMaterial = MaterialMgr::instance().getID("yellow");
 	int numFaces = 0;

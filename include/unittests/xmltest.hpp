@@ -15,7 +15,7 @@ namespace test {
 /**
  * This class tests the XML loading and saving facilities for:
  *		the config file		(load)
- *		levels			  (load/save)
+ *		levels				(load)
  *		the material file	(load)
  *		templates			(load)
  */
@@ -33,30 +33,24 @@ class xmlTest : public CPPUNIT_NS::TestFixture {
 	/* config file end */
 
 	/* level files */
-	
 	CPPUNIT_TEST(noLevelFileTest);
 	CPPUNIT_TEST(loadLevelTest);
 	CPPUNIT_TEST(loadLevelEmptyRootTest);
-	/*
-	CPPUNIT_TEST(loadLevelRootEyeBrokenTest);
+	CPPUNIT_TEST(loadLevelEnvOnlyTest);
+	CPPUNIT_TEST(loadLevelNoEnvTest);
+	CPPUNIT_TEST(loadLevelNoRootTest);
 	CPPUNIT_TEST(loadLevelRootUpBrokenTest);
 	CPPUNIT_TEST(loadLevelRootPositionBrokenTest);
-
+	CPPUNIT_TEST(loadLevelRootEyeBrokenTest);
 	CPPUNIT_TEST(loadLevelCompoundMatrixBrokenTest);
-
 	CPPUNIT_TEST(loadLevelJointTypeBrokenTest);
 	CPPUNIT_TEST(loadLevelJointPivotBrokenTest);
 	CPPUNIT_TEST(loadLevelJointPinDirBrokenTest);
-
 	CPPUNIT_TEST(loadLevelObjectTypeBrokenTest);
 	CPPUNIT_TEST(loadLevelObjectMaterialBrokenTest);
 	CPPUNIT_TEST(loadLevelObjectMatrixBrokenTest);
 	CPPUNIT_TEST(loadLevelObjectDampingBrokenTest);
-
-	CPPUNIT_TEST(loadLevelNoEnvTest);
 	CPPUNIT_TEST(loadLevelEnvNoSuchModelTest);
-
-	CPPUNIT_TEST(loadLevelNoCompAndObjTest);
 	/* level files end*/
 
 	/* material files */
@@ -92,6 +86,22 @@ protected:
 	void noLevelFileTest();
 	void loadLevelTest();
 	void loadLevelEmptyRootTest();
+	void loadLevelEnvOnlyTest();
+	void loadLevelNoEnvTest();
+	void loadLevelNoRootTest();
+	void loadLevelCompoundMatrixBrokenTest();
+	void loadLevelRootUpBrokenTest();
+	void loadLevelRootEyeBrokenTest();
+	void loadLevelRootPositionBrokenTest();
+	void loadLevelJointTypeBrokenTest();
+	void loadLevelJointPivotBrokenTest();
+	void loadLevelJointPinDirBrokenTest();
+	void loadLevelEnvNoSuchModelTest();
+	void loadLevelObjectTypeBrokenTest();
+	void loadLevelObjectMaterialBrokenTest();
+	void loadLevelObjectMatrixBrokenTest();
+	void loadLevelObjectDampingBrokenTest();
+
 };
 
 }

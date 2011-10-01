@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<level gravity="9.84" position="-32.229, 25.6476, -17.756" eye="-31.6305, 25.367, -17.0056" up="0, 1, 0">
+<level gravity="9.84" position="-32.229, 25.6476, -17.756" eye="-31.6305, 25.367, -17.0056" up="that's no vector">
   <compound id="1" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 0, 1">
     <object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 0, 1" width="15" height="5" depth="15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
     <object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 8.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
@@ -48,6 +48,6 @@
   <object id="582" type="box" matrix="1, 0, 0, 0; 0, 0.906308, -0.422618, 0; 0, 0.422618, 0.906308, 0; 0.156124, 22.4963, 79.1066, 1" width="21.4" height="0.55" depth="47.5001" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="planks" mass="0"/>
   <object id="4" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0.408348, 34.001, 99.4819, 1" radius_x="1" radius_y="1" radius_z="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="1"/>
   <object id="7" type="cylinder" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -0.0260237, 13.5001, -6.40002, 1" height="6" radius="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="box" mass="0.485"/>
-  <environment filename="data/models/no_such_file.3ds" octree="1"/>
+  <environment filename="data/models/mattest.3ds" octree="1"/>
 </level>
 

@@ -39,9 +39,7 @@ Joint __Joint::load(const std::list<Object>& list, rapidxml::xml_node<>* node)
 	if( node->first_attribute("type") && std::string(node->first_attribute("type")->value()) == "hinge" ) return __Hinge::load(list, node);
 	if( node->first_attribute("type") && std::string(node->first_attribute("type")->value()) == "slider" ) return __Slider::load(list, node);
 	if( node->first_attribute("type") && std::string(node->first_attribute("type")->value()) == "ballandsocket" ) return __BallAndSocket::load(list, node);
-
-	Joint result;
-	return result;
+	else throw rapidxml::parse_error("unsupported \"type\" in joint tag", "__Joint::load");
 }
 
 __Hinge::__Hinge(Vec3f pivot, Vec3f pinDir,

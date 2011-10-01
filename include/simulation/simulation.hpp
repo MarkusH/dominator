@@ -7,7 +7,7 @@
 #ifndef SIMULATION_HPP_
 #define SIMULATION_HPP_
 
-#define UNIT_TESTS
+//#define UNIT_TESTS
 
 #include <util/inputadapters.hpp>
 #include <util/clock.hpp>
