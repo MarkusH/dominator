@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level gravity="9.84" position="-32.229, 25.6476, -17.756" eye="-31.6305, 25.367, -17.0056" up="0, 1, 0">
+  <compound id="1" matrix="stupid matrix">
+    <object id="0" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 0, 1" width="15" height="5" depth="15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
+    <object id="1" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 8.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="2" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 11.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="3" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 13.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="4" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 16.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="5" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 18.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="6" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 21.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="7" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 23.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="8" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 26.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="9" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 28.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="10" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 31.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="11" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 33.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="12" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 36.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="13" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 38.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="14" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 41.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="15" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 43.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="16" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 46.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="17" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 48.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="18" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 51.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="19" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 53.75, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="20" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 12.25, 56.25, 1" width="7" height="0.5" depth="2.5" freezeState="0" damping="0.5, 0.5, 0.5, 0.5" material="plankso" mass="0.25"/>
+    <object id="21" type="box" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 65, 1" width="15" height="5" depth="15" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="0"/>
+    <joint type="hinge" parentID="1" childID="0" pivot="0, 12.5, 7.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="2" childID="1" pivot="0, 12.5, 10" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="3" childID="2" pivot="0, 12.5, 12.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="4" childID="3" pivot="0, 12.5, 15" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="5" childID="4" pivot="0, 12.5, 17.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="6" childID="5" pivot="0, 12.5, 20" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="7" childID="6" pivot="0, 12.5, 22.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="8" childID="7" pivot="0, 12.5, 25" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="9" childID="8" pivot="0, 12.5, 27.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="10" childID="9" pivot="0, 12.5, 30" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="11" childID="10" pivot="0, 12.5, 32.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="12" childID="11" pivot="0, 12.5, 35" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="13" childID="12" pivot="0, 12.5, 37.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="14" childID="13" pivot="0, 12.5, 40" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="15" childID="14" pivot="0, 12.5, 42.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="16" childID="15" pivot="0, 12.5, 45" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="17" childID="16" pivot="0, 12.5, 47.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="18" childID="17" pivot="0, 12.5, 50" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="19" childID="18" pivot="0, 12.5, 52.5" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="20" childID="19" pivot="0, 12.5, 55" pinDir="1, 0, 0" limited="0"/>
+    <joint type="hinge" parentID="21" childID="20" pivot="0, 12.5, 57.5" pinDir="1, 0, 0" limited="0"/>
+  </compound>
+  <object id="582" type="box" matrix="1, 0, 0, 0; 0, 0.906308, -0.422618, 0; 0, 0.422618, 0.906308, 0; 0.156124, 22.4963, 79.1066, 1" width="21.4" height="0.55" depth="47.5001" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="planks" mass="0"/>
+  <object id="4" type="sphere" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0.408348, 34.001, 99.4819, 1" radius_x="1" radius_y="1" radius_z="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="wood" mass="1"/>
+  <object id="7" type="cylinder" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; -0.0260237, 13.5001, -6.40002, 1" height="6" radius="1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="box" mass="0.485"/>
+  <environment filename="data/models/mattest.3ds" octree="1"/>
+</level>
+

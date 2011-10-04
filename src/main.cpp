@@ -34,6 +34,11 @@ int main (int argc, char* argv[])
     CPPUNIT_NS::CompilerOutputter compileroutputter(&collectedresults, std::cerr);
     compileroutputter.write();
 
+#ifdef _WIN32
+	std::cout << "Press ENTER to continue...";
+    std::cin.ignore(1);
+#endif
+
     return collectedresults.wasSuccessful() ? 0 : 1;
 }
 #else

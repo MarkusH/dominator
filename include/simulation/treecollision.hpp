@@ -47,7 +47,7 @@ NewtonMesh* m_mesh;
 	Lib3dsTexel* m_uvs;
 	GLuint m_list;
 public:
-	__TreeCollision(const Mat4f& matrix, const std::string& fileName);
+	__TreeCollision(const Mat4f& matrix, std::string& fileName);
 	~__TreeCollision();
 
 	virtual const Mat4f& getMatrix() const { return Body::getMatrix(); }

@@ -483,7 +483,6 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	matrix.assign(attr->value());
 	} else throw parse_error("No \"matrix\" attribute in object tag found", node->name());
 
-
 	/* set dimensions for box */
 	if ( type == TypeStr[BOX]) {
 		//attribute width
@@ -599,7 +598,7 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if( type == TypeStr[DOMINO_SMALL] ) result = __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_MIDDLE] ) result = __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_LARGE] ) result = __Domino::createDomino(t, matrix, mass, material, false);
-
+	if(result == NULL) throw rapidxml::parse_error("Unsupported \"type\" in object tag","__RigidBody::load");
 	return result;
 }
 

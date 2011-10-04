@@ -7,6 +7,8 @@
 #ifndef SIMULATION_HPP_
 #define SIMULATION_HPP_
 
+//#define UNIT_TESTS
+
 #include <util/inputadapters.hpp>
 #include <util/clock.hpp>
 #include <util/erroradapters.hpp>
@@ -268,7 +270,7 @@ public:
 	 *
 	 *  @param fileName Path to XML file
 	 */
-	void load(const std::string& fileName);
+	bool load(const std::string& fileName);
 	//void saveTemplate(const std::string& fileName, __Object& object);
 	//void loadTemplate(const std::string& fileName);
 

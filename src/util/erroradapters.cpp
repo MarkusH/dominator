@@ -53,7 +53,7 @@ void ErrorAdapter::displayErrorMessage(const std::string& function,
 
 void ErrorAdapter::displayErrorMessage(const std::string& function,
 		const std::vector<std::string>& args, rapidxml::parse_error& e) {
-	std::string msg = "Parse Exception: '";
+	std::string msg = "\nParse Exception: '";
 	msg += e.what();
 	msg += "' caught in '";
 	msg += e.where<char>();
@@ -66,7 +66,7 @@ void ErrorAdapter::displayErrorMessage(const std::string& function,
 
 void ErrorAdapter::displayErrorMessage(const std::string& function,
 		const std::vector<std::string>& args, std::runtime_error& e) {
-	std::string msg = "Runtime Exception was caught when loading file ";
+	std::string msg = "\nRuntime Exception was caught when loading file ";
 	msg += function;
 	msg += " '";
 	msg += e.what();

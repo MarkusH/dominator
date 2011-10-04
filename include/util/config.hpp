@@ -23,7 +23,7 @@ public:
 	void destroy();
 
 	void save(const std::string& path);
-	void load(const std::string& path);
+	bool load(const std::string& path);
 
 	void set(const std::string& key, const std::string& value);
 	void set(const std::string& key, bool value);
