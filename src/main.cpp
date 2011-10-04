@@ -6,6 +6,7 @@
 
 //#define UNIT_TESTS
 #ifdef UNIT_TESTS
+#define UNIT_TESTS_RUNS 1
 
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
@@ -26,7 +27,9 @@ int main (int argc, char* argv[])
 
     CPPUNIT_NS::TestRunner testrunner;
     testrunner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest());
-    testrunner.run (testresult);
+
+    for (int i = 0; i < UNIT_TESTS_RUNS; ++i)
+    	testrunner.run(testresult);
 
     CPPUNIT_NS::CompilerOutputter compileroutputter(&collectedresults, std::cerr);
     compileroutputter.write();

@@ -12,6 +12,8 @@ template<typename T>
 inline
 std::ostream& operator<< (std::ostream& out, const Vec2<T>& v)
 {
+	out.setf(std::ios::fixed, std::ios::floatfield);
+	out.precision(10);
 	return out << v.x << ", " << v.y;
 }
 
@@ -19,6 +21,8 @@ template<typename T>
 inline
 std::ostream& operator<< (std::ostream& out, const Vec3<T>& v)
 {
+	out.setf(std::ios::fixed, std::ios::floatfield);
+	out.precision(10);
 	return out << v.x << ", " << v.y << ", " << v.z;
 }
 
@@ -35,6 +39,8 @@ template<typename T>
 inline
 std::ostream& operator<< (std::ostream& out, const Vec4<T>& v)
 {
+	out.setf(std::ios::fixed, std::ios::floatfield);
+	out.precision(10);
 	return out << v.x << ", " << v.y << ", " << v.z << ", " << v.w;
 }
 
@@ -52,6 +58,8 @@ template<typename T>
 inline
 std::ostream& operator<< (std::ostream& out, const Mat4<T>& m)
 {
+	out.setf(std::ios::fixed, std::ios::floatfield);
+	out.precision(10);
 	return out << m._11 << ", " << m._12 << ", " << m._13 << ", " << m._14 << "; "
 	           << m._21 << ", " << m._22 << ", " << m._23 << ", " << m._24 << "; "
 	           << m._31 << ", " << m._32 << ", " << m._33 << ", " << m._34 << "; "
@@ -73,6 +81,8 @@ template<typename T>
 inline
 std::ostream& operator<< (std::ostream& out, const Quat<T>& q)
 {
+	out.setf(std::ios::fixed, std::ios::floatfield);
+	out.precision(10);
 	return out << q.a << ", " << q.b << ", " << q.c << ", " << q.d;
 }
 

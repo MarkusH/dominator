@@ -48,8 +48,13 @@ struct Material {
 	/** The shininess of the material */
 	float shininess;
 
-
+	/**
+	 * Constructs an empty material with the given name.
+	 *
+	 * @param name The name of the material
+	 */
 	Material(const std::string& name);
+
 	/**
 	 * The copy constructor
 	 *
@@ -81,11 +86,24 @@ struct MaterialPair {
 	/** The id of the two materials */
 	int mat0, mat1;
 
+	/**
+	 * The elasticity of the material. Elasticity is a function of
+	 * the impact velocity of two bodies.
+	 */
 	float elasticity;
+
+	/** The static friction of the material. */
 	float staticFriction;
+
+	/** The kinetic friction of the material */
 	float kineticFriction;
+
+	/** The softness of the material. Softness is a function of
+	 * the penetration depth of two bodies.
+	 */
 	float softness;
 
+	/** The name of the impact sound effect */
 	std::string impactSound;
 
 	/**

@@ -21,6 +21,7 @@ namespace sim {
 
 using namespace m3d;
 
+/* Forward declarations*/
 class __Object;
 typedef std::tr1::shared_ptr<__Object> Object;
 class __Joint;
@@ -151,7 +152,10 @@ public:
 };
 
 /**
- * A ball and socket joint at a pivot point. The cone and twist angles can be limited.
+ * A ball and socket joint at a pivot point. The cone and twist angles
+ * may be limited. This class cannot be instantiated as it is a base class
+ * for __BallAndSocketStd and __BallAndSocketLimited which need to inherit
+ * from two different CustomJoint classes.
  */
 class __BallAndSocket : public __Joint {
 protected:
@@ -165,8 +169,23 @@ public:
 	float coneAngle;
 	float minTwist, maxTwist;
 
-	~__BallAndSocket();
+	virtual ~__BallAndSocket();
 
+	/**
+	 * Constructs a BallAndSocket joint with the given attributes. The underlying
+	 * joint object will be either __BallAndSocketStd or __BallAndSocketLimited,
+	 * depending on the limited parameter.
+	 *
+	 * @param pivot     The pivot point of the joint
+	 * @param pinDir    The pin direction of the joint
+	 * @param child     The attached child body
+	 * @param parent    The attached parent body, or an empty smart pointer if none
+	 * @param limited   true, if the joint shall be limited, false else
+	 * @param coneAngle The maximum allowed cone angle
+	 * @param minTwist  The minimum allowed twist angle
+	 * @param maxTwist  The maximum allowed twist angle
+	 * @return          The newly created BallAndSocket joint
+	 */
 	static BallAndSocket create(Vec3f pivot, Vec3f pinDir,
 			const Object& child, const Object& parent,
 			bool limited = false, float coneAngle = 0.0f, float minTwist = 0.0f, float maxTwist = 0.0f);
@@ -191,6 +210,9 @@ public:
 	static BallAndSocket load(const std::list<Object>& list, rapidxml::xml_node<>* node);
 };
 
+/**
+ * The default BallAndSocket joint without any limits.
+ */
 class __BallAndSocketStd : public __BallAndSocket, public CustomBallAndSocket {
 protected:
 	__BallAndSocketStd(Vec3f pivot, Vec3f pinDir,
@@ -204,6 +226,9 @@ protected:
 	friend class __BallAndSocket;
 };
 
+/**
+ * The BallAndSocket joint with cone angle and twist angle limits.
+ */
 class __BallAndSocketLimited : public __BallAndSocket, public CustomLimitBallAndSocket {
 protected:
 	__BallAndSocketLimited(Vec3f pivot, Vec3f pinDir,

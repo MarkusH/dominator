@@ -201,6 +201,10 @@ void m3dTest::gramSchmidtTest()
 	CPPUNIT_ASSERT(fabs(matrix.getY() * matrix.getZ()) < EPSILON);
 	CPPUNIT_ASSERT(fabs(matrix.getX() * matrix.getZ()) < EPSILON);
 
+	CPPUNIT_ASSERT(fabs(matrix.getX().len() - 1.0f) < EPSILON);
+	CPPUNIT_ASSERT(fabs(matrix.getY().len() - 1.0f) < EPSILON);
+	CPPUNIT_ASSERT(fabs(matrix.getZ().len() - 1.0f) < EPSILON);
+
 	for (int x = 0; x < 4; ++x) {
 		for (int y = 0; y < 4; ++y) {
 
