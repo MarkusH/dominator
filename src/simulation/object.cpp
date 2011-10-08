@@ -598,7 +598,10 @@ RigidBody __RigidBody::load(rapidxml::xml_node<>* node)
 	if( type == TypeStr[DOMINO_SMALL] ) result = __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_MIDDLE] ) result = __Domino::createDomino(t, matrix, mass, material, false);
 	if( type == TypeStr[DOMINO_LARGE] ) result = __Domino::createDomino(t, matrix, mass, material, false);
-	if(result == NULL) throw rapidxml::parse_error("Unsupported \"type\" in object tag","__RigidBody::load");
+	if(result == NULL) {
+		std::string function = "__RigidBody::load";
+		throw rapidxml::parse_error("Unsupported \"type\" in object tag", (void*)function.c_str());
+	}
 	return result;
 }
 
@@ -837,11 +840,12 @@ Convex __Convex::createAssembly(const Mat4f& matrix, float mass, const std::stri
 
 	// for each sub-mesh, create a convex hull
 	std::vector<NewtonCollision*> collisions;
-	BOOST_FOREACH(ogl::SubBuffer* buf, buffers) {
-		int meshMaterial = MaterialMgr::instance().getID(buf->material);
-		const float* data = visual->firstVertex() + buf->dataOffset * visual->floatSize();
-		collisions.push_back(NewtonCreateConvexHull(newton::world, buf->dataCount, data, visual->byteSize(), 0.002f, meshMaterial, NULL));
-		delete buf;
+	//BOOST_FOREACH(ogl::SubBuffer* buf, buffers) {
+	for (ogl::SubBuffers::iterator itr = buffers.begin(); itr != buffers.end(); ++itr) {
+		int meshMaterial = MaterialMgr::instance().getID((*itr)->material);
+		const float* data = visual->firstVertex() + (*itr)->dataOffset * visual->floatSize();
+		collisions.push_back(NewtonCreateConvexHull(newton::world, (*itr)->dataCount, data, visual->byteSize(), 0.002f, meshMaterial, NULL));
+		delete *itr;
 	}
 
 	// create a compound from all hulls
@@ -849,8 +853,10 @@ Convex __Convex::createAssembly(const Mat4f& matrix, float mass, const std::stri
 	result->create(collision, mass, freezeState, damping);
 
 	NewtonReleaseCollision(newton::world, collision);
-	BOOST_FOREACH(NewtonCollision* hull, collisions)
-		NewtonReleaseCollision(newton::world, hull);
+
+	//BOOST_FOREACH(NewtonCollision* hull, collisions)
+	for (std::vector<NewtonCollision*>::iterator itr = collisions.begin(); itr != collisions.end(); ++itr)
+		NewtonReleaseCollision(newton::world, *itr);
 
 	result->m_visual = visual;
 

@@ -189,7 +189,7 @@ __TreeCollision::__TreeCollision(const Mat4f& matrix, std::string& fileName)
 	
 	if (!file) {
 		fileName.append(" couldn't be loaded");
-		throw std::exception(fileName.c_str());
+		throw std::runtime_error(fileName.c_str());
 	}
 
 	int defaultMaterial = MaterialMgr::instance().getID("yellow");

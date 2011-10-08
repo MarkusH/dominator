@@ -37,10 +37,10 @@ static Mat4f rot_mat_start;
 static Vec3f rot_drag_start;
 static Vec3f rot_drag_cur;
 static Vec2i rot_mouse;
-static Vec3f rot_p1, rot_p2, rot_p3;
+//static Vec3f rot_p1, rot_p2, rot_p3;
 
 // INT_DOMINO_CURVE
-static Vec3f curve_current;
+//static Vec3f curve_current;
 static CRSpline curve_spline;
 
 ObjectInfo::ObjectInfo(__Object::Type type, const std::string& material, const std::string& fileName, const float mass, const int freezeState, const Vec3f& size)
