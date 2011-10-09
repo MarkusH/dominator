@@ -30,6 +30,7 @@ template<typename T>
 inline
 std::istream& operator>> (std::istream& is, Vec3<T>& v)
 {
+	is.exceptions(std::istream::failbit | std::istream::badbit);
 	is >> v.x; is.ignore(2);
 	is >> v.y; is.ignore(2);
 	return is >> v.z;
@@ -48,6 +49,7 @@ template<typename T>
 inline
 std::istream& operator>> (std::istream& is, Vec4<T>& v)
 {
+	is.exceptions(std::istream::failbit | std::istream::badbit);
 	is >> v.x; is.ignore(2);
 	is >> v.y; is.ignore(2);
 	is >> v.z; is.ignore(2);
@@ -70,6 +72,7 @@ template<typename T>
 inline
 std::istream& operator>> (std::istream& is, Mat4<T>& m)
 {
+	is.exceptions(std::istream::failbit | std::istream::badbit);
 	is >> m._11; is.ignore(2); is >> m._12; is.ignore(2); is >> m._13; is.ignore(2); is >> m._14; is.ignore(2);
 	is >> m._21; is.ignore(2); is >> m._22; is.ignore(2); is >> m._23; is.ignore(2); is >> m._24; is.ignore(2);
 	is >> m._31; is.ignore(2); is >> m._32; is.ignore(2); is >> m._33; is.ignore(2); is >> m._34; is.ignore(2);
