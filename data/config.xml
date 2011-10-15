@@ -3,6 +3,10 @@
 	<data key="enableMusic" value="false"/>
 	<data key="enableShadows" value="false"/>
 	<data key="gravity" value="9.81"/>
+	<data key="levels" value="data/levels/"/>
+	<data key="materialsxml" value="data/materials.xml"/>
+	<data key="music" value="data/music/"/>
+	<data key="sounds" value="data/sounds/"/>
 	<data key="useAF" value="false"/>
 </config>
 

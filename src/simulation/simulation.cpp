@@ -138,7 +138,7 @@ Simulation::Simulation(util::KeyAdapter& keyAdapter,
 	m_interactionTypes[util::MIDDLE] = INT_DOMINO_CURVE;
 	newton::world = NULL;
 	m_enabled = true;
-	newton::gravity = -9.81f * 4.0f;
+	newton::gravity = util::Config::instance().get("gravity", 9.81f) * -4.0f;
 	m_mouseAdapter.addListener(this);
 	m_environment = Object();
 	m_lightPos = Vec4f(100.0f, 500.0f, 700.0f, 0.0f);
@@ -259,7 +259,7 @@ bool Simulation::load(const std::string& fileName)
 			if(nodes->first_attribute("gravity")) {
 				newton::gravity = (float)atof(nodes->first_attribute("gravity")->value()) * -4.0f;
 			} else {
-				newton::gravity = 9.81f * -4.0f;
+				newton::gravity = util::Config::instance().get("gravity", 9.81) * -4.0f;
 			}
 
 			// load camera stuff

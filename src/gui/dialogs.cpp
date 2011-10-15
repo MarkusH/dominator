@@ -5,12 +5,16 @@
  */
 
 #include <gui/dialogs.hpp>
+#include <util/config.hpp>
 
+#include <QtCore/QString>
+#include <QtGui/QCheckBox>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QGridLayout>
 #include <QtGui/QImage>
 #include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
 #include <QtGui/QListWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QStackedWidget>
@@ -189,11 +193,97 @@ ConfigurationPage::ConfigurationPage(QWidget *parent) :
 SettingsPage::SettingsPage(QWidget *parent) :
 		ConfigurationPage(parent)
 {
+	m_enableMusic = new QCheckBox("Enable Music");
+	m_enableMusic->setChecked(util::Config::instance().get("enableMusic", false));
+	m_layout->addWidget(m_enableMusic, 0, 0, 1, 3);
+	connect(m_enableMusic, SIGNAL(stateChanged(int)), this, SLOT(onBooleanSettingChanged(int)));
+
+	m_enableShadows = new QCheckBox("Enable Shadows");
+	m_enableShadows->setChecked(util::Config::instance().get("enableShadows", false));
+	m_enableShadows->setToolTip("Activating shadows reduces simulation speed dramatically!");
+	m_layout->addWidget(m_enableShadows, 1, 0, 1, 3);
+	connect(m_enableShadows, SIGNAL(stateChanged(int)), this, SLOT(onBooleanSettingChanged(int)));
+
+	m_gravity = new QDoubleSpinBox();
+	m_gravity->setRange(0.0f, 25.0f);
+	m_gravity->setValue(util::Config::instance().get("gravity", 9.81));
+	m_layout->addWidget(m_gravity, 2, 0);
+	connect(m_gravity, SIGNAL(valueChanged(double)), this, SLOT(onDoubleSettingChanged(double)));
+	m_layout->addWidget(new QLabel("Gravity"), 2, 1, 1, 2);
+
+	m_useAF = new QCheckBox("Use anisotropic filtering");
+	m_useAF->setChecked(util::Config::instance().get("useAF", false));
+	m_useAF->setToolTip("Activating anisotropic texture filtering reduces simulation speed!");
+	m_layout->addWidget(m_useAF, 3, 0, 1, 3);
+	connect(m_useAF, SIGNAL(stateChanged(int)), this, SLOT(onBooleanSettingChanged(int)));
+}
+
+void SettingsPage::onBooleanSettingChanged(int state)
+{
+	QString key = "";
+	if (QObject::sender() == m_enableMusic)
+		key = "enableMusic";
+	else if (QObject::sender() == m_enableShadows)
+		key = "enableShadows";
+	else if (QObject::sender() == m_useAF)
+		key = "useAF";
+	else
+		return;
+	util::Config::instance().set(key.toStdString(), state == Qt::Checked);
+}
+
+void SettingsPage::onDoubleSettingChanged(double d)
+{
+	QString key = "";
+	if (QObject::sender() == m_gravity)
+		key = "gravity";
+	else
+		return;
+	util::Config::instance().set(key.toStdString(), d);
 }
 
 DataPage::DataPage(QWidget *parent) :
 		ConfigurationPage(parent)
 {
+	m_layout->addWidget(new QLabel("Material Specifications:"));
+	m_materialsXML = new QLineEdit();
+	m_materialsXML->setText(QString::fromStdString(util::Config::instance().get<std::string>("materialsxml", "data/materials.xml")));
+	m_layout->addWidget(m_materialsXML);
+	connect(m_materialsXML, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
+
+	m_layout->addWidget(new QLabel("Sounds:"));
+	m_sounds = new QLineEdit();
+	m_sounds->setText(QString::fromStdString(util::Config::instance().get<std::string>("sounds", "data/sounds/")));
+	m_layout->addWidget(m_sounds);
+	connect(m_sounds, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
+
+	m_layout->addWidget(new QLabel("Background Music:"));
+	m_music = new QLineEdit();
+	m_music->setText(QString::fromStdString(util::Config::instance().get<std::string>("music", "data/music/")));
+	m_layout->addWidget(m_music);
+	connect(m_music, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
+
+	m_layout->addWidget(new QLabel("Background Music:"));
+	m_levels = new QLineEdit();
+	m_levels->setText(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/")));
+	m_layout->addWidget(m_levels);
+	connect(m_levels, SIGNAL(textChanged(QString)), this, SLOT(onStringSettingChanged(QString)));
+}
+
+void DataPage::onStringSettingChanged(QString text)
+{
+	QString key = "";
+	if (QObject::sender() == m_materialsXML)
+		key = "materialsxml";
+	else if (QObject::sender() == m_sounds)
+		key = "sounds";
+	else if (QObject::sender() == m_music)
+		key = "music";
+	else if (QObject::sender() == m_levels)
+		key = "levels";
+	else
+		return;
+	util::Config::instance().set(key.toStdString(), text.toStdString());
 }
 
 }

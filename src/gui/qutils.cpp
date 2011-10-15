@@ -102,7 +102,7 @@ void QtMouseAdapter::mouseEvent(QMouseEvent* event)
 		button = util::RIGHT;
 		break;
 
-	case Qt::MiddleButton:
+	case Qt::MidButton:
 		button = util::MIDDLE;
 		break;
 
