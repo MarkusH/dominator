@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <materials>
 	<!--
+	Author: Robert Waury, Timo Hübner
 	A material has only graphical properties, the physical interactions are
 	defined by so-called material-pairs (see below). A material can have the
 	following properties:
@@ -79,13 +80,14 @@
 
     <pair mat0="rubber" mat1="rubber" elasticity="1.0" staticFriction="0.29" kineticFriction="0.21" softness="0.05"/>
     <pair mat0="rubber" mat1="asphalt" elasticity="0.85" staticFriction="0.29" kineticFriction="0.21" softness="0.05"/>
-    <pair mat0="wood" mat1="asphalt" elasticity="0.55" staticFriction="0.29" kineticFriction="0.21" softness="0.05"/>
+    <pair mat0="wood" mat1="asphalt" elasticity="0.55" staticFriction="0.29" kineticFriction="0.21" softness="0.05" impactSound="stone_wood"/>
 
-    <pair mat0="rough" mat1="rough" elasticity="0.3" staticFriction="0.89" kineticFriction="0.91" softness="0.05"/>
-    <pair mat0="metal" mat1="metal" elasticity="0.3" staticFriction="0.19" kineticFriction="0.11" softness="0.05"/>
-    <pair mat0="rough" mat1="metal" elasticity="0.3" staticFriction="0.59" kineticFriction="0.31" softness="0.05"/>
-    <pair mat0="rough" mat1="crate" elasticity="0.3" staticFriction="0.49" kineticFriction="0.25" softness="0.05"/>
-    <pair mat0="wood" mat1="rough" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05"/>
+    <pair mat0="rough" mat1="rough" elasticity="0.3" staticFriction="0.89" kineticFriction="0.91" softness="0.05" impactSound="stone_stone"/>
+    <pair mat0="metal" mat1="metal" elasticity="0.3" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="metal_metal"/> 
+    <pair mat0="rough" mat1="metal" elasticity="0.3" staticFriction="0.59" kineticFriction="0.31" softness="0.05" impactSound="stone_metal"/>
+    <pair mat0="rough" mat1="crate" elasticity="0.3" staticFriction="0.49" kineticFriction="0.25" softness="0.05" impactSound="box_singlehit"/>
+    <pair mat0="wood" mat1="rough" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05" impactSound="stone_wood"/>
+    <pair mat0="wood" mat1="metal" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05" impactSound="wood_metal"/>
 
-    <pair mat0="barrel" mat1="metal" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05"/>
+    <pair mat0="barrel" mat1="metal" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
 </materials>
