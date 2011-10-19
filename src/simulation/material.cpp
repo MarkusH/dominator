@@ -172,6 +172,7 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 
 void MaterialPair::load(rapidxml::xml_node<>* node)
 {
+	setlocale(LC_ALL, "C");
 	using namespace rapidxml;
 
 	MaterialMgr& m = MaterialMgr::instance();
