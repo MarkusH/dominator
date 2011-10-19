@@ -40,7 +40,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	icon->setPixmap(pixmap);
 	layout->addWidget(icon, 0, 0, 2, 1, Qt::AlignTop);
 
-	text = QString("\"DOMINATOR\" is a student's project at the\nDHBW Mannheim, Corporate State University.\n\n");
+	text = QString("\"DOMINATOR\" is a student's project at the\nCorporate State University Baden-Wuerttemberg, Mannheim.\n\n");
 	layout->addWidget(new QLabel(text), 0, 1);
 
 	text = QString("Authors:\n");
@@ -50,8 +50,19 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	text.append(" * Markus Holtermann\n");
 	text.append(" * Timo Hübner\n");
 	text.append(" * Alexander Tenberge\n");
-	text.append(" * Robert Waury\n");
+  text.append(" * Robert Waury\n");
 	layout->addWidget(new QLabel(text), 1, 1);
+
+  text = QString("\nCredits:\n");
+  text.append(" * Qt4 Framework\n");
+  text.append(" * Newton Game Dynamics\n");
+  text.append(" * lib3ds\n");
+  text.append(" * FMOD Sound System\n");
+  text.append(" * Boost C++ Libraries\n");
+  text.append(" * GLEW\n");
+  text.append(" * RapidXML\n");
+  text.append(" * pstdint\n");
+  layout->addWidget(new QLabel(text), 2, 1);
 
 	setWindowTitle("TUStudios - About");
 	setLayout(layout);
