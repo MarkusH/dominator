@@ -73,13 +73,13 @@ void Material::load(rapidxml::xml_node<>* const node)
 	attr = node->first_attribute("ambient");
 	if(attr) {
 	ambient.assign(attr->value());
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
+	} else throw parse_error("No \"ambient\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("diffuse");
 	if(attr) {
 	diffuse.assign(attr->value());
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
+	} else throw parse_error("No \"diffuse\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("specular");
@@ -470,7 +470,7 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 	return std::make_pair(pair.mat0, pair.mat1);
 }
 
-bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doesn't exist
+bool MaterialMgr::load(const std::string& fileName)
 {
 	/* information for error messages */
 	std::string function = "MaterialMgr::load";
@@ -507,18 +507,15 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 		// this is important so we don't parse the materials tag but the material and pair tags
 		xml_node<>* nodes = materials.first_node("materials");
 		if( nodes ) { 
-			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-				std::string name = node->name();
-				if(name == "material") {
-					Material mat("none");
-					mat.load(node);
-					add(mat);
-				}
-				if(name == "pair") {
-					MaterialPair p;
-					p.load(node);
-					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
-				}
+			for (xml_node<>* node = nodes->first_node("material"); node; node = node->next_sibling("material")) {
+				Material mat("none");
+				mat.load(node);
+				add(mat);
+			}
+			for (xml_node<>* node = nodes->first_node("pair"); node; node = node->next_sibling("pair")) {
+				MaterialPair p;
+				p.load(node);
+				m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
 			}
 			delete f;
 			return true;
