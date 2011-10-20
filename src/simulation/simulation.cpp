@@ -24,7 +24,7 @@
 #include <util/tostring.hpp>
 #include <stdlib.h>
 #include <sound/soundmgr.hpp>
-
+#include <clocale>
 
 
 namespace sim {
@@ -248,6 +248,10 @@ bool Simulation::load(const std::string& fileName)
 	std::vector<std::string> args;
 	args.push_back(fileName);
 	/* END information for error messages */
+
+	// this prevents that the atof functions fails on German systems
+	// since they use "," as a separator for floats
+	setlocale(LC_ALL,"C");
 
 	init();
 
