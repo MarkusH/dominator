@@ -17,7 +17,6 @@ namespace test {
  *		the config file		(load)
  *		levels				(load)
  *		the material file	(load)
- *		templates			(load)
  */
 class xmlTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST_SUITE(xmlTest);
@@ -76,7 +75,6 @@ class xmlTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST(loadTemplateTest);
 
 	CPPUNIT_TEST(loadTemplateNoRootTest);
-	CPPUNIT_TEST(loadLevelEmptyRootTest);
 	*/
 	/* template files end */
 

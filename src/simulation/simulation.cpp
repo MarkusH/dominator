@@ -79,26 +79,49 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 	case __Object::CONVEX_HULL:
 		{
 			using namespace rapidxml;
+			file<char>* f = 0;
 
-			file<char> f(fileName.c_str());
+			try {
+				f = new file<char>(fileName.c_str());
+			} catch ( std::runtime_error& e ) {
+				const std::string error = e.what();
+				util::ErrorAdapter::instance().displayErrorMessage(error);
+				return __Domino::createDomino(__Object::DOMINO_SMALL, matrix, 1, "yellow", 0);
+			} catch(...) {
+				const std::string error = "An unknown error occured while loading this template. Here's a domino instead.";
+				util::ErrorAdapter::instance().displayErrorMessage(error);
+				return __Domino::createDomino(__Object::DOMINO_SMALL, matrix, 1, "yellow", 0);
+			}
+			
+			try {
+				xml_document<> doc;
+				doc.parse<0>(f->data());
 
-			char* m = f.data();
+				// this is important so we don't parse the template tag but the object or compound tag
+				xml_node<>* nodes = doc.first_node();
 
-			/// @todo add exception handling
-			xml_document<> doc;
-			doc.parse<0>(m);
+				// only the first tag is loaded the rest will be ignored
+				xml_node<>* node = nodes->first_node();
+				std::string type = "";
+				if(node)
+					type = std::string(node->name());
+				else {
+					throw new std::exception("template file broken");
+				}
 
-			// this is important so we don't parse the template tag but the object or compound tag
-			xml_node<>* nodes = doc.first_node();
-
-			// only the first tag is loaded the rest will be ignored
-			xml_node<>* node = nodes->first_node();
-			std::string type(node->name());
-
-			if (type == "object" || type == "compound") {
-				result = __Object::load(node);
-				if (result) result->setMatrix(matrix);
-				return result;
+				if (type == "object" || type == "compound") {
+					result = __Object::load(node);
+					if (result) result->setMatrix(matrix);
+					return result;
+				}
+			} catch(parse_error& e) {
+				const std::string error = e.what();
+				util::ErrorAdapter::instance().displayErrorMessage(error);
+				return __Domino::createDomino(__Object::DOMINO_SMALL, matrix, 1, "yellow", 0);
+			} catch(...) {
+				const std::string error = "An unknown error occured while parsing this template. Here's a domino instead.";
+				util::ErrorAdapter::instance().displayErrorMessage(error);
+				return __Domino::createDomino(__Object::DOMINO_SMALL, matrix, 1, "yellow", 0);
 			}
 		}
 		break;
