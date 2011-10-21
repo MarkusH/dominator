@@ -106,7 +106,7 @@ Object ObjectInfo::create(const Mat4f& matrix) const
 				if(node)
 					type = std::string(node->name());
 				else {
-					throw new std::exception("template file broken");
+					throw new std::runtime_error("template file broken");
 				}
 
 				if (type == "object" || type == "compound") {
