@@ -17,7 +17,6 @@ namespace test {
  *		the config file		(load)
  *		levels				(load)
  *		the material file	(load)
- *		templates			(load)
  */
 class xmlTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST_SUITE(xmlTest);
@@ -53,9 +52,22 @@ class xmlTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST(loadLevelEnvNoSuchModelTest);
 	/* level files end*/
 
-	/* material files */
-
-	/* material files end */
+	/* materials file */
+	CPPUNIT_TEST(noMaterialsFileTest);
+	CPPUNIT_TEST(loadMaterialsTest);
+	CPPUNIT_TEST(loadMaterialsAmbientBrokenTest);
+	CPPUNIT_TEST(loadMaterialsDiffuseBrokenTest);
+	CPPUNIT_TEST(loadMaterialsSpecularBrokenTest);
+	CPPUNIT_TEST(loadMaterialsEmptyRoot);
+	CPPUNIT_TEST(loadMaterialsNoRoot);
+	CPPUNIT_TEST(loadMaterialsNoPairsTest);
+	CPPUNIT_TEST(loadMaterialsNoMaterialsTest);
+	CPPUNIT_TEST(loadMaterialsNoSuchShaderTest);
+	CPPUNIT_TEST(loadMaterialsNoSuchSoundTest);
+	CPPUNIT_TEST(loadMaterialsNoSuchTextureTest);
+	CPPUNIT_TEST(loadMaterialsNoSuchTexture1Test);
+	CPPUNIT_TEST(loadMaterialsUnknownMatInPairTest);
+	/* materials file end */
 
 	/* template files */
 	/*
@@ -63,7 +75,6 @@ class xmlTest : public CPPUNIT_NS::TestFixture {
 	CPPUNIT_TEST(loadTemplateTest);
 
 	CPPUNIT_TEST(loadTemplateNoRootTest);
-	CPPUNIT_TEST(loadLevelEmptyRootTest);
 	*/
 	/* template files end */
 
@@ -102,6 +113,20 @@ protected:
 	void loadLevelObjectMatrixBrokenTest();
 	void loadLevelObjectDampingBrokenTest();
 
+	void noMaterialsFileTest();
+	void loadMaterialsTest();
+	void loadMaterialsAmbientBrokenTest();
+	void loadMaterialsDiffuseBrokenTest();
+	void loadMaterialsSpecularBrokenTest();
+	void loadMaterialsEmptyRoot();
+	void loadMaterialsNoRoot();
+	void loadMaterialsNoPairsTest();
+	void loadMaterialsNoMaterialsTest();
+	void loadMaterialsNoSuchShaderTest();
+	void loadMaterialsNoSuchSoundTest();
+	void loadMaterialsNoSuchTextureTest();
+	void loadMaterialsNoSuchTexture1Test();
+	void loadMaterialsUnknownMatInPairTest();
 };
 
 }

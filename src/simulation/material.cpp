@@ -73,13 +73,13 @@ void Material::load(rapidxml::xml_node<>* const node)
 	attr = node->first_attribute("ambient");
 	if(attr) {
 	ambient.assign(attr->value());
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
+	} else throw parse_error("No \"ambient\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("diffuse");
 	if(attr) {
 	diffuse.assign(attr->value());
-	} else throw parse_error("No \"shader\" attribute in material tag found", node->name());
+	} else throw parse_error("No \"diffuse\" attribute in material tag found", node->name());
 
 
 	attr = node->first_attribute("specular");
@@ -470,7 +470,7 @@ std::pair<int,int> MaterialMgr::addPair(const std::string& mat0,
 	return std::make_pair(pair.mat0, pair.mat1);
 }
 
-bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doesn't exist
+bool MaterialMgr::load(const std::string& fileName)
 {
 	/* information for error messages */
 	std::string function = "MaterialMgr::load";
@@ -480,7 +480,10 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 
 	using namespace rapidxml;
 
-	char* m;
+	// this prevents that the atof functions fails on German systems
+	// since they use "," as a separator for floats
+	setlocale(LC_ALL,"C");
+
 	file<char>* f = 0;
 
 	try {
@@ -496,29 +499,21 @@ bool MaterialMgr::load(const std::string& fileName)/// @todo crashes if file doe
 	}
 
 	try {
-
-		// string containing valid xml for test purposes
-		// char m[] = "<?xml version=\"1.0\" ?><materials><material name=\"wood_shiny\" texture=\"wood_shiny\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.6, 0.6, 0.6, 1\" shininess=\"50\" /><material name=\"wood_matt\" texture=\"wood_matt\" shader=\"ppl_textured\" ambient=\"1, 1, 1, 1\" diffuse=\"1, 1, 1, 1\" specular=\"0.1, 0.1, 0.1, 1\" shininess=\"20\" /><pair mat0=\"wood_shiny\" mat1=\"wood_shiny\" elasticity=\"0.100000\" staticFriction=\"0.450000\" kineticFriction=\"0.310000\" softness=\"0.050000\" /><pair mat0=\"wood_matt\" mat1=\"wood_matt\" elasticity=\"0.15000\" staticFriction=\"0.55000\" kineticFriction=\"0.45000\" softness=\"0.080000\" /></materials>";	
-		m = f->data();
-		
 		xml_document<> materials;
-		materials.parse<0>(m);
+		materials.parse<0>(f->data());
 
 		// this is important so we don't parse the materials tag but the material and pair tags
 		xml_node<>* nodes = materials.first_node("materials");
 		if( nodes ) { 
-			for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
-				std::string name = node->name();
-				if(name == "material") {
-					Material mat("none");
-					mat.load(node);
-					add(mat);
-				}
-				if(name == "pair") {
-					MaterialPair p;
-					p.load(node);
-					m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
-				}
+			for (xml_node<>* node = nodes->first_node("material"); node; node = node->next_sibling("material")) {
+				Material mat("none");
+				mat.load(node);
+				add(mat);
+			}
+			for (xml_node<>* node = nodes->first_node("pair"); node; node = node->next_sibling("pair")) {
+				MaterialPair p;
+				p.load(node);
+				m_pairs[std::make_pair(p.mat0, p.mat1)] = p;
 			}
 			delete f;
 			return true;
