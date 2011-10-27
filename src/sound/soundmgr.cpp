@@ -118,7 +118,7 @@ void SoundMgr::SoundUpdate()
 		if (m_musicChannel)
 			m_musicChannel->isPlaying(&playing);
 		if (!playing) {
-			PlayMusic(1);
+			PlayMusic(0.3);
 		}
 	}
 

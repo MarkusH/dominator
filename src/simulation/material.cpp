@@ -172,6 +172,7 @@ MaterialPair::MaterialPair(const MaterialPair& p)
 
 void MaterialPair::load(rapidxml::xml_node<>* node)
 {
+	setlocale(LC_ALL, "C");
 	using namespace rapidxml;
 
 	MaterialMgr& m = MaterialMgr::instance();
@@ -602,7 +603,7 @@ MaterialPair& MaterialMgr::getPair(int mat0, int mat1)
 void MaterialMgr::processContact(const NewtonJoint* contactJoint, float timestep, int threadIndex)
 {
 	Vec3f contactPos, contactNormal;
-	float bestNormalSpeed = 7.5f;
+	float bestNormalSpeed = 6.7f;
 	std::string bestSound = "";
 
 	int mat0, mat1;
