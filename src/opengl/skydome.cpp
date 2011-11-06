@@ -29,6 +29,7 @@ static const float flare_uv[4][4][2] = {
 
 Skydome::Skydome()
 	: m_list(0),
+	  m_fadeTime(0.0f),
 	  m_radius(1000.0f * 0.01f)
 {
 	m_horizon = Vec4f(0.9f, 0.7f, 0.7f, 1.0f);
@@ -97,6 +98,7 @@ void Skydome::clear()
 	m_shader = Shader();
 	m_clouds = 0;
 	m_time = 0.0f;
+	m_fadeTime = 0.0f;
 }
 
 void Skydome::update(float dt)
