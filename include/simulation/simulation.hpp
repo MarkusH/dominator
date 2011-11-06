@@ -295,6 +295,7 @@ inline Simulation& Simulation::instance()
 inline void Simulation::setEnabled(bool enabled)
 {
 	m_enabled = enabled;
+	m_clock.reset();
 }
 
 inline bool Simulation::isEnabled()
