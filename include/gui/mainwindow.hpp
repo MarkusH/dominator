@@ -186,10 +186,6 @@ private:
 	 */
 	QMenu* m_menuHelp;
 	/**
-	 * When triggered MainWindow::onHelpPressed() is executed
-	 */
-	QAction* m_help;
-	/**
 	 * When triggered MainWindow::onAboutPressed() is executed
 	 */
 	QAction* m_about;

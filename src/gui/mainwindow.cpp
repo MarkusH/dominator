@@ -197,13 +197,8 @@ void MainWindow::createMenu()
 	// Help
 	m_menuHelp = menuBar()->addMenu("&Help");
 
-	m_help = new QAction("&Help", this);
-	m_help->setShortcuts(QKeySequence::HelpContents);
-	connect(m_help, SIGNAL(triggered()), this, SLOT(onHelpPressed()));
-	m_menuHelp->addAction(m_help);
-
 	m_about = new QAction("&Info", this);
-	m_about->setShortcut(Qt::ALT + Qt::Key_F1);
+	m_about->setShortcuts(QKeySequence::HelpContents);
 	connect(m_about, SIGNAL(triggered()), this, SLOT(onAboutPressed()));
 	m_menuHelp->addAction(m_about);
 }
