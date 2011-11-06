@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<level gravity="9.81" position="-4.28631, 18.2293, -30.837" eye="-3.76462, 17.5235, -30.3577" up="0, 1, 0">
-	<object id="0" type="assembly" matrix="0.934309, 0.00186184, 0.356459, 0; 0.356456, 0.00190216, -0.93431, 0; -0.00241759, 0.999997, 0.00111353, 0; 0.26996, 2.83026, -25.6901, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/tenpin.3ds"/>
-	<object id="1" type="hull" matrix="-0.893278, -0.000620858, 0.449505, 0; -0.000200605, 1, 0.000982551, 0; -0.449505, 0.000787518, -0.893278, 0; 4.82937, 2.14077, -23.7964, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="tire" mass="2" filename="data/models/barrel.3ds"/>
-	<environment filename="data/models/mattest.3ds" octree="1"/>
-</level>
-

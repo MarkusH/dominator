@@ -117,6 +117,9 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	result->m_matrix = Mat4f::identity();
 	} else throw parse_error("No \"matrix\" attribute in compound tag found", nodes->value());
 
+	// optional compound freeze state
+	attr = nodes->first_attribute("freezeState");
+	int freezeState = attr ? atoi(attr->value()) : 0;
 	
 	for (xml_node<>* node = nodes->first_node(); node; node = node->next_sibling()) {
 		std::string type = node->name();
@@ -130,6 +133,16 @@ Compound __Compound::load(rapidxml::xml_node<>* nodes)
 	 		result->m_joints.push_back(joint);
 		}
 	}
+
+	// we have to set that after loading all nodes because when attaching
+	// joints, all states previously set get lost
+	if (freezeState) {
+		for (std::list<Object>::iterator itr = result->m_nodes.begin();
+					itr != result->m_nodes.end(); ++itr) {
+			(*itr)->setFreezeState(freezeState);
+		}
+	}
+
 
 	result->m_matrix = matrix;
 

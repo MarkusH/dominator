@@ -127,14 +127,14 @@
     <pair mat0="grass" mat1="crate" elasticity="0.3" staticFriction="0.49" kineticFriction="0.25" softness="0.05" impactSound="box_singlehit"/>
     
     <!-- Barrel -->
-    <pair mat0="rough" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
-    <pair mat0="asphalt" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
-    <pair mat0="stone" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
+    <pair mat0="rough" mat1="barrel" elasticity="0.1" staticFriction="0.49" kineticFriction="0.31" softness="0.05" impactSound="box_singlehit"/>
+    <pair mat0="asphalt" mat1="barrel" elasticity="0.1" staticFriction="0.29" kineticFriction="0.21" softness="0.05" impactSound="box_singlehit"/>
+    <pair mat0="stone" mat1="barrel" elasticity="0.1" staticFriction="0.49" kineticFriction="0.51" softness="0.05" impactSound="box_singlehit"/>
     <pair mat0="metal" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
-    <pair mat0="wood" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
+    <pair mat0="wood" mat1="barrel" elasticity="0.1" staticFriction="0.29" kineticFriction="0.31" softness="0.05" impactSound="box_singlehit"/>
     <pair mat0="domino" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
     <pair mat0="barrel" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
-    <pair mat0="grass" mat1="barrel" elasticity="0.1" staticFriction="0.19" kineticFriction="0.11" softness="0.05" impactSound="box_singlehit"/>
+    <pair mat0="grass" mat1="barrel" elasticity="0.1" staticFriction="0.39" kineticFriction="0.41" softness="0.05" impactSound="box_singlehit"/>
     
     <!-- Box -->
     <pair mat0="rough" mat1="box" elasticity="0.3" staticFriction="0.49" kineticFriction="0.25" softness="0.05" impactSound="box_singlehit"/>

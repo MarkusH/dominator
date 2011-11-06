@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-  <object type="hull" filename="data/models/barrel.3ds" matrix="1, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1, 0; 0, 10, 0, 1" freezeState="0" damping="0.1, 0.1, 0.1, 0.1" material="barrel" mass="1"/>
