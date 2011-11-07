@@ -19,15 +19,11 @@ int main(int argc, char **argv) {
 	using namespace util;
 	Config::instance().load("data/config.xml");
 
-	std::cout << "Totally Unrelated Studios proudly presents:" << std::endl
-			  << "\tDOMINATOR" << std::endl << std::endl;
-
 	QApplication app(argc, argv);
 
 	gui::MainWindow mainwindow(&app);
 
 	int result = app.exec();
-	//Config::instance().save("data/config.xml");
 
 	return result;
 }

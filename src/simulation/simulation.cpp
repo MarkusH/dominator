@@ -715,9 +715,7 @@ void Simulation::clear()
 	__Domino::freeCollisions();
 	m_skydome.clear();
 	if (newton::world) {
-		std::cout << "Remaining bodies: " << NewtonWorldGetBodyCount(newton::world) << std::endl;
 		NewtonDestroy(newton::world);
-		std::cout << "Remaining memory: " << NewtonGetMemoryUsed() << std::endl;
 	}
 	newton::world = NULL;
 }

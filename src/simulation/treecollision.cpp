@@ -150,7 +150,6 @@ int __TreeCollision::Node::draw(bool test) {
 
 	if (list) {
 		glCallList(list);
-		std::cout << "call" << std::endl;
 	} else {
 		list = glGenLists(1);
 		glNewList(list, GL_COMPILE_AND_EXECUTE);
