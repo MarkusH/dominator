@@ -11,10 +11,10 @@ DST="${SUDO_HOME}dominator/"
 FILEPATH="$(readlink -f "${SUDO_COMMAND}")"
 SRC="$(dirname "${FILEPATH}")/.install/"
 
-apt-get install libglew1.5 libqt4 lib3ds libboost-thread1.40.0 libboost-filesystem1.40.0
+apt-get install libglew1.5 libqt4-core libqt4-opengl libqt4-gui lib3ds-1-3 libboost-thread1.40.0 libboost-filesystem1.40.0
 mkdir -p "${DST}"
 
-cp "${SRC}libs/*" "/usr/lib/"
+cp "${SRC}libs/"* "/usr/lib/"
 cp "${SRC}dominator" "${DST}"
 cp -r "${SRC}data" "${DST}"
 cp -r "${SRC}licenses" "${DST}"
