@@ -116,7 +116,7 @@ void ToolBox::create_m_objects()
 
 void ToolBox::create_m_materials()
 {
-	m_labelMaterial = new QLabel("Size:");
+	m_labelMaterial = new QLabel("Material:");
 	// just create the materials QComboBox. we connect the slot after loading
 	// the content to prevent crashes due to changed selection list
 	m_materials = new QComboBox();
