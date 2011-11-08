@@ -275,9 +275,23 @@ void MainWindow::onClosePressed()
 
 void MainWindow::onSavePressed()
 {
-	sim::Simulation::instance().setEnabled(false);
+	QFileDialog dialog(this);
+	sim::Simulation::instance().setEnabled(false); //stop the simulation
+	if (QObject::sender() == m_saveas) {
+		QFileDialog dialog(this, "TUStudios Dominator - Save As");
+	} else {
+		QFileDialog dialog(this, "TUStudios Dominator - Save");
+	}
+	dialog.setAcceptMode(QFileDialog::AcceptSave);
+	dialog.setFileMode(QFileDialog::AnyFile); //This is default
+	dialog.setDirectory(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/new_level.xml")) + "/new_level.xml");
+	dialog.setFilter("TUStudios Dominator (*.xml)");
 	if (m_filename == "" || QObject::sender() == m_saveas) {
-		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.xml)");
+		if (dialog.exec()) {
+			m_filename = dialog.selectedFiles().first();
+		} else {
+			return;
+		}
 	}
 	m_currentFilename->setText(m_filename);
 	sim::Simulation::instance().save(m_filename.toStdString());
@@ -286,7 +300,7 @@ void MainWindow::onSavePressed()
 
 void MainWindow::onOpenPressed()
 {
-	QFileDialog dialog(this);
+	QFileDialog dialog(this, "TUStudios Dominator - Load");
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
 	dialog.setDirectory(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/")));
