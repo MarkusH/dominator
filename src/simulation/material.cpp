@@ -347,9 +347,12 @@ void MaterialMgr::applyMaterial(const std::string& material, bool useShadows) {
 			glBindTexture(GL_TEXTURE_2D, 0);
 			glActiveTexture(GL_TEXTURE0);
 		}
+
+		GLfloat emission[4] = { 0.0, 0.0, 0.0, 1.0 };
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, &mat.diffuse[0]);
 		glMaterialfv(GL_FRONT, GL_AMBIENT, &mat.ambient[0]);
 		glMaterialfv(GL_FRONT, GL_SPECULAR, &mat.specular[0]);
+		glMaterialfv(GL_FRONT, GL_EMISSION, &emission[0]);
 		glMaterialf(GL_FRONT, GL_SHININESS, mat.shininess);
 
 		ogl::Shader shader = ogl::ShaderMgr::instance().get(mat.shader);
