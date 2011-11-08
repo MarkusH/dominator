@@ -178,12 +178,12 @@ void MainWindow::createMenu()
 	// Options
 	m_menuOptions = menuBar()->addMenu("&Options");
 
-	m_sound_play = new QAction("&Play Sound", this);
+	m_sound_play = new QAction("&Play Music", this);
 	m_sound_play->setEnabled(!util::Config::instance().get("enableMusic", false));
 	connect(m_sound_play, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_play);
 
-	m_sound_stop = new QAction("&Stop Sound", this);
+	m_sound_stop = new QAction("&Stop Music", this);
 	m_sound_stop->setEnabled(util::Config::instance().get("enableMusic", false));
 	connect(m_sound_stop, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_stop);
