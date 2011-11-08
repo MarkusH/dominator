@@ -42,8 +42,6 @@
 	<material name="cradle" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.9, 0.9, 0.9, 1" shininess="20" />
     <material name="rubber" texture="yellow" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.6, 0.6, 0.6, 1" shininess="20" />
     <material name="rough" texture="asphalt" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.1, 0.1, 0.1, 1" shininess="20" />
-    <material name="ice" texture="ice" texture1="ice_normal" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.8, 0.8, 0.8, 1" shininess="20" />
-    <material name="wall" texture="wall" texture1="wall_normal" shader="ppl_textured" ambient="1, 1, 1, 1" diffuse="1, 1, 1, 1" specular="0.5, 0.5, 0.5, 1" shininess="50" />
 	<!-- 
 	For each pair of materials, there can be a material-pair that defines their
 	mutual interactions. If there is no pair defines for two materials, the
@@ -93,7 +91,7 @@
     <pair mat0="wood" mat1="metal" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05" impactSound="wood_metal"/>
     
     <!-- Wood -->
-    <pair mat0="wood" mat1="asphalt" elasticity="0.55" staticFriction="0.29" kineticFriction="0.21" softness="0.05" impactSound="stone_wood"/>
+    <pair mat0="wood" mat1="asphalt" elasticity="0.55" staticFriction="0.39" kineticFriction="0.51" softness="0.05" impactSound="stone_wood"/>
     <pair mat0="wood" mat1="rough" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05" impactSound="stone_wood"/>
     <pair mat0="wood" mat1="stone" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05" impactSound="stone_wood"/>
     <pair mat0="wood" mat1="wood" elasticity="0.3" staticFriction="0.39" kineticFriction="0.21" softness="0.05" impactSound="wood_wood"/>
