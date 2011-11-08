@@ -1,10 +1,12 @@
 #!/bin/bash
 
-SUBDIR="dominator-installer-$(git describe --abbrev=0)/"
+SUBDIR="dominator-installer-$(git describe)/"
 INST="/tmp/${SUBDIR}"
 mkdir -p "${INST}.install/libs/"
 echo "Adding libs"
-cp "/usr/lib/libNewton.so" "/usr/lib/libfmodex.so" "/usr/lib/libQtGui.so.4" "/usr/lib/libQtOpenGL.so.4" "/usr/lib/libQtCore.so.4" "/usr/lib/libQtDBus.so.4" "/usr/lib/libQtXml.so.4" "${INST}.install/libs/"
+cp "/usr/lib/libNewton.so" "/usr/lib/libfmodex.so" "${INST}.install/libs/"
+#We don't need the Qt libs in our installer - do we?
+#cp "/usr/lib/libQtGui.so.4" "/usr/lib/libQtOpenGL.so.4" "/usr/lib/libQtCore.so.4" "/usr/lib/libQtDBus.so.4" "/usr/lib/libQtXml.so.4" "${INST}.install/libs/"
 echo "Adding runtime"
 cp "./Release/dominator" "${INST}.install/"
 echo "Adding data"
@@ -15,7 +17,7 @@ cp "./LICENSE" "./README" "${INST}.install/"
 echo "Adding installer"
 cp "./install.sh" "${INST}"
 echo "Compressing"
-FN="$(readlink -f "dominator-$(git describe --abbrev=0).tar.gz")"
+FN="$(readlink -f "dominator-$(git describe).tar.gz")"
 cd "/tmp/"
 tar -c -z -f "${FN}" "${SUBDIR}"
 echo "Done. Cleaning up."
