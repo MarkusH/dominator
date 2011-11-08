@@ -313,6 +313,12 @@ void MainWindow::onSimulationControlsPressed()
 		status = false;
 	}
 
+	// Disable to prevent inconsistencies with reset files
+	m_new->setEnabled(!status);
+	m_open->setEnabled(!status);
+	m_save->setEnabled(!status);
+	m_saveas->setEnabled(!status);
+
 	m_play->setEnabled(!status);
 	m_stop->setEnabled(status);
 	m_stop_no_reset->setEnabled(status);
