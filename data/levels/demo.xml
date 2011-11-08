@@ -1086,6 +1086,6 @@
 		<joint type="hinge" parentID="3" childID="0" pivot="-192.3844909668, 22.0889225006, -314.8021850586" pinDir="0.0000000977, 0.0000000000, 1.0000066757" limited="0"/>
 		<joint type="hinge" parentID="4" childID="0" pivot="-187.8831329346, 22.0889225006, -314.8021850586" pinDir="0.0000000977, 0.0000000000, 1.0000066757" limited="0"/>
 	</compound>
-	<environment filename="data/models/spielplatz.3ds" octree="1"/>
+	<environment filename="data/models/playground.3ds" octree="1"/>
 </level>
 
