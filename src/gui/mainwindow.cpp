@@ -178,12 +178,12 @@ void MainWindow::createMenu()
 	// Options
 	m_menuOptions = menuBar()->addMenu("&Options");
 
-	m_sound_play = new QAction("&Play Sound", this);
+	m_sound_play = new QAction("&Play Music", this);
 	m_sound_play->setEnabled(!util::Config::instance().get("enableMusic", false));
 	connect(m_sound_play, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_play);
 
-	m_sound_stop = new QAction("&Stop Sound", this);
+	m_sound_stop = new QAction("&Stop Music", this);
 	m_sound_stop->setEnabled(util::Config::instance().get("enableMusic", false));
 	connect(m_sound_stop, SIGNAL(triggered()), this, SLOT(onSoundControlsPressed()));
 	m_menuOptions->addAction(m_sound_stop);
@@ -275,9 +275,23 @@ void MainWindow::onClosePressed()
 
 void MainWindow::onSavePressed()
 {
-	sim::Simulation::instance().setEnabled(false);
+	QFileDialog dialog(this);
+	sim::Simulation::instance().setEnabled(false); //stop the simulation
+	if (QObject::sender() == m_saveas) {
+		QFileDialog dialog(this, "TUStudios Dominator - Save As");
+	} else {
+		QFileDialog dialog(this, "TUStudios Dominator - Save");
+	}
+	dialog.setAcceptMode(QFileDialog::AcceptSave);
+	dialog.setFileMode(QFileDialog::AnyFile); //This is default
+	dialog.setDirectory(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/new_level.xml")) + "/new_level.xml");
+	dialog.setFilter("TUStudios Dominator (*.xml)");
 	if (m_filename == "" || QObject::sender() == m_saveas) {
-		m_filename = QFileDialog::getSaveFileName(this, "TUStudios Dominator - Save file", 0, "TUStudios Dominator (*.xml)");
+		if (dialog.exec()) {
+			m_filename = dialog.selectedFiles().first();
+		} else {
+			return;
+		}
 	}
 	m_currentFilename->setText(m_filename);
 	sim::Simulation::instance().save(m_filename.toStdString());
@@ -286,7 +300,7 @@ void MainWindow::onSavePressed()
 
 void MainWindow::onOpenPressed()
 {
-	QFileDialog dialog(this);
+	QFileDialog dialog(this, "TUStudios Dominator - Load");
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
 	dialog.setDirectory(QString::fromStdString(util::Config::instance().get<std::string>("levels", "data/levels/")));
@@ -312,6 +326,12 @@ void MainWindow::onSimulationControlsPressed()
 	} else {
 		status = false;
 	}
+
+	// Disable to prevent inconsistencies with reset files
+	m_new->setEnabled(!status);
+	m_open->setEnabled(!status);
+	m_save->setEnabled(!status);
+	m_saveas->setEnabled(!status);
 
 	m_play->setEnabled(!status);
 	m_stop->setEnabled(status);
