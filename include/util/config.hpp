@@ -1,3 +1,9 @@
+/**
+ * @author Markus Holtermann
+ * @date July 17, 2011
+ * @file util/config.hpp
+ */
+
 #ifndef CONFIG_HPP_
 #define CONFIG_HPP_
 

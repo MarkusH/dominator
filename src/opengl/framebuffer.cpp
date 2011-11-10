@@ -2,7 +2,7 @@
  * framebuffer.cpp
  *
  *  Created on: Jul 3, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #include <opengl/framebuffer.hpp>

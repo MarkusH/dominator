@@ -2,7 +2,7 @@
  * framebuffer.hpp
  *
  *  Created on: Jul 3, 2011
- *      Author: markus
+ *      Author: Markus Doellinger
  */
 
 #ifndef FRAMEBUFFER_HPP_

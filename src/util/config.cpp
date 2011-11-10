@@ -1,3 +1,9 @@
+/**
+ * @author Markus Holtermann
+ * @date July 17, 2011
+ * @file util/config.cpp
+ */
+
 #include <util/config.hpp>
 #include <xml/rapidxml.hpp>
 #include <xml/rapidxml_utils.hpp>
