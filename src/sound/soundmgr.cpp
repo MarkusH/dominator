@@ -194,7 +194,12 @@ unsigned SoundMgr::LoadMusic(const std::string& folder)
 		for (directory_iterator itr(p); itr != end_itr; ++itr) {
 			if (itr->leaf().size() > 3) {
 				count++;
+
+#ifdef _WIN32
+				result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE, 0, &sound);
+#else
 				result = m_system->createSound(itr->string().c_str(), FMOD_HARDWARE | FMOD_CREATESTREAM, 0, &sound);
+#endif
 				ERRCHECK(result);
 
 				result = sound->setMode(FMOD_LOOP_OFF);

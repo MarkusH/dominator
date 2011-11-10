@@ -1043,7 +1043,7 @@ void Simulation::mouseDoubleClick(util::Button button, int x, int y)
 		rot_mat_start = m_selectedObject->getMatrix();
 
 	if (m_interactionTypes[button] == INT_DOMINO_CURVE && !m_enabled) {
-		__Object::Type type = __Domino::DOMINO_SMALL;
+		__Object::Type type = m_newObjectType <= __Domino::DOMINO_LARGE ? m_newObjectType : __Domino::DOMINO_SMALL;
 		float gap = __Domino::s_domino_gap[type];
 
 		// Remove knots that are too close to each other, this improves the
