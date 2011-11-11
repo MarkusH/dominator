@@ -1,5 +1,5 @@
 /**
- * @author Markus Doellinger
+ * @author Markus Doellinger, Robert Waury
  * @date May 23, 2011
  * @file util/clock.hpp
  */
