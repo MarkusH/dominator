@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level gravity="9.84" position="-5.1723942757, 7.9834856987, -85.5229263306" eye="-5.1327710152, 8.1017837524, -84.5307083130" up="0.0000000000, 1.0000000000, 0.0000000000">
-	<environment filename="data/models/playground2.3ds" octree="1"/>
+	<environment filename="data/models/playground.3ds" octree="1"/>
 </level>
 
